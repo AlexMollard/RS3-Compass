@@ -11,6 +11,7 @@ export interface Profile {
   completedTasks: string[];
   activeTask: string;
   notes: Record<string, string>;
+  trainingRanges?: Record<string, number>;
 }
 export interface QuestRecord {
   id: string;
@@ -334,4 +335,15 @@ export function taskTitle(id: string) {
 }
 export function toggleItem(items: string[], id: string) {
   return items.includes(id) ? items.filter((x) => x !== id) : [...items, id];
+}
+
+export function trainingStage(skill: SkillRecord, profile: Profile) {
+  const level = profile.levels[skill.name] ?? 1;
+  return (
+    skill.stages.find(
+      (stage) => stage.from === profile.trainingRanges?.[skill.name],
+    ) ??
+    skill.stages.find((stage) => level >= stage.from && level < stage.to) ??
+    skill.stages[skill.stages.length - 1]
+  );
 }

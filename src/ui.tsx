@@ -1,5 +1,6 @@
+import { useId, useRef } from "react";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
-import { Check, ChevronRight, ExternalLink } from "lucide-react";
+import { Check, ChevronRight, ExternalLink, Search } from "lucide-react";
 import type { QuestRecord } from "./data";
 import GameText from "./GameText";
 import { wikiHref, wikiImage } from "./wiki";
@@ -175,6 +176,99 @@ export function QuestNavigationCard({
   );
 }
 
+export function SearchField({
+  value,
+  onChange,
+  label,
+  placeholder,
+  className,
+  autoFocus,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  label: string;
+  placeholder: string;
+  className?: string;
+  autoFocus?: boolean;
+}) {
+  const input = useRef<HTMLInputElement>(null);
+  return (
+    <div className={"search-field" + (className ? " " + className : "")}>
+      <Search size={16} aria-hidden="true" />
+      <input
+        ref={input}
+        aria-label={label}
+        placeholder={placeholder}
+        value={value}
+        autoFocus={autoFocus}
+        onChange={(event) => onChange(event.target.value)}
+      />
+      {value && (
+        <IconButton
+          framed={false}
+          label={"Clear " + label.toLowerCase()}
+          onClick={() => {
+            onChange("");
+            input.current?.focus();
+          }}
+        >
+          <span aria-hidden="true">×</span>
+        </IconButton>
+      )}
+    </div>
+  );
+}
+
+export function NavigationCard({
+  title,
+  label,
+  icon,
+  value,
+  detail,
+  selected,
+  wiki,
+  onOpen,
+}: {
+  title: string;
+  label: string;
+  icon?: ReactNode;
+  value?: ReactNode;
+  detail?: ReactNode;
+  selected?: boolean;
+  wiki?: string;
+  onOpen: () => void;
+}) {
+  return (
+    <div className={"navigation-card" + (selected ? " selected" : "")}>
+      <button
+        type="button"
+        className="navigation-main"
+        aria-label={label}
+        aria-pressed={selected}
+        onClick={onOpen}
+      >
+        {icon && <span className="navigation-icon">{icon}</span>}
+        <strong>{title}</strong>
+        {value != null && <span className="navigation-value">{value}</span>}
+        <ChevronRight size={16} />
+      </button>
+      {detail != null && <div className="navigation-detail">{detail}</div>}
+      {wiki && (
+        <a
+          className="navigation-wiki"
+          href={wikiHref(wiki)}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={title + " on RuneScape Wiki"}
+          title={title + " on RuneScape Wiki (opens a new tab)"}
+        >
+          <ExternalLink size={16} />
+        </a>
+      )}
+    </div>
+  );
+}
+
 export function ItemList({
   items,
   checked,
@@ -184,10 +278,11 @@ export function ItemList({
   checked?: readonly string[];
   onToggle?: (item: string) => void;
 }) {
+  const checklistId = useId();
   if (onToggle) {
     return (
       <div className="item-checklist">
-        {items.map((item) => {
+        {items.map((item, index) => {
           const isChecked = checked?.includes(item) ?? false;
           return (
             <div
@@ -196,9 +291,16 @@ export function ItemList({
             >
               <input
                 type="checkbox"
+                id={checklistId + "-" + index}
                 aria-label={item}
                 checked={isChecked}
                 onChange={() => onToggle(item)}
+              />
+              <label
+                className="pack-row-toggle"
+                htmlFor={checklistId + "-" + index}
+                aria-hidden="true"
+                title={"Toggle packed: " + item}
               />
               <span>
                 <GameText text={item} />

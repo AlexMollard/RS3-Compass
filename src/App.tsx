@@ -38,12 +38,15 @@ import {
   IconButton,
   ItemList,
   PageHeading,
+  NavigationCard,
+  SearchField,
   SectionHeading,
   WikiAction,
 } from "./ui";
 import {
   QUESTS,
   SKILLS,
+  trainingStage,
   nextQuest,
   taskTitle,
   toggleItem,
@@ -121,8 +124,15 @@ export default function App() {
       completedQuests: toggleItem(p.completedQuests, id),
     }));
   };
-  const start = (id: string) => {
-    updateProfile((p) => ({ ...p, activeTask: id }));
+  const start = (id: string, trainingFrom?: number) => {
+    updateProfile((p) => ({
+      ...p,
+      activeTask: id,
+      trainingRanges:
+        trainingFrom == null
+          ? p.trainingRanges
+          : { ...p.trainingRanges, [id.slice(6)]: trainingFrom },
+    }));
     navigate("play");
   };
   const openSkill = (name: string) => {
@@ -260,11 +270,12 @@ export default function App() {
             <button
               className="search-trigger"
               aria-label="Search prototype guides"
+              title="Search quests and skills (Ctrl/⌘ K)"
               onClick={() => searchDialog.current?.showModal()}
             >
               <Search size={17} />
               <span>Find a guide</span>
-              <kbd>⌘ K</kbd>
+              <kbd>Ctrl/⌘ K</kbd>
             </button>
             <label className="character-select">
               <span className="avatar">{profile.name[0]}</span>
@@ -303,6 +314,12 @@ export default function App() {
               onQuest={(id) => navigate("quests", id)}
               onSkill={openSkill}
               onPlay={() => navigate("play")}
+              onLevelsChange={(levels) =>
+                updateProfile((p) => ({
+                  ...p,
+                  levels: { ...p.levels, ...levels },
+                }))
+              }
             />
           )}
           {route.page === "play" && (
@@ -404,62 +421,46 @@ export default function App() {
             <X size={20} />
           </IconButton>
         </div>
-        <label className="search-field large">
-          <Search size={19} />
-          <input
-            autoFocus
-            aria-label="Search quests and skills"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search sample quests and skills…"
-          />
-        </label>
+        <SearchField
+          className="large"
+          autoFocus
+          label="Search quests and skills"
+          placeholder="Search sample quests and skills…"
+          value={search}
+          onChange={setSearch}
+        />
         <div className="search-results">
           {QUESTS.filter((q) =>
             q.name.toLowerCase().includes(search.toLowerCase()),
           ).map((q) => (
-            <div className="search-result" key={q.id}>
-              <BookOpen size={18} />
-              <span>
-                <strong>
-                  <GameText text={q.name} />
-                </strong>
-                <small>
-                  {q.members ? "Members quest" : "Free-to-play quest"}
-                </small>
-              </span>
-              <IconButton
-                label={"Open preparation for " + q.name}
-                onClick={() => {
-                  searchDialog.current?.close();
-                  navigate("quests", q.id);
-                }}
-              >
-                <ArrowRight size={16} />
-              </IconButton>
-            </div>
+            <NavigationCard
+              key={q.id}
+              title={q.name}
+              label={"Open preparation for " + q.name}
+              icon={<BookOpen size={20} />}
+              detail={q.members ? "Members quest" : "Free-to-play quest"}
+              wiki={q.wiki}
+              onOpen={() => {
+                searchDialog.current?.close();
+                navigate("quests", q.id);
+              }}
+            />
           ))}
           {SKILLS.filter((s) =>
             s.name.toLowerCase().includes(search.toLowerCase()),
           ).map((s) => (
-            <div className="search-result" key={s.name}>
-              <Pickaxe size={18} />
-              <span>
-                <strong>
-                  <GameText text={s.name} />
-                </strong>
-                <small>Sample training methods</small>
-              </span>
-              <IconButton
-                label={"Open training for " + s.name}
-                onClick={() => {
-                  searchDialog.current?.close();
-                  openSkill(s.name);
-                }}
-              >
-                <ArrowRight size={16} />
-              </IconButton>
-            </div>
+            <NavigationCard
+              key={s.name}
+              title={s.name}
+              label={"Open training for " + s.name}
+              icon={<Pickaxe size={20} />}
+              detail="Sample training methods"
+              wiki={s.wiki}
+              onOpen={() => {
+                searchDialog.current?.close();
+                openSkill(s.name);
+              }}
+            />
           ))}
           {![...QUESTS.map((q) => q.name), ...SKILLS.map((s) => s.name)].some(
             (n) => n.toLowerCase().includes(search.toLowerCase()),
@@ -567,12 +568,7 @@ function PlayCompanion({
   const done = skill
     ? profile.completedTasks.includes(task)
     : profile.completedQuests.includes(task);
-  const stage =
-    skill?.stages.find(
-      (s) =>
-        (profile.levels[skill.name] || 1) >= s.from &&
-        (profile.levels[skill.name] || 1) < s.to,
-    ) || skill?.stages[skill.stages.length - 1];
+  const stage = skill ? trainingStage(skill, profile) : undefined;
   const packing = quest?.supplies || stage?.supplies || [];
   const packedItems = packing.filter((item) =>
     profile.packed.includes(task + "::" + item),
@@ -618,7 +614,11 @@ function PlayCompanion({
             title={taskTitle(task)}
             wiki={quest?.wiki || skill?.wiki || "Ironman_Mode/Strategies"}
             image={skill?.icon || "Quest_icon.png"}
-            eyebrow={skill ? "TRAINING SESSION" : "QUEST PREPARATION"}
+            eyebrow={
+              stage
+                ? `TRAINING SESSION · LEVELS ${stage.from}–${stage.to}`
+                : "QUEST PREPARATION"
+            }
             meta={
               <p className="location-line">
                 <MapPin size={14} />

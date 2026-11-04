@@ -1,20 +1,13 @@
 import { useState } from "react";
-import {
-  ArrowRight,
-  Check,
-  ChevronRight,
-  MapPin,
-  Pickaxe,
-  Search,
-  Target,
-} from "lucide-react";
-import { SKILLS, type Profile } from "./data";
+import { ArrowRight, Check, MapPin, Pickaxe, Target } from "lucide-react";
+import { SKILLS, trainingStage, type Profile } from "./data";
 import GameText from "./GameText";
-import { wikiHref, wikiImage } from "./wiki";
+import { wikiImage } from "./wiki";
 import {
   ActivityHeader,
   Button,
-  IconButton,
+  NavigationCard,
+  SearchField,
   ItemList,
   PageHeading,
   SectionHeading,
@@ -26,7 +19,7 @@ interface Props {
   selectedSkill: string;
   onSelect: (name: string) => void;
   onLevelChange: (skill: string, level: number) => void;
-  onStart: (id: string) => void;
+  onStart: (id: string, trainingFrom?: number) => void;
 }
 export default function SkillPage({
   profile,
@@ -70,19 +63,14 @@ function SkillContent({
   skill: (typeof SKILLS)[number];
   onSelect: (name: string) => void;
   onLevelChange: (name: string, level: number) => void;
-  onStart: (id: string) => void;
+  onStart: (id: string, trainingFrom?: number) => void;
 }) {
   const current = profile.levels[skill.name];
   const [level, setLevel] = useState(current?.toString() || "");
   const [target, setTarget] = useState(skill.goal);
   const [tab, setTab] = useState("method");
-  const [band, setBand] = useState(
-    Math.max(
-      0,
-      skill.stages.findIndex(
-        (s) => current != null && current >= s.from && current < s.to,
-      ),
-    ),
+  const [band, setBand] = useState(() =>
+    skill.stages.indexOf(trainingStage(skill, profile)),
   );
   const [message, setMessage] = useState("");
   const [search, setSearch] = useState("");
@@ -95,46 +83,25 @@ function SkillContent({
   return (
     <div className="journal-layout skill-layout">
       <aside className="panel journal-list">
-        <label className="search-field">
-          <Search size={16} />
-          <input
-            aria-label="Search sample skills"
-            placeholder="Find a skill…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </label>
+        <SearchField
+          label="Search sample skills"
+          placeholder="Find a skill…"
+          value={search}
+          onChange={setSearch}
+        />
         <p className="list-kicker">SAMPLE FIELD GUIDES</p>
         {filtered.map((s) => (
-          <div
-            className={
-              "journal-row " + (s.name === skill.name ? "selected" : "")
-            }
+          <NavigationCard
             key={s.name}
-          >
-            <a
-              href={wikiHref(s.wiki)}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={s.name + " on RuneScape Wiki"}
-            >
-              <img className="skill-sprite" src={wikiImage(s.icon)} alt="" />
-            </a>
-            <span>
-              <strong>
-                <GameText text={s.name} />
-              </strong>
-              <small>{s.category}</small>
-            </span>
-            <span className="skill-level">{profile.levels[s.name] ?? "?"}</span>
-            <IconButton
-              label={"Open training for " + s.name}
-              aria-pressed={s.name === skill.name}
-              onClick={() => onSelect(s.name)}
-            >
-              <ChevronRight size={15} />
-            </IconButton>
-          </div>
+            title={s.name}
+            label={"Open training for " + s.name}
+            icon={<img src={wikiImage(s.icon)} alt="" />}
+            detail={s.category}
+            value={profile.levels[s.name] ?? "?"}
+            selected={s.name === skill.name}
+            wiki={s.wiki}
+            onOpen={() => onSelect(s.name)}
+          />
         ))}
         {filtered.length === 0 && (
           <p className="empty-state">No sample skills match.</p>
@@ -258,24 +225,14 @@ function SkillContent({
             />
             <div className="range-selector">
               {skill.stages.map((s, i) => (
-                <div
-                  className={"range-row " + (band === i ? "selected" : "")}
+                <NavigationCard
                   key={s.title}
-                >
-                  <span>
-                    {s.from}–{s.to}
-                  </span>
-                  <strong>
-                    <GameText text={s.title} />
-                  </strong>
-                  <IconButton
-                    label={"Select levels " + s.from + " to " + s.to}
-                    aria-pressed={band === i}
-                    onClick={() => setBand(i)}
-                  >
-                    <ChevronRight size={15} />
-                  </IconButton>
-                </div>
+                  title={"Levels " + s.from + "–" + s.to}
+                  label={"Select levels " + s.from + " to " + s.to}
+                  detail={<GameText text={s.title} />}
+                  selected={band === i}
+                  onOpen={() => setBand(i)}
+                />
               ))}
             </div>
           </section>
@@ -348,7 +305,7 @@ function SkillContent({
           <div className="detail-actions">
             <Button
               variant="primary"
-              onClick={() => onStart("train-" + skill.name)}
+              onClick={() => onStart("train-" + skill.name, stage.from)}
             >
               Start training session <ArrowRight size={16} />
             </Button>

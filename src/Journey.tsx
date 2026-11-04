@@ -8,14 +8,16 @@ import {
   type Profile,
 } from "./data";
 import GameText from "./GameText";
-import { wikiHref, wikiImage } from "./wiki";
+import { wikiImage } from "./wiki";
+import LevelEditor from "./LevelEditor";
 import {
   Button,
   GameWindow,
-  IconButton,
+  NavigationCard,
   PageHeading,
   QuestNavigationCard,
   Tabs,
+  WikiAction,
 } from "./ui";
 
 interface Props {
@@ -24,6 +26,7 @@ interface Props {
   onQuest: (id: string) => void;
   onSkill: (name: string) => void;
   onPlay: () => void;
+  onLevelsChange: (levels: Profile["levels"]) => void;
 }
 
 export default function Journey({
@@ -32,8 +35,10 @@ export default function Journey({
   onQuest,
   onSkill,
   onPlay,
+  onLevelsChange,
 }: Props) {
   const [view, setView] = useState("next");
+  const [editingSkill, setEditingSkill] = useState<string | null>(null);
   const quests = accessibleQuests(profile);
   const next = nextQuest(profile);
   const complete = quests.filter((quest) =>
@@ -77,33 +82,16 @@ export default function Journey({
           {view === "training" ? (
             <div className="training-register">
               {SKILLS.map((skill) => (
-                <article className="training-register-row" key={skill.name}>
-                  <a
-                    href={wikiHref(skill.wiki)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={skill.name + " on RuneScape Wiki"}
-                  >
-                    <img src={wikiImage(skill.icon)} alt="" />
-                  </a>
-                  <div>
-                    <h3>
-                      <GameText text={skill.name} />
-                    </h3>
-                    <p>
-                      <GameText text={skill.payoff} />
-                    </p>
-                  </div>
-                  <span className="register-level">
-                    {profile.levels[skill.name] ?? "?"}
-                  </span>
-                  <IconButton
-                    label={"Open training for " + skill.name}
-                    onClick={() => onSkill(skill.name)}
-                  >
-                    <ChevronRight size={16} />
-                  </IconButton>
-                </article>
+                <NavigationCard
+                  key={skill.name}
+                  title={skill.name}
+                  label={"Open training for " + skill.name}
+                  icon={<img src={wikiImage(skill.icon)} alt="" />}
+                  value={profile.levels[skill.name] ?? "?"}
+                  detail={<GameText text={skill.payoff} />}
+                  wiki={skill.wiki}
+                  onOpen={() => onSkill(skill.name)}
+                />
               ))}
             </div>
           ) : (
@@ -114,7 +102,13 @@ export default function Journey({
                   {next ? (
                     <>
                       <h3>
-                        <GameText text={next.name} />
+                        <button
+                          type="button"
+                          className="objective-title"
+                          onClick={() => onQuest(next.id)}
+                        >
+                          {next.name}
+                        </button>
                       </h3>
                       <p>
                         <GameText text={next.why} />
@@ -132,6 +126,7 @@ export default function Journey({
                         >
                           View requirements <ChevronRight size={15} />
                         </Button>
+                        <WikiAction page={next.wiki} label="Quest Wiki" />
                       </div>
                     </>
                   ) : (
@@ -178,27 +173,29 @@ export default function Journey({
           >
             <div className="level-register">
               {Object.entries(profile.levels).map(([name, level]) => (
-                <div className="level-register-cell" key={name}>
-                  <a
-                    href={wikiHref(name)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={name + " on RuneScape Wiki"}
-                  >
-                    <img src={wikiImage(name + "-icon.png")} alt="" />
-                  </a>
-                  <span>
-                    <GameText text={name} />
-                  </span>
+                <button
+                  type="button"
+                  className="level-register-cell"
+                  key={name}
+                  aria-label={"Edit " + name + " level"}
+                  title={"Edit " + name + " level"}
+                  onClick={() => setEditingSkill(name)}
+                >
+                  <img src={wikiImage(name + "-icon.png")} alt="" />
+                  <span>{name}</span>
                   <strong>{level}</strong>
-                </div>
+                </button>
               ))}
             </div>
-            <button className="register-edit" onClick={() => onSkill("Mining")}>
+            <button
+              type="button"
+              className="register-edit"
+              onClick={() => setEditingSkill("Mining")}
+            >
               Update recorded levels <ChevronRight size={14} />
             </button>
             <p className="window-footnote">
-              Manual entries · fictional sample profile
+              Select a skill to edit · manual entries
             </p>
           </GameWindow>
           <GameWindow
@@ -207,16 +204,25 @@ export default function Journey({
             icon={<Focus size={15} />}
           >
             <div className="active-register-body">
-              <p>
-                <GameText text={taskTitle(profile.activeTask)} />
-              </p>
-              <Button className="full-width" onClick={onPlay}>
-                Resume preparation <ArrowRight size={15} />
-              </Button>
+              <NavigationCard
+                title={taskTitle(profile.activeTask)}
+                label="Resume preparation"
+                detail="Continue the saved packing checklist and session notes."
+                onOpen={onPlay}
+              />
             </div>
           </GameWindow>
         </aside>
       </div>
+      {editingSkill && (
+        <LevelEditor
+          key={profile.id}
+          profile={profile}
+          initialSkill={editingSkill}
+          onSave={onLevelsChange}
+          onDismiss={() => setEditingSkill(null)}
+        />
+      )}
     </div>
   );
 }

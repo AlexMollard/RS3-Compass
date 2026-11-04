@@ -15,6 +15,13 @@ function validProfile(value: unknown): value is Profile {
     (p.kind === "Solo Ironman" || p.kind === "Group Ironman") &&
     (p.mode === "f2p" || p.mode === "members") &&
     typeof p.activeTask === "string" &&
+    (p.trainingRanges === undefined ||
+      (!!p.trainingRanges &&
+        typeof p.trainingRanges === "object" &&
+        !Array.isArray(p.trainingRanges) &&
+        Object.values(p.trainingRanges).every(
+          (from) => Number.isInteger(from) && from >= 1 && from <= 120,
+        ))) &&
     !!p.levels &&
     typeof p.levels === "object" &&
     Object.values(p.levels).every(

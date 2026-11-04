@@ -22,6 +22,8 @@ npm run preview -- --port 4173 --strictPort
 
 Open http://127.0.0.1:4173/RS3-Compass/.
 
+Run `npm test` for the dependency-free training-range regression checks. The command uses Node's built-in TypeScript stripping.
+
 ## Product direction
 
 - Answer “What should I do next?” and provide clear guidance while playing.
@@ -45,6 +47,10 @@ Open http://127.0.0.1:4173/RS3-Compass/.
 - Export of prototype profiles, explicitly labelled as a preview-only format.
 - Shared game-reference rendering: item image and name link to the same Wiki article, without coloured link backgrounds.
 - Whole quest-navigation cards open the corresponding preparation page inside Compass. Wiki links live in the selected quest heading and external-guide controls.
+- Clicking a recorded skill opens a focused level editor for all eight sample levels, including skills without a guide. Save validates levels 1–120; Cancel and Escape discard changes.
+- Skill lists, training ranges, active preparation, and global search use full-card navigation. Wiki actions stay independent wherever shown. The recommended quest title opens its Compass requirements.
+- Search fields have a clear control that restores input focus; global search stays touch-accessible on phone screens. Packing-row whitespace toggles the native checkbox; linked item images/names remain independent Wiki actions.
+- Starting a training session preserves the selected method per character and restores it after reload. Older profiles without an explicit choice use their recorded level; removed ranges fall back without losing progress.
 
 ## Shared interface widgets
 
@@ -53,6 +59,8 @@ Pages compose the widgets in `src/ui.tsx` rather than recreating their markup an
 - `PageHeading` and `ActivityHeader`: consistent page and game-activity headers.
 - `GameWindow` and `SectionHeading`: framed panels and section labels.
 - `QuestNavigationCard`: full-box internal navigation in both the progression queue and quest list.
+- `NavigationCard`: a keyboard-operable whole-card action with independently clickable content references and a separate Wiki gutter.
+- `SearchField`: consistent labelled search with clear-and-refocus behaviour.
 - `ItemList`: the same Wiki-linked item rendering in readonly lists and interactive packing checklists.
 - `Button`, `IconButton`, and `Tabs`: native controls with shared variants, accessible labels, and explicit form-submit behaviour.
 - `WikiAction`: external Wiki controls with consistent URL, target, rel, and icon handling.
@@ -94,8 +102,11 @@ There are no RuneScape account credentials, server API calls, or shared database
 5. Click anywhere on a quest-navigation card to open its Compass preparation page. Item icons and names should open the correct Wiki article without toggling packing checks.
 6. Open compact mode and resize the browser beside the game. Also inspect the narrow-screen navigation.
 7. Enter a long session note rapidly, then reload. Confirm every character survives and no React update-depth error appears.
+8. Click a recorded level, edit it, and cancel with Escape. Reopen, save a valid value, and reload. Check that invalid levels cannot be saved and the other character is unchanged.
+9. Select a lower training range, start the session, and reload. The companion must keep that method rather than silently choosing the recorded-level range.
+10. Click card padding and names in skill/search lists; they should navigate inside Compass. Click their explicit Wiki action instead; it should open a new tab without navigating the card.
 
-The shared-widget refactor was exercised in the production preview across all four pages at phone, tablet, and desktop widths. Checks covered full-card mouse navigation, Wiki popups from item images and names, native level submission and bounds, character isolation, membership gating, packing/note persistence, rapid native typing, and actual browser-storage exhaustion followed by recovery. Persistence updates its error indicator only when the write outcome changes; successful keystroke saves do not enqueue redundant renders.
+The shared-widget and interaction passes were exercised in the production preview across all four pages at phone, tablet, and desktop widths. Checks covered full-card mouse/keyboard navigation, touch-accessible search, Wiki popups, exact-skill editor focus and cancellation, native level bounds, character isolation, selected-method handoff and reload, membership gating, packing/note persistence, rapid native typing, and browser-storage exhaustion/recovery. `npm test` retains training-range precedence, boundary, removed-range, and profile-isolation regressions. Persistence updates its error indicator only when the write outcome changes; successful keystroke saves do not enqueue redundant renders.
 
 ## Hosting status
 

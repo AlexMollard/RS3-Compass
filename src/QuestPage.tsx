@@ -1,12 +1,5 @@
 import { useState } from "react";
-import {
-  ArrowRight,
-  BookOpen,
-  Check,
-  LockKeyhole,
-  MapPin,
-  Search,
-} from "lucide-react";
+import { ArrowRight, BookOpen, Check, LockKeyhole, MapPin } from "lucide-react";
 import { QUESTS, type Profile } from "./data";
 import QuestLevels from "./QuestLevels";
 import GameText from "./GameText";
@@ -17,6 +10,7 @@ import {
   PageHeading,
   QuestNavigationCard,
   SectionHeading,
+  SearchField,
   WikiAction,
 } from "./ui";
 interface Props {
@@ -60,15 +54,12 @@ export default function QuestPage({
       />
       <div className="journal-layout">
         <aside className="panel journal-list" aria-label="Sample quests">
-          <label className="search-field">
-            <Search size={16} />
-            <input
-              aria-label="Search sample quests"
-              placeholder="Find a quest…"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-          </label>
+          <SearchField
+            label="Search sample quests"
+            placeholder="Find a quest…"
+            value={query}
+            onChange={setQuery}
+          />
           <label className="small-checkbox">
             <input
               type="checkbox"
