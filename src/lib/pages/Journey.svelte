@@ -26,10 +26,6 @@
     quests.filter((q) => profile.completedQuests.includes(q.id)).length,
   );
   let editingSkill = $state<string | null>(null);
-  function start(id: string) {
-    controller.updateProfile((p) => ({ ...p, activeTask: id }));
-    void goto("/play");
-  }
 </script>
 
 <div class="progression-page page-enter">
@@ -63,23 +59,10 @@
               <div class="objective-actions">
                 <Button
                   variant="primary"
-                  onclick={() =>
-                    next!.id === profile.activeTask
-                      ? void goto("/play")
-                      : void goto(questPath(next!.id))}
+                  onclick={() => void goto(questPath(next!.id))}
                   >{next.id === profile.activeTask
-                    ? "Resume preparation"
-                    : "Prepare quest"} →</Button
-                >
-                <Button
-                  variant="quiet"
-                  onclick={() =>
-                    next!.id === profile.activeTask
-                      ? void goto(questPath(next!.id))
-                      : start(next!.id)}
-                  >{next.id === profile.activeTask
-                    ? "Quest preparation"
-                    : "Start packing"}</Button
+                    ? "Continue quest"
+                    : "Open quest"} →</Button
                 >
                 <WikiAction page={next.wiki} label="Quest Wiki" />
               </div>

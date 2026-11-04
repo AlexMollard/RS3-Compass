@@ -16,9 +16,7 @@
   const controller = getCompass();
   const saved = controller.state;
   const storageError = controller.storageError;
-  let players = $derived(
-    $saved.profiles.filter((profile) => profile.source === "hiscores"),
-  );
+  let players = $derived($saved.profiles);
   let removing = $state<string | null>(null);
   let dialog: HTMLDialogElement;
   onMount(() => {
@@ -91,10 +89,12 @@
           ><ChevronRight size={17} />
         </button>
         <p class="player-updated">
-          {player.hiscoresFetchedAt
-            ? "Data fetched: " +
-              new Date(player.hiscoresFetchedAt).toLocaleString()
-            : "Not refreshed yet"}
+          {player.source !== "hiscores"
+            ? "Fictional sample profile"
+            : player.hiscoresFetchedAt
+              ? "Data fetched: " +
+                new Date(player.hiscoresFetchedAt).toLocaleString()
+              : "Not refreshed yet"}
         </p>
         {#if removing === player.id}
           <p class="removal-warning" role="alert">
@@ -110,9 +110,14 @@
           </div>
         {:else}
           <div class="player-actions">
-            <Button variant="quiet" onclick={() => onLookup(player.name, true)}
-              >Refresh &amp; open</Button
-            ><Button
+            {#if player.source === "hiscores"}
+              <Button
+                variant="quiet"
+                onclick={() => onLookup(player.name, true)}
+                >Refresh &amp; open</Button
+              >
+            {/if}
+            <Button
               variant="quiet"
               aria-label={"Remove " + player.name + " from this device"}
               onclick={() => (removing = player.id)}>Remove</Button
@@ -122,8 +127,7 @@
       </section>
     {:else}
       <p class="empty-state">
-        No saved players yet. Sample profiles remain available in the character
-        selector.
+        No saved players yet. Look up a player to get started.
       </p>
     {/each}
   </div>

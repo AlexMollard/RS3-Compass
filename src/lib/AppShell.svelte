@@ -34,9 +34,7 @@
     ready = controller.ready,
     compact = controller.compact,
     notice = controller.notice;
-  let profile = $derived(
-    $saved.profiles.find((p) => p.id === $saved.activeId)!,
-  );
+  let profile = $derived($saved.profiles.find((p) => p.id === $saved.activeId));
   let route = $derived(
     page.url.pathname.startsWith("/quests")
       ? "quests"
@@ -54,14 +52,8 @@
       href: "/",
     },
     {
-      id: "play",
-      label: "Play companion",
-      image: "Quest_map_icon.png",
-      href: "/play",
-    },
-    {
       id: "quests",
-      label: "Quest preparation",
+      label: "Quests",
       image: "Quest.png",
       href: "/quests",
     },
@@ -72,10 +64,6 @@
       href: "/skills",
     },
   ];
-  let activeIcon = $derived(
-    QUESTS.find((q) => q.id === profile.activeTask)?.icon ??
-      SKILLS.find((s) => "train-" + s.name === profile.activeTask)?.icon,
-  );
   let mobileNav = $state(false),
     search = $state(""),
     lookupName = $state(""),
@@ -89,20 +77,20 @@
     lookupDialog: HTMLDialogElement;
   let request: AbortController | undefined;
   let rememberedStarted = false;
-  let main: HTMLElement;
+  let main: HTMLElement, topbar: HTMLElement;
   function abortLookup() {
     request?.abort();
     request = undefined;
     lookupLoading = false;
   }
   function openLookup(
-    name = profile.source === "hiscores"
+    name = profile?.source === "hiscores"
       ? profile.name
       : readRememberedPlayer(),
   ) {
     abortLookup();
     lookupName = name;
-    lookupKind = profile.kind;
+    lookupKind = profile?.kind ?? "Solo Ironman";
     lookupError = "";
     if (!lookupDialog.open) lookupDialog.showModal();
   }
@@ -132,7 +120,7 @@
     lookupLoading = true;
     lookupError = "";
     const kind = lookupKind,
-      mode = profile.mode;
+      mode = profile?.mode ?? "f2p";
     try {
       const player = await fetchPlayer(name, current.signal);
       if (current.signal.aborted || request !== current) return;
@@ -165,7 +153,7 @@
   }
   function navigate(href: string) {
     mobileNav = false;
-    if (!href.startsWith("/play")) compact.set(false);
+    compact.set(false);
     void goto(href);
   }
   onMount(() => {
@@ -199,17 +187,28 @@
       }
     };
     window.addEventListener("keydown", keydown);
+    const headerSize = new ResizeObserver(() => {
+      document.documentElement.style.setProperty(
+        "--topbar-height",
+        topbar.getBoundingClientRect().height + "px",
+      );
+    });
+    headerSize.observe(topbar);
     return () => {
       unready();
       abortLookup();
       window.removeEventListener("keydown", keydown);
+      headerSize.disconnect();
+      document.documentElement.style.removeProperty("--topbar-height");
     };
   });
 </script>
 
 <div
   class:nav-open={mobileNav}
-  class:is-compact={$compact && route === "play"}
+  class:is-compact={$compact &&
+    !!profile &&
+    (route === "play" || route === "quests")}
   class="app-shell"
 >
   <a
@@ -240,11 +239,8 @@
           class="nav-item"
           aria-current={route === item.id ? "page" : undefined}
           onclick={() => navigate(item.href)}
-          ><GameArt
-            file={item.id === "play" ? (activeIcon ?? item.image) : item.image}
-            size={24}
-          /><span>{item.label}</span>{#if route === item.id}<span
-              class="nav-active-dot"
+          ><GameArt file={item.image} size={24} /><span>{item.label}</span
+          >{#if route === item.id}<span class="nav-active-dot"
             ></span>{/if}</button
         >
       {/each}
@@ -264,7 +260,7 @@
     </div>
   </aside>
   <div class="workspace">
-    <header class="topbar">
+    <header class="topbar" bind:this={topbar}>
       <div class="breadcrumb">
         <IconButton
           framed={false}
@@ -275,7 +271,11 @@
           ><Menu size={21} /></IconButton
         ><Compass size={15} /><span>Workspace</span><ChevronRight
           size={13}
-        /><strong>{navigation.find((item) => item.id === route)?.label}</strong>
+        /><strong
+          >{route === "play"
+            ? "Training companion"
+            : navigation.find((item) => item.id === route)?.label}</strong
+        >
       </div>
       <div class="topbar-tools">
         <button
@@ -286,50 +286,52 @@
           ><Search size={17} /><span>Search guides</span><kbd>{shortcut}</kbd
           ></button
         >
-        <div
-          class="access-toggle"
-          role="group"
-          aria-label="Character membership planning"
-        >
-          <button
-            class:selected={profile.mode === "f2p"}
-            aria-pressed={profile.mode === "f2p"}
-            onclick={() =>
-              controller.updateProfile((p) => ({ ...p, mode: "f2p" }))}
-            >F2P</button
-          ><button
-            class:selected={profile.mode === "members"}
-            aria-pressed={profile.mode === "members"}
-            onclick={() =>
-              controller.updateProfile((p) => ({ ...p, mode: "members" }))}
-            >Members</button
+        {#if profile}
+          <div
+            class="access-toggle"
+            role="group"
+            aria-label="Character membership planning"
           >
-        </div>
-        <label class="character-select"
-          ><GameArt
-            file={profile.kind === "Group Ironman"
-              ? "Group_Ironman_badge.png"
-              : "Ironman_badge.png"}
-            size={28}
-          /><span class="character-details"
-            ><small
-              >{profile.source === "hiscores"
-                ? "Public data"
-                : "Sample / manual"} · {profile.kind}</small
-            ><span class="character-name" aria-hidden="true"
-              >{profile.name} <span>▾</span></span
-            ><select
-              aria-label="Select character"
-              value={profile.id}
-              onchange={(event) => select(event.currentTarget.value)}
-              >{#each $saved.profiles as p}<option value={p.id}
-                  >{p.name} ({p.source === "hiscores"
-                    ? "Public data"
-                    : "Sample / manual"})</option
-                >{/each}</select
-            ></span
-          ></label
-        >
+            <button
+              class:selected={profile.mode === "f2p"}
+              aria-pressed={profile.mode === "f2p"}
+              onclick={() =>
+                controller.updateProfile((p) => ({ ...p, mode: "f2p" }))}
+              >F2P</button
+            ><button
+              class:selected={profile.mode === "members"}
+              aria-pressed={profile.mode === "members"}
+              onclick={() =>
+                controller.updateProfile((p) => ({ ...p, mode: "members" }))}
+              >Members</button
+            >
+          </div>
+          <label class="character-select"
+            ><GameArt
+              file={profile.kind === "Group Ironman"
+                ? "Group_Ironman_badge.png"
+                : "Ironman_badge.png"}
+              size={28}
+            /><span class="character-details"
+              ><small
+                >{profile.source === "hiscores"
+                  ? "Public data"
+                  : "Sample / manual"} · {profile.kind}</small
+              ><span class="character-name" aria-hidden="true"
+                >{profile.name} <span>▾</span></span
+              ><select
+                aria-label="Select character"
+                value={profile.id}
+                onchange={(event) => select(event.currentTarget.value)}
+                >{#each $saved.profiles as p}<option value={p.id}
+                    >{p.name} ({p.source === "hiscores"
+                      ? "Public data"
+                      : "Sample / manual"})</option
+                  >{/each}</select
+              ></span
+            ></label
+          >
+        {/if}
         <button class="lookup-trigger" onclick={openPlayerManager}
           >Manage players</button
         >
@@ -345,7 +347,7 @@
             ><ArrowDownToLine size={16} /> Export progress</Button
           >
         </div>{/if}
-      {#if $ready && route !== "skills" && profile.source === "hiscores" && profile.questImportStatus && profile.questImportStatus !== "available"}<div
+      {#if $ready && route !== "skills" && profile?.source === "hiscores" && profile.questImportStatus && profile.questImportStatus !== "available"}<div
           class="notice quest-import-notice"
           role="status"
         >
@@ -357,11 +359,24 @@
                 : "The quest service could not be reached. Existing checks are kept."}
             </p>
           </div>
-          <Button variant="quiet" onclick={() => openLookup(profile.name)}
+          <Button variant="quiet" onclick={() => openLookup(profile?.name)}
             >Retry lookup</Button
           >
         </div>{/if}
-      {#if $ready}{@render children()}{/if}
+      {#if $ready && profile}
+        {@render children()}
+      {:else if $ready}
+        <section class="panel empty-player-state">
+          <h1>No saved players</h1>
+          <p>
+            Look up your RuneScape player to start planning. Removed profiles
+            stay removed on this device.
+          </p>
+          <Button variant="primary" onclick={() => openLookup("")}
+            >Look up a player</Button
+          >
+        </section>
+      {/if}
       <footer class="workspace-footer">
         <span><span class="status-dot"></span> Local progress</span><span
           >Unofficial RuneScape fan project · Artwork © Jagex</span
@@ -531,7 +546,8 @@
         ></label
       >
       <p>
-        Access: {profile.mode === "f2p" ? "F2P" : "Members"} (change using the header).
+        Access: {(profile?.mode ?? "f2p") === "f2p" ? "F2P" : "Members"} (change using
+        the header after import).
       </p>
       <p>
         Public data may be cached for up to five minutes. Refreshing keeps your

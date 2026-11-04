@@ -142,6 +142,74 @@ test("Legacy profiles survive the framework cutover and later storage writes rec
   assert.deepEqual(restored.profiles[1], legacy.profiles[1]);
 });
 
+test("Removing every sample persists an empty workspace across reload and permits a fresh lookup", (t) => {
+  const descriptor = Object.getOwnPropertyDescriptor(
+    globalThis,
+    "localStorage",
+  );
+  const storage = new Map();
+  Object.defineProperty(globalThis, "localStorage", {
+    configurable: true,
+    value: {
+      getItem: (key) => storage.get(key) ?? null,
+      setItem: (key, value) => storage.set(key, value),
+    },
+  });
+  const first = createCompassController();
+  const reloaded = createCompassController();
+  t.after(() => {
+    first.destroy();
+    reloaded.destroy();
+    if (descriptor)
+      Object.defineProperty(globalThis, "localStorage", descriptor);
+    else delete globalThis.localStorage;
+  });
+  first.initialize();
+  for (const profile of get(first.state).profiles)
+    first.removePlayer(profile.id);
+  const empty = { version: 1, activeId: "", profiles: [] };
+  assert.deepEqual(JSON.parse(storage.get(KEY)), empty);
+  first.destroy();
+  reloaded.initialize();
+  assert.equal(get(reloaded.storageError), false);
+  assert.deepEqual(get(reloaded.state), empty);
+  reloaded.addPlayer(player, "Solo Ironman", "f2p");
+  const real = current(reloaded);
+  assert.equal(real.id, "rs3:real player");
+  assert.deepEqual(real.completedQuests, []);
+  assert.deepEqual(real.completedTasks, []);
+  assert.deepEqual(real.packed, []);
+  assert.deepEqual(real.notes, {});
+  assert.deepEqual(JSON.parse(storage.get(KEY)), get(reloaded.state));
+});
+
+test("An empty profile list with a nonempty selection is not overwritten", (t) => {
+  const descriptor = Object.getOwnPropertyDescriptor(
+    globalThis,
+    "localStorage",
+  );
+  const original = JSON.stringify({
+    version: 1,
+    activeId: "missing",
+    profiles: [],
+  });
+  let stored = original;
+  Object.defineProperty(globalThis, "localStorage", {
+    configurable: true,
+    value: { getItem: () => stored, setItem: (_, value) => (stored = value) },
+  });
+  const controller = createCompassController();
+  t.after(() => {
+    controller.destroy();
+    if (descriptor)
+      Object.defineProperty(globalThis, "localStorage", descriptor);
+    else delete globalThis.localStorage;
+  });
+  controller.initialize();
+  assert.equal(get(controller.storageError), true);
+  assert.equal(stored, original);
+});
+
 test("An unsupported saved format is not overwritten with sample data", (t) => {
   const descriptor = Object.getOwnPropertyDescriptor(
     globalThis,

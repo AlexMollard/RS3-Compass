@@ -92,12 +92,15 @@ export function createCompassController(): CompassController {
             if (
               s.version === 1 &&
               Array.isArray(s.profiles) &&
-              s.profiles.length &&
               s.profiles.every(validProfile) &&
-              s.profiles.some((p) => p.id === s.activeId)
-            )
+              (s.profiles.length === 0
+                ? s.activeId === ""
+                : s.profiles.some((p) => p.id === s.activeId))
+            ) {
               state.set(s);
-            else {
+              if (!s.profiles.length && typeof document !== "undefined")
+                clearRememberedPlayer();
+            } else {
               storageError.set(true);
               ready.set(true);
               return;
@@ -209,26 +212,26 @@ export function createCompassController(): CompassController {
       );
     },
     removePlayer(id) {
+      let selectionChanged = false;
       let selected: Profile | undefined;
       state.update((current) => {
-        if (
-          !current.profiles.some(
-            (profile) => profile.id === id && profile.source === "hiscores",
-          )
-        )
+        if (!current.profiles.some((profile) => profile.id === id))
           return current;
         const profiles = current.profiles.filter(
           (profile) => profile.id !== id,
         );
-        if (!profiles.length)
-          profiles.push(structuredClone(SAMPLE_PROFILES[0]));
         const activeId =
-          current.activeId === id ? profiles[0].id : current.activeId;
-        if (current.activeId === id)
+          current.activeId === id ? (profiles[0]?.id ?? "") : current.activeId;
+        if (current.activeId === id) {
+          selectionChanged = true;
           selected = profiles.find((profile) => profile.id === activeId);
+        }
         return { ...current, activeId, profiles };
       });
-      if (selected) rememberSelection(selected);
+      if (selectionChanged) {
+        if (selected) rememberSelection(selected);
+        else if (typeof document !== "undefined") clearRememberedPlayer();
+      }
     },
     exportProgress() {
       const url = URL.createObjectURL(

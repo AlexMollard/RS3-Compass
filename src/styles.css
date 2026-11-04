@@ -21,6 +21,7 @@
   --green: #8eb7a3;
   --blue: #9cbacc;
   color-scheme: dark;
+  scroll-padding-top: calc(var(--topbar-height, 79px) + 12px);
 }
 * {
   box-sizing: border-box;
@@ -138,13 +139,15 @@ textarea {
 .sidebar {
   position: sticky;
   top: 0;
-  height: 100vh;
+  height: 100dvh;
+  align-self: start;
   border-right: 1px solid #34414a;
   background: linear-gradient(180deg, #14212a, #111c24);
   padding: 30px 17px 18px;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  overscroll-behavior-y: contain;
   z-index: 20;
 }
 .brand {
@@ -275,6 +278,9 @@ textarea {
   min-width: 0;
 }
 .topbar {
+  position: sticky;
+  top: 0;
+  z-index: 18;
   height: 79px;
   padding: 0 34px;
   border-bottom: 1px solid #2c3a44;
@@ -282,7 +288,7 @@ textarea {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  background: #111c24b8;
+  background: #111c24;
 }
 .breadcrumb {
   display: flex;
@@ -1308,6 +1314,12 @@ textarea {
 }
 .is-compact .play-rail {
   gap: 17px;
+}
+.is-compact .quest-page .journal-layout {
+  grid-template-columns: minmax(0, 1fr);
+}
+.is-compact .quest-page .guide-picker {
+  display: none;
 }
 
 .is-compact .play-page-top {
@@ -2834,8 +2846,8 @@ textarea::placeholder {
   align-items: center;
   flex-wrap: wrap;
   position: sticky;
-  top: 12px;
-  z-index: 20;
+  top: calc(var(--topbar-height, 79px) + 12px);
+  z-index: 10;
   background: var(--panel-raised);
 }
 .storage-alert > div {
@@ -2939,4 +2951,12 @@ textarea::placeholder {
     width: 56px;
     height: 56px;
   }
+}
+.empty-player-state {
+  max-width: 720px;
+  margin: 24px 0;
+  padding: 28px;
+}
+.empty-player-state p {
+  margin: 12px 0 20px;
 }
