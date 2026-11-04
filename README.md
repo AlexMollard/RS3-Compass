@@ -22,7 +22,7 @@ npm run preview -- --port 4173 --strictPort
 
 Open http://127.0.0.1:4173/RS3-Compass/.
 
-Run `npm test` for the dependency-free training-range regression checks. The command uses Node's built-in TypeScript stripping.
+Run `npm test` for the dependency-free training-range and location-catalogue regression checks. The command uses Node's built-in TypeScript stripping.
 
 ## Product direction
 
@@ -51,6 +51,11 @@ Run `npm test` for the dependency-free training-range regression checks. The com
 - Skill lists, training ranges, active preparation, and global search use full-card navigation. Wiki actions stay independent wherever shown. The recommended quest title opens its Compass requirements.
 - Search fields have a clear control that restores input focus; global search stays touch-accessible on phone screens. Packing-row whitespace toggles the native checkbox; linked item images/names remain independent Wiki actions.
 - Starting a training session preserves the selected method per character and restores it after reload. Older profiles without an explicit choice use their recorded level; removed ranges fall back without losing progress.
+- A redesigned starting page separates the next quest's preparation from the current session, shows relevant location photos, and keeps the full recorded-level sheet collapsible.
+- Compact 13px body text and 12px captions replace the formerly tiny labels; actionable icons and phone hit areas are enlarged independently of typography.
+- Quest, skill, and companion pages share Wiki-linked location cards with access warnings. Narrow-screen quest, skill, and training-range pickers collapse without losing navigation.
+- Mining ranges name concrete destinations. Members mode can add an explicitly labelled alternative without pretending that every member has quest or shortcut unlocks.
+- A sticky save-failure warning remains available while using the companion on a phone, with progress export and recovery when browser storage becomes writable.
 
 ## Shared interface widgets
 
@@ -64,6 +69,8 @@ Pages compose the widgets in `src/ui.tsx` rather than recreating their markup an
 - `ItemList`: the same Wiki-linked item rendering in readonly lists and interactive packing checklists.
 - `Button`, `IconButton`, and `Tabs`: native controls with shared variants, accessible labels, and explicit form-submit behaviour.
 - `WikiAction`: external Wiki controls with consistent URL, target, rel, and icon handling.
+- `ResponsivePicker`: a native disclosure on narrow screens and an expanded selector on desktop.
+- `LocationGallery` in `src/LocationGallery.tsx`: shared Wiki-linked location photos and access details, with a compact overview variant.
 
 Pages and App own state, data, and callbacks. Widgets do not fetch data, change membership, or write local storage.
 
@@ -78,6 +85,8 @@ Use `GameText` for authored content that mentions items, quests, skills, or loca
 `src/wiki.ts` centralises article and image URLs. Images are hotlinked from RuneScape Wiki, not downloaded or bundled. The browser follows the upstream cache headers; this is not an offline-image guarantee. A missing image must be corrected at its catalogue entry, not replaced with an unrelated placeholder.
 
 Keep the widget out of buttons and checkbox labels. Navigation cards are internal controls; content references are external links. Packing checkboxes and item links are independent controls, so opening the Wiki cannot change a packing check.
+
+Register locations once in `src/locations.ts`, then reference their keys from quest or training data. `stageLocations` chooses access-mode recommendations; the catalogue tests reject missing locations, ambiguous reference names, and members-only destinations in free-to-play routes. Members alternatives are recommendations, not proof that a character has unlocked a route.
 
 Recommendations use a small, deterministic sample order to demonstrate interactions. They are not a complete personalised progression engine. Members skill notes demonstrate access-mode changes; they are not a members training catalogue.
 
@@ -105,6 +114,9 @@ There are no RuneScape account credentials, server API calls, or shared database
 8. Click a recorded level, edit it, and cancel with Escape. Reopen, save a valid value, and reload. Check that invalid levels cannot be saved and the other character is unchanged.
 9. Select a lower training range, start the session, and reload. The companion must keep that method rather than silently choosing the recorded-level range.
 10. Click card padding and names in skill/search lists; they should navigate inside Compass. Click their explicit Wiki action instead; it should open a new tab without navigating the card.
+11. On the starting page, prepare the next quest, resume the current session, switch activity tabs, and expand the recorded-level sheet. All eight recorded levels remain editable.
+12. At phone width, open the quest, skill, and range disclosures with the keyboard. Select a range and confirm the summary updates and collapses; widen the window and confirm selectors expand.
+13. Select Mining levels 20–30, switch F2P → Members → F2P, and inspect the location cards. The shared Lumbridge mine remains available; coal trucks appear only as a Members alternative with the optional shortcut explained.
 
 The shared-widget and interaction passes were exercised in the production preview across all four pages at phone, tablet, and desktop widths. Checks covered full-card mouse/keyboard navigation, touch-accessible search, Wiki popups, exact-skill editor focus and cancellation, native level bounds, character isolation, selected-method handoff and reload, membership gating, packing/note persistence, rapid native typing, and browser-storage exhaustion/recovery. `npm test` retains training-range precedence, boundary, removed-range, and profile-isolation regressions. Persistence updates its error indicator only when the write outcome changes; successful keystroke saves do not enqueue redundant renders.
 
@@ -120,5 +132,8 @@ RuneScape and its artwork belong to Jagex. This is an unofficial fan project, no
 
 - [Quest icon source](https://runescape.wiki/w/Quests)
 - Skill icons and item images link to their associated Wiki articles through the shared reference widget.
+- Location photographs and access details use the articles linked directly from each card in `src/locations.ts`.
+- Mining recommendations: [Ironman Mining guide](https://runescape.wiki/w/Ironman_Mode/Guide/Mining), [coal truck mine](https://runescape.wiki/w/Coal_truck_mine), [luminite rocks](https://runescape.wiki/w/Luminite_rock), and [Rimmington mine](https://runescape.wiki/w/Rimmington_mine). These are researched sample ranges, not an exhaustive optimal Members route.
+- Other destination references: [free-to-play Fishing training](https://runescape.wiki/w/Free-to-play_Fishing_training) and [Artisans' Workshop](https://runescape.wiki/w/Artisans%27_Workshop).
 - Cinzel and DM Sans are requested from Google Fonts; system fonts are the fallback if unavailable.
 - Interface icons: lucide-react (ISC).

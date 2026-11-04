@@ -48,7 +48,7 @@ export default function LevelEditor({
     >
       <div className="dialog-heading">
         <div>
-          <h2 id="level-editor-title">Recorded levels</h2>
+          <h2 id="level-editor-title">Edit recorded levels</h2>
           <p>{profile.name} · manual entries</p>
         </div>
         <IconButton
@@ -60,8 +60,8 @@ export default function LevelEditor({
         </IconButton>
       </div>
       <p>
-        Enter your current in-game levels. Saving does not award XP or change
-        quest completion.
+        Enter your current in-game levels. This does not award XP or complete
+        quests.
       </p>
       <form
         onSubmit={(event) => {
@@ -120,7 +120,7 @@ export default function LevelEditor({
         </div>
         <div className="detail-actions">
           <Button variant="primary" type="submit">
-            Save recorded levels
+            Save levels
           </Button>
           <Button onClick={dismiss}>Cancel</Button>
         </div>

@@ -18,7 +18,6 @@ import {
   ListChecks,
   LockKeyhole,
   Map,
-  MapPin,
   Menu,
   Minimize2,
   Pickaxe,
@@ -32,6 +31,7 @@ import SkillPage from "./SkillPage";
 import QuestLevels from "./QuestLevels";
 import GameText from "./GameText";
 import Journey from "./Journey";
+import LocationGallery from "./LocationGallery";
 import {
   ActivityHeader,
   Button,
@@ -47,6 +47,7 @@ import {
   QUESTS,
   SKILLS,
   trainingStage,
+  stageLocations,
   nextQuest,
   taskTitle,
   toggleItem,
@@ -307,6 +308,17 @@ export default function App() {
           ref={main}
           tabIndex={-1}
         >
+          {storageError && (
+            <div className="notice storage-alert" role="alert">
+              <div>
+                <strong>Your latest changes are not saved.</strong>
+                <p>Export your progress before closing this tab.</p>
+              </div>
+              <Button onClick={exportPreview}>
+                <ArrowDownToLine size={16} /> Export progress
+              </Button>
+            </div>
+          )}
           {route.page === "journey" && (
             <Journey
               profile={profile}
@@ -392,14 +404,11 @@ export default function App() {
           )}
           <footer className="workspace-footer">
             <span>
-              <span className="status-dot" /> Local-first. No account required.
+              <span className="status-dot" /> Local progress
             </span>
-            <span>
-              Sample content · Unofficial RuneScape fan project · Artwork ©
-              Jagex
-            </span>
+            <span>Unofficial RuneScape fan project · Artwork © Jagex</span>
             <button onClick={() => aboutDialog.current?.showModal()}>
-              Preview notes <ArrowUpRight size={12} />
+              About <ArrowUpRight size={12} />
             </button>
           </footer>
         </main>
@@ -484,37 +493,29 @@ export default function App() {
           </IconButton>
         </div>
         <p>
-          This clickable prototype explores a desktop-first progression
-          companion for Solo and Group Ironman. Aster and Rowan are fictional
-          sample profiles, not live RuneScape accounts. Compass prepares your
-          levels and items; the Wiki or in-game quest helper handles the quest
-          itself.
+          This clickable prototype uses fictional profiles and a limited set of
+          guides. Progress is entered manually and saved on this device, not
+          connected to a RuneScape account. Use the Wiki or in-game quest helper
+          for the quest itself.
         </p>
-        <h3>Working in this preview</h3>
+        <h3>Preview features and limits</h3>
         <p>
-          Journey and session navigation, F2P/Members settings per character,
-          quest completion, sample skill levels, packing checks, notes, search,
-          and local persistence.
-        </p>
-        <h3>Not implemented in this design pass</h3>
-        <p>
-          The complete guide catalogue, researched members routes, full
-          equipment and supply planners, local group comparison, and importing
-          old Ironbound backups. Preview export is not an Ironbound-compatible
-          backup.
+          Track levels, quests, packing checks and notes per character. The
+          complete guide catalogue, researched members routes, equipment and
+          supply planners, group comparison and Ironbound backup import are not
+          implemented. Preview export is not compatible with Ironbound.
         </p>
         <p>
-          The planned first release is static-only: no automatic player lookup,
-          public-stat refresh, online boards, or shared task/supply sync.
+          No automatic player lookup, public-stat refresh, online boards, or
+          shared task/supply sync is planned for the first release.
         </p>
         <Button onClick={exportPreview}>
           <ArrowDownToLine size={16} /> Export preview profiles
         </Button>
         <h3>Artwork and sources</h3>
         <p>
-          RuneScape and its artwork belong to Jagex. Game icons and item images
-          load directly from RuneScape Wiki. Browser caching follows the Wiki's
-          response headers; no game artwork is bundled with Compass.
+          RuneScape and its artwork belong to Jagex. Icons and item images load
+          from RuneScape Wiki; no game artwork is bundled with Compass.
         </p>
         <div className="credit-links">
           <a
@@ -569,6 +570,8 @@ function PlayCompanion({
     ? profile.completedTasks.includes(task)
     : profile.completedQuests.includes(task);
   const stage = skill ? trainingStage(skill, profile) : undefined;
+  const places =
+    quest?.locations ?? (stage ? stageLocations(stage, profile.mode) : []);
   const packing = quest?.supplies || stage?.supplies || [];
   const packedItems = packing.filter((item) =>
     profile.packed.includes(task + "::" + item),
@@ -576,9 +579,8 @@ function PlayCompanion({
   const packed = packedItems.length;
   const next = nextQuest(profile);
   const instructions = [
-    stage?.method || "Choose a sample quest or skill session to get started.",
-    "Include gathering, travel, and banking in your session.",
-    "Record your new level in the skill guide when you finish.",
+    stage?.method || "Choose a quest or skill session to get started.",
+    "Allow for gathering, travel and banking; update your level when finished.",
   ];
   return (
     <div className="play-page page-enter">
@@ -599,12 +601,12 @@ function PlayCompanion({
         title="Play companion"
         subtitle={
           quest
-            ? "Prepare your levels and items, then start the quest in-game."
-            : "Training method, equipment, and supplies for the selected skill."
+            ? "Check requirements and pack items, use the Wiki or in-game helper, then mark completion here."
+            : "Follow your selected method, then update your recorded level."
         }
         trailing={
           <span className="badge badge-green">
-            <span className="status-dot" /> {profile.name} · saved locally
+            <span className="status-dot" /> {profile.name} · manual progress
           </span>
         }
       />
@@ -614,17 +616,7 @@ function PlayCompanion({
             title={taskTitle(task)}
             wiki={quest?.wiki || skill?.wiki || "Ironman_Mode/Strategies"}
             image={skill?.icon || "Quest_icon.png"}
-            eyebrow={
-              stage
-                ? `TRAINING SESSION · LEVELS ${stage.from}–${stage.to}`
-                : "QUEST PREPARATION"
-            }
-            meta={
-              <p className="location-line">
-                <MapPin size={14} />
-                <GameText text={quest?.location || stage?.location || ""} />
-              </p>
-            }
+            eyebrow={stage ? `LEVELS ${stage.from}–${stage.to}` : "QUEST"}
           />
           <div className="detail-body">
             {locked ? (
@@ -658,36 +650,80 @@ function PlayCompanion({
                     <GameText text={quest?.why || skill?.payoff || ""} />
                   </p>
                 </div>
-                {quest ? (
+                {quest && (
+                  <section className="detail-section">
+                    <SectionHeading
+                      title="Check requirements"
+                      aside={
+                        <span className="muted">Required vs self-supply</span>
+                      }
+                    />
+                    <QuestLevels
+                      profile={profile}
+                      quest={quest}
+                      onSkill={onSkill}
+                    />
+                  </section>
+                )}
+              </>
+            )}
+            <section className="panel packing-card">
+              <SectionHeading
+                title={
                   <>
-                    <section className="detail-section">
-                      <SectionHeading
-                        title="Prepare these levels"
-                        aside={
-                          <span className="muted">Required vs self-supply</span>
-                        }
-                      />
-                      <QuestLevels
-                        profile={profile}
-                        quest={quest}
-                        onSkill={onSkill}
-                      />
-                    </section>
-                    <section className="detail-section">
-                      <h3>Then start the quest in-game</h3>
-                      <p className="intro-copy">
-                        Gather the items in your preparation checklist and
-                        confirm the requirements, then start{" "}
-                        <GameText text={quest.name} /> in-game. Use the Wiki or
-                        your in-game quest helper for the quest itself.
-                      </p>
-                      <WikiAction
-                        page={quest.wiki}
-                        label="Open Wiki quest guide"
-                        primary
-                      />
-                    </section>
+                    <Backpack size={18} />{" "}
+                    {quest ? "Gather these items" : "Before you go"}
                   </>
+                }
+                aside={
+                  <span className="badge">
+                    {packed}/{packing.length}
+                  </span>
+                }
+              />
+              <p className="muted">Check items as you pack them.</p>
+              <div className="packing-progress">
+                <span
+                  style={{
+                    width:
+                      (packing.length ? (packed / packing.length) * 100 : 0) +
+                      "%",
+                  }}
+                />
+              </div>
+              <ItemList
+                items={packing}
+                checked={packedItems}
+                onToggle={(item) => onTogglePack(task + "::" + item)}
+              />
+              <p className="sample-note">
+                Checks are manual; they do not read your bank or inventory.
+              </p>
+            </section>
+            {places.length > 0 && (
+              <section className="detail-section">
+                <SectionHeading
+                  title={skill ? "Where to train" : "Where to go"}
+                />
+                <LocationGallery locations={places} profile={profile} />
+              </section>
+            )}
+            {!locked && (
+              <>
+                {quest ? (
+                  <section className="detail-section">
+                    <h3>Start the quest</h3>
+                    <p className="intro-copy">
+                      Pack the items listed here, then use the Wiki guide or
+                      in-game quest helper. Mark the quest complete here once
+                      you finish it in-game.
+                    </p>
+                    <WikiAction
+                      page={quest.wiki}
+                      label="Open Wiki quest guide"
+                      primary
+                    />
+                  </section>
                 ) : (
                   <section className="detail-section">
                     <SectionHeading
@@ -714,8 +750,8 @@ function PlayCompanion({
                 <div className="session-warning">
                   <Shield size={17} />
                   <p>
-                    Sample preparation only. Confirm the current requirements
-                    and combat risks in your game journal or the Wiki.
+                    Confirm current requirements and combat risks in your game
+                    journal or the Wiki.
                   </p>
                 </div>
                 <div className="detail-actions">
@@ -728,8 +764,8 @@ function PlayCompanion({
                     {done
                       ? "Recorded complete · undo"
                       : quest
-                        ? "Mark quest complete after finishing"
-                        : "Record session complete"}
+                        ? "Mark quest complete"
+                        : "Mark session complete"}
                   </Button>
                   <Button
                     variant="quiet"
@@ -771,40 +807,6 @@ function PlayCompanion({
           </div>
         </article>
         <aside className="play-rail">
-          <section className="panel packing-card">
-            <SectionHeading
-              title={
-                <>
-                  <Backpack size={18} />{" "}
-                  {quest ? "Gather these items" : "Before you go"}
-                </>
-              }
-              aside={
-                <span className="badge">
-                  {packed}/{packing.length}
-                </span>
-              }
-            />
-            <p className="muted">Check what you’ve actually packed.</p>
-            <div className="packing-progress">
-              <span
-                style={{
-                  width:
-                    (packing.length ? (packed / packing.length) * 100 : 0) +
-                    "%",
-                }}
-              />
-            </div>
-            <ItemList
-              items={packing}
-              checked={packedItems}
-              onToggle={(item) => onTogglePack(task + "::" + item)}
-            />
-            <p className="sample-note">
-              Checks describe this sample session only. They do not read your
-              bank or inventory.
-            </p>
-          </section>
           <section className="panel notes-card">
             <SectionHeading
               title={
@@ -812,7 +814,6 @@ function PlayCompanion({
                   <ListChecks size={18} /> Session notes
                 </>
               }
-              aside={<span className="muted">Autosaved</span>}
             />
             <label className="sr-only" htmlFor="session-notes">
               Session notes
@@ -828,10 +829,6 @@ function PlayCompanion({
               {(profile.notes[task] || "").length}/4,000
             </span>
           </section>
-          <div className="play-smallprint">
-            <Compass size={18} />
-            <p>Use compact mode for a narrower layout beside the game.</p>
-          </div>
         </aside>
       </div>
     </div>

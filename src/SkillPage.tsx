@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { ArrowRight, Check, MapPin, Pickaxe, Target } from "lucide-react";
-import { SKILLS, trainingStage, type Profile } from "./data";
+import { ArrowRight, Check, Pickaxe, Target } from "lucide-react";
+import { SKILLS, trainingStage, stageLocations, type Profile } from "./data";
 import GameText from "./GameText";
 import { wikiImage } from "./wiki";
+import LocationGallery from "./LocationGallery";
 import {
   ActivityHeader,
   Button,
@@ -12,6 +13,7 @@ import {
   PageHeading,
   SectionHeading,
   Tabs,
+  ResponsivePicker,
   WikiAction,
 } from "./ui";
 interface Props {
@@ -82,49 +84,42 @@ function SkillContent({
     current == null ? 0 : Math.min(100, Math.round((current / target) * 100));
   return (
     <div className="journal-layout skill-layout">
-      <aside className="panel journal-list">
-        <SearchField
-          label="Search sample skills"
-          placeholder="Find a skill…"
-          value={search}
-          onChange={setSearch}
-        />
-        <p className="list-kicker">SAMPLE FIELD GUIDES</p>
-        {filtered.map((s) => (
-          <NavigationCard
-            key={s.name}
-            title={s.name}
-            label={"Open training for " + s.name}
-            icon={<img src={wikiImage(s.icon)} alt="" />}
-            detail={s.category}
-            value={profile.levels[s.name] ?? "?"}
-            selected={s.name === skill.name}
-            wiki={s.wiki}
-            onOpen={() => onSelect(s.name)}
+      <ResponsivePicker label="Skill" selection={skill.name}>
+        <aside className="panel journal-list">
+          <SearchField
+            label="Search sample skills"
+            placeholder="Find a skill…"
+            value={search}
+            onChange={setSearch}
           />
-        ))}
-        {filtered.length === 0 && (
-          <p className="empty-state">No sample skills match.</p>
-        )}
-        <div className="field-tip">
-          <Target size={21} />
-          <h3>Training targets</h3>
-          <p>
-            Quest requirements, equipment, and useful supplies should drive the
-            next training session.
+          <p className="list-kicker">SAMPLE FIELD GUIDES</p>
+          {filtered.map((s) => (
+            <NavigationCard
+              key={s.name}
+              title={s.name}
+              label={"Open training for " + s.name}
+              icon={<img src={wikiImage(s.icon)} alt="" />}
+              detail={s.category}
+              value={profile.levels[s.name] ?? "?"}
+              selected={s.name === skill.name}
+              wiki={s.wiki}
+              onOpen={() => onSelect(s.name)}
+            />
+          ))}
+          {filtered.length === 0 && (
+            <p className="empty-state">No sample skills match.</p>
+          )}
+          <p className="sample-note">
+            Sample skills, not the full training catalogue.
           </p>
-        </div>
-        <p className="sample-note">
-          Three representative skills for this design review. Not a complete
-          training catalogue.
-        </p>
-      </aside>
+        </aside>
+      </ResponsivePicker>
       <article className="panel skill-detail">
         <ActivityHeader
           title={skill.name}
           wiki={skill.wiki}
           image={skill.icon}
-          eyebrow={skill.category.toUpperCase() + " FIELD GUIDE"}
+          eyebrow={skill.category.toUpperCase()}
           meta={
             <p>
               <GameText text={skill.description} />
@@ -161,7 +156,7 @@ function SkillContent({
             <div className="progress-caption">
               <span>
                 {current == null
-                  ? "Record your level to personalise this guide"
+                  ? "Record your level to personalise the guide"
                   : current >= target
                     ? "Recorded level target reached"
                     : target - current + " levels to your target"}
@@ -200,10 +195,7 @@ function SkillContent({
             </form>
             <p className="form-message" role="status">
               <GameText
-                text={
-                  message ||
-                  "Manual entry · sample character · no public stat lookup"
-                }
+                text={message || "Manual entry · no public stat lookup"}
               />
             </p>
           </section>
@@ -220,21 +212,26 @@ function SkillContent({
           </div>
           <section className="detail-section">
             <SectionHeading
-              title="Choose your training range"
+              title="Choose a training range"
               aside={<span className="muted">Sample methods</span>}
             />
-            <div className="range-selector">
-              {skill.stages.map((s, i) => (
-                <NavigationCard
-                  key={s.title}
-                  title={"Levels " + s.from + "–" + s.to}
-                  label={"Select levels " + s.from + " to " + s.to}
-                  detail={<GameText text={s.title} />}
-                  selected={band === i}
-                  onOpen={() => setBand(i)}
-                />
-              ))}
-            </div>
+            <ResponsivePicker
+              label="Range"
+              selection={"Levels " + stage.from + "–" + stage.to}
+            >
+              <div className="range-selector">
+                {skill.stages.map((s, i) => (
+                  <NavigationCard
+                    key={s.title}
+                    title={"Levels " + s.from + "–" + s.to}
+                    label={"Select levels " + s.from + " to " + s.to}
+                    detail={<GameText text={s.title} />}
+                    selected={band === i}
+                    onOpen={() => setBand(i)}
+                  />
+                ))}
+              </div>
+            </ResponsivePicker>
           </section>
           <Tabs
             variant="detail"
@@ -256,38 +253,31 @@ function SkillContent({
                 <h3>
                   <GameText text={stage.title} />
                 </h3>
-                <p className="location-line">
-                  <MapPin size={15} />
-                  <GameText text={stage.location} />
-                </p>
+                <LocationGallery
+                  locations={stageLocations(stage, profile.mode)}
+                  profile={profile}
+                />
                 <p>
                   <GameText text={stage.method} />
                 </p>
                 <div className="method-note">
-                  Compare complete sessions, including gathering, travel, and
-                  banking. This preview does not supply measured XP/hour
-                  estimates.
+                  Compare full sessions, including travel and banking. No
+                  measured XP/hour estimates.
                 </div>
               </>
             ) : tab === "equipment" ? (
               <>
-                <span className="eyebrow">PREPARE YOUR TOOLS</span>
+                <span className="eyebrow">TOOLS</span>
                 <h3>Equipment to prepare</h3>
-                <p>
-                  Use the best equipment you can obtain and use. A higher skill
-                  level does not mean you own the upgrade.
-                </p>
+                <p>Use the best equipment you own and can use.</p>
                 <ItemList items={stage.supplies} />
               </>
             ) : (
               <>
-                <span className="eyebrow">YOUR NEXT TRAINING SESSION</span>
+                <span className="eyebrow">TRAINING SESSION</span>
                 <h3>Gather before you go</h3>
                 <ItemList items={stage.supplies} />
-                <p>
-                  Open Play Companion to check off the packing list and keep
-                  session notes.
-                </p>
+                <p>Check off items and save notes in Play Companion.</p>
               </>
             )}
           </section>
@@ -307,7 +297,7 @@ function SkillContent({
               variant="primary"
               onClick={() => onStart("train-" + skill.name, stage.from)}
             >
-              Start training session <ArrowRight size={16} />
+              Start packing <ArrowRight size={16} />
             </Button>
             <WikiAction page={skill.wiki} label="Skill reference" />
           </div>

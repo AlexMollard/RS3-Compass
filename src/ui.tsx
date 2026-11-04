@@ -1,6 +1,12 @@
-import { useId, useRef } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
-import { Check, ChevronRight, ExternalLink, Search } from "lucide-react";
+import {
+  Check,
+  ChevronDown,
+  ChevronRight,
+  ExternalLink,
+  Search,
+} from "lucide-react";
 import type { QuestRecord } from "./data";
 import GameText from "./GameText";
 import { wikiHref, wikiImage } from "./wiki";
@@ -173,6 +179,44 @@ export function QuestNavigationCard({
         <ChevronRight size={15} />
       </span>
     </button>
+  );
+}
+
+export function ResponsivePicker({
+  label,
+  selection,
+  children,
+}: {
+  label: string;
+  selection: string;
+  children: ReactNode;
+}) {
+  const [wide, setWide] = useState(
+    () => window.matchMedia("(min-width: 1001px)").matches,
+  );
+  const [expanded, setExpanded] = useState(false);
+  useEffect(() => {
+    const query = window.matchMedia("(min-width: 1001px)");
+    const update = () => setWide(query.matches);
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
+  useEffect(() => setExpanded(false), [selection]);
+  return (
+    <details
+      className="guide-picker"
+      open={wide || expanded}
+      onToggle={(event) => {
+        if (!wide) setExpanded(event.currentTarget.open);
+      }}
+    >
+      <summary aria-label={"Choose " + label.toLowerCase() + ": " + selection}>
+        <span>{label}</span>
+        <strong>{selection}</strong>
+        <ChevronDown size={18} aria-hidden="true" />
+      </summary>
+      {children}
+    </details>
   );
 }
 

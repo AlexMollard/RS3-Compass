@@ -61,8 +61,7 @@ export default function QuestLevels({ profile, quest, onSkill }: Props) {
       </div>
       {quest.id === "dragon-slayer" && (
         <p className="notice-inline">
-          33 quest points are required. Confirm your total in-game; this
-          prototype does not verify it.
+          33 quest points required. Check your total in-game.
         </p>
       )}
     </>

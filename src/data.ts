@@ -19,7 +19,7 @@ export interface QuestRecord {
   members: boolean;
   difficulty: string;
   length: string;
-  location: string;
+  locations: string[];
   why: string;
   requirements: { skill: string; level: number; recommended?: boolean }[];
   questRequirements: string[];
@@ -38,7 +38,8 @@ export interface SkillRecord {
     from: number;
     to: number;
     title: string;
-    location: string;
+    locations: string[];
+    memberLocations?: string[];
     method: string;
     supplies: string[];
   }[];
@@ -52,7 +53,7 @@ export const QUESTS: QuestRecord[] = [
     members: false,
     difficulty: "Novice",
     length: "Short",
-    location: "Lumbridge Castle",
+    locations: ["Lumbridge Castle"],
     why: "An approachable first quest that starts your cooking journey and opens the way to later cooking quests.",
     requirements: [],
     questRequirements: [],
@@ -70,7 +71,7 @@ export const QUESTS: QuestRecord[] = [
     members: false,
     difficulty: "Intermediate",
     length: "Medium",
-    location: "Falador · Asgarnian Ice Dungeon",
+    locations: ["Falador", "Asgarnian Ice Dungeon"],
     why: "A valuable early Smithing reward. Gather your own inputs first and avoid a long, repetitive early Smithing grind.",
     requirements: [
       { skill: "Mining", level: 10 },
@@ -97,7 +98,7 @@ export const QUESTS: QuestRecord[] = [
     members: false,
     difficulty: "Experienced",
     length: "Long",
-    location: "Champions’ Guild · Crandor",
+    locations: ["Champions' Guild", "Crandor"],
     why: "A major F2P quest milestone that brings your combat, equipment, and self-supplied preparation together.",
     requirements: [
       { skill: "Crafting", level: 8, recommended: true },
@@ -123,7 +124,7 @@ export const QUESTS: QuestRecord[] = [
     members: true,
     difficulty: "Intermediate",
     length: "Medium",
-    location: "Baxtorian Falls",
+    locations: ["Baxtorian Falls"],
     why: "A classic early-members direction with Attack and Strength rewards. Plan for the dangerous areas rather than assuming starter equipment is enough.",
     requirements: [],
     questRequirements: [],
@@ -145,7 +146,7 @@ export const QUESTS: QuestRecord[] = [
     members: true,
     difficulty: "Intermediate",
     length: "Medium",
-    location: "Tree Gnome Village",
+    locations: ["Tree Gnome Village"],
     why: "An early-members quest direction with Attack experience and useful travel progression.",
     requirements: [],
     questRequirements: [],
@@ -168,32 +169,51 @@ export const SKILLS: SkillRecord[] = [
         from: 1,
         to: 10,
         title: "Copper ore & tin ore",
-        location: "Burthorpe mine / Lumbridge swamp",
+        locations: ["Burthorpe mine"],
         method:
-          "Mine matching copper ore and tin ore for bronze bars. Keep ore in an ore box and use the metal bank.",
+          "Mine copper ore and tin ore for bronze bars. Fill an ore box and deposit at the nearby furnace's metal bank.",
         supplies: ["A suitable pickaxe", "An ore box if available"],
       },
       {
         from: 10,
-        to: 30,
-        title: "Iron ore, then coal",
-        location: "An accessible iron mine",
+        to: 20,
+        title: "Iron ore",
+        locations: ["Lumbridge south-west mine"],
         method:
-          "Mine the ore you need for your next Smithing target. Upgrade your pickaxe when you can obtain and use the next tier.",
+          "Mine iron ore and fill an iron ore box. Deposit at a furnace or anvil metal bank.",
         supplies: ["A level-appropriate pickaxe", "Space in your ore box"],
       },
       {
-        from: 30,
-        to: 50,
-        title: "A stronger metal supply",
-        location: "Accessible mithril ore and adamantite ore rocks",
+        from: 20,
+        to: 30,
+        title: "Coal",
+        locations: ["Lumbridge south-west mine"],
+        memberLocations: ["Lumbridge south-west mine", "Coal truck mine"],
         method:
-          "Balance the ores you collect with your Smithing needs. Account for travel and banking when comparing methods.",
-        supplies: ["An upgraded pickaxe", "An upgraded ore box"],
+          "Mine coal for steel bars. Carry a steel ore box and deposit your ore for Smithing.",
+        supplies: ["An upgraded pickaxe", "A steel ore box"],
+      },
+      {
+        from: 30,
+        to: 40,
+        title: "Mithril ore",
+        locations: ["Varrock south-east mine"],
+        method:
+          "Mine mithril ore, fill a mithril ore box, and bank at Varrock east bank.",
+        supplies: ["An upgraded pickaxe", "A mithril ore box"],
+      },
+      {
+        from: 40,
+        to: 50,
+        title: "Adamantite ore & luminite",
+        locations: ["Rimmington mine", "Dwarven luminite mine"],
+        method:
+          "Mine adamantite ore at Rimmington and luminite in the Dwarven mine. Use an adamant ore box; Port Sarim has a metal bank.",
+        supplies: ["An upgraded pickaxe", "An adamant ore box"],
       },
     ],
     membersNote:
-      "Membership opens additional locations and methods. This prototype demonstrates the mode switch; a researched members training catalogue is not included yet.",
+      "Shared mines remain useful. Coal trucks are a members alternative, not an automatic upgrade.",
     wiki: "Mining",
   },
   {
@@ -208,7 +228,7 @@ export const SKILLS: SkillRecord[] = [
         from: 1,
         to: 10,
         title: "Bronze foundations",
-        location: "An accessible furnace and anvil",
+        locations: ["Artisans' Workshop"],
         method:
           "Smelt your gathered copper and tin into bronze bars, then smith useful equipment. Complete What’s Mine is Yours when eligible.",
         supplies: ["Copper and tin ore", "A hammer or tool-belt hammer"],
@@ -217,7 +237,7 @@ export const SKILLS: SkillRecord[] = [
         from: 10,
         to: 20,
         title: "Iron equipment",
-        location: "Artisans’ Workshop",
+        locations: ["Artisans' Workshop"],
         method:
           "Make iron equipment from your own ore and complete The Knight’s Sword when ready. Check your new level after claiming the reward.",
         supplies: ["Iron ore", "Smithing tools"],
@@ -226,14 +246,14 @@ export const SKILLS: SkillRecord[] = [
         from: 20,
         to: 30,
         title: "Build your steel supply",
-        location: "Artisans’ Workshop",
+        locations: ["Artisans' Workshop"],
         method:
           "Gather the required ores for steel, and make upgrades or quest inputs you actually need.",
         supplies: ["Ore for steel bars", "A hammer"],
       },
     ],
     membersNote:
-      "Keep your existing Smithing progress when changing access mode. Members recommendations will connect additional quests and equipment routes.",
+      "These shared workshops work in both modes; quest-gated alternatives are not assumed unlocked.",
     wiki: "Smithing",
   },
   {
@@ -248,23 +268,23 @@ export const SKILLS: SkillRecord[] = [
         from: 1,
         to: 20,
         title: "Your first food reserve",
-        location: "Lumbridge / Draynor Village",
+        locations: ["Lumbridge", "Draynor Village"],
         method:
-          "Catch fish appropriate for your level and cook them for your next adventure. Allow for burns when planning a food target.",
+          "Catch raw crayfish in Lumbridge, or raw shrimps at Draynor. Cook your catch for questing and combat.",
         supplies: ["Appropriate fishing equipment", "Bait where required"],
       },
       {
         from: 20,
         to: 40,
         title: "Fly-fishing loop",
-        location: "An accessible river fishing spot",
+        locations: ["Gunnarsgrunn"],
         method:
-          "Use feathers and a fly-fishing rod when eligible. Bank or cook what you need for combat; keep gathering and cooking time separate.",
+          "Fly-fish raw trout with feathers; raw salmon unlock at 30 Fishing. Bank or cook what you need.",
         supplies: ["A fly-fishing rod", "Feathers"],
       },
     ],
     membersNote:
-      "Members locations and food routes need their own researched methods. Your recorded levels and food checklist remain unchanged.",
+      "These river spots work in both modes; membership alone does not unlock quest-gated fishing areas.",
     wiki: "Fishing",
   },
 ];
@@ -312,6 +332,14 @@ export const SAMPLE_PROFILES: Profile[] = [
     notes: {},
   },
 ];
+export function stageLocations(
+  stage: SkillRecord["stages"][number],
+  mode: AccessMode,
+): string[] {
+  return mode === "members" && stage.memberLocations
+    ? stage.memberLocations
+    : stage.locations;
+}
 export function accessibleQuests(profile: Profile) {
   return QUESTS.filter((q) => profile.mode === "members" || !q.members);
 }

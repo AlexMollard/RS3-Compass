@@ -1,15 +1,20 @@
 import { useState } from "react";
-import { ArrowRight, ChevronRight, Focus } from "lucide-react";
+import { ArrowRight, ChevronDown, Focus } from "lucide-react";
 import {
+  QUESTS,
+  SKILLS,
   accessibleQuests,
   nextQuest,
-  SKILLS,
+  stageLocations,
   taskTitle,
+  trainingStage,
   type Profile,
 } from "./data";
 import GameText from "./GameText";
 import { wikiImage } from "./wiki";
 import LevelEditor from "./LevelEditor";
+import LocationGallery from "./LocationGallery";
+import QuestLevels from "./QuestLevels";
 import {
   Button,
   GameWindow,
@@ -37,44 +42,125 @@ export default function Journey({
   onPlay,
   onLevelsChange,
 }: Props) {
-  const [view, setView] = useState("next");
+  const [view, setView] = useState("quests");
   const [editingSkill, setEditingSkill] = useState<string | null>(null);
   const quests = accessibleQuests(profile);
   const next = nextQuest(profile);
   const complete = quests.filter((quest) =>
     profile.completedQuests.includes(quest.id),
   ).length;
+  const activeQuest = QUESTS.find((quest) => quest.id === profile.activeTask);
+  const activeSkill = SKILLS.find(
+    (skill) => "train-" + skill.name === profile.activeTask,
+  );
+  const activeStage = activeSkill
+    ? trainingStage(activeSkill, profile)
+    : undefined;
+  const packing = activeQuest?.supplies ?? activeStage?.supplies ?? [];
+  const packed = packing.filter((item) =>
+    profile.packed.includes(profile.activeTask + "::" + item),
+  ).length;
+  const activePlaces =
+    activeQuest?.locations ??
+    (activeStage ? stageLocations(activeStage, profile.mode) : []);
+  const sessionComplete = activeQuest
+    ? profile.completedQuests.includes(activeQuest.id)
+    : profile.completedTasks.includes(profile.activeTask);
   return (
     <div className="progression-page page-enter">
       <PageHeading
         title="Progression"
-        subtitle={
-          <>
-            {profile.kind} ·{" "}
-            {profile.mode === "members" ? "Members" : "Free-to-play"}
-          </>
-        }
+        subtitle={profile.name + " · " + profile.kind}
         trailing={
-          <span className="preview-label">SAMPLE ROUTE · DESIGN PREVIEW</span>
+          <Button onClick={() => setEditingSkill("Mining")}>
+            Update recorded levels
+          </Button>
         }
       />
-      <div className="route-workspace">
+      <div className="home-workspace">
+        {(activeQuest || activeSkill) && (
+          <GameWindow
+            className="home-session"
+            title="Current preparation"
+            icon={<Focus size={18} />}
+            trailing={
+              sessionComplete
+                ? "Completed"
+                : packed + "/" + packing.length + " packed"
+            }
+          >
+            <div className="home-session-body">
+              <NavigationCard
+                title={taskTitle(profile.activeTask)}
+                label="Resume preparation"
+                detail="Continue your checklist and notes."
+                onOpen={onPlay}
+              />
+              <LocationGallery
+                locations={activePlaces}
+                profile={profile}
+                compact
+              />
+            </div>
+          </GameWindow>
+        )}
         <GameWindow
-          className="route-window"
-          title="Progression queue"
+          className="home-next"
+          title="Next quest"
           icon={<img src={wikiImage("Quest_icon.png")} alt="" />}
-          trailing={
-            <>
-              {complete} / {quests.length} recorded complete
-            </>
-          }
+        >
+          {next ? (
+            <div className="next-preparation">
+              <div className="next-preparation-content">
+                <h2>
+                  <button
+                    type="button"
+                    className="objective-title"
+                    onClick={() => onQuest(next.id)}
+                  >
+                    {next.name}
+                  </button>
+                </h2>
+                <p>
+                  <GameText text={next.why} />
+                </p>
+                <h3>Preparation</h3>
+                <QuestLevels profile={profile} quest={next} onSkill={onSkill} />
+                <div className="objective-actions">
+                  <Button variant="primary" onClick={() => onQuest(next.id)}>
+                    Prepare quest <ArrowRight size={18} />
+                  </Button>
+                  <Button variant="quiet" onClick={() => onStart(next.id)}>
+                    Start packing
+                  </Button>
+                  <WikiAction page={next.wiki} label="Quest Wiki" />
+                </div>
+              </div>
+              <div className="next-preparation-places">
+                <LocationGallery
+                  locations={next.locations}
+                  profile={profile}
+                  compact
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="home-empty">
+              <h3>Sample route complete</h3>
+              <p>Browse quests or choose a skill below.</p>
+            </div>
+          )}
+        </GameWindow>
+        <GameWindow
+          className="home-route"
+          title="Browse activities"
+          trailing={complete + "/" + quests.length + " quests complete"}
         >
           <Tabs
             label="Progression views"
             value={view}
             onChange={setView}
             items={[
-              { value: "next", label: "Next activity" },
               { value: "quests", label: "Quest route" },
               { value: "training", label: "Skill training" },
             ]}
@@ -96,52 +182,8 @@ export default function Journey({
             </div>
           ) : (
             <>
-              {view === "next" && (
-                <section className="pinned-objective">
-                  <span className="objective-label">NEXT RECOMMENDED</span>
-                  {next ? (
-                    <>
-                      <h3>
-                        <button
-                          type="button"
-                          className="objective-title"
-                          onClick={() => onQuest(next.id)}
-                        >
-                          {next.name}
-                        </button>
-                      </h3>
-                      <p>
-                        <GameText text={next.why} />
-                      </p>
-                      <div className="objective-actions">
-                        <Button
-                          variant="primary"
-                          onClick={() => onStart(next.id)}
-                        >
-                          Prepare levels & items <ArrowRight size={15} />
-                        </Button>
-                        <Button
-                          variant="quiet"
-                          onClick={() => onQuest(next.id)}
-                        >
-                          View requirements <ChevronRight size={15} />
-                        </Button>
-                        <WikiAction page={next.wiki} label="Quest Wiki" />
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <h3>Sample route complete</h3>
-                      <p>
-                        No further recommendations are included in this
-                        prototype.
-                      </p>
-                    </>
-                  )}
-                </section>
-              )}
               <div className="queue-column-labels">
-                <span>ORDER / QUEST</span>
+                <span>QUEST</span>
                 <span>MAIN REWARD</span>
               </div>
               <ol className="progression-queue">
@@ -158,61 +200,34 @@ export default function Journey({
                   </li>
                 ))}
               </ol>
-              <p className="window-footnote">
-                Sample order only. Quest completion, item ownership, and reward
-                claims are recorded separately.
-              </p>
             </>
           )}
+          <p className="window-footnote">
+            Sample activities · progress entered manually.
+          </p>
         </GameWindow>
-        <aside className="account-register">
-          <GameWindow
-            className="levels-window"
-            title="Recorded levels"
-            trailing={profile.name}
-          >
-            <div className="level-register">
-              {Object.entries(profile.levels).map(([name, level]) => (
-                <button
-                  type="button"
-                  className="level-register-cell"
-                  key={name}
-                  aria-label={"Edit " + name + " level"}
-                  title={"Edit " + name + " level"}
-                  onClick={() => setEditingSkill(name)}
-                >
-                  <img src={wikiImage(name + "-icon.png")} alt="" />
-                  <span>{name}</span>
-                  <strong>{level}</strong>
-                </button>
-              ))}
-            </div>
-            <button
-              type="button"
-              className="register-edit"
-              onClick={() => setEditingSkill("Mining")}
-            >
-              Update recorded levels <ChevronRight size={14} />
-            </button>
-            <p className="window-footnote">
-              Select a skill to edit · manual entries
-            </p>
-          </GameWindow>
-          <GameWindow
-            className="active-register"
-            title="Active preparation"
-            icon={<Focus size={15} />}
-          >
-            <div className="active-register-body">
-              <NavigationCard
-                title={taskTitle(profile.activeTask)}
-                label="Resume preparation"
-                detail="Continue the saved packing checklist and session notes."
-                onOpen={onPlay}
-              />
-            </div>
-          </GameWindow>
-        </aside>
+        <details className="tool-window home-levels">
+          <summary className="window-title">
+            <h2>Recorded levels</h2>
+            <ChevronDown size={18} aria-hidden="true" />
+          </summary>
+          <div className="level-register">
+            {Object.entries(profile.levels).map(([name, level]) => (
+              <button
+                type="button"
+                className="level-register-cell"
+                key={name}
+                aria-label={"Edit " + name + " level"}
+                title={"Edit " + name + " level"}
+                onClick={() => setEditingSkill(name)}
+              >
+                <img src={wikiImage(name + "-icon.png")} alt="" />
+                <span>{name}</span>
+                <strong>{level}</strong>
+              </button>
+            ))}
+          </div>
+        </details>
       </div>
       {editingSkill && (
         <LevelEditor

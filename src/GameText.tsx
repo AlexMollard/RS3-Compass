@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { QUESTS, SAMPLE_PROFILES } from "./data";
 import { wikiHref, wikiImage } from "./wiki";
+import { LOCATIONS } from "./locations";
 
 interface Reference {
   name: string;
@@ -55,6 +56,30 @@ const items: Omit<Reference, "kind">[] = [
     image: "Adamantite_ore.png",
   },
   { name: "Coal", wiki: "Coal", image: "Coal.png" },
+  { name: "Luminite", wiki: "Luminite", image: "Luminite.png" },
+  { name: "Iron ore box", wiki: "Iron_ore_box", image: "Iron_ore_box.png" },
+  { name: "Steel ore box", wiki: "Steel_ore_box", image: "Steel_ore_box.png" },
+  {
+    name: "Mithril ore box",
+    wiki: "Mithril_ore_box",
+    image: "Mithril_ore_box.png",
+  },
+  {
+    name: "Adamant ore box",
+    wiki: "Adamant_ore_box",
+    image: "Adamant_ore_box.png",
+  },
+  { name: "Blurite ore", wiki: "Blurite_ore", image: "Blurite_ore.png" },
+  { name: "Raw crayfish", wiki: "Raw_crayfish", image: "Raw_crayfish.png" },
+  { name: "Raw trout", wiki: "Raw_trout", image: "Raw_trout.png" },
+  { name: "Raw salmon", wiki: "Raw_salmon", image: "Raw_salmon.png" },
+  { name: "Raw shrimps", wiki: "Raw_shrimps", image: "Raw_shrimps.png" },
+  { name: "Raw anchovies", wiki: "Raw_anchovies", image: "Raw_anchovies.png" },
+  {
+    name: "Small fishing net",
+    wiki: "Small_fishing_net",
+    image: "Small_fishing_net.png",
+  },
   {
     name: "Bronze bar",
     wiki: "Bronze_bar",
@@ -107,6 +132,12 @@ const items: Omit<Reference, "kind">[] = [
 ];
 const references: Reference[] = [
   ...items.map((item) => ({ ...item, kind: "item" as const })),
+  ...Object.values(LOCATIONS).map((location) => ({
+    name: location.name,
+    wiki: location.wiki,
+    aliases: [location.name.replaceAll("'", "’")],
+    kind: "place" as const,
+  })),
   ...QUESTS.map((quest) => ({
     name: quest.name,
     wiki: quest.wiki,
@@ -120,25 +151,12 @@ const references: Reference[] = [
     kind: "quest",
   },
   ...[
-    ...new Set(
-      SAMPLE_PROFILES.flatMap((profile) => Object.keys(profile.levels)),
-    ),
+    ...new Set([
+      ...SAMPLE_PROFILES.flatMap((profile) => Object.keys(profile.levels)),
+      "Agility",
+    ]),
   ].map((name) => ({ name, wiki: name, kind: "skill" as const })),
-  { name: "Lumbridge Castle", wiki: "Lumbridge_Castle", kind: "place" },
-  { name: "Lumbridge", wiki: "Lumbridge", kind: "place" },
-  { name: "Falador", wiki: "Falador", kind: "place" },
-  {
-    name: "Asgarnian Ice Dungeon",
-    wiki: "Asgarnian_Ice_Dungeon",
-    kind: "place",
-  },
-  { name: "Champions’ Guild", wiki: "Champions'_Guild", kind: "place" },
-  { name: "Crandor", wiki: "Crandor", kind: "place" },
-  { name: "Baxtorian Falls", wiki: "Baxtorian_Falls", kind: "place" },
-  { name: "Burthorpe mine", wiki: "Burthorpe_mine", kind: "place" },
   { name: "Lumbridge swamp", wiki: "Lumbridge_Swamp", kind: "place" },
-  { name: "Draynor Village", wiki: "Draynor_Village", kind: "place" },
-  { name: "Artisans’ Workshop", wiki: "Artisans'_Workshop", kind: "place" },
   { name: "Metal bank", wiki: "Metal_bank", kind: "reference" },
   { name: "Food", wiki: "Food", kind: "reference" },
 ];
