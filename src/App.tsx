@@ -32,6 +32,7 @@ import QuestLevels from "./QuestLevels";
 import GameText from "./GameText";
 import Journey from "./Journey";
 import LocationGallery from "./LocationGallery";
+import QuestStart from "./QuestStart";
 import {
   ActivityHeader,
   Button,
@@ -570,8 +571,7 @@ function PlayCompanion({
     ? profile.completedTasks.includes(task)
     : profile.completedQuests.includes(task);
   const stage = skill ? trainingStage(skill, profile) : undefined;
-  const places =
-    quest?.locations ?? (stage ? stageLocations(stage, profile.mode) : []);
+  const places = stage ? stageLocations(stage, profile.mode) : [];
   const packing = quest?.supplies || stage?.supplies || [];
   const packedItems = packing.filter((item) =>
     profile.packed.includes(task + "::" + item),
@@ -700,12 +700,16 @@ function PlayCompanion({
                 Checks are manual; they do not read your bank or inventory.
               </p>
             </section>
-            {places.length > 0 && (
+            {(quest || places.length > 0) && (
               <section className="detail-section">
                 <SectionHeading
-                  title={skill ? "Where to train" : "Where to go"}
+                  title={skill ? "Where to train" : "Where to start"}
                 />
-                <LocationGallery locations={places} profile={profile} />
+                {quest ? (
+                  <QuestStart quest={quest} />
+                ) : (
+                  <LocationGallery locations={places} profile={profile} />
+                )}
               </section>
             )}
             {!locked && (

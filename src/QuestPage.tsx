@@ -3,7 +3,7 @@ import { ArrowRight, BookOpen, Check, LockKeyhole } from "lucide-react";
 import { QUESTS, type Profile } from "./data";
 import QuestLevels from "./QuestLevels";
 import GameText from "./GameText";
-import LocationGallery from "./LocationGallery";
+import QuestStart from "./QuestStart";
 import {
   ActivityHeader,
   Button,
@@ -146,8 +146,8 @@ export default function QuestPage({
               </Button>
             </div>
             <section className="detail-section">
-              <SectionHeading title="Where to go" />
-              <LocationGallery locations={quest.locations} profile={profile} />
+              <SectionHeading title="Where to start" />
+              <QuestStart quest={quest} />
             </section>
             <div className="quest-columns">
               <section className="detail-section">

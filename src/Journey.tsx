@@ -15,6 +15,7 @@ import { wikiImage } from "./wiki";
 import LevelEditor from "./LevelEditor";
 import LocationGallery from "./LocationGallery";
 import QuestLevels from "./QuestLevels";
+import QuestStart from "./QuestStart";
 import {
   Button,
   GameWindow,
@@ -60,9 +61,9 @@ export default function Journey({
   const packed = packing.filter((item) =>
     profile.packed.includes(profile.activeTask + "::" + item),
   ).length;
-  const activePlaces =
-    activeQuest?.locations ??
-    (activeStage ? stageLocations(activeStage, profile.mode) : []);
+  const activePlaces = activeStage
+    ? stageLocations(activeStage, profile.mode)
+    : [];
   const sessionComplete = activeQuest
     ? profile.completedQuests.includes(activeQuest.id)
     : profile.completedTasks.includes(profile.activeTask);
@@ -96,11 +97,15 @@ export default function Journey({
                 detail="Continue your checklist and notes."
                 onOpen={onPlay}
               />
-              <LocationGallery
-                locations={activePlaces}
-                profile={profile}
-                compact
-              />
+              {activeQuest ? (
+                <QuestStart quest={activeQuest} compact />
+              ) : (
+                <LocationGallery
+                  locations={activePlaces}
+                  profile={profile}
+                  compact
+                />
+              )}
             </div>
           </GameWindow>
         )}
@@ -136,12 +141,8 @@ export default function Journey({
                   <WikiAction page={next.wiki} label="Quest Wiki" />
                 </div>
               </div>
-              <div className="next-preparation-places">
-                <LocationGallery
-                  locations={next.locations}
-                  profile={profile}
-                  compact
-                />
+              <div className="next-preparation-start">
+                <QuestStart quest={next} compact />
               </div>
             </div>
           ) : (

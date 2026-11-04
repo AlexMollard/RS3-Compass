@@ -7,7 +7,7 @@ const stages = SKILLS.flatMap((skill) => skill.stages);
 
 test("every quest and training destination resolves to a location card", () => {
   const references = [
-    ...QUESTS.flatMap((quest) => quest.locations),
+    ...QUESTS.map((quest) => quest.start.location),
     ...stages.flatMap((stage) => [
       ...stage.locations,
       ...(stage.memberLocations ?? []),
@@ -32,6 +32,11 @@ test("location names cannot collide in case-insensitive game references", () => 
 test("free-to-play recommendations never include a members-only destination", () => {
   const forbidden = stages.flatMap((stage) =>
     stageLocations(stage, "f2p").filter((id) => LOCATIONS[id]?.members),
+  );
+  forbidden.push(
+    ...QUESTS.filter(
+      (quest) => !quest.members && LOCATIONS[quest.start.location]?.members,
+    ).map((quest) => quest.start.location),
   );
   assert.deepEqual(forbidden, []);
 });

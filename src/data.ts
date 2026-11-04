@@ -19,7 +19,14 @@ export interface QuestRecord {
   members: boolean;
   difficulty: string;
   length: string;
-  locations: string[];
+  start: {
+    npc: string;
+    npcWiki: string;
+    image: string;
+    location: string;
+    meetingPoint: string;
+    access?: string;
+  };
   why: string;
   requirements: { skill: string; level: number; recommended?: boolean }[];
   questRequirements: string[];
@@ -53,7 +60,13 @@ export const QUESTS: QuestRecord[] = [
     members: false,
     difficulty: "Novice",
     length: "Short",
-    locations: ["Lumbridge Castle"],
+    start: {
+      npc: "Cook",
+      npcWiki: "Cook (Lumbridge)",
+      image: "Cook_(Lumbridge)_chathead.png",
+      location: "Lumbridge Castle",
+      meetingPoint: "Kitchen on the ground floor, south side of the castle.",
+    },
     why: "An approachable first quest that starts your cooking journey and opens the way to later cooking quests.",
     requirements: [],
     questRequirements: [],
@@ -71,7 +84,13 @@ export const QUESTS: QuestRecord[] = [
     members: false,
     difficulty: "Intermediate",
     length: "Medium",
-    locations: ["Falador", "Asgarnian Ice Dungeon"],
+    start: {
+      npc: "Squire Asrol",
+      npcWiki: "Squire Asrol",
+      image: "Squire_Asrol_chathead.png",
+      location: "Falador",
+      meetingPoint: "White Knights' Castle courtyard.",
+    },
     why: "A valuable early Smithing reward. Gather your own inputs first and avoid a long, repetitive early Smithing grind.",
     requirements: [
       { skill: "Mining", level: 10 },
@@ -98,7 +117,14 @@ export const QUESTS: QuestRecord[] = [
     members: false,
     difficulty: "Experienced",
     length: "Long",
-    locations: ["Champions' Guild", "Crandor"],
+    start: {
+      npc: "Guildmaster",
+      npcWiki: "Guildmaster",
+      image: "Guildmaster_chathead.png",
+      location: "Champions' Guild",
+      meetingPoint: "Ground-floor foyer, south-west of Varrock.",
+      access: "33 quest points are required to enter the guild.",
+    },
     why: "A major F2P quest milestone that brings your combat, equipment, and self-supplied preparation together.",
     requirements: [
       { skill: "Crafting", level: 8, recommended: true },
@@ -124,7 +150,14 @@ export const QUESTS: QuestRecord[] = [
     members: true,
     difficulty: "Intermediate",
     length: "Medium",
-    locations: ["Baxtorian Falls"],
+    start: {
+      npc: "Almera",
+      npcWiki: "Almera",
+      image: "Almera_chathead.png",
+      location: "Baxtorian Falls",
+      meetingPoint:
+        "Inside her house north-east of the falls, south of Barbarian Outpost.",
+    },
     why: "A classic early-members direction with Attack and Strength rewards. Plan for the dangerous areas rather than assuming starter equipment is enough.",
     requirements: [],
     questRequirements: [],
@@ -146,7 +179,16 @@ export const QUESTS: QuestRecord[] = [
     members: true,
     difficulty: "Intermediate",
     length: "Medium",
-    locations: ["Tree Gnome Village"],
+    start: {
+      npc: "King Bolren",
+      npcWiki: "King Bolren",
+      image: "King_Bolren_chathead.png",
+      location: "Tree Gnome Village",
+      meetingPoint:
+        "By the spirit tree inside the village, at the centre of the maze.",
+      access:
+        "First visit: navigate the maze and squeeze through the loose railing. Spirit-tree travel unlocks after this quest.",
+    },
     why: "An early-members quest direction with Attack experience and useful travel progression.",
     requirements: [],
     questRequirements: [],
