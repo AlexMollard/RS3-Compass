@@ -3,15 +3,22 @@ import {
   ArrowRight,
   BookOpen,
   Check,
-  CheckCircle2,
-  ChevronRight,
-  ExternalLink,
   LockKeyhole,
   MapPin,
   Search,
-  ShieldCheck,
 } from "lucide-react";
-import { QUESTS, asset, type Profile } from "./data";
+import { QUESTS, type Profile } from "./data";
+import QuestLevels from "./QuestLevels";
+import GameText from "./GameText";
+import {
+  ActivityHeader,
+  Button,
+  ItemList,
+  PageHeading,
+  QuestNavigationCard,
+  SectionHeading,
+  WikiAction,
+} from "./ui";
 interface Props {
   profile: Profile;
   selectedId: string;
@@ -41,21 +48,16 @@ export default function QuestPage({
   );
   return (
     <div className="quest-page page-enter">
-      <div className="page-heading">
-        <div>
-          <span className="eyebrow">YOUR ADVENTURE, ONE CHAPTER AT A TIME</span>
-          <h1>
-            Quest journal<span className="heading-dot">.</span>
-          </h1>
-          <p className="page-subtitle">
-            More than a checkbox. Know what to bring, and why it matters.
-          </p>
-        </div>
-        <span className="badge badge-gold">
-          <BookOpen size={14} /> {profile.completedQuests.length} /{" "}
-          {QUESTS.length} sample quests
-        </span>
-      </div>
+      <PageHeading
+        title="Quest preparation"
+        subtitle="Levels and items to prepare before starting a quest."
+        trailing={
+          <span className="badge badge-gold">
+            <BookOpen size={14} /> {profile.completedQuests.length} /{" "}
+            {QUESTS.length} sample quests
+          </span>
+        }
+      />
       <div className="journal-layout">
         <aside className="panel journal-list" aria-label="Sample quests">
           <label className="search-field">
@@ -86,36 +88,13 @@ export default function QuestPage({
             </div>
           ) : (
             visible.map((q) => (
-              <button
+              <QuestNavigationCard
                 key={q.id}
-                className={
-                  "journal-row " + (quest.id === q.id ? "selected" : "")
-                }
-                aria-pressed={quest.id === q.id}
-                onClick={() => onSelect(q.id)}
-              >
-                <span
-                  className={
-                    "quest-state " +
-                    (profile.completedQuests.includes(q.id)
-                      ? "is-complete"
-                      : "")
-                  }
-                >
-                  {profile.completedQuests.includes(q.id) ? (
-                    <Check size={15} />
-                  ) : (
-                    <BookOpen size={15} />
-                  )}
-                </span>
-                <span>
-                  <strong>{q.name}</strong>
-                  <small>
-                    {q.members ? "Members" : "Free-to-play"} · {q.difficulty}
-                  </small>
-                </span>
-                <ChevronRight size={15} />
-              </button>
+                quest={q}
+                completed={profile.completedQuests.includes(q.id)}
+                selected={quest.id === q.id}
+                onOpen={onSelect}
+              />
             ))
           )}
           <p className="sample-note">
@@ -124,19 +103,17 @@ export default function QuestPage({
           </p>
         </aside>
         <article className="panel quest-detail" key={quest.id}>
-          <div className="detail-art">
-            <img src={asset(quest.image)} alt="" />
-            <div className="detail-art-shade" />
-            <div>
-              <span className="badge">
-                {quest.members ? "MEMBERS" : "FREE-TO-PLAY"} QUEST
-              </span>
-              <h2>{quest.name}</h2>
-              <p>
-                <MapPin size={14} /> {quest.location}
+          <ActivityHeader
+            title={quest.name}
+            wiki={quest.wiki}
+            image="Quest_icon.png"
+            eyebrow={(quest.members ? "MEMBERS" : "FREE-TO-PLAY") + " QUEST"}
+            meta={
+              <p className="location-line">
+                <MapPin size={14} /> <GameText text={quest.location} />
               </p>
-            </div>
-          </div>
+            }
+          />
           <div className="detail-body">
             <div className="quest-facts">
               <span>
@@ -148,16 +125,12 @@ export default function QuestPage({
                 {complete ? "Completed" : "Not recorded complete"}
               </span>
             </div>
-            <p className="intro-copy">{quest.description}</p>
-            <div className="why-card">
-              <span className="icon-tile">
-                <ShieldCheck size={20} />
-              </span>
-              <div>
-                <span className="eyebrow">WHY THIS BELONGS ON YOUR ROUTE</span>
-                <p>{quest.why}</p>
-              </div>
-            </div>
+            <section className="prep-reason">
+              <h3>Purpose</h3>
+              <p>
+                <GameText text={quest.why} />
+              </p>
+            </section>
             {locked && (
               <div className="notice">
                 <LockKeyhole size={18} />
@@ -171,72 +144,18 @@ export default function QuestPage({
               </div>
             )}
             <section className="detail-section">
-              <div className="section-heading">
-                <h3>Before you set out</h3>
-                <span className="muted">Check your in-game journal</span>
-              </div>
-              <div className="requirement-grid">
-                {quest.requirements.length === 0 ? (
-                  <div className="requirement">
-                    <CheckCircle2 size={17} />
-                    <div>
-                      <strong>No skill levels listed in this sample</strong>
-                      <small>
-                        This does not confirm quest, combat, or item readiness.
-                      </small>
-                    </div>
-                  </div>
-                ) : (
-                  quest.requirements.map((r) => {
-                    const level = profile.levels[r.skill];
-                    const met = level != null && level >= r.level;
-                    return (
-                      <button
-                        key={r.skill}
-                        className={"requirement " + (met ? "met" : "missing")}
-                        onClick={() => onSkill(r.skill)}
-                      >
-                        <span className="level-disc">{r.level}</span>
-                        <span>
-                          <strong>
-                            {r.skill}
-                            {r.recommended ? " · self-supply" : ""}
-                          </strong>
-                          <small>
-                            {level == null
-                              ? "Your level is unknown"
-                              : "Recorded level " + level}
-                            {r.recommended ? " · recommended" : " · required"}
-                          </small>
-                        </span>
-                        {met ? (
-                          <CheckCircle2 size={17} />
-                        ) : (
-                          <ArrowRight size={17} />
-                        )}
-                      </button>
-                    );
-                  })
-                )}
-              </div>
-              {quest.id === "dragon-slayer" && (
-                <p className="notice-inline">
-                  33 quest points are required. This prototype does not
-                  calculate or verify your quest-point total.
-                </p>
-              )}
+              <SectionHeading
+                title="Prepare these levels"
+                aside={
+                  <span className="muted">Check your in-game journal</span>
+                }
+              />
+              <QuestLevels profile={profile} quest={quest} onSkill={onSkill} />
             </section>
             <div className="quest-columns">
               <section className="detail-section">
-                <h3>Pack for the journey</h3>
-                <ul className="plain-list">
-                  {quest.supplies.map((s) => (
-                    <li key={s}>
-                      <span className="tiny-diamond" />
-                      {s}
-                    </li>
-                  ))}
-                </ul>
+                <h3>Gather these items</h3>
+                <ItemList items={quest.supplies} />
                 <small className="muted">
                   Packing checks are saved in Play Companion.
                 </small>
@@ -247,7 +166,7 @@ export default function QuestPage({
                   {quest.rewards.map((r) => (
                     <li key={r}>
                       <Check size={14} />
-                      {r}
+                      <GameText text={r} />
                     </li>
                   ))}
                 </ul>
@@ -257,31 +176,22 @@ export default function QuestPage({
               </section>
             </div>
             <div className="detail-actions">
-              <button
-                className="btn btn-primary"
+              <Button
+                variant="primary"
                 disabled={locked}
                 onClick={() => onStart(quest.id)}
               >
-                Plan this quest <ArrowRight size={16} />
-              </button>
-              <button
-                className={
-                  "btn " + (complete ? "btn-success" : "btn-secondary")
-                }
+                Open preparation checklist <ArrowRight size={16} />
+              </Button>
+              <Button
+                variant={complete ? "success" : "secondary"}
                 aria-pressed={complete}
                 onClick={() => onToggleQuest(quest.id)}
               >
                 <Check size={16} />
                 {complete ? "Completed · undo" : "Mark quest complete"}
-              </button>
-              <a
-                className="text-link"
-                href={"https://runescape.wiki/w/" + quest.wiki}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Wiki walkthrough <ExternalLink size={13} />
-              </a>
+              </Button>
+              <WikiAction page={quest.wiki} label="Wiki walkthrough" />
             </div>
             <p className="sample-note">
               Illustrative planning content adapted from the existing guide.

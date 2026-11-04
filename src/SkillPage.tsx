@@ -3,14 +3,24 @@ import {
   ArrowRight,
   Check,
   ChevronRight,
-  ExternalLink,
-  Hammer,
   MapPin,
   Pickaxe,
   Search,
   Target,
 } from "lucide-react";
-import { SKILLS, asset, type Profile } from "./data";
+import { SKILLS, type Profile } from "./data";
+import GameText from "./GameText";
+import { wikiHref, wikiImage } from "./wiki";
+import {
+  ActivityHeader,
+  Button,
+  IconButton,
+  ItemList,
+  PageHeading,
+  SectionHeading,
+  Tabs,
+  WikiAction,
+} from "./ui";
 interface Props {
   profile: Profile;
   selectedSkill: string;
@@ -28,26 +38,16 @@ export default function SkillPage({
   const skill = SKILLS.find((s) => s.name === selectedSkill) || SKILLS[0];
   return (
     <div className="skill-page page-enter">
-      <div className="page-heading">
-        <div>
-          <span className="eyebrow">
-            GATHER. CREATE. BECOME SELF-SUFFICIENT.
+      <PageHeading
+        title="Skills"
+        subtitle="Methods, equipment, and supplies for the selected skill."
+        trailing={
+          <span className="badge badge-gold">
+            <Pickaxe size={14} />{" "}
+            {profile.mode === "members" ? "Members methods" : "F2P methods"}
           </span>
-          <h1>
-            Skill field guide<span className="heading-dot">.</span>
-          </h1>
-          <p className="page-subtitle">
-            Train for something useful. Know your method before you leave the
-            bank.
-          </p>
-        </div>
-        <span className="badge badge-gold">
-          <Pickaxe size={14} />{" "}
-          {profile.mode === "members"
-            ? "Members perspective"
-            : "Free-world perspective"}
-        </span>
-      </div>
+        }
+      />
       <SkillContent
         key={skill.name}
         profile={profile}
@@ -106,28 +106,42 @@ function SkillContent({
         </label>
         <p className="list-kicker">SAMPLE FIELD GUIDES</p>
         {filtered.map((s) => (
-          <button
+          <div
             className={
               "journal-row " + (s.name === skill.name ? "selected" : "")
             }
             key={s.name}
-            onClick={() => onSelect(s.name)}
-            aria-pressed={s.name === skill.name}
           >
-            <img className="skill-sprite" src={asset(s.icon)} alt="" />
+            <a
+              href={wikiHref(s.wiki)}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={s.name + " on RuneScape Wiki"}
+            >
+              <img className="skill-sprite" src={wikiImage(s.icon)} alt="" />
+            </a>
             <span>
-              <strong>{s.name}</strong>
+              <strong>
+                <GameText text={s.name} />
+              </strong>
               <small>{s.category}</small>
             </span>
             <span className="skill-level">{profile.levels[s.name] ?? "?"}</span>
-          </button>
+            <IconButton
+              label={"Open training for " + s.name}
+              aria-pressed={s.name === skill.name}
+              onClick={() => onSelect(s.name)}
+            >
+              <ChevronRight size={15} />
+            </IconButton>
+          </div>
         ))}
         {filtered.length === 0 && (
           <p className="empty-state">No sample skills match.</p>
         )}
         <div className="field-tip">
           <Target size={21} />
-          <h3>Levels with a purpose</h3>
+          <h3>Training targets</h3>
           <p>
             Quest requirements, equipment, and useful supplies should drive the
             next training session.
@@ -139,18 +153,17 @@ function SkillContent({
         </p>
       </aside>
       <article className="panel skill-detail">
-        <div className="skill-titlebar">
-          <div className="skill-emblem">
-            <img src={asset(skill.icon)} alt="" />
-          </div>
-          <div>
-            <span className="eyebrow">
-              {skill.category.toUpperCase()} FIELD GUIDE
-            </span>
-            <h2>{skill.name}</h2>
-            <p>{skill.description}</p>
-          </div>
-        </div>
+        <ActivityHeader
+          title={skill.name}
+          wiki={skill.wiki}
+          image={skill.icon}
+          eyebrow={skill.category.toUpperCase() + " FIELD GUIDE"}
+          meta={
+            <p>
+              <GameText text={skill.description} />
+            </p>
+          }
+        />
         <div className="detail-body">
           <section className="skill-progress-card">
             <div className="skill-progress-top">
@@ -202,7 +215,7 @@ function SkillContent({
               }}
             >
               <label>
-                Update my {skill.name} level
+                Update recorded level
                 <input
                   aria-label={skill.name + " level"}
                   type="number"
@@ -214,13 +227,17 @@ function SkillContent({
                   onChange={(e) => setLevel(e.target.value)}
                 />
               </label>
-              <button className="btn btn-secondary" type="submit">
+              <Button type="submit">
                 <Check size={15} /> Save level
-              </button>
+              </Button>
             </form>
             <p className="form-message" role="status">
-              {message ||
-                "Manual entry · sample character · no public stat lookup"}
+              <GameText
+                text={
+                  message ||
+                  "Manual entry · sample character · no public stat lookup"
+                }
+              />
             </p>
           </section>
           <div className="why-card">
@@ -229,59 +246,66 @@ function SkillContent({
             </span>
             <div>
               <span className="eyebrow">WHAT THIS TRAINING UNLOCKS</span>
-              <p>{skill.payoff}</p>
+              <p>
+                <GameText text={skill.payoff} />
+              </p>
             </div>
           </div>
           <section className="detail-section">
-            <div className="section-heading">
-              <h3>Choose your training range</h3>
-              <span className="muted">Sample methods</span>
-            </div>
+            <SectionHeading
+              title="Choose your training range"
+              aside={<span className="muted">Sample methods</span>}
+            />
             <div className="range-selector">
               {skill.stages.map((s, i) => (
-                <button
+                <div
+                  className={"range-row " + (band === i ? "selected" : "")}
                   key={s.title}
-                  aria-pressed={band === i}
-                  className={band === i ? "selected" : ""}
-                  onClick={() => setBand(i)}
                 >
                   <span>
                     {s.from}–{s.to}
                   </span>
-                  <strong>{s.title}</strong>
-                  <ChevronRight size={15} />
-                </button>
+                  <strong>
+                    <GameText text={s.title} />
+                  </strong>
+                  <IconButton
+                    label={"Select levels " + s.from + " to " + s.to}
+                    aria-pressed={band === i}
+                    onClick={() => setBand(i)}
+                  >
+                    <ChevronRight size={15} />
+                  </IconButton>
+                </div>
               ))}
             </div>
           </section>
-          <div className="detail-tabs" aria-label="Training guide sections">
-            {[
-              ["method", "Method"],
-              ["equipment", "Gear & tools"],
-              ["supplies", "Supplies"],
-            ].map(([id, label]) => (
-              <button
-                key={id}
-                aria-pressed={tab === id}
-                className={tab === id ? "selected" : ""}
-                onClick={() => setTab(id)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+          <Tabs
+            variant="detail"
+            label="Training guide sections"
+            value={tab}
+            onChange={setTab}
+            items={[
+              { value: "method", label: "Method" },
+              { value: "equipment", label: "Gear & tools" },
+              { value: "supplies", label: "Supplies" },
+            ]}
+          />
           <section className="training-method">
             {tab === "method" ? (
               <>
                 <span className="eyebrow">
                   LEVEL {stage.from}–{stage.to}
                 </span>
-                <h3>{stage.title}</h3>
+                <h3>
+                  <GameText text={stage.title} />
+                </h3>
                 <p className="location-line">
                   <MapPin size={15} />
-                  {stage.location}
+                  <GameText text={stage.location} />
                 </p>
-                <p>{stage.method}</p>
+                <p>
+                  <GameText text={stage.method} />
+                </p>
                 <div className="method-note">
                   Compare complete sessions, including gathering, travel, and
                   banking. This preview does not supply measured XP/hour
@@ -291,32 +315,18 @@ function SkillContent({
             ) : tab === "equipment" ? (
               <>
                 <span className="eyebrow">PREPARE YOUR TOOLS</span>
-                <h3>The right setup, self-supplied</h3>
+                <h3>Equipment to prepare</h3>
                 <p>
                   Use the best equipment you can obtain and use. A higher skill
                   level does not mean you own the upgrade.
                 </p>
-                <ul className="plain-list">
-                  {stage.supplies.map((s) => (
-                    <li key={s}>
-                      <Hammer size={16} />
-                      {s}
-                    </li>
-                  ))}
-                </ul>
+                <ItemList items={stage.supplies} />
               </>
             ) : (
               <>
                 <span className="eyebrow">YOUR NEXT TRAINING SESSION</span>
                 <h3>Gather before you go</h3>
-                <ul className="plain-list">
-                  {stage.supplies.map((s) => (
-                    <li key={s}>
-                      <span className="tiny-diamond" />
-                      {s}
-                    </li>
-                  ))}
-                </ul>
+                <ItemList items={stage.supplies} />
                 <p>
                   Open Play Companion to check off the packing list and keep
                   session notes.
@@ -329,25 +339,20 @@ function SkillContent({
               <Pickaxe size={20} />
               <div>
                 <strong>Members content preview</strong>
-                <p>{skill.membersNote}</p>
+                <p>
+                  <GameText text={skill.membersNote} />
+                </p>
               </div>
             </div>
           )}
           <div className="detail-actions">
-            <button
-              className="btn btn-primary"
+            <Button
+              variant="primary"
               onClick={() => onStart("train-" + skill.name)}
             >
-              Start {skill.name} session <ArrowRight size={16} />
-            </button>
-            <a
-              className="text-link"
-              href={"https://runescape.wiki/w/" + skill.wiki}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Skill reference <ExternalLink size={13} />
-            </a>
+              Start training session <ArrowRight size={16} />
+            </Button>
+            <WikiAction page={skill.wiki} label="Skill reference" />
           </div>
         </div>
       </article>

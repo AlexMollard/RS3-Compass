@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SAMPLE_PROFILES, type Profile } from "./data";
 const STORAGE_KEY = "rs3-compass-design-v1";
 interface SavedState {
@@ -56,12 +56,18 @@ function initialState(): SavedState {
 export function useProfiles() {
   const [saved, setSaved] = useState<SavedState>(initialState);
   const [storageError, setStorageError] = useState(false);
+  const lastStorageError = useRef(false);
   useEffect(() => {
+    let failed = false;
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
-      setStorageError(false);
     } catch {
-      setStorageError(true);
+      failed = true;
+    }
+    // A successful write must not enqueue another render on every keystroke.
+    if (lastStorageError.current !== failed) {
+      lastStorageError.current = failed;
+      setStorageError(failed);
     }
   }, [saved]);
   const profile = saved.profiles.find((p) => p.id === saved.activeId)!;

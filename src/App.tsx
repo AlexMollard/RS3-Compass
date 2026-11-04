@@ -13,10 +13,8 @@ import {
   Compass,
   Crown,
   Expand,
-  Flag,
   Focus,
   Info,
-  Leaf,
   ListChecks,
   LockKeyhole,
   Map,
@@ -24,44 +22,53 @@ import {
   Menu,
   Minimize2,
   Pickaxe,
-  Play,
   Search,
   Shield,
-  Sparkles,
-  Swords,
   Target,
   X,
 } from "lucide-react";
 import QuestPage from "./QuestPage";
 import SkillPage from "./SkillPage";
+import QuestLevels from "./QuestLevels";
+import GameText from "./GameText";
+import Journey from "./Journey";
+import {
+  ActivityHeader,
+  Button,
+  IconButton,
+  ItemList,
+  PageHeading,
+  SectionHeading,
+  WikiAction,
+} from "./ui";
 import {
   QUESTS,
   SKILLS,
-  accessibleQuests,
-  asset,
   nextQuest,
   taskTitle,
   toggleItem,
   type Page,
   type Profile,
-  type QuestRecord,
 } from "./data";
 import { useProfiles } from "./state";
 const pageNames: Record<Page, string> = {
-  journey: "My journey",
+  journey: "Progression",
   play: "Play companion",
-  quests: "Quest journal",
-  skills: "Skill field guide",
+  quests: "Quest preparation",
+  skills: "Skills",
 };
 const navigation = [
-  { id: "journey" as const, label: "My journey", icon: Map },
+  { id: "journey" as const, label: "Progression", icon: Map },
   { id: "play" as const, label: "Play companion", icon: Focus },
-  { id: "quests" as const, label: "Quest journal", icon: BookOpen },
-  { id: "skills" as const, label: "Skill field guide", icon: Pickaxe },
+  { id: "quests" as const, label: "Quest preparation", icon: BookOpen },
+  { id: "skills" as const, label: "Skills", icon: Pickaxe },
 ];
 function readRoute(): { page: Page; detail: string } {
   const [page, detail = ""] = location.hash.slice(1).split("/");
-  return { page: Object.hasOwn(pageNames, page) ? (page as Page) : "journey", detail };
+  return {
+    page: Object.hasOwn(pageNames, page) ? (page as Page) : "journey",
+    detail,
+  };
 }
 export default function App() {
   const { profile, profiles, updateProfile, selectProfile, storageError } =
@@ -178,11 +185,11 @@ export default function App() {
           </span>
           <span>
             <strong>RS3 COMPASS</strong>
-            <small>FIND YOUR OWN WAY</small>
+            <small>IRONMAN PLANNER</small>
           </span>
         </a>
         <div className="sidebar-rule" />
-        <span className="nav-heading">YOUR ADVENTURE</span>
+        <span className="nav-heading">WORKSPACE</span>
         <nav aria-label="Main navigation">
           {navigation.map(({ id, label, icon: Icon }) => (
             <button
@@ -197,18 +204,6 @@ export default function App() {
             </button>
           ))}
         </nav>
-        <div className="sidebar-milestone">
-          <span className="small-compass">
-            <Compass size={22} />
-          </span>
-          <span className="eyebrow">YOUR PACE. YOUR PATH.</span>
-          <p>
-            Every great account
-            <br />
-            starts somewhere.
-          </p>
-          <span className="sidebar-flourish">◆ ───── ◆</span>
-        </div>
         <div className="sidebar-bottom">
           <div className="save-status">
             <span className={"status-dot " + (storageError ? "warning" : "")} />
@@ -229,14 +224,15 @@ export default function App() {
       <div className="workspace">
         <header className="topbar">
           <div className="breadcrumb">
-            <button
-              className="icon-button mobile-menu"
-              aria-label="Open navigation"
+            <IconButton
+              framed={false}
+              className="mobile-menu"
+              label="Open navigation"
               aria-expanded={mobileNav}
               onClick={() => setMobileNav(!mobileNav)}
             >
               <Menu size={21} />
-            </button>
+            </IconButton>
             <Compass size={15} />
             <span>Workspace</span>
             <ChevronRight size={13} />
@@ -307,9 +303,6 @@ export default function App() {
               onQuest={(id) => navigate("quests", id)}
               onSkill={openSkill}
               onPlay={() => navigate("play")}
-              onSetMode={() =>
-                updateProfile((p) => ({ ...p, mode: "members" }))
-              }
             />
           )}
           {route.page === "play" && (
@@ -402,14 +395,14 @@ export default function App() {
       )}
       <dialog className="app-dialog" ref={searchDialog}>
         <div className="dialog-heading">
-          <h2>Find your next adventure</h2>
-          <button
-            className="icon-button"
-            aria-label="Close search"
+          <h2>Search quests and skills</h2>
+          <IconButton
+            framed={false}
+            label="Close search"
             onClick={() => searchDialog.current?.close()}
           >
             <X size={20} />
-          </button>
+          </IconButton>
         </div>
         <label className="search-field large">
           <Search size={19} />
@@ -425,44 +418,48 @@ export default function App() {
           {QUESTS.filter((q) =>
             q.name.toLowerCase().includes(search.toLowerCase()),
           ).map((q) => (
-            <button
-              key={q.id}
-              onClick={() => {
-                searchDialog.current?.close();
-                navigate("quests", q.id);
-              }}
-            >
+            <div className="search-result" key={q.id}>
               <BookOpen size={18} />
               <span>
-                <strong>{q.name}</strong>
+                <strong>
+                  <GameText text={q.name} />
+                </strong>
                 <small>
                   {q.members ? "Members quest" : "Free-to-play quest"}
                 </small>
               </span>
-              {q.members && profile.mode === "f2p" ? (
-                <LockKeyhole size={15} />
-              ) : (
+              <IconButton
+                label={"Open preparation for " + q.name}
+                onClick={() => {
+                  searchDialog.current?.close();
+                  navigate("quests", q.id);
+                }}
+              >
                 <ArrowRight size={16} />
-              )}
-            </button>
+              </IconButton>
+            </div>
           ))}
           {SKILLS.filter((s) =>
             s.name.toLowerCase().includes(search.toLowerCase()),
           ).map((s) => (
-            <button
-              key={s.name}
-              onClick={() => {
-                searchDialog.current?.close();
-                openSkill(s.name);
-              }}
-            >
+            <div className="search-result" key={s.name}>
               <Pickaxe size={18} />
               <span>
-                <strong>{s.name}</strong>
-                <small>Sample skill guide</small>
+                <strong>
+                  <GameText text={s.name} />
+                </strong>
+                <small>Sample training methods</small>
               </span>
-              <ArrowRight size={16} />
-            </button>
+              <IconButton
+                label={"Open training for " + s.name}
+                onClick={() => {
+                  searchDialog.current?.close();
+                  openSkill(s.name);
+                }}
+              >
+                <ArrowRight size={16} />
+              </IconButton>
+            </div>
           ))}
           {![...QUESTS.map((q) => q.name), ...SKILLS.map((s) => s.name)].some(
             (n) => n.toLowerCase().includes(search.toLowerCase()),
@@ -475,20 +472,22 @@ export default function App() {
         <div className="dialog-heading">
           <div>
             <span className="eyebrow">RS3 COMPASS · DESIGN PREVIEW</span>
-            <h2>A direction, not the finished atlas.</h2>
+            <h2>Prototype scope</h2>
           </div>
-          <button
-            className="icon-button"
-            aria-label="Close prototype notes"
+          <IconButton
+            framed={false}
+            label="Close prototype notes"
             onClick={() => aboutDialog.current?.close()}
           >
             <X size={20} />
-          </button>
+          </IconButton>
         </div>
         <p>
           This clickable prototype explores a desktop-first progression
           companion for Solo and Group Ironman. Aster and Rowan are fictional
-          sample profiles, not live RuneScape accounts.
+          sample profiles, not live RuneScape accounts. Compass prepares your
+          levels and items; the Wiki or in-game quest helper handles the quest
+          itself.
         </p>
         <h3>Working in this preview</h3>
         <p>
@@ -507,36 +506,22 @@ export default function App() {
           The planned first release is static-only: no automatic player lookup,
           public-stat refresh, online boards, or shared task/supply sync.
         </p>
-        <button className="btn btn-secondary" onClick={exportPreview}>
+        <Button onClick={exportPreview}>
           <ArrowDownToLine size={16} /> Export preview profiles
-        </button>
+        </Button>
         <h3>Artwork and sources</h3>
         <p>
-          RuneScape and its artwork belong to Jagex. Existing guide imagery is
-          reused for this private design review; public redistribution terms
-          still need review before publication.
+          RuneScape and its artwork belong to Jagex. Game icons and item images
+          load directly from RuneScape Wiki. Browser caching follows the Wiki's
+          response headers; no game artwork is bundled with Compass.
         </p>
         <div className="credit-links">
           <a
-            href="https://runescape.wiki/w/File:Lumbridge.png"
+            href="https://runescape.wiki/w/Quests"
             target="_blank"
             rel="noreferrer"
           >
-            Lumbridge ↗
-          </a>
-          <a
-            href="https://runescape.wiki/w/File:Lumbridge_Castle.png"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Lumbridge Castle ↗
-          </a>
-          <a
-            href="https://runescape.wiki/w/File:Elvarg_fight.png"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Elvarg ↗
+            Quest icon source ↗
           </a>
           <a
             href="https://ironbound-rs3-alex.alexmollard93.chatgpt.site/guide/"
@@ -548,364 +533,6 @@ export default function App() {
         </div>
       </dialog>
     </div>
-  );
-}
-function Journey({
-  profile,
-  onStart,
-  onQuest,
-  onSkill,
-  onPlay,
-  onSetMode,
-}: {
-  profile: Profile;
-  onStart: (id: string) => void;
-  onQuest: (id: string) => void;
-  onSkill: (name: string) => void;
-  onPlay: () => void;
-  onSetMode: () => void;
-}) {
-  const [focus, setFocus] = useState("recommended");
-  const available = accessibleQuests(profile);
-  const complete = available.filter((q) =>
-    profile.completedQuests.includes(q.id),
-  ).length;
-  const recommendation = nextQuest(profile);
-  const alternatives = available.filter(
-    (q) =>
-      q.id !== recommendation?.id && !profile.completedQuests.includes(q.id),
-  );
-  return (
-    <div className="journey-page page-enter">
-      <div className="welcome-line">
-        <span>
-          <span className="status-dot" /> {profile.kind} ·{" "}
-          {profile.mode === "members" ? "Members world" : "Free world"}
-        </span>
-        <span className="preview-label">INTERACTIVE DESIGN PREVIEW</span>
-      </div>
-      <section className="journey-hero">
-        <img src={asset("lumbridge.webp")} alt="Lumbridge in RuneScape" />
-        <div className="hero-shade" />
-        <div className="hero-content">
-          <span className="eyebrow">
-            <Compass size={14} /> YOUR JOURNEY THROUGH GIELINOR
-          </span>
-          <h1>
-            A little direction.
-            <br />
-            <em>A bigger adventure.</em>
-          </h1>
-          <p>
-            Your next useful step, and everything you need
-            <br className="desktop-break" /> to make it happen. At your own
-            pace.
-          </p>
-          <button className="hero-resume" onClick={onPlay}>
-            <span className="play-disc">
-              <Play size={12} fill="currentColor" />
-            </span>
-            <span>
-              Pick up where you left off
-              <small>{taskTitle(profile.activeTask)}</small>
-            </span>
-            <ArrowRight size={18} />
-          </button>
-        </div>
-        <span className="scene-caption">LUMBRIDGE · WHERE IT ALL BEGINS</span>
-      </section>
-      <div className="journey-grid">
-        <div className="journey-primary">
-          <div className="section-heading journey-section-title">
-            <div>
-              <span className="eyebrow">MAKE YOUR NEXT SESSION COUNT</span>
-              <h2>A path worth taking</h2>
-            </div>
-            <span className="badge">
-              <Sparkles size={12} /> Sample recommendations
-            </span>
-          </div>
-          <div className="focus-tabs" aria-label="Recommendation focus">
-            {[
-              ["recommended", "Recommended"],
-              ["quests", "Questing"],
-              ["training", "Training"],
-            ].map(([id, label]) => (
-              <button
-                key={id}
-                aria-pressed={focus === id}
-                className={focus === id ? "selected" : ""}
-                onClick={() => setFocus(id)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-          {focus === "training" ? (
-            <div className="training-cards">
-              {SKILLS.map((s) => (
-                <button
-                  className="panel training-choice"
-                  key={s.name}
-                  onClick={() => onSkill(s.name)}
-                >
-                  <span className="skill-choice-icon">
-                    <img src={asset(s.icon)} alt="" />
-                  </span>
-                  <div>
-                    <span className="eyebrow">
-                      {s.category.toUpperCase()} · LEVEL{" "}
-                      {profile.levels[s.name] ?? "?"}
-                    </span>
-                    <h3>{s.name}</h3>
-                    <p>{s.payoff}</p>
-                  </div>
-                  <ArrowRight size={18} />
-                </button>
-              ))}
-            </div>
-          ) : (
-            <>
-              {recommendation ? (
-                <RecommendedQuest
-                  quest={recommendation}
-                  profile={profile}
-                  onStart={onStart}
-                  onQuest={onQuest}
-                />
-              ) : (
-                <div className="panel complete-panel">
-                  <CheckCircle2 size={30} />
-                  <h3>You’ve completed the sample route.</h3>
-                  <p>
-                    This is the end of the design sample, not the end of your
-                    RuneScape journey.
-                  </p>
-                  <button
-                    className="btn btn-secondary"
-                    onClick={() => onQuest(QUESTS[0].id)}
-                  >
-                    Review the quest journal
-                  </button>
-                </div>
-              )}
-              {alternatives.length > 0 && (
-                <section className="alternative-section">
-                  <div className="section-heading">
-                    <h3>
-                      {focus === "quests"
-                        ? "More of your quest route"
-                        : "Or take a different path"}
-                    </h3>
-                    <span className="muted">Your pace, your choice</span>
-                  </div>
-                  {alternatives
-                    .slice(0, focus === "quests" ? 4 : 2)
-                    .map((q) => (
-                      <button
-                        className="alternative-row"
-                        key={q.id}
-                        onClick={() => onQuest(q.id)}
-                      >
-                        <span className="alternative-icon">
-                          <BookOpen size={17} />
-                        </span>
-                        <span>
-                          <strong>{q.name}</strong>
-                          <small>
-                            {q.members ? "Members" : "F2P"} · {q.location}
-                          </small>
-                        </span>
-                        <ArrowUpRight size={16} />
-                      </button>
-                    ))}
-                </section>
-              )}
-            </>
-          )}
-          <section className="long-journey">
-            <div className="section-heading">
-              <h3>From first steps to lasting goals</h3>
-              <span className="muted">The product direction</span>
-            </div>
-            <div className="milestone-track">
-              {[
-                { name: "Foundations", icon: Leaf },
-                { name: "Quest unlocks", icon: BookOpen },
-                { name: "Combat & bosses", icon: Swords },
-                { name: "Long-term mastery", icon: Flag },
-              ].map(({ name, icon: Icon }, i) => (
-                <div className={i === 0 ? "current" : ""} key={name}>
-                  <span>
-                    <Icon size={17} />
-                  </span>
-                  <strong>{name}</strong>
-                  {i === 0 && <small>Your sample chapter</small>}
-                </div>
-              ))}
-            </div>
-            <p className="sample-note">
-              Later milestones show the intended journey, not completed guide
-              coverage.
-            </p>
-          </section>
-        </div>
-        <aside className="journey-rail">
-          <section className="panel character-card">
-            <div className="section-heading">
-              <span className="eyebrow">YOUR ADVENTURER</span>
-              <Shield size={16} />
-            </div>
-            <div className="character-summary">
-              <span className="portrait">
-                <Shield size={31} strokeWidth={1.2} />
-              </span>
-              <div>
-                <h3>{profile.name}</h3>
-                <span>{profile.kind}</span>
-                <small>Fictional sample profile</small>
-              </div>
-            </div>
-            <div className="character-stat">
-              <span>Sample quest progress</span>
-              <strong>
-                {complete}
-                <span> / {available.length}</span>
-              </strong>
-            </div>
-            <div className="progress-track">
-              <span
-                style={{ width: (complete / available.length) * 100 + "%" }}
-              />
-            </div>
-            <div className="character-stat">
-              <span>Recorded sample skills</span>
-              <strong>{Object.keys(profile.levels).length}</strong>
-            </div>
-            <div className="mini-skills">
-              {SKILLS.map((s) => (
-                <button
-                  key={s.name}
-                  onClick={() => onSkill(s.name)}
-                  title={"Open " + s.name}
-                >
-                  <img src={asset(s.icon)} alt={s.name} />
-                  <strong>{profile.levels[s.name] ?? "?"}</strong>
-                </button>
-              ))}
-            </div>
-            <p className="manual-note">
-              <Info size={13} /> Manually recorded. Not synced with Jagex.
-            </p>
-          </section>
-          <section className="panel session-card">
-            <span className="eyebrow">READY WHEN YOU ARE</span>
-            <div className="session-title">
-              <Backpack size={22} />
-              <h3>Your field kit</h3>
-            </div>
-            <p>
-              One task. The right supplies.
-              <br />A clear next step.
-            </p>
-            <button className="btn btn-secondary full-width" onClick={onPlay}>
-              Open play companion <ArrowRight size={15} />
-            </button>
-          </section>
-          <section className="horizon-card">
-            <Crown size={22} />
-            <h3>
-              {profile.mode === "members"
-                ? "A whole world ahead."
-                : "Beyond the free world."}
-            </h3>
-            <p>
-              {profile.mode === "members"
-                ? "Quest unlocks, combat readiness, and long-term goals belong on the same journey."
-                : "You don’t need to finish every free skill before choosing a members adventure."}
-            </p>
-            {profile.mode === "f2p" ? (
-              <button className="text-link" onClick={onSetMode}>
-                Explore Members mode <ArrowRight size={14} />
-              </button>
-            ) : (
-              <span className="badge badge-gold">
-                Members direction preview
-              </span>
-            )}
-          </section>
-        </aside>
-      </div>
-    </div>
-  );
-}
-function RecommendedQuest({
-  quest,
-  profile,
-  onStart,
-  onQuest,
-}: {
-  quest: QuestRecord;
-  profile: Profile;
-  onStart: (id: string) => void;
-  onQuest: (id: string) => void;
-}) {
-  const missing = quest.requirements.filter(
-    (r) => profile.levels[r.skill] == null || profile.levels[r.skill] < r.level,
-  );
-  return (
-    <article className="panel next-action">
-      <div className="next-action-top">
-        <span className="eyebrow">
-          <span className="gold-dot" /> RECOMMENDED NEXT
-        </span>
-        <span className="quest-type">
-          <BookOpen size={13} />
-          {quest.members ? "Members quest" : "Free-to-play quest"}
-        </span>
-      </div>
-      <div className="next-action-body">
-        <span className="quest-crest">
-          <BookOpen size={29} strokeWidth={1.3} />
-        </span>
-        <div>
-          <h3>{quest.name}</h3>
-          <p className="location-line">
-            <MapPin size={13} />
-            {quest.location}
-          </p>
-        </div>
-      </div>
-      <p className="next-why">{quest.why}</p>
-      <div className="readiness-line">
-        {missing.length ? (
-          <>
-            <span className="amber-indicator" />
-            <span>
-              {missing.length} preparation{" "}
-              {missing.length === 1 ? "level" : "levels"} to review
-            </span>
-            <span className="muted">
-              · Required vs recommended shown in guide
-            </span>
-          </>
-        ) : (
-          <>
-            <CheckCircle2 size={15} />
-            <span>No missing sample skill requirements</span>
-            <span className="muted">· Confirm items and combat readiness</span>
-          </>
-        )}
-      </div>
-      <div className="next-actions">
-        <button className="btn btn-primary" onClick={() => onStart(quest.id)}>
-          Prepare for this quest <ArrowRight size={16} />
-        </button>
-        <button className="btn btn-quiet" onClick={() => onQuest(quest.id)}>
-          View quest details <ArrowUpRight size={15} />
-        </button>
-      </div>
-    </article>
   );
 }
 function PlayCompanion({
@@ -947,11 +574,12 @@ function PlayCompanion({
         (profile.levels[skill.name] || 1) < s.to,
     ) || skill?.stages[skill.stages.length - 1];
   const packing = quest?.supplies || stage?.supplies || [];
-  const packed = packing.filter((item) =>
+  const packedItems = packing.filter((item) =>
     profile.packed.includes(task + "::" + item),
-  ).length;
+  );
+  const packed = packedItems.length;
   const next = nextQuest(profile);
-  const instructions = quest?.steps || [
+  const instructions = [
     stage?.method || "Choose a sample quest or skill session to get started.",
     "Include gathering, travel, and banking in your session.",
     "Record your new level in the skill guide when you finish.",
@@ -959,51 +587,45 @@ function PlayCompanion({
   return (
     <div className="play-page page-enter">
       <div className="play-page-top">
-        <button className="text-link" onClick={onBack}>
+        <Button variant="link" onClick={onBack}>
           <ArrowLeft size={15} /> Back to my journey
-        </button>
-        <button
-          className="btn btn-secondary compact-switch"
+        </Button>
+        <Button
+          className="compact-switch"
           aria-pressed={compact}
           onClick={onCompact}
         >
           {compact ? <Expand size={15} /> : <Minimize2 size={15} />}{" "}
           {compact ? "Expand workspace" : "Compact companion"}
-        </button>
+        </Button>
       </div>
-      <div className="page-heading">
-        <div>
-          <span className="eyebrow">LESS PLANNING. MORE ADVENTURING.</span>
-          <h1>
-            Your next adventure<span className="heading-dot">.</span>
-          </h1>
-          <p className="page-subtitle">
-            One useful task, and a little direction along the way.
-          </p>
-        </div>
-        <span className="badge badge-green">
-          <span className="status-dot" /> {profile.name} · saved locally
-        </span>
-      </div>
+      <PageHeading
+        title="Play companion"
+        subtitle={
+          quest
+            ? "Prepare your levels and items, then start the quest in-game."
+            : "Training method, equipment, and supplies for the selected skill."
+        }
+        trailing={
+          <span className="badge badge-green">
+            <span className="status-dot" /> {profile.name} · saved locally
+          </span>
+        }
+      />
       <div className="play-layout">
         <article className="panel active-session">
-          <div className="session-banner">
-            <img
-              src={asset(quest?.image || skill?.image || "lumbridge.webp")}
-              alt=""
-            />
-            <div className="session-banner-shade" />
-            <div className="session-banner-content">
-              <span className="badge">
-                {skill ? "TRAINING SESSION" : "QUEST SESSION"}
-              </span>
-              <h2>{taskTitle(task)}</h2>
-              <p>
+          <ActivityHeader
+            title={taskTitle(task)}
+            wiki={quest?.wiki || skill?.wiki || "Ironman_Mode/Strategies"}
+            image={skill?.icon || "Quest_icon.png"}
+            eyebrow={skill ? "TRAINING SESSION" : "QUEST PREPARATION"}
+            meta={
+              <p className="location-line">
                 <MapPin size={14} />
-                {quest?.location || stage?.location}
+                <GameText text={quest?.location || stage?.location || ""} />
               </p>
-            </div>
-          </div>
+            }
+          />
           <div className="detail-body">
             {locked ? (
               <div className="notice">
@@ -1015,12 +637,14 @@ function PlayCompanion({
                     header, or choose an accessible quest.
                   </p>
                   {next && (
-                    <button
-                      className="text-link"
-                      onClick={() => onStart(next.id)}
-                    >
-                      Prepare for {next.name} instead <ArrowRight size={14} />
-                    </button>
+                    <>
+                      <p>
+                        Available quest: <GameText text={next.name} />
+                      </p>
+                      <Button variant="link" onClick={() => onStart(next.id)}>
+                        Open preparation <ArrowRight size={14} />
+                      </Button>
+                    </>
                   )}
                 </div>
               </div>
@@ -1030,79 +654,114 @@ function PlayCompanion({
                   <span className="icon-tile">
                     <Target size={19} />
                   </span>
-                  <p>{quest?.why || skill?.payoff}</p>
+                  <p>
+                    <GameText text={quest?.why || skill?.payoff || ""} />
+                  </p>
                 </div>
-                <section className="detail-section">
-                  <div className="section-heading">
-                    <h3>Your field notes</h3>
-                    <a
-                      className="text-link"
-                      href={
-                        "https://runescape.wiki/w/" +
-                        (quest?.wiki ||
-                          skill?.wiki ||
-                          "Ironman_Mode/Strategies")
+                {quest ? (
+                  <>
+                    <section className="detail-section">
+                      <SectionHeading
+                        title="Prepare these levels"
+                        aside={
+                          <span className="muted">Required vs self-supply</span>
+                        }
+                      />
+                      <QuestLevels
+                        profile={profile}
+                        quest={quest}
+                        onSkill={onSkill}
+                      />
+                    </section>
+                    <section className="detail-section">
+                      <h3>Then start the quest in-game</h3>
+                      <p className="intro-copy">
+                        Gather the items in your preparation checklist and
+                        confirm the requirements, then start{" "}
+                        <GameText text={quest.name} /> in-game. Use the Wiki or
+                        your in-game quest helper for the quest itself.
+                      </p>
+                      <WikiAction
+                        page={quest.wiki}
+                        label="Open Wiki quest guide"
+                        primary
+                      />
+                    </section>
+                  </>
+                ) : (
+                  <section className="detail-section">
+                    <SectionHeading
+                      title="Your training method"
+                      aside={
+                        <WikiAction
+                          page={skill?.wiki || "Ironman_Mode/Strategies"}
+                          label="Skill reference"
+                        />
                       }
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Full Wiki guide <ArrowUpRight size={13} />
-                    </a>
-                  </div>
-                  <ol className="session-steps">
-                    {instructions.map((s, i) => (
-                      <li key={s}>
-                        <span>{String(i + 1).padStart(2, "0")}</span>
-                        <p>{s}</p>
-                      </li>
-                    ))}
-                  </ol>
-                </section>
+                    />
+                    <ol className="session-steps">
+                      {instructions.map((instruction, index) => (
+                        <li key={instruction}>
+                          <span>{String(index + 1).padStart(2, "0")}</span>
+                          <p>
+                            <GameText text={instruction} />
+                          </p>
+                        </li>
+                      ))}
+                    </ol>
+                  </section>
+                )}
                 <div className="session-warning">
                   <Shield size={17} />
                   <p>
-                    Prototype guidance, not a verified walkthrough. Check the
-                    current game journal and Wiki, especially before combat.
+                    Sample preparation only. Confirm the current requirements
+                    and combat risks in your game journal or the Wiki.
                   </p>
                 </div>
                 <div className="detail-actions">
-                  <button
-                    className={"btn " + (done ? "btn-success" : "btn-primary")}
+                  <Button
+                    variant={done ? "success" : quest ? "secondary" : "primary"}
                     aria-pressed={done}
                     onClick={onComplete}
                   >
                     <Check size={17} />
                     {done
                       ? "Recorded complete · undo"
-                      : "Record session complete"}
-                  </button>
-                  <button
-                    className="btn btn-quiet"
+                      : quest
+                        ? "Mark quest complete after finishing"
+                        : "Record session complete"}
+                  </Button>
+                  <Button
+                    variant="quiet"
                     onClick={() =>
                       quest ? onQuest(quest.id) : skill && onSkill(skill.name)
                     }
                   >
                     {skill ? "Update my level" : "Review quest preparation"}{" "}
                     <ArrowRight size={15} />
-                  </button>
+                  </Button>
                 </div>
                 {done && (
                   <div className="completion-message" role="status">
                     <CheckCircle2 size={21} />
                     <div>
-                      <strong>A little further along the path.</strong>
+                      <strong>Completion recorded</strong>
                       <p>
                         Completion does not automatically add XP, rewards, or
                         supplies.
                       </p>
                       {next && next.id !== task && (
-                        <button
-                          className="text-link"
-                          onClick={() => onStart(next.id)}
-                        >
-                          Next sample quest: {next.name}{" "}
-                          <ArrowRight size={14} />
-                        </button>
+                        <>
+                          <p>
+                            Next sample quest: <GameText text={next.name} />
+                          </p>
+                          <Button
+                            variant="link"
+                            onClick={() => onStart(next.id)}
+                          >
+                            Prepare next quest <ArrowRight size={14} />
+                          </Button>
+                        </>
                       )}
                     </div>
                   </div>
@@ -1113,14 +772,19 @@ function PlayCompanion({
         </article>
         <aside className="play-rail">
           <section className="panel packing-card">
-            <div className="section-heading">
-              <h3>
-                <Backpack size={18} /> Before you go
-              </h3>
-              <span className="badge">
-                {packed}/{packing.length}
-              </span>
-            </div>
+            <SectionHeading
+              title={
+                <>
+                  <Backpack size={18} />{" "}
+                  {quest ? "Gather these items" : "Before you go"}
+                </>
+              }
+              aside={
+                <span className="badge">
+                  {packed}/{packing.length}
+                </span>
+              }
+            />
             <p className="muted">Check what you’ve actually packed.</p>
             <div className="packing-progress">
               <span
@@ -1131,34 +795,25 @@ function PlayCompanion({
                 }}
               />
             </div>
-            {packing.map((item) => (
-              <label
-                key={task + item}
-                className={
-                  "pack-row " +
-                  (profile.packed.includes(task + "::" + item) ? "checked" : "")
-                }
-              >
-                <input
-                  type="checkbox"
-                  checked={profile.packed.includes(task + "::" + item)}
-                  onChange={() => onTogglePack(task + "::" + item)}
-                />
-                <span>{item}</span>
-              </label>
-            ))}
+            <ItemList
+              items={packing}
+              checked={packedItems}
+              onToggle={(item) => onTogglePack(task + "::" + item)}
+            />
             <p className="sample-note">
               Checks describe this sample session only. They do not read your
               bank or inventory.
             </p>
           </section>
           <section className="panel notes-card">
-            <div className="section-heading">
-              <h3>
-                <ListChecks size={18} /> A note for later
-              </h3>
-              <span className="muted">Autosaved</span>
-            </div>
+            <SectionHeading
+              title={
+                <>
+                  <ListChecks size={18} /> Session notes
+                </>
+              }
+              aside={<span className="muted">Autosaved</span>}
+            />
             <label className="sr-only" htmlFor="session-notes">
               Session notes
             </label>
@@ -1175,11 +830,7 @@ function PlayCompanion({
           </section>
           <div className="play-smallprint">
             <Compass size={18} />
-            <p>
-              Keep this view beside the game.
-              <br />
-              Your next step stays in sight.
-            </p>
+            <p>Use compact mode for a narrower layout beside the game.</p>
           </div>
         </aside>
       </div>
