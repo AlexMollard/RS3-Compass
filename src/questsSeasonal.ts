@@ -164,7 +164,7 @@ export const SEASONAL_QUESTS: QuestRecord[] = [
     why: "Help Death celebrate Halloween in Harvest Hollow.",
     requirements: [],
     questRequirements: ["necromancy", "field-of-screams"],
-    supplies: ["5 cooked meat, or any five pieces of cooked food"],
+    supplies: ["5 cooked meat (other cooked food works; mince pies do not)"],
     rewards: [
       "Trick or Treat bowl furniture plans and the Dead Cool title.",
       "10,000 spooky tokens and previous Halloween emotes; the bursting trick or treat bag contains 3 regular ritual candles, 5 gold charms and another 100 spooky tokens.",

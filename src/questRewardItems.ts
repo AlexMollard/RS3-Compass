@@ -64,6 +64,7 @@ export const QUEST_REWARD_ITEMS: ItemReference[] = [
     name: "Tower mindspike",
     wiki: "Tower mindspike",
     image: "Tower mindspike (air).png",
+    aliases: ["mindspike"],
   },
   {
     name: "First tower hat",
@@ -367,5 +368,34 @@ export const QUEST_REWARD_ITEMS: ItemReference[] = [
     name: "Rune platebody",
     wiki: "Rune platebody",
     image: "Rune_platebody.png",
+  },
+  {
+    name: "Rat's tail",
+    wiki: "Rat's tail",
+    image: "Rat's tail.png",
+    aliases: ["rat’s tail"],
+  },
+  {
+    name: "Limestone brick",
+    wiki: "Limestone brick",
+    image: "Limestone brick.png",
+    aliases: ["limestone bricks"],
+  },
+  {
+    name: "Crafting cape",
+    wiki: "Crafting cape",
+    image: "Crafting cape.png",
+  },
+  {
+    name: "Mince pie",
+    wiki: "Mince pie",
+    image: "Mince pie.png",
+    aliases: ["mince pies"],
+  },
+  {
+    name: "Nails",
+    wiki: "Nails",
+    image: "Bronze nails.png",
+    aliases: ["nail"],
   },
 ];

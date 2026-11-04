@@ -33,7 +33,7 @@ export const SIDE_QUESTS: QuestRecord[] = [
       meetingPoint: "Outside the tavern, east of the Taverley lodestone.",
       map: { x: 2881, y: 3444, plane: 0 },
     },
-    why: "Help Nails turn the tables on a merchant profiteering from refugees.",
+    why: "Turn the tables on a merchant profiteering from refugees.",
     requirements: [],
     questRequirements: [],
     supplies: [],

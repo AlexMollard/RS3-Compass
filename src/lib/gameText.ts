@@ -235,7 +235,7 @@ const references: Reference[] = [
   })),
   { name: "Lumbridge swamp", wiki: "Lumbridge_Swamp", kind: "place" },
   { name: "Metal bank", wiki: "Metal_bank", kind: "reference" },
-  { name: "Food", wiki: "Food", kind: "reference" },
+  { name: "Food", wiki: "Food", image: "Cooked_meat.png", kind: "reference" },
   { name: "Sostratus", wiki: "Sostratus", kind: "reference" },
 ];
 const byAlias = new Map<string, Reference>();

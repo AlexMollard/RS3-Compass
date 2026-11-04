@@ -168,6 +168,8 @@ test("Item plurals and upgraded equipment resolve to the correct linked artwork"
       "Adamant platebody + 2.png",
     ],
     ["fairylight whip", "Fairylight whip", "Fairylight whip.png"],
+    ["rat's tail", "Rat's tail", "Rat's tail.png"],
+    ["limestone bricks", "Limestone brick", "Limestone brick.png"],
     [
       "five ancient bones",
       "Ancient bones (The Restless Ghost)",
