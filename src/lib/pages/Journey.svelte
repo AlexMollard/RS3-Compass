@@ -1,6 +1,6 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import { accessibleQuests, nextQuest, SKILLS } from "../../data";
+  import { progressionQuests, nextQuest, SKILLS } from "../../data";
   import { getCompass } from "../compassContext";
   import { questPath, skillPath } from "../navigation";
   import GameArt from "../components/GameArt.svelte";
@@ -20,7 +20,7 @@
   let profile = $derived(
     $saved.profiles.find((p) => p.id === $saved.activeId) ?? $saved.profiles[0],
   );
-  let quests = $derived(accessibleQuests(profile));
+  let quests = $derived(progressionQuests(profile));
   let next = $derived(nextQuest(profile));
   let complete = $derived(
     quests.filter((q) => profile.completedQuests.includes(q.id)).length,
@@ -73,7 +73,7 @@
           </div>
         </div>
       {:else}<div class="home-empty">
-          <h3>Sample route complete</h3>
+          <h3>Regular route complete</h3>
           <p>Browse quests or choose a skill below.</p>
         </div>{/if}
     </GameWindow>
@@ -81,7 +81,7 @@
       <GameWindow
         className="home-route"
         title="Browse activities"
-        trailing={`${complete}/${quests.length} quests complete`}
+        trailing={`${complete}/${quests.length} activities complete`}
       >
         <div class="queue-column-labels">
           <span>QUEST</span><span>MAIN REWARD</span>
@@ -99,7 +99,9 @@
             </li>{/each}
         </ol>
         <p class="window-footnote">
-          Quest preparation · choose a skill in the level grid for training.
+          <Button variant="quiet" onclick={() => void goto("/quests")}
+            >View the full quest catalogue →</Button
+          >
         </p>
       </GameWindow>
       <GameWindow className="home-levels" title="Recorded levels">

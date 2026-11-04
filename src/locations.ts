@@ -1,6 +1,12 @@
 import { COMBAT_LOCATIONS } from "./skillsCombat.ts";
 import { ARTISAN_LOCATIONS } from "./skillsArtisan.ts";
 import { SUPPORT_LOCATIONS } from "./skillsSupport.ts";
+import { FOUNDATION_LOCATIONS } from "./questsFoundations.ts";
+import { UNLOCK_LOCATIONS } from "./questsUnlocks.ts";
+import { TALE_LOCATIONS } from "./questsTales.ts";
+import { ADVENTURE_LOCATIONS } from "./questsAdventures.ts";
+import { SIDE_LOCATIONS } from "./questsSideActivities.ts";
+import { SEASONAL_LOCATIONS } from "./questsSeasonal.ts";
 
 export interface LocationRecord {
   name: string;
@@ -13,6 +19,12 @@ export interface LocationRecord {
 
 // Images and access details are drawn from each linked RuneScape Wiki location article.
 export const LOCATIONS: Record<string, LocationRecord> = {
+  ...FOUNDATION_LOCATIONS,
+  ...UNLOCK_LOCATIONS,
+  ...TALE_LOCATIONS,
+  ...ADVENTURE_LOCATIONS,
+  ...SIDE_LOCATIONS,
+  ...SEASONAL_LOCATIONS,
   "Lumbridge Castle": {
     name: "Lumbridge Castle",
     wiki: "Lumbridge Castle",

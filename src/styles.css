@@ -2211,6 +2211,9 @@ textarea {
   list-style: none;
   margin: 0;
   padding: 0;
+  max-height: min(65dvh, 620px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 .queue-row {
   display: grid;

@@ -1,8 +1,15 @@
+import { FOUNDATION_COMBAT } from "./questsFoundations.ts";
+import { UNLOCK_COMBAT } from "./questsUnlocks.ts";
+import { TALE_COMBAT } from "./questsTales.ts";
+import { ADVENTURE_COMBAT } from "./questsAdventures.ts";
+import { SIDE_COMBAT } from "./questsSideActivities.ts";
+import { SEASONAL_COMBAT } from "./questsSeasonal.ts";
+
 export interface QuestEnemy {
   name: string;
   wiki: string;
-  image: string;
-  level: number;
+  image?: string;
+  level: number | string;
 }
 export interface CombatPlan {
   required: QuestEnemy[];
@@ -12,6 +19,12 @@ export interface CombatPlan {
 
 // Combat fields and enemy images are sourced from each quest and NPC Wiki article.
 export const QUEST_COMBAT: Record<string, CombatPlan> = {
+  ...FOUNDATION_COMBAT,
+  ...UNLOCK_COMBAT,
+  ...TALE_COMBAT,
+  ...ADVENTURE_COMBAT,
+  ...SIDE_COMBAT,
+  ...SEASONAL_COMBAT,
   "cooks-assistant": { required: [], hazards: [], notes: [] },
   "knights-sword": {
     required: [],

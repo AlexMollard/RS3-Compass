@@ -1,0 +1,326 @@
+{
+  "asOf": "2026-11-04",
+  "sources": [
+    "https://runescape.wiki/w/List_of_quests_by_membership_status#Free-to-play",
+    "https://runescape.wiki/w/List_of_miniquests_by_membership_status",
+    "https://apps.runescape.com/runemetrics/quests?user=Maikeru"
+  ],
+  "excludedHistorical": ["Unstable Foundations"],
+  "activities": [
+    {
+      "name": "A Shadow over Ashdale",
+      "questPoints": 1,
+      "kind": "quest"
+    },
+    {
+      "name": "A Soul's Bane",
+      "questPoints": 1,
+      "kind": "quest"
+    },
+    {
+      "name": "Beneath Cursed Tides",
+      "questPoints": 1,
+      "kind": "quest"
+    },
+    {
+      "name": "Benedict's World Tour (miniquest)",
+      "questPoints": 0,
+      "kind": "miniquest"
+    },
+    {
+      "name": "Broken Home",
+      "questPoints": 1,
+      "kind": "quest"
+    },
+    {
+      "name": "Chef's Assistant",
+      "questPoints": 1,
+      "kind": "quest"
+    },
+    {
+      "name": "Cook's Assistant",
+      "questPoints": 1,
+      "kind": "quest"
+    },
+    {
+      "name": "Death Plateau",
+      "questPoints": 1,
+      "kind": "quest"
+    },
+    {
+      "name": "Demon Slayer",
+      "questPoints": 3,
+      "kind": "quest"
+    },
+    {
+      "name": "Doric's Task I (miniquest)",
+      "questPoints": 0,
+      "kind": "miniquest"
+    },
+    {
+      "name": "Doric's Task II (miniquest)",
+      "questPoints": 0,
+      "kind": "miniquest"
+    },
+    {
+      "name": "Doric's Task III (miniquest)",
+      "questPoints": 0,
+      "kind": "miniquest"
+    },
+    {
+      "name": "Doric's Task IV (miniquest)",
+      "questPoints": 0,
+      "kind": "miniquest"
+    },
+    {
+      "name": "Dragon Slayer",
+      "questPoints": 2,
+      "kind": "quest"
+    },
+    {
+      "name": "Druidic Ritual",
+      "questPoints": 4,
+      "kind": "quest"
+    },
+    {
+      "name": "Ernest the Chicken",
+      "questPoints": 4,
+      "kind": "quest"
+    },
+    {
+      "name": "Gertrude's Cat",
+      "questPoints": 1,
+      "kind": "quest"
+    },
+    {
+      "name": "Goblin Diplomacy",
+      "questPoints": 5,
+      "kind": "quest"
+    },
+    {
+      "name": "Gunnar's Ground",
+      "questPoints": 5,
+      "kind": "quest"
+    },
+    {
+      "name": "Hearts of Sanguine",
+      "questPoints": 1,
+      "kind": "quest"
+    },
+    {
+      "name": "Heartstealer",
+      "questPoints": 1,
+      "kind": "quest"
+    },
+    {
+      "name": "Imp Catcher",
+      "questPoints": 1,
+      "kind": "quest"
+    },
+    {
+      "name": "It's Snow Bother",
+      "questPoints": 0,
+      "kind": "quest"
+    },
+    {
+      "name": "Learning the Ropes",
+      "questPoints": 0,
+      "kind": "quest"
+    },
+    {
+      "name": "Let Them Eat Pie",
+      "questPoints": 1,
+      "kind": "quest"
+    },
+    {
+      "name": "Missing, Presumed Death",
+      "questPoints": 2,
+      "kind": "quest"
+    },
+    {
+      "name": "Myths of the White Lands",
+      "questPoints": 2,
+      "kind": "quest"
+    },
+    {
+      "name": "Necromancy!",
+      "questPoints": 1,
+      "kind": "quest"
+    },
+    {
+      "name": "Once Upon a Slime",
+      "questPoints": 1,
+      "kind": "quest"
+    },
+    {
+      "name": "One Piercing Note",
+      "questPoints": 2,
+      "kind": "quest"
+    },
+    {
+      "name": "Perils of Ice Mountain",
+      "questPoints": 1,
+      "kind": "quest"
+    },
+    {
+      "name": "Pirate's Treasure",
+      "questPoints": 2,
+      "kind": "quest"
+    },
+    {
+      "name": "Priest in Peril",
+      "questPoints": 1,
+      "kind": "quest"
+    },
+    {
+      "name": "Purple Cat (miniquest)",
+      "questPoints": 0,
+      "kind": "miniquest"
+    },
+    {
+      "name": "Rune Mysteries",
+      "questPoints": 1,
+      "kind": "quest"
+    },
+    {
+      "name": "Sheep Shearer (miniquest)",
+      "questPoints": 0,
+      "kind": "miniquest"
+    },
+    {
+      "name": "Shield of Arrav",
+      "questPoints": 1,
+      "kind": "quest"
+    },
+    {
+      "name": "Song from the Depths",
+      "questPoints": 1,
+      "kind": "quest"
+    },
+    {
+      "name": "Stolen Hearts",
+      "questPoints": 3,
+      "kind": "quest"
+    },
+    {
+      "name": "Swept Away",
+      "questPoints": 2,
+      "kind": "quest"
+    },
+    {
+      "name": "The Blood Pact",
+      "questPoints": 1,
+      "kind": "quest"
+    },
+    {
+      "name": "The Death of Chivalry",
+      "questPoints": 3,
+      "kind": "quest"
+    },
+    {
+      "name": "The Knight's Sword",
+      "questPoints": 1,
+      "kind": "quest"
+    },
+    {
+      "name": "The Restless Ghost",
+      "questPoints": 1,
+      "kind": "quest"
+    },
+    {
+      "name": "Three's Company (saga)",
+      "questPoints": 0,
+      "kind": "saga"
+    },
+    {
+      "name": "Vampyre Slayer",
+      "questPoints": 3,
+      "kind": "quest"
+    },
+    {
+      "name": "Violet is Blue",
+      "questPoints": 1,
+      "kind": "quest"
+    },
+    {
+      "name": "Violet is Blue Too",
+      "questPoints": 1,
+      "kind": "quest"
+    },
+    {
+      "name": "Visions of Havenhythe",
+      "questPoints": 1,
+      "kind": "quest"
+    },
+    {
+      "name": "What's Mine is Yours",
+      "questPoints": 1,
+      "kind": "quest"
+    },
+    {
+      "name": "Witch's House",
+      "questPoints": 4,
+      "kind": "quest"
+    },
+    {
+      "name": "Witch's Potion (miniquest)",
+      "questPoints": 0,
+      "kind": "miniquest"
+    },
+    {
+      "name": "A Christmas Reunion",
+      "questPoints": 0,
+      "kind": "quest"
+    },
+    {
+      "name": "All Souls' Eve",
+      "questPoints": 0,
+      "kind": "quest"
+    },
+    {
+      "name": "Cold Front",
+      "questPoints": 0,
+      "kind": "quest"
+    },
+    {
+      "name": "Corporate Egg-spionage",
+      "questPoints": 0,
+      "kind": "quest"
+    },
+    {
+      "name": "Duck Quest",
+      "questPoints": 1,
+      "kind": "quest"
+    },
+    {
+      "name": "Field of Screams",
+      "questPoints": 0,
+      "kind": "quest"
+    },
+    {
+      "name": "Gower Quest",
+      "questPoints": 1,
+      "kind": "quest"
+    },
+    {
+      "name": "Great Egg-spectations",
+      "questPoints": 0,
+      "kind": "quest"
+    },
+    {
+      "name": "Guys and Dolls",
+      "questPoints": 0,
+      "kind": "quest"
+    },
+    {
+      "name": "There's No Place Like Home...",
+      "questPoints": 1,
+      "kind": "quest"
+    },
+    {
+      "name": "Wolf Whistle",
+      "questPoints": 1,
+      "kind": "quest"
+    }
+  ]
+}

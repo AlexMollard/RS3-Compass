@@ -13,7 +13,7 @@
 
 {#snippet enemies(list: QuestEnemy[])}
   <ul class="quest-enemies">
-    {#each list as enemy (enemy.wiki)}
+    {#each list as enemy (enemy.wiki + ":" + enemy.name)}
       <li>
         <a
           href={wikiHref(enemy.wiki)}
@@ -21,10 +21,16 @@
           rel="noreferrer"
           class="quest-enemy-reference"
         >
-          <GameArt file={enemy.image} size={36} thumbnail />
+          {#if enemy.image}<GameArt
+              file={enemy.image}
+              size={36}
+              thumbnail
+            />{/if}
           <span
             ><strong>{enemy.name}</strong><small
-              >Combat level {enemy.level}</small
+              >{typeof enemy.level === "number"
+                ? `Combat level ${enemy.level}`
+                : enemy.level}</small
             ></span
           >
           <ExternalLink size={14} />

@@ -1,0 +1,425 @@
+import type { QuestRecord, ItemReference } from "./data";
+import type { CombatPlan } from "./combatData";
+import type { LocationRecord } from "./locations";
+
+// RS3 Wiki quest and miniquest quick guides, NPC maps and image metadata, accessed 4 November 2026.
+// https://runescape.wiki/w/List_of_miniquests_by_membership_status
+// https://runescape.wiki/w/Benedict%27s_World_Tour_(miniquest)
+// https://runescape.wiki/w/Purple_Cat_(miniquest)
+// https://runescape.wiki/w/Doric%27s_Task_IV_(miniquest)/Quick_guide
+const doricStart = {
+  npc: "Doric",
+  npcWiki: "Doric",
+  image: "Doric_chathead.png",
+  location: "Doric's hut",
+  meetingPoint: "Inside his smithy north of Falador, outside Taverley's gate.",
+  map: { x: 2959, y: 3439, plane: 0 as const },
+};
+
+export const SIDE_QUESTS: QuestRecord[] = [
+  {
+    id: "let-them-eat-pie",
+    name: "Let Them Eat Pie",
+    icon: "Let_Them_Eat_Pie_icon.png",
+    artwork: "Let_Them_Eat_Pie.png",
+    members: false,
+    difficulty: "Novice",
+    length: "Short to Medium",
+    start: {
+      npc: "Nails Newton",
+      npcWiki: "Nails Newton",
+      image: "Nails_Newton_chathead.png",
+      location: "The Pick and Lute",
+      meetingPoint: "Outside the tavern, east of the Taverley lodestone.",
+      map: { x: 2881, y: 3444, plane: 0 },
+    },
+    why: "Help Nails turn the tables on a merchant profiteering from refugees.",
+    requirements: [],
+    questRequirements: [],
+    supplies: [],
+    rewards: [
+      "1 quest point",
+      "100 Cooking XP and 150 Thieving XP",
+      "Expensive spices and 5 meat pies",
+    ],
+    wiki: "Let_Them_Eat_Pie",
+  },
+  {
+    id: "perils-of-ice-mountain",
+    name: "Perils of Ice Mountain",
+    icon: "Perils_of_Ice_Mountain_icon.png",
+    artwork: "Perils_of_Ice_Mountain.png",
+    members: false,
+    difficulty: "Novice",
+    length: "Medium",
+    start: {
+      npc: "Lakki the delivery dwarf",
+      npcWiki: "Lakki the delivery dwarf",
+      image: "Lakki_the_delivery_dwarf_chathead.png",
+      location: "Ice Mountain",
+      meetingPoint:
+        "Beside his broken cart on the road south of Ice Mountain, east of the Invention Guild.",
+      map: { x: 3008, y: 3434, plane: 0 },
+    },
+    why: "Investigate the dwarven power station and help avert an environmental disaster.",
+    requirements: [
+      { skill: "Construction", level: 5 },
+      { skill: "Farming", level: 5 },
+      { skill: "Hunter", level: 5 },
+      { skill: "Thieving", level: 5 },
+    ],
+    questRequirements: [],
+    supplies: [
+      "A watering can containing water",
+      "A bucket of compost or supercompost",
+      "2 planks and 2 nails (steel nails or lower in free-to-play)",
+    ],
+    rewards: [
+      "1 quest point",
+      "500 XP each in Farming, Hunter, Construction and Thieving",
+      "Use of the power station ladder; Brother Bordiss can attach spirit shield sigils for a fee",
+    ],
+    wiki: "Perils_of_Ice_Mountain",
+  },
+  {
+    id: "priest-in-peril",
+    name: "Priest in Peril",
+    icon: "Priest_in_Peril_icon.png",
+    artwork: "Priest_in_Peril.png",
+    members: false,
+    difficulty: "Novice",
+    length: "Medium",
+    start: {
+      npc: "King Roald",
+      npcWiki: "King Roald",
+      image: "King_Roald_chathead.png",
+      location: "Varrock Palace",
+      meetingPoint: "Ground-floor throne room in the south-east of the palace.",
+      map: { x: 3222, y: 3476, plane: 0 },
+    },
+    why: "Rescue Drezel and begin the Myreque story; access beyond Paterdomus into Morytania remains members-only.",
+    requirements: [],
+    questRequirements: [],
+    supplies: [
+      "50 unnoted rune essence or 25 unnoted pure essence",
+      "A bucket",
+      "Optional: food, armour and a weapon for two fights; Varrock lodestone speeds the return.",
+    ],
+    rewards: [
+      "1 quest point",
+      "1,406 Prayer XP lamp",
+      "Wolfbane dagger",
+      "5 Varrock Museum Kudos from Historian Minas",
+    ],
+    wiki: "Priest_in_Peril",
+  },
+  {
+    id: "song-from-the-depths",
+    preparationNotes: [
+      "Leave four backpack spaces free. The Constitution targets are for optional rewards, not starting the quest.",
+    ],
+    name: "Song from the Depths",
+    icon: "Song_from_the_Depths_icon.png",
+    artwork: "Song_from_the_Depths.png",
+    members: false,
+    difficulty: "Novice",
+    length: "Short to Medium",
+    start: {
+      npc: "Lucille",
+      npcWiki: "Lucille",
+      image: "Lucille_chathead.png",
+      location: "Rimmington",
+      meetingPoint: "Inside the house west of the Rimmington well.",
+      map: { x: 2946, y: 3207, plane: 0 },
+    },
+    why: "Investigate the sleeping villagers and earn the coral crossbow.",
+    requirements: [
+      {
+        skill: "Constitution",
+        level: 50,
+        recommended: true,
+        purpose: "First ancient writings reward",
+      },
+      {
+        skill: "Constitution",
+        level: 80,
+        recommended: true,
+        purpose: "Second ancient writings reward",
+      },
+    ],
+    questRequirements: [],
+    supplies: [
+      "Optional: food for acid damage and armour for low-level enemies.",
+    ],
+    rewards: [
+      "1 quest point and 700 Constitution XP lamp",
+      "Coral crossbow, 50 coral bolts and Remora's necklace",
+      "Optional ancient writings grant 5,000 Constitution XP at level 50 and 25,000 at level 80; collect later if needed",
+      "Reduced Queen Black Dragon damage; the boss requires 60 Summoning",
+    ],
+    wiki: "Song_from_the_Depths",
+  },
+  {
+    id: "benedicts-world-tour",
+    completionMembers: true,
+    preparationNotes: [
+      "The free route covers nine locations; full completion needs the seven members-only locations.",
+      "The oasis clue is reachable without 65 Agility via the northern fallen palm.",
+    ],
+    name: "Benedict's World Tour (miniquest)",
+    kind: "miniquest",
+    icon: "Benedict's_World_Tour_(miniquest)_icon.png",
+    artwork: "Benedict's_World_Tour_(miniquest).png",
+    members: false,
+    difficulty: "Intermediate",
+    length: "Short",
+    start: {
+      npc: "Benedict",
+      npcWiki: "Benedict",
+      image: "Benedict_chathead.png",
+      location: "Varrock",
+      meetingPoint:
+        "In the building north-west of the Varrock lodestone, near Charlie the Tramp.",
+      access:
+        "Nine locations and their rewards are free; full completion requires the seven members-only locations. Reach the Al Kharid palace roof partway through Stolen Hearts; the Anachronia stop requires partial base camp tutorial progress.",
+      map: { x: 3206, y: 3387, plane: 0 },
+    },
+    why: "Collect Benedict's sightseeing clues across Gielinor; full miniquest completion is members-only despite its free start.",
+    requirements: [],
+    questRequirements: [],
+    supplies: [],
+    rewards: [
+      "Small XP lamps at 4 and 8 items and a large XP lamp for all 9 free locations",
+      "A further small lamp at 12 and large lamp for the last 7 locations require members access",
+    ],
+    wiki: "Benedict's_World_Tour_(miniquest)",
+  },
+  {
+    id: "dorics-task-i",
+    name: "Doric's Task I (miniquest)",
+    kind: "miniquest",
+    icon: "Doric's_Task_I_(miniquest)_icon.png",
+    artwork: "Doric's_hut.png",
+    members: false,
+    difficulty: "Novice",
+    length: "Very Short",
+    start: doricStart,
+    why: "Continue Doric's Smithing jobs with a helm for Aksel.",
+    requirements: [
+      { skill: "Smithing", level: 10 },
+      { skill: "Mining", level: 10, recommended: true },
+    ],
+    questRequirements: ["whats-mine-is-yours"],
+    supplies: [
+      "4 iron bars, or an iron full helm and 2 iron bars; make the +1 helm at Doric's anvil yourself.",
+    ],
+    rewards: ["250 Smithing XP", "750 Gofannon amulet charges"],
+    wiki: "Doric's_Task_I_(miniquest)",
+  },
+  {
+    id: "dorics-task-ii",
+    name: "Doric's Task II (miniquest)",
+    kind: "miniquest",
+    icon: "Doric's_Task_II_(miniquest)_icon.png",
+    artwork: "Doric's_hut.png",
+    members: false,
+    difficulty: "Novice",
+    length: "Very Short",
+    start: doricStart,
+    why: "Supply Burthorpe's defenders and repair their cannon.",
+    requirements: [
+      { skill: "Smithing", level: 20 },
+      { skill: "Mining", level: 20, recommended: true },
+    ],
+    questRequirements: ["dorics-task-i", "death-plateau"],
+    supplies: [
+      "10 steel bars for two steel chainbodies, which you must smith yourself",
+      "2 unnoted bronze bars for the cannon part at Doric's anvil",
+    ],
+    rewards: ["500 Smithing XP", "1,500 Gofannon amulet charges"],
+    wiki: "Doric's_Task_II_(miniquest)",
+  },
+  {
+    id: "dorics-task-iii",
+    name: "Doric's Task III (miniquest)",
+    kind: "miniquest",
+    icon: "Doric's_Task_III_(miniquest)_icon.png",
+    artwork: "Doric's_hut.png",
+    members: false,
+    difficulty: "Intermediate",
+    length: "Short",
+    start: doricStart,
+    why: "Make improved mithril weapons for the Goblin Village generals.",
+    requirements: [
+      { skill: "Smithing", level: 30 },
+      { skill: "Mining", level: 30, recommended: true },
+    ],
+    questRequirements: ["dorics-task-ii"],
+    supplies: [
+      "8 mithril bars, or 4 mithril bars plus a mithril longsword and mithril warhammer; smith both weapons to +1.",
+    ],
+    rewards: ["750 Smithing XP", "2,250 Gofannon amulet charges"],
+    wiki: "Doric's_Task_III_(miniquest)",
+  },
+  {
+    id: "dorics-task-iv",
+    preparationNotes: [
+      "Make the burial set as a set, not individual burial items. First-time burial smiths must speak to Suak.",
+    ],
+    name: "Doric's Task IV (miniquest)",
+    kind: "miniquest",
+    icon: "Doric's_Task_IV_(miniquest)_icon.png",
+    artwork: "Doric's_hut.png",
+    members: false,
+    difficulty: "Intermediate",
+    length: "Medium",
+    start: doricStart,
+    why: "Make an adamant burial set at the Artisans' Workshop.",
+    requirements: [
+      { skill: "Smithing", level: 40 },
+      { skill: "Mining", level: 40, recommended: true },
+    ],
+    questRequirements: ["dorics-task-iii"],
+    supplies: [
+      "48 adamant bars to smith an adamant full helm + 2, adamant platebody + 2, adamant platelegs + 2, adamant armoured boots + 2 and adamant gauntlets + 2; alternatively acquire those five +2 pieces.",
+    ],
+    rewards: ["1,500 Smithing XP", "4,500 Gofannon amulet charges"],
+    wiki: "Doric's_Task_IV_(miniquest)",
+  },
+  {
+    id: "purple-cat",
+    name: "Purple Cat (miniquest)",
+    kind: "miniquest",
+    icon: "Purple_Cat_(miniquest)_icon.png",
+    artwork: "Purple_cat.png",
+    members: false,
+    difficulty: "Intermediate",
+    length: "Short",
+    start: {
+      npc: "Wendy",
+      npcWiki: "Wendy",
+      image: "Wendy_chathead.png",
+      location: "Draynor Village",
+      meetingPoint: "With Maggie's caravan west of the Draynor lodestone.",
+      map: { x: 3082, y: 3298, plane: 0 },
+    },
+    why: "Repeat Betty's animal-pen puzzle to unlock purple cats.",
+    requirements: [],
+    questRequirements: ["swept-away", "gertrudes-cat"],
+    supplies: [
+      "No item is required to finish; optionally bring a cat or kitten to dye immediately. Dyeing a hellcat reverts it to a normal cat.",
+    ],
+    rewards: ["Wendy can dye cats purple"],
+    wiki: "Purple_Cat_(miniquest)",
+  },
+];
+
+export const SIDE_COMBAT: Record<string, CombatPlan> = {
+  "let-them-eat-pie": { required: [], hazards: [], notes: [] },
+  "perils-of-ice-mountain": { required: [], hazards: [], notes: [] },
+  "priest-in-peril": {
+    required: [
+      { name: "Cerberus", wiki: "Cerberus", image: "Cerberus.png", level: 33 },
+      {
+        name: "Monk of Zamorak",
+        wiki: "Monk of Zamorak (Paterdomus)",
+        image: "Monk_of_Zamorak_(level_23).png",
+        level: 23,
+      },
+    ],
+    hazards: [],
+    notes: [
+      "Defeat Cerberus and a monk for the key; bring food and appropriate combat gear.",
+    ],
+  },
+  "song-from-the-depths": {
+    required: [],
+    hazards: [],
+    notes: [
+      "Defend against low-level enemies and avoid damaging acid. The Queen Black Dragon is not a required fight.",
+    ],
+  },
+  "benedicts-world-tour": {
+    required: [],
+    hazards: [],
+    notes: ["No quest combat; full completion requires members-only travel."],
+  },
+  "dorics-task-i": { required: [], hazards: [], notes: [] },
+  "dorics-task-ii": { required: [], hazards: [], notes: [] },
+  "dorics-task-iii": { required: [], hazards: [], notes: [] },
+  "dorics-task-iv": { required: [], hazards: [], notes: [] },
+  "purple-cat": { required: [], hazards: [], notes: [] },
+};
+
+export const SIDE_ITEMS: ItemReference[] = [
+  {
+    name: "Watering can",
+    wiki: "Watering_can",
+    image: "Watering_can.png",
+    aliases: ["watering cans"],
+  },
+  { name: "Compost", wiki: "Compost", image: "Compost.png" },
+  { name: "Supercompost", wiki: "Supercompost", image: "Supercompost.png" },
+  { name: "Bucket", wiki: "Bucket", image: "Bucket.png", aliases: ["buckets"] },
+  { name: "Rune essence", wiki: "Rune_essence", image: "Rune_essence.png" },
+  { name: "Pure essence", wiki: "Pure_essence", image: "Pure_essence.png" },
+  {
+    name: "Iron full helm",
+    wiki: "Iron_full_helm",
+    image: "Iron_full_helm.png",
+  },
+  {
+    name: "Mithril bar",
+    wiki: "Mithril_bar",
+    image: "Mithril_bar.png",
+    aliases: ["mithril bars"],
+  },
+  {
+    name: "Adamant bar",
+    wiki: "Adamant_bar",
+    image: "Adamant_bar.png",
+    aliases: ["adamant bars"],
+  },
+  {
+    name: "Mithril longsword",
+    wiki: "Mithril_longsword",
+    image: "Mithril_longsword.png",
+  },
+  {
+    name: "Mithril warhammer",
+    wiki: "Mithril_warhammer",
+    image: "Mithril_warhammer.png",
+  },
+];
+
+export const SIDE_LOCATIONS: Record<string, LocationRecord> = {
+  "The Pick and Lute": {
+    name: "The Pick and Lute",
+    wiki: "The Pick and Lute",
+    image: "Let_Them_Eat_Pie.png",
+    members: false,
+    summary: "A tavern in western Taverley, east of its lodestone.",
+  },
+  "Ice Mountain": {
+    name: "Ice Mountain",
+    wiki: "Ice Mountain",
+    image: "Perils_of_Ice_Mountain.png",
+    members: false,
+    summary:
+      "The mountain north-east of Falador; Lakki waits by the southern road.",
+  },
+  Varrock: {
+    name: "Varrock",
+    wiki: "Varrock",
+    image: "Varrock.png",
+    members: false,
+    summary: "Misthalin's capital, home to Benedict and the palace.",
+  },
+  "Varrock Palace": {
+    name: "Varrock Palace",
+    wiki: "Varrock Palace",
+    image: "Varrock_Palace.png",
+    members: false,
+    summary: "King Roald's palace in northern Varrock.",
+  },
+};

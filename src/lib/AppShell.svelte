@@ -464,10 +464,10 @@
       >
     </div>
     <p>
-      Plan quest preparation and training for all 29 skills. The quest catalogue
-      currently contains five quests; skill pages provide starting methods, not
-      complete optimal routes. Use the Wiki or in-game quest helper for quest
-      walkthroughs.
+      Plan preparation for all current free-to-play quests, miniquests and
+      sagas, plus training for all 29 skills. Seasonal content and the tutorial
+      are labelled. Members coverage is still selective. Use the Wiki or in-game
+      quest helper for walkthroughs.
     </p>
     <h3>Your data</h3>
     <p>

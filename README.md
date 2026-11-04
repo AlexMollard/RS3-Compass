@@ -16,11 +16,13 @@
 
 ## Your preparation journal
 
-- **Quests:** Prepare for five quests with requirements, supplies, packing checks, notes, combat advice, maps and completion tracking in one workspace.
+- **Quests:** Prepare for all 54 F2P quests and 9 miniquests/sagas, checked against November 2026 sources. Requirements, linked item artwork, packing, notes, combat risks, NPC start maps and completion tracking share one workspace.
 - **Skills:** Explore starter and early-to-mid training guides for all 29 skills, with destinations and preparation references.
 - **Players:** Look up and cache public player data, keep separate local plans, or explore with removable fictional sample players. Public quest completion may be unavailable when RuneMetrics data is private or inaccessible.
 
 Compass is a preparation companion, not a walkthrough or an exhaustive guide to the game. Check the in-game journal and linked Wiki articles for current details.
+
+Seasonal quests and the tutorial stay in the catalogue, outside the regular progression route. Benedict's World Tour has a free section but needs membership to finish; members quest coverage is otherwise selective.
 
 ## Run locally
 

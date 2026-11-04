@@ -4,14 +4,15 @@ type StartPoint = QuestRecord["start"]["map"];
 
 // Pin the Wiki's verified cache version so map updates are deliberate.
 const TILE_ROOT =
-  "https://maps.runescape.wiki/rs/versions/2026-10-12-a/map_icon_squares/28";
+  "https://maps.runescape.wiki/rs/versions/2026-10-12-a/map_icon_squares";
 
 export function wikiTileUrl(
   tile: { x: number; y: number; z: number },
   plane: StartPoint["plane"],
+  mapId = 28,
 ) {
   // Leaflet's north-up CRS has negative tile rows; Wiki rows increase northward.
-  return `${TILE_ROOT}/${tile.z}/${plane}_${tile.x}_${-tile.y - 1}.png`;
+  return `${TILE_ROOT}/${mapId}/${tile.z}/${plane}_${tile.x}_${-tile.y - 1}.png`;
 }
 
 export function questMapCenter(
@@ -21,5 +22,5 @@ export function questMapCenter(
 }
 
 export function externalMapUrl(point: StartPoint) {
-  return `https://mejrs.github.io/rs3?m=28&z=2&p=${point.plane}&x=${point.x}&y=${point.y}`;
+  return `https://mejrs.github.io/rs3?m=${point.mapId ?? 28}&z=2&p=${point.plane}&x=${point.x}&y=${point.y}`;
 }

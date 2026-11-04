@@ -34,6 +34,21 @@
       profile.packed.includes(quest.id + "::" + item),
     ),
   );
+  let catalogueCounts = $derived.by(() => {
+    let total = 0;
+    let completed = 0;
+    for (const entry of QUESTS) {
+      if (entry.members && profile.mode !== "members") continue;
+      total++;
+      if (profile.completedQuests.includes(entry.id)) completed++;
+    }
+    return { total, completed };
+  });
+  let prerequisites = $derived(
+    quest.questRequirements.map((id) =>
+      QUESTS.find((entry) => entry.id === id)!,
+    ),
+  );
   $effect(() => {
     const id = quest.id;
     controller.updateProfile((p) =>
@@ -65,7 +80,7 @@
     subtitle="Check requirements and prepare for a quest."
     >{#snippet trailing()}<div class="quest-workspace-controls">
         <span class="badge badge-gold"
-          >{profile.completedQuests.length} / {QUESTS.length} guide quests</span
+          >{catalogueCounts.completed} / {catalogueCounts.total} activities</span
         >
         <Button
           variant="quiet"
@@ -78,9 +93,9 @@
   >
   <div class="journal-layout">
     <ResponsivePicker label="Quest" selection={quest.name}>
-      <aside class="panel journal-list" aria-label="Sample quests">
+      <aside class="panel journal-list" aria-label="Quest catalogue">
         <SearchField
-          label="Search sample quests"
+          label="Search quests and miniquests"
           placeholder="Find a quest…"
           value={query}
           onChange={(v) => (query = v)}
@@ -101,7 +116,9 @@
           />{:else}<div class="empty-state">
             No matching quests. Change your search or show completed quests.
           </div>{/each}
-        <p class="sample-note">Sample quests, not the full catalogue.</p>
+        <p class="sample-note">
+          Seasonal quests and tutorials are labelled separately.
+        </p>
       </aside>
     </ResponsivePicker>
     <article class="panel quest-detail">
@@ -118,6 +135,17 @@
             class:text-green={complete}
             >{complete ? "Completed" : "Not recorded complete"}</span
           >
+          {#if quest.kind && quest.kind !== "quest"}<span
+              >{quest.kind === "saga" ? "Saga" : "Miniquest"}</span
+            >{/if}
+          {#if quest.availability}<span class="badge"
+              >{quest.availability === "seasonal"
+                ? "Seasonal"
+                : "Tutorial"}</span
+            >{/if}
+          {#if quest.completionMembers && profile.mode === "f2p"}<span
+              class="badge">Members to finish</span
+            >{/if}
         </div>
         <section class="prep-reason">
           <h3>Purpose</h3>
@@ -134,6 +162,33 @@
           </div>{/if}
         <div class="quest-preparation-grid">
           <div class="quest-preparation-main">
+            {#if prerequisites.length}
+              <section
+                class="detail-section quest-preparation-section"
+                aria-label="Quest requirements"
+              >
+                <SectionHeading title="Quest requirements" />
+                {#each prerequisites as prerequisite (prerequisite.id)}
+                  <QuestNavigationCard
+                    quest={prerequisite}
+                    completed={profile.completedQuests.includes(
+                      prerequisite.id,
+                    )}
+                    onOpen={(id) => void goto(questPath(id))}
+                  />
+                {/each}
+              </section>
+            {/if}
+            {#if quest.preparationNotes?.length}
+              <section class="detail-section quest-preparation-section">
+                <SectionHeading title="Before you go" />
+                <ul class="plain-list">
+                  {#each quest.preparationNotes as note}<li>
+                      <GameText text={note} />
+                    </li>{/each}
+                </ul>
+              </section>
+            {/if}
             <section
               class="detail-section quest-preparation-section"
               aria-label="Level checks"
@@ -149,9 +204,11 @@
             >
               <SectionHeading title="Gather these items">
                 {#snippet aside()}
-                  <span class="badge"
-                    >{packedItems.length}/{quest.supplies.length} packed</span
-                  >
+                  {#if quest.supplies.length}
+                    <span class="badge"
+                      >{packedItems.length}/{quest.supplies.length} packed</span
+                    >
+                  {/if}
                 {/snippet}
               </SectionHeading>
               <ItemList
@@ -209,7 +266,8 @@
           ><WikiAction page={quest.wiki} label="Wiki walkthrough" />
         </div>
         <p class="sample-note">
-          Sample guide. Check the current Wiki and in-game journal.
+          Preparation checked against the RuneScape Wiki, November 2026. Use the
+          Wiki or in-game helper for walkthrough steps.
         </p>
       </div>
     </article>
@@ -247,6 +305,22 @@
   }
   .quest-preparation-items :global(.section-heading) {
     flex-wrap: wrap;
+  }
+  @media (min-width: 1001px) {
+    .quest-page :global(.guide-picker) {
+      position: sticky;
+      top: calc(var(--topbar-height, 72px) + 16px);
+      max-height: calc(100dvh - var(--topbar-height, 72px) - 32px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+  }
+  @media (max-width: 1000px) {
+    .quest-page :global(.journal-list) {
+      max-height: 60dvh;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
   }
   @container quest-detail (min-width: 740px) {
     .quest-preparation-grid {

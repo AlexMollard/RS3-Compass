@@ -40,6 +40,12 @@
   grid-column: 1;
   grid-row: 1;
 }
+.level-check-purpose {
+  display: block;
+  color: var(--muted);
+  font-size: var(--font-caption);
+  font-weight: 400;
+}
 .level-check-values {
   display: flex;
   flex-wrap: wrap;

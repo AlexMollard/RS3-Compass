@@ -20,3 +20,18 @@ test("avoidable encounters cannot also be labelled required kills", () => {
   );
   assert.deepEqual(conflicts, []);
 });
+
+test("Multiple forms of the same creature remain independently renderable", () => {
+  for (const [id, plan] of Object.entries(QUEST_COMBAT)) {
+    for (const encounters of [plan.required, plan.hazards]) {
+      const identities = encounters.map(
+        (enemy) => enemy.wiki + ":" + enemy.name,
+      );
+      assert.equal(
+        new Set(identities).size,
+        identities.length,
+        id + " has indistinguishable encounter forms",
+      );
+    }
+  }
+});

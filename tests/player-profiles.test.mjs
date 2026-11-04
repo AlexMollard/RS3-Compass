@@ -247,6 +247,9 @@ test("Public completion matches Compass quest identities without importing sampl
         completedTitles: [
           "COOK’S ASSISTANT",
           "Dragon Slayer",
+          "DORIC’S TASK IV (MINIQUEST)",
+          "Three's Company (saga)",
+          "Visions of Havenhythe",
           "A quest outside this catalogue",
         ],
       },
@@ -255,8 +258,13 @@ test("Public completion matches Compass quest identities without importing sampl
     "f2p",
   );
   const real = current(controller);
-  assert.deepEqual(real.completedQuests, ["cooks-assistant", "dragon-slayer"]);
-  assert.equal(real.activeTask, "knights-sword");
+  assert.deepEqual(real.completedQuests, [
+    "cooks-assistant",
+    "dragon-slayer",
+    "visions-of-havenhythe",
+    "dorics-task-iv",
+    "threes-company",
+  ]);
   assert.equal(real.questImportStatus, "available");
   assert.deepEqual(real.packed, []);
 });

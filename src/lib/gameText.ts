@@ -1,9 +1,16 @@
-import { QUESTS, type ItemReference } from "../data";
-import { LOCATIONS } from "../locations";
-import { RS3_SKILL_NAMES } from "../skillNames";
-import { COMBAT_ITEMS } from "../skillsCombat";
-import { ARTISAN_ITEMS } from "../skillsArtisan";
-import { SUPPORT_ITEMS } from "../skillsSupport";
+import { QUESTS, type ItemReference } from "../data.ts";
+import { LOCATIONS } from "../locations.ts";
+import { RS3_SKILL_NAMES } from "../skillNames.ts";
+import { COMBAT_ITEMS } from "../skillsCombat.ts";
+import { ARTISAN_ITEMS } from "../skillsArtisan.ts";
+import { SUPPORT_ITEMS } from "../skillsSupport.ts";
+import { FOUNDATION_ITEMS } from "../questsFoundations.ts";
+import { UNLOCK_ITEMS } from "../questsUnlocks.ts";
+import { TALE_ITEMS } from "../questsTales.ts";
+import { ADVENTURE_ITEMS } from "../questsAdventures.ts";
+import { SIDE_ITEMS } from "../questsSideActivities.ts";
+import { SEASONAL_ITEMS } from "../questsSeasonal.ts";
+import { QUEST_REWARD_ITEMS } from "../questRewardItems.ts";
 
 interface Reference {
   name: string;
@@ -184,6 +191,13 @@ const items: ItemReference[] = [
   ...COMBAT_ITEMS,
   ...ARTISAN_ITEMS,
   ...SUPPORT_ITEMS,
+  ...FOUNDATION_ITEMS,
+  ...UNLOCK_ITEMS,
+  ...TALE_ITEMS,
+  ...ADVENTURE_ITEMS,
+  ...SIDE_ITEMS,
+  ...SEASONAL_ITEMS,
+  ...QUEST_REWARD_ITEMS,
 ];
 const references: Reference[] = [
   ...items.map((item) => ({ ...item, kind: "item" as const })),
@@ -196,30 +210,22 @@ const references: Reference[] = [
   ...QUESTS.map((quest) => ({
     name: quest.name,
     wiki: quest.wiki,
-    aliases: [quest.name.replaceAll("'", "’")],
+    aliases: [
+      quest.name.replaceAll("'", "’"),
+      quest.name.replace(/\s+\((?:miniquest|saga)\)$/, ""),
+      quest.name.replace(/\s+\((?:miniquest|saga)\)$/, "").replaceAll("'", "’"),
+      ...(quest.id === "theres-no-place-like-home"
+        ? ["There's No Place Like Home", "There’s No Place Like Home"]
+        : []),
+    ],
     kind: "quest" as const,
   })),
-  {
-    name: "What's Mine is Yours",
-    wiki: "What's_Mine_is_Yours",
-    aliases: ["What’s Mine is Yours"],
-    kind: "quest",
-  },
   ...[
-    { name: "The Blood Pact", wiki: "The_Blood_Pact" },
-    { name: "Wolf Whistle", wiki: "Wolf_Whistle" },
-    { name: "Necromancy!", wiki: "Necromancy!" },
     { name: "Kili Row", wiki: "Kili_Row" },
     { name: "Bar Crawl", wiki: "Bar_Crawl_(miniquest)" },
-    { name: "Druidic Ritual", wiki: "Druidic_Ritual" },
-    {
-      name: "There's No Place Like Home...",
-      wiki: "There's_No_Place_Like_Home...",
-      aliases: ["There's No Place Like Home", "There’s No Place Like Home"],
-    },
   ].map((quest) => ({
     ...quest,
-    aliases: [...(quest.aliases ?? []), quest.name.replaceAll("'", "’")],
+    aliases: [quest.name.replaceAll("'", "’")],
     kind: "quest" as const,
   })),
   ...RS3_SKILL_NAMES.map((name) => ({

@@ -2,6 +2,12 @@ import type { SkillName } from "./skillNames.ts";
 import { COMBAT_SKILLS } from "./skillsCombat.ts";
 import { ARTISAN_SKILLS } from "./skillsArtisan.ts";
 import { SUPPORT_SKILLS } from "./skillsSupport.ts";
+import { FOUNDATION_QUESTS } from "./questsFoundations.ts";
+import { UNLOCK_QUESTS } from "./questsUnlocks.ts";
+import { TALE_QUESTS } from "./questsTales.ts";
+import { ADVENTURE_QUESTS } from "./questsAdventures.ts";
+import { SIDE_QUESTS } from "./questsSideActivities.ts";
+import { SEASONAL_QUESTS } from "./questsSeasonal.ts";
 
 export type AccessMode = "f2p" | "members";
 export type Page = "journey" | "play" | "quests" | "skills";
@@ -25,6 +31,10 @@ export interface Profile {
 export interface QuestRecord {
   id: string;
   name: string;
+  kind?: "quest" | "miniquest" | "saga";
+  availability?: "seasonal" | "tutorial";
+  completionMembers?: boolean;
+  preparationNotes?: string[];
   icon: string;
   artwork: string;
   members: boolean;
@@ -37,10 +47,15 @@ export interface QuestRecord {
     location: string;
     meetingPoint: string;
     access?: string;
-    map: { x: number; y: number; plane: 0 | 1 | 2 | 3 };
+    map: { x: number; y: number; plane: 0 | 1 | 2 | 3; mapId?: number };
   };
   why: string;
-  requirements: { skill: string; level: number; recommended?: boolean }[];
+  requirements: {
+    skill: string;
+    level: number;
+    recommended?: boolean;
+    purpose?: string;
+  }[];
   questRequirements: string[];
   supplies: string[];
   rewards: string[];
@@ -77,7 +92,7 @@ export interface SkillRecord {
 }
 // Quest preparation: https://runescape.wiki/w/Dragon_Slayer/Quick_guide
 // Mining locations and ore boxes: https://runescape.wiki/w/Adamant_ore_box
-export const QUESTS: QuestRecord[] = [
+const CORE_QUESTS: QuestRecord[] = [
   {
     id: "cooks-assistant",
     name: "Cook's Assistant",
@@ -99,9 +114,9 @@ export const QUESTS: QuestRecord[] = [
     questRequirements: [],
     supplies: ["A pot of flour", "A bucket of milk", "An egg"],
     rewards: [
-      "Cooking experience",
-      "Quest points",
-      "Access to the cook’s range",
+      "300 Cooking XP and 1 quest point",
+      "500 coins and 3 noted sardines",
+      "Access to the Cook-o-matic 25 range",
     ],
     wiki: "Cook's_Assistant",
   },
@@ -135,9 +150,9 @@ export const QUESTS: QuestRecord[] = [
       "Food for the ice dungeon",
     ],
     rewards: [
-      "A substantial Smithing XP reward",
-      "Quest points",
-      "An early foundation for self-made equipment",
+      "12,725 Smithing XP lamp",
+      "1 quest point",
+      "Ability to smith blurite bars and blurite swords",
     ],
     wiki: "The_Knight's_Sword",
   },
@@ -172,9 +187,9 @@ export const QUESTS: QuestRecord[] = [
       "Anti-dragon shield (obtained during the quest), combat food and equipment",
     ],
     rewards: [
-      "Strength XP lamp and Defence XP lamp (each requires level 40 in its skill)",
-      "Quest points",
-      "A core F2P journey milestone",
+      "Strength XP lamp and Defence XP lamp, each granting 18,650 XP and requiring level 40 in its skill",
+      "2 quest points, a rune platebody and an anti-dragon shield",
+      "Crandor access and a maze key for Melzar's Maze",
     ],
     wiki: "Dragon_Slayer",
   },
@@ -239,6 +254,92 @@ export const QUESTS: QuestRecord[] = [
     wiki: "Tree_Gnome_Village",
   },
 ];
+
+// Preserve Ironbound's main quest sequence; append the remaining miniquests and
+// separately labelled seasonal/tutorial entries. Inventory checked 4 November 2026.
+const QUEST_ORDER = [
+  "cooks-assistant",
+  "sheep-shearer",
+  "the-blood-pact",
+  "the-restless-ghost",
+  "duck-quest",
+  "necromancy",
+  "whats-mine-is-yours",
+  "once-upon-a-slime",
+  "gertrudes-cat",
+  "knights-sword",
+  "goblin-diplomacy",
+  "ernest-the-chicken",
+  "gunnars-ground",
+  "rune-mysteries",
+  "druidic-ritual",
+  "wolf-whistle",
+  "death-plateau",
+  "stolen-hearts",
+  "pirates-treasure",
+  "witchs-potion",
+  "imp-catcher",
+  "demon-slayer",
+  "shield-of-arrav",
+  "violet-is-blue",
+  "violet-is-blue-too",
+  "one-piercing-note",
+  "vampyre-slayer",
+  "witchs-house",
+  "dragon-slayer",
+  "visions-of-havenhythe",
+  "hearts-of-sanguine",
+  "heartstealer",
+  "myths-of-the-white-lands",
+  "swept-away",
+  "a-shadow-over-ashdale",
+  "the-death-of-chivalry",
+  "missing-presumed-death",
+  "broken-home",
+  "theres-no-place-like-home",
+  "a-souls-bane",
+  "beneath-cursed-tides",
+  "chefs-assistant",
+  "gower-quest",
+  "let-them-eat-pie",
+  "perils-of-ice-mountain",
+  "priest-in-peril",
+  "song-from-the-depths",
+  "benedicts-world-tour",
+  "dorics-task-i",
+  "dorics-task-ii",
+  "dorics-task-iii",
+  "dorics-task-iv",
+  "purple-cat",
+  "threes-company",
+  "learning-the-ropes",
+  "its-snow-bother",
+  "a-christmas-reunion",
+  "cold-front",
+  "great-egg-spectations",
+  "corporate-egg-spionage",
+  "field-of-screams",
+  "guys-and-dolls",
+  "all-souls-eve",
+  "waterfall-quest",
+  "tree-gnome-village",
+];
+const questsById = new Map<string, QuestRecord>();
+for (const group of [
+  CORE_QUESTS,
+  FOUNDATION_QUESTS,
+  UNLOCK_QUESTS,
+  TALE_QUESTS,
+  ADVENTURE_QUESTS,
+  SIDE_QUESTS,
+  SEASONAL_QUESTS,
+]) {
+  for (const quest of group) questsById.set(quest.id, quest);
+}
+export const QUESTS: QuestRecord[] = QUEST_ORDER.map((id) =>
+  questsById.get(id)!,
+);
+
 export const SKILLS: SkillRecord[] = [
   {
     name: "Mining",
@@ -434,13 +535,19 @@ export function stageLocations(
     ? stage.memberLocations
     : stage.locations;
 }
-export function accessibleQuests(profile: Profile) {
-  return QUESTS.filter((q) => profile.mode === "members" || !q.members);
+export function progressionQuests(profile: Profile) {
+  return QUESTS.filter(
+    (quest) =>
+      (profile.mode === "members" || !quest.members) &&
+      !quest.availability &&
+      !(quest.completionMembers && profile.mode === "f2p"),
+  );
 }
 export function nextQuest(profile: Profile) {
-  const available = accessibleQuests(profile);
+  const available = progressionQuests(profile);
   const incomplete = (quest: QuestRecord) =>
-    !profile.completedQuests.includes(quest.id);
+    !profile.completedQuests.includes(quest.id) &&
+    quest.questRequirements.every((id) => profile.completedQuests.includes(id));
   return (
     (profile.mode === "members"
       ? available.find((q) => q.members && incomplete(q))

@@ -21,31 +21,32 @@
   let groups = $derived(
     [
       { title: "Required levels", levels: required },
-      { title: "Self-supply targets · optional", levels: recommended },
+      { title: "Optional targets", levels: recommended },
     ].filter((group) => group.levels.length),
   );
 </script>
 
 <div class="quest-level-checks">
   {#if !required.length}
-    <p class="level-check-empty">
-      No required skill levels listed in this sample. Confirm the full
-      requirements in-game.
-    </p>
+    <p class="level-check-empty">No required skill levels.</p>
   {/if}
   {#each groups as group (group.title)}
     <section class="level-check-group" aria-label={group.title}>
       <h4>{group.title}</h4>
       <div class="level-check-list">
-        {#each group.levels as requirement (requirement.skill)}
+        {#each group.levels as requirement (requirement.skill + ":" + requirement.level)}
           {@const current = profile.levels[requirement.skill]}
           {@const known = current != null}
           {@const met = known && current >= requirement.level}
           <div class:is-met={met} class="level-check-row">
             <div class="level-check-skill">
-              <GameArt file={requirement.skill + "-icon.png"} /><strong
-                ><GameText text={requirement.skill} /></strong
-              >
+              <GameArt file={requirement.skill + "-icon.png"} />
+              <div>
+                <strong><GameText text={requirement.skill} /></strong>
+                {#if requirement.recommended}<small class="level-check-purpose"
+                    >{requirement.purpose || "Self-supply"}</small
+                  >{/if}
+              </div>
             </div>
             <dl class="level-check-values">
               <div>

@@ -18,6 +18,7 @@
   let marker: Leaflet.Marker | undefined;
   let tiles: Leaflet.TileLayer | undefined;
   let plane: Point["plane"] = 0;
+  let mapId = 28;
   let visible = $state(false);
   let ready = $state(false);
   let tileFailed = $state(false);
@@ -27,6 +28,7 @@
       rendered.point.x !== point.x ||
       rendered.point.y !== point.y ||
       rendered.point.plane !== point.plane ||
+      rendered.point.mapId !== point.mapId ||
       rendered.npc !== npc,
   );
 
@@ -56,7 +58,7 @@
         attribution:
           'Map tiles © <a href="https://runescape.wiki/" target="_blank" rel="noreferrer">RuneScape Wiki</a> · © <a href="https://www.jagex.com/" target="_blank" rel="noreferrer">Jagex</a>',
       });
-      tiles.getTileUrl = (coords) => wikiTileUrl(coords, plane);
+      tiles.getTileUrl = (coords) => wikiTileUrl(coords, plane, mapId);
       tiles.on("tileerror", () => {
         tileFailed = true;
       });
@@ -91,7 +93,7 @@
 
   $effect(() => {
     const selected = {
-      point: { x: point.x, y: point.y, plane: point.plane },
+      point: { x: point.x, y: point.y, plane: point.plane, mapId: point.mapId },
       npc,
     };
     if (!ready || !map || !tiles || !marker) return;
@@ -103,6 +105,7 @@
     if (!visible) return;
     const timer = window.setTimeout(() => {
       plane = selected.point.plane;
+      mapId = selected.point.mapId ?? 28;
       tileFailed = false;
       const position = questMapCenter(selected.point);
       currentMarker.setLatLng(position);

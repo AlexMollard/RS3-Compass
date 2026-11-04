@@ -19,6 +19,20 @@
     position?: number;
     onOpen: (id: string) => void;
   } = $props();
+  let activityType = $derived(
+    quest.kind === "miniquest"
+      ? "Miniquest"
+      : quest.kind === "saga"
+        ? "Saga"
+        : "Quest",
+  );
+  let availability = $derived(
+    quest.availability === "seasonal"
+      ? "Seasonal"
+      : quest.availability === "tutorial"
+        ? "Tutorial"
+        : "",
+  );
 </script>
 
 {#if variant === "queue"}<button
@@ -40,9 +54,8 @@
           ? "Recorded complete"
           : recommended
             ? "Next · prepare levels and items"
-            : quest.members
-              ? "Members quest"
-              : "Free-to-play quest"}</small
+            : availability ||
+              `${quest.members ? "Members" : "Free-to-play"} ${activityType.toLowerCase()}`}</small
       ></span
     ><span class="queue-reward">{quest.rewards[0]}</span><ChevronRight
       size={16}
@@ -61,7 +74,8 @@
         />{/if}</span
     ><span
       ><strong>{quest.name}</strong><small
-        >{quest.members ? "Members" : "Free-to-play"} · {quest.difficulty}</small
+        >{quest.members ? "Members" : "Free-to-play"} · {availability ||
+          activityType} · {quest.difficulty}</small
       ></span
     ><span class="reference-action" aria-hidden="true"
       ><ChevronRight size={15} /></span
