@@ -21,6 +21,31 @@ const items: Omit<Reference, "kind">[] = [
   { name: "Egg", wiki: "Egg", image: "Egg.png", aliases: ["eggs"] },
   { name: "Redberry pie", wiki: "Redberry_pie", image: "Redberry_pie.png" },
   {
+    name: "Anti-dragon shield",
+    wiki: "Anti-dragon shield",
+    image: "Anti-dragon_shield.png",
+  },
+  { name: "Rope", wiki: "Rope", image: "Rope.png", aliases: ["ropes"] },
+  {
+    name: "Air rune",
+    wiki: "Air rune",
+    image: "Air_rune.png",
+    aliases: ["air runes"],
+  },
+  {
+    name: "Earth rune",
+    wiki: "Earth rune",
+    image: "Earth_rune.png",
+    aliases: ["earth runes"],
+  },
+  {
+    name: "Water rune",
+    wiki: "Water rune",
+    image: "Water_rune.png",
+    aliases: ["water runes"],
+  },
+  { name: "Logs", wiki: "Logs", image: "Logs.png", aliases: ["normal logs"] },
+  {
     name: "Iron bar",
     wiki: "Iron_bar",
     image: "Iron_bar.png",

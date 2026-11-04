@@ -16,6 +16,8 @@ export interface Profile {
 export interface QuestRecord {
   id: string;
   name: string;
+  icon: string;
+  artwork: string;
   members: boolean;
   difficulty: string;
   length: string;
@@ -26,6 +28,7 @@ export interface QuestRecord {
     location: string;
     meetingPoint: string;
     access?: string;
+    map: { x: number; y: number; plane: 0 | 1 | 2 | 3 };
   };
   why: string;
   requirements: { skill: string; level: number; recommended?: boolean }[];
@@ -38,6 +41,7 @@ export interface SkillRecord {
   name: string;
   category: string;
   icon: string;
+  artwork: string;
   description: string;
   goal: number;
   payoff: string;
@@ -57,6 +61,8 @@ export const QUESTS: QuestRecord[] = [
   {
     id: "cooks-assistant",
     name: "Cook's Assistant",
+    icon: "Cook's_Assistant_icon.png",
+    artwork: "Cook's_Assistant.png",
     members: false,
     difficulty: "Novice",
     length: "Short",
@@ -66,6 +72,7 @@ export const QUESTS: QuestRecord[] = [
       image: "Cook_(Lumbridge)_chathead.png",
       location: "Lumbridge Castle",
       meetingPoint: "Kitchen on the ground floor, south side of the castle.",
+      map: { x: 3209, y: 3215, plane: 0 },
     },
     why: "An approachable first quest that starts your cooking journey and opens the way to later cooking quests.",
     requirements: [],
@@ -81,6 +88,8 @@ export const QUESTS: QuestRecord[] = [
   {
     id: "knights-sword",
     name: "The Knight's Sword",
+    icon: "The_Knight's_Sword_icon.png",
+    artwork: "The_Knight's_Sword.png",
     members: false,
     difficulty: "Intermediate",
     length: "Medium",
@@ -90,6 +99,7 @@ export const QUESTS: QuestRecord[] = [
       image: "Squire_Asrol_chathead.png",
       location: "Falador",
       meetingPoint: "White Knights' Castle courtyard.",
+      map: { x: 2975, y: 3343, plane: 0 },
     },
     why: "A valuable early Smithing reward. Gather your own inputs first and avoid a long, repetitive early Smithing grind.",
     requirements: [
@@ -114,6 +124,8 @@ export const QUESTS: QuestRecord[] = [
   {
     id: "dragon-slayer",
     name: "Dragon Slayer",
+    icon: "Dragon_Slayer_icon.png",
+    artwork: "Dragon_Slayer.png",
     members: false,
     difficulty: "Experienced",
     length: "Long",
@@ -124,6 +136,7 @@ export const QUESTS: QuestRecord[] = [
       location: "Champions' Guild",
       meetingPoint: "Ground-floor foyer, south-west of Varrock.",
       access: "33 quest points are required to enter the guild.",
+      map: { x: 3191, y: 3362, plane: 0 },
     },
     why: "A major F2P quest milestone that brings your combat, equipment, and self-supplied preparation together.",
     requirements: [
@@ -147,6 +160,8 @@ export const QUESTS: QuestRecord[] = [
   {
     id: "waterfall-quest",
     name: "Waterfall Quest",
+    icon: "Waterfall_Quest_icon.png",
+    artwork: "Waterfall_Quest.png",
     members: true,
     difficulty: "Intermediate",
     length: "Medium",
@@ -157,14 +172,17 @@ export const QUESTS: QuestRecord[] = [
       location: "Baxtorian Falls",
       meetingPoint:
         "Inside her house north-east of the falls, south of Barbarian Outpost.",
+      map: { x: 2522, y: 3498, plane: 0 },
     },
     why: "A classic early-members direction with Attack and Strength rewards. Plan for the dangerous areas rather than assuming starter equipment is enough.",
     requirements: [],
     questRequirements: [],
     supplies: [
-      "Check the current Wiki item list",
-      "Appropriate food",
-      "An escape plan for dangerous areas",
+      "6 air runes",
+      "6 earth runes",
+      "6 water runes",
+      "A rope",
+      "Food for dangerous areas",
     ],
     rewards: [
       "13,750 Attack XP",
@@ -176,6 +194,8 @@ export const QUESTS: QuestRecord[] = [
   {
     id: "tree-gnome-village",
     name: "Tree Gnome Village",
+    icon: "Tree_Gnome_Village_icon.png",
+    artwork: "Tree_Gnome_Village_(quest).png",
     members: true,
     difficulty: "Intermediate",
     length: "Medium",
@@ -188,11 +208,12 @@ export const QUESTS: QuestRecord[] = [
         "By the spirit tree inside the village, at the centre of the maze.",
       access:
         "First visit: navigate the maze and squeeze through the loose railing. Spirit-tree travel unlocks after this quest.",
+      map: { x: 2542, y: 3169, plane: 0 },
     },
     why: "An early-members quest direction with Attack experience and useful travel progression.",
     requirements: [],
     questRequirements: [],
-    supplies: ["Check the current Wiki item list", "Combat gear and food"],
+    supplies: ["6 normal logs", "Combat gear and food"],
     rewards: ["11,450 Attack XP", "Travel progression"],
     wiki: "Tree_Gnome_Village",
   },
@@ -202,6 +223,7 @@ export const SKILLS: SkillRecord[] = [
     name: "Mining",
     category: "Gathering",
     icon: "Mining.png",
+    artwork: "Mining_detail.png",
     description:
       "Mining methods and equipment for gathering your next Smithing materials.",
     goal: 20,
@@ -262,6 +284,7 @@ export const SKILLS: SkillRecord[] = [
     name: "Smithing",
     category: "Artisan",
     icon: "Smithing.png",
+    artwork: "Smithing_detail.png",
     description: "Smelt your gathered ore and make equipment or quest items.",
     goal: 20,
     payoff: "Make useful equipment and prepare your own quest inputs.",
@@ -302,6 +325,7 @@ export const SKILLS: SkillRecord[] = [
     name: "Fishing",
     category: "Gathering",
     icon: "Fishing.png",
+    artwork: "Fishing_detail.png",
     description: "Fishing methods and equipment for a renewable food supply.",
     goal: 20,
     payoff: "Support questing and combat with renewable food.",

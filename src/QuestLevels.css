@@ -1,0 +1,77 @@
+.quest-level-checks {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  align-items: start;
+  gap: 18px;
+  max-width: 980px;
+}
+.level-check-empty {
+  grid-column: 1 / -1;
+  color: var(--muted);
+  margin: 0;
+}
+.level-check-group > h4 {
+  font-size: var(--font-ui);
+  color: var(--muted);
+  margin: 0 0 9px;
+  font-weight: 500;
+}
+.level-check-list {
+  display: grid;
+  gap: 8px;
+}
+.level-check-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px 14px;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  background: #12212a;
+}
+.level-check-skill {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  grid-column: 1;
+  grid-row: 1;
+}
+.level-check-values {
+  display: flex;
+  gap: 22px;
+  margin: 0;
+  grid-column: 1;
+  grid-row: 2;
+}
+.level-check-values dt {
+  color: var(--muted);
+  font-size: var(--font-caption);
+}
+.level-check-values dd {
+  margin: 0;
+  color: var(--text);
+  font-size: 17px;
+  font-variant-numeric: tabular-nums;
+}
+.level-check-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: end;
+  gap: 5px;
+  color: var(--muted);
+  font-size: var(--font-caption);
+  grid-column: 2;
+  grid-row: 2;
+}
+.level-check-row.is-met .level-check-status {
+  color: var(--green);
+}
+.level-check-status.below {
+  color: var(--gold-bright);
+}
+.quest-level-checks .level-check-train {
+  grid-column: 2;
+  grid-row: 1;
+  padding: 0 5px;
+}

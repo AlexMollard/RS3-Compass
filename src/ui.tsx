@@ -9,7 +9,8 @@ import {
 } from "lucide-react";
 import type { QuestRecord } from "./data";
 import GameText from "./GameText";
-import { wikiHref, wikiImage } from "./wiki";
+import { wikiHref } from "./wiki";
+import GameArt from "./GameArt";
 
 export function PageHeading({
   title,
@@ -62,12 +63,16 @@ export function ActivityHeader({
   image,
   eyebrow,
   meta,
+  artwork,
+  onOpen,
 }: {
   title: string;
   wiki: string;
   image: string;
   eyebrow: string;
   meta?: ReactNode;
+  artwork?: string;
+  onOpen?: () => void;
 }) {
   return (
     <header className="activity-header">
@@ -78,15 +83,41 @@ export function ActivityHeader({
         rel="noopener noreferrer"
         aria-label={title + " on RuneScape Wiki"}
       >
-        <img src={wikiImage(image)} alt="" />
+        <GameArt file={image} />
       </a>
-      <div>
+      <div className="activity-header-copy">
         <span className="eyebrow">{eyebrow}</span>
         <h2>
-          <GameText text={title} />
+          {onOpen ? (
+            <button
+              type="button"
+              className="activity-title-button"
+              onClick={onOpen}
+            >
+              {title}
+            </button>
+          ) : (
+            <GameText text={title} />
+          )}
         </h2>
         {meta}
       </div>
+      {artwork && (
+        <a
+          className="activity-artwork-link"
+          href={wikiHref(wiki)}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={title + " artwork on RuneScape Wiki"}
+        >
+          <GameArt
+            file={artwork}
+            size={112}
+            thumbnail
+            className="activity-artwork"
+          />
+        </a>
+      )}
     </header>
   );
 }
@@ -127,11 +158,7 @@ export function QuestNavigationCard({
         <span className="queue-position">
           {completed ? <Check size={17} /> : String(position).padStart(2, "0")}
         </span>
-        <img
-          className="queue-quest-icon"
-          src={wikiImage("Quest_icon.png")}
-          alt=""
-        />
+        <GameArt className="queue-quest-icon" file={quest.icon} />
         <span className="queue-quest-name">
           <strong>{quest.name}</strong>
           <small>
@@ -158,16 +185,8 @@ export function QuestNavigationCard({
       onClick={() => onOpen(quest.id)}
     >
       <span className={"quest-state" + (completed ? " is-complete" : "")}>
-        {completed ? (
-          <Check size={15} />
-        ) : (
-          <img
-            src={wikiImage("Quest_icon.png")}
-            alt=""
-            width={18}
-            height={18}
-          />
-        )}
+        <GameArt file={quest.icon} size={20} />
+        {completed && <Check className="quest-complete-mark" size={12} />}
       </span>
       <span>
         <strong>{quest.name}</strong>

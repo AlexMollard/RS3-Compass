@@ -1,22 +1,21 @@
 import { useState } from "react";
-import { ArrowRight, ChevronDown, Focus } from "lucide-react";
+import { ArrowRight, ChevronDown } from "lucide-react";
 import {
   QUESTS,
   SKILLS,
   accessibleQuests,
   nextQuest,
-  stageLocations,
   taskTitle,
   trainingStage,
   type Profile,
 } from "./data";
+import GameArt from "./GameArt";
 import GameText from "./GameText";
-import { wikiImage } from "./wiki";
 import LevelEditor from "./LevelEditor";
-import LocationGallery from "./LocationGallery";
-import QuestLevels from "./QuestLevels";
 import QuestStart from "./QuestStart";
+import WorldMap from "./WorldMap";
 import {
+  ActivityHeader,
   Button,
   GameWindow,
   NavigationCard,
@@ -25,6 +24,7 @@ import {
   Tabs,
   WikiAction,
 } from "./ui";
+import "./Journey.css";
 
 interface Props {
   profile: Profile;
@@ -61,17 +61,15 @@ export default function Journey({
   const packed = packing.filter((item) =>
     profile.packed.includes(profile.activeTask + "::" + item),
   ).length;
-  const activePlaces = activeStage
-    ? stageLocations(activeStage, profile.mode)
-    : [];
   const sessionComplete = activeQuest
     ? profile.completedQuests.includes(activeQuest.id)
     : profile.completedTasks.includes(profile.activeTask);
+  const activeIcon = activeQuest?.icon ?? activeSkill?.icon;
+  const resumingNext = activeQuest?.id === next?.id;
   return (
     <div className="progression-page page-enter">
       <PageHeading
         title="Progression"
-        subtitle={profile.name + " · " + profile.kind}
         trailing={
           <Button onClick={() => setEditingSkill("Mining")}>
             Update recorded levels
@@ -79,70 +77,70 @@ export default function Journey({
         }
       />
       <div className="home-workspace">
-        {(activeQuest || activeSkill) && (
-          <GameWindow
-            className="home-session"
-            title="Current preparation"
-            icon={<Focus size={18} />}
-            trailing={
-              sessionComplete
-                ? "Completed"
-                : packed + "/" + packing.length + " packed"
-            }
-          >
-            <div className="home-session-body">
-              <NavigationCard
-                title={taskTitle(profile.activeTask)}
-                label="Resume preparation"
-                detail="Continue your checklist and notes."
-                onOpen={onPlay}
-              />
-              {activeQuest ? (
-                <QuestStart quest={activeQuest} compact />
-              ) : (
-                <LocationGallery
-                  locations={activePlaces}
-                  profile={profile}
-                  compact
-                />
-              )}
-            </div>
-          </GameWindow>
+        {activeIcon && !resumingNext && (
+          <section className="home-resume" aria-label="Current preparation">
+            <span className="home-resume-label">Current preparation</span>
+            <NavigationCard
+              title={taskTitle(profile.activeTask)}
+              label="Resume preparation"
+              icon={<GameArt file={activeIcon} size={32} />}
+              value={
+                sessionComplete
+                  ? "Completed"
+                  : packed + "/" + packing.length + " packed"
+              }
+              onOpen={onPlay}
+            />
+          </section>
         )}
         <GameWindow
           className="home-next"
-          title="Next quest"
-          icon={<img src={wikiImage("Quest_icon.png")} alt="" />}
+          title={resumingNext ? "Current quest" : "Next quest"}
         >
           {next ? (
-            <div className="next-preparation">
-              <div className="next-preparation-content">
-                <h2>
-                  <button
-                    type="button"
-                    className="objective-title"
-                    onClick={() => onQuest(next.id)}
+            <div className="next-quest-workspace">
+              <div className="home-preparation">
+                <ActivityHeader
+                  title={next.name}
+                  wiki={next.wiki}
+                  image={next.icon}
+                  artwork={next.artwork}
+                  eyebrow={next.members ? "MEMBERS" : "FREE-TO-PLAY"}
+                  onOpen={() => onQuest(next.id)}
+                />
+                <div className="home-preparation-body">
+                  <p className="home-quest-purpose">
+                    <GameText text={next.why} />
+                  </p>
+                  <section
+                    className="home-start"
+                    aria-label="Quest starting point"
                   >
-                    {next.name}
-                  </button>
-                </h2>
-                <p>
-                  <GameText text={next.why} />
-                </p>
-                <h3>Preparation</h3>
-                <QuestLevels profile={profile} quest={next} onSkill={onSkill} />
-                <div className="objective-actions">
-                  <Button variant="primary" onClick={() => onQuest(next.id)}>
-                    Prepare quest <ArrowRight size={18} />
-                  </Button>
-                  <Button variant="quiet" onClick={() => onStart(next.id)}>
-                    Start packing
-                  </Button>
-                  <WikiAction page={next.wiki} label="Quest Wiki" />
+                    <h3>Where to start</h3>
+                    <QuestStart quest={next} showMap={false} />
+                  </section>
+                  <div className="objective-actions">
+                    <Button
+                      variant="primary"
+                      onClick={resumingNext ? onPlay : () => onQuest(next.id)}
+                    >
+                      {resumingNext ? "Resume preparation" : "Prepare quest"}{" "}
+                      <ArrowRight size={18} />
+                    </Button>
+                    <Button
+                      variant="quiet"
+                      onClick={() =>
+                        resumingNext ? onQuest(next.id) : onStart(next.id)
+                      }
+                    >
+                      {resumingNext ? "Quest preparation" : "Start packing"}
+                    </Button>
+                    <WikiAction page={next.wiki} label="Quest Wiki" />
+                  </div>
                 </div>
               </div>
-              <div className="next-preparation-start">
-                <QuestStart quest={next} compact />
+              <div className="home-map">
+                <WorldMap point={next.start.map} npc={next.start.npc} />
               </div>
             </div>
           ) : (
@@ -152,11 +150,12 @@ export default function Journey({
             </div>
           )}
         </GameWindow>
-        <GameWindow
-          className="home-route"
-          title="Browse activities"
-          trailing={complete + "/" + quests.length + " quests complete"}
-        >
+        <details className="tool-window home-route">
+          <summary className="window-title">
+            <h2>Browse activities</h2>
+            <span>{complete + "/" + quests.length + " quests complete"}</span>
+            <ChevronDown size={18} aria-hidden="true" />
+          </summary>
           <Tabs
             label="Progression views"
             value={view}
@@ -173,7 +172,7 @@ export default function Journey({
                   key={skill.name}
                   title={skill.name}
                   label={"Open training for " + skill.name}
-                  icon={<img src={wikiImage(skill.icon)} alt="" />}
+                  icon={<GameArt file={skill.icon} size={32} />}
                   value={profile.levels[skill.name] ?? "?"}
                   detail={<GameText text={skill.payoff} />}
                   wiki={skill.wiki}
@@ -206,7 +205,7 @@ export default function Journey({
           <p className="window-footnote">
             Sample activities · progress entered manually.
           </p>
-        </GameWindow>
+        </details>
         <details className="tool-window home-levels">
           <summary className="window-title">
             <h2>Recorded levels</h2>
@@ -222,7 +221,7 @@ export default function Journey({
                 title={"Edit " + name + " level"}
                 onClick={() => setEditingSkill(name)}
               >
-                <img src={wikiImage(name + "-icon.png")} alt="" />
+                <GameArt file={name + "-icon.png"} />
                 <span>{name}</span>
                 <strong>{level}</strong>
               </button>

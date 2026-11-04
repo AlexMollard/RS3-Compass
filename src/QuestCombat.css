@@ -1,0 +1,54 @@
+.quest-combat h4 {
+  margin: 14px 0 8px;
+  font-size: var(--font-ui);
+  font-weight: 500;
+  color: var(--muted);
+}
+.quest-enemies {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+  gap: 8px;
+}
+.quest-enemy-reference {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 58px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  background: #12212a;
+  text-decoration: none;
+}
+.quest-enemy-reference > span {
+  flex: 1;
+  min-width: 0;
+}
+.quest-enemy-reference strong {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--gold);
+}
+.quest-enemy-reference small {
+  display: block;
+  color: var(--muted);
+  font-size: var(--font-caption);
+}
+.quest-enemy-reference > svg {
+  flex: none;
+  color: var(--muted);
+}
+.combat-notes {
+  margin: 14px 0 0;
+  padding-left: 18px;
+  color: #d2c39f;
+}
+.combat-notes li + li {
+  margin-top: 8px;
+}
+.combat-no-fights {
+  margin: 0;
+  color: var(--muted);
+}

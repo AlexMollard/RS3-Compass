@@ -4,6 +4,7 @@ import { QUESTS, type Profile } from "./data";
 import QuestLevels from "./QuestLevels";
 import GameText from "./GameText";
 import QuestStart from "./QuestStart";
+import QuestCombat from "./QuestCombat";
 import {
   ActivityHeader,
   Button,
@@ -100,7 +101,8 @@ export default function QuestPage({
           <ActivityHeader
             title={quest.name}
             wiki={quest.wiki}
-            image="Quest_icon.png"
+            image={quest.icon}
+            artwork={quest.artwork}
             eyebrow={quest.members ? "MEMBERS" : "FREE-TO-PLAY"}
           />
           <div className="detail-body">
@@ -136,6 +138,7 @@ export default function QuestPage({
               <SectionHeading title="Level checks" />
               <QuestLevels profile={profile} quest={quest} onSkill={onSkill} />
             </section>
+            <QuestCombat quest={quest} />
             <div className="detail-actions">
               <Button
                 variant="primary"

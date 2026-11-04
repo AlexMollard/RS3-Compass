@@ -5,22 +5,17 @@ import {
   ArrowRight,
   ArrowUpRight,
   Backpack,
-  BookOpen,
   Check,
   CheckCircle2,
   ChevronRight,
   CircleHelp,
   Compass,
-  Crown,
   Expand,
-  Focus,
   Info,
   ListChecks,
   LockKeyhole,
-  Map,
   Menu,
   Minimize2,
-  Pickaxe,
   Search,
   Shield,
   Target,
@@ -30,9 +25,11 @@ import QuestPage from "./QuestPage";
 import SkillPage from "./SkillPage";
 import QuestLevels from "./QuestLevels";
 import GameText from "./GameText";
+import GameArt from "./GameArt";
 import Journey from "./Journey";
 import LocationGallery from "./LocationGallery";
 import QuestStart from "./QuestStart";
+import QuestCombat from "./QuestCombat";
 import {
   ActivityHeader,
   Button,
@@ -63,10 +60,10 @@ const pageNames: Record<Page, string> = {
   skills: "Skills",
 };
 const navigation = [
-  { id: "journey" as const, label: "Progression", icon: Map },
-  { id: "play" as const, label: "Play companion", icon: Focus },
-  { id: "quests" as const, label: "Quest preparation", icon: BookOpen },
-  { id: "skills" as const, label: "Skills", icon: Pickaxe },
+  { id: "journey" as const, label: "Progression", image: "Quest_map_icon.png" },
+  { id: "play" as const, label: "Play companion", image: "Quest_map_icon.png" },
+  { id: "quests" as const, label: "Quest preparation", image: "Quest.png" },
+  { id: "skills" as const, label: "Skills", image: "Skills_icon.png" },
 ];
 function readRoute(): { page: Page; detail: string } {
   const [page, detail = ""] = location.hash.slice(1).split("/");
@@ -78,6 +75,9 @@ function readRoute(): { page: Page; detail: string } {
 export default function App() {
   const { profile, profiles, updateProfile, selectProfile, storageError } =
     useProfiles();
+  const activeIcon =
+    QUESTS.find((quest) => quest.id === profile.activeTask)?.icon ??
+    SKILLS.find((skill) => "train-" + skill.name === profile.activeTask)?.icon;
   const [route, setRoute] = useState(readRoute);
   const [mobileNav, setMobileNav] = useState(false);
   const [compact, setCompact] = useState(false);
@@ -203,14 +203,17 @@ export default function App() {
         <div className="sidebar-rule" />
         <span className="nav-heading">WORKSPACE</span>
         <nav aria-label="Main navigation">
-          {navigation.map(({ id, label, icon: Icon }) => (
+          {navigation.map(({ id, label, image }) => (
             <button
               key={id}
               className={"nav-item " + (route.page === id ? "active" : "")}
               aria-current={route.page === id ? "page" : undefined}
               onClick={() => navigate(id)}
             >
-              <Icon size={19} />
+              <GameArt
+                file={id === "play" ? (activeIcon ?? image) : image}
+                size={24}
+              />
               <span>{label}</span>
               {route.page === id && <span className="nav-active-dot" />}
             </button>
@@ -251,6 +254,20 @@ export default function App() {
             <strong>{pageNames[route.page]}</strong>
           </div>
           <div className="topbar-tools">
+            <button
+              className="search-trigger"
+              aria-label="Search quests and skills"
+              title="Search quests and skills"
+              onClick={() => searchDialog.current?.showModal()}
+            >
+              <Search size={17} />
+              <span>Search guides</span>
+              <kbd>
+                {/Mac|iPhone|iPad|iPod/.test(navigator.platform)
+                  ? "⌘ K"
+                  : "Ctrl K"}
+              </kbd>
+            </button>
             <div
               className="access-toggle"
               role="group"
@@ -263,26 +280,24 @@ export default function App() {
                   className={profile.mode === mode ? "selected" : ""}
                   onClick={() => updateProfile((p) => ({ ...p, mode }))}
                 >
-                  {mode === "members" && <Crown size={13} />}{" "}
                   {mode === "f2p" ? "F2P" : "Members"}
                 </button>
               ))}
             </div>
-            <span className="topbar-divider" />
-            <button
-              className="search-trigger"
-              aria-label="Search prototype guides"
-              title="Search quests and skills (Ctrl/⌘ K)"
-              onClick={() => searchDialog.current?.showModal()}
-            >
-              <Search size={17} />
-              <span>Find a guide</span>
-              <kbd>Ctrl/⌘ K</kbd>
-            </button>
             <label className="character-select">
-              <span className="avatar">{profile.name[0]}</span>
-              <span>
-                <small>SAMPLE CHARACTER</small>
+              <GameArt
+                file={
+                  profile.kind === "Group Ironman"
+                    ? "Group_Ironman_badge.png"
+                    : "Ironman_badge.png"
+                }
+                size={28}
+              />
+              <span className="character-details">
+                <small>Sample · {profile.kind}</small>
+                <span className="character-name" aria-hidden="true">
+                  {profile.name} <span>▾</span>
+                </span>
                 <select
                   aria-label="Sample character"
                   value={profile.id}
@@ -447,7 +462,7 @@ export default function App() {
               key={q.id}
               title={q.name}
               label={"Open preparation for " + q.name}
-              icon={<BookOpen size={20} />}
+              icon={<GameArt file={q.icon} size={24} />}
               detail={q.members ? "Members quest" : "Free-to-play quest"}
               wiki={q.wiki}
               onOpen={() => {
@@ -463,7 +478,7 @@ export default function App() {
               key={s.name}
               title={s.name}
               label={"Open training for " + s.name}
-              icon={<Pickaxe size={20} />}
+              icon={<GameArt file={s.icon} size={24} />}
               detail="Sample training methods"
               wiki={s.wiki}
               onOpen={() => {
@@ -615,7 +630,8 @@ function PlayCompanion({
           <ActivityHeader
             title={taskTitle(task)}
             wiki={quest?.wiki || skill?.wiki || "Ironman_Mode/Strategies"}
-            image={skill?.icon || "Quest_icon.png"}
+            image={quest?.icon || skill?.icon || "Quest_icon.png"}
+            artwork={quest?.artwork || skill?.artwork}
             eyebrow={stage ? `LEVELS ${stage.from}–${stage.to}` : "QUEST"}
           />
           <div className="detail-body">
@@ -667,6 +683,7 @@ function PlayCompanion({
                 )}
               </>
             )}
+            {quest && <QuestCombat quest={quest} />}
             <section className="panel packing-card">
               <SectionHeading
                 title={

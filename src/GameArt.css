@@ -1,0 +1,214 @@
+.game-art {
+  display: block;
+  object-fit: contain;
+  flex: none;
+}
+
+.quest-nav-row .quest-state {
+  position: relative;
+}
+.quest-nav-row .quest-complete-mark {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  color: #cce9d2;
+  background: #284936;
+  border-radius: 50%;
+}
+
+.activity-header .activity-header-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.activity-header .activity-artwork-link {
+  display: grid;
+  place-items: center;
+  flex: 0 0 112px;
+  height: 84px;
+  max-width: 24%;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: #0f1a21;
+}
+.activity-header img.activity-artwork {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+}
+.activity-header .activity-title-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.activity-header .activity-title-button:hover {
+  text-decoration: underline;
+}
+
+.workspace .topbar {
+  min-height: 72px;
+  height: auto;
+  gap: 20px;
+}
+.workspace .topbar-tools {
+  gap: 10px;
+  min-width: 0;
+}
+.workspace .topbar .search-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 240px;
+  min-height: var(--control-size);
+  padding: 0 10px;
+  border: 1px solid #40505b;
+  border-radius: 5px;
+  background: #101c24;
+  color: #b4c5d0;
+  text-align: left;
+}
+.workspace .topbar .search-trigger > span {
+  display: block;
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.workspace .topbar .search-trigger kbd {
+  display: block;
+  flex: none;
+  white-space: nowrap;
+}
+.workspace .topbar .access-toggle {
+  flex: none;
+  padding: 2px;
+  border-radius: 5px;
+}
+.workspace .topbar .access-toggle button {
+  min-height: var(--control-size);
+  min-width: 51px;
+  padding: 0 10px;
+}
+.workspace .topbar .character-select {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  min-height: var(--control-size);
+  padding: 3px 8px;
+  border: 1px solid #40505b;
+  border-radius: 5px;
+  background: #101c24;
+}
+.workspace .topbar .character-details {
+  min-width: 0;
+}
+.workspace .topbar .character-select small {
+  display: block;
+  overflow: hidden;
+  color: #aabac4;
+  font-size: 12px;
+  letter-spacing: normal;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.workspace .topbar .character-name {
+  display: block;
+  min-width: 112px;
+  max-width: 150px;
+  overflow: hidden;
+  color: #e3e6e4;
+  font-size: 13px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.workspace .topbar .character-name span {
+  float: right;
+}
+.workspace .topbar .character-select:focus-within {
+  outline: 2px solid #dec795;
+  outline-offset: 2px;
+}
+.workspace .topbar .character-select select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  opacity: 0;
+  cursor: pointer;
+}
+.workspace .topbar .character-select select option {
+  color: #e3e6e4;
+  background: #172630;
+}
+@media (max-width: 1100px) {
+  .workspace .topbar .search-trigger {
+    width: 190px;
+  }
+}
+@media (max-width: 850px) {
+  .workspace .topbar .search-trigger {
+    width: 44px;
+    justify-content: center;
+    padding: 0;
+  }
+  .workspace .topbar .search-trigger > span,
+  .workspace .topbar .search-trigger kbd {
+    display: none;
+  }
+}
+@media (max-width: 600px) {
+  .workspace .topbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: 44px 48px;
+    height: auto;
+    gap: 4px 8px;
+    padding: 8px 14px;
+  }
+  .workspace .topbar-tools {
+    display: contents;
+  }
+  .workspace .topbar .breadcrumb {
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+  }
+  .workspace .topbar .search-trigger {
+    grid-column: 2;
+    grid-row: 1;
+    width: 44px;
+    min-height: 44px;
+  }
+  .workspace .topbar .access-toggle {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: start;
+  }
+  .workspace .topbar .access-toggle button {
+    min-height: 44px;
+    padding: 0 10px;
+  }
+  .workspace .topbar .character-select {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: end;
+    min-height: 44px;
+    max-width: 160px;
+  }
+  .workspace .topbar .character-name {
+    min-width: 95px;
+    max-width: 110px;
+  }
+  .activity-header .activity-artwork-link {
+    flex-basis: 76px;
+    height: 68px;
+  }
+}

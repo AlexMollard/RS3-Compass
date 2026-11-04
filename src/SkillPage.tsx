@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { ArrowRight, Check, Pickaxe, Target } from "lucide-react";
+import { ArrowRight, Check, Target } from "lucide-react";
 import { SKILLS, trainingStage, stageLocations, type Profile } from "./data";
 import GameText from "./GameText";
-import { wikiImage } from "./wiki";
+import GameArt from "./GameArt";
 import LocationGallery from "./LocationGallery";
 import {
   ActivityHeader,
@@ -38,7 +38,7 @@ export default function SkillPage({
         subtitle="Methods, equipment, and supplies for the selected skill."
         trailing={
           <span className="badge badge-gold">
-            <Pickaxe size={14} />{" "}
+            <GameArt file={skill.icon} size={16} />{" "}
             {profile.mode === "members" ? "Members methods" : "F2P methods"}
           </span>
         }
@@ -98,7 +98,7 @@ function SkillContent({
               key={s.name}
               title={s.name}
               label={"Open training for " + s.name}
-              icon={<img src={wikiImage(s.icon)} alt="" />}
+              icon={<GameArt file={s.icon} size={24} />}
               detail={s.category}
               value={profile.levels[s.name] ?? "?"}
               selected={s.name === skill.name}
@@ -119,6 +119,7 @@ function SkillContent({
           title={skill.name}
           wiki={skill.wiki}
           image={skill.icon}
+          artwork={skill.artwork}
           eyebrow={skill.category.toUpperCase()}
           meta={
             <p>
@@ -283,7 +284,7 @@ function SkillContent({
           </section>
           {profile.mode === "members" && (
             <div className="notice">
-              <Pickaxe size={20} />
+              <GameArt file={skill.icon} size={20} />
               <div>
                 <strong>Members content preview</strong>
                 <p>

@@ -7,18 +7,12 @@ import { wikiHref, wikiThumbnail } from "./wiki";
 export default function LocationGallery({
   locations,
   profile,
-  compact = false,
 }: {
   locations: readonly string[];
   profile: Profile;
-  compact?: boolean;
 }) {
   return (
-    <div
-      className={
-        "location-gallery" + (compact ? " location-gallery-compact" : "")
-      }
-    >
+    <div className="location-gallery">
       {locations.map((id) => {
         const location = LOCATIONS[id];
         return (
@@ -47,11 +41,9 @@ export default function LocationGallery({
                 <span>{location.name}</span>
                 <ExternalLink size={16} aria-hidden="true" />
               </a>
-              {!compact && (
-                <p>
-                  <GameText text={location.summary} />
-                </p>
-              )}
+              <p>
+                <GameText text={location.summary} />
+              </p>
               {location.members && (
                 <p className="location-access">
                   {profile.mode === "f2p"
@@ -59,7 +51,7 @@ export default function LocationGallery({
                     : "Members location."}
                 </p>
               )}
-              {!compact && location.access && (
+              {location.access && (
                 <p className="location-access">
                   <GameText text={location.access} />
                 </p>
