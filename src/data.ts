@@ -1,3 +1,8 @@
+import type { SkillName } from "./skillNames.ts";
+import { COMBAT_SKILLS } from "./skillsCombat.ts";
+import { ARTISAN_SKILLS } from "./skillsArtisan.ts";
+import { SUPPORT_SKILLS } from "./skillsSupport.ts";
+
 export type AccessMode = "f2p" | "members";
 export type Page = "journey" | "play" | "quests" | "skills";
 export interface Profile {
@@ -12,6 +17,10 @@ export interface Profile {
   activeTask: string;
   notes: Record<string, string>;
   trainingRanges?: Record<string, number>;
+  source?: "sample" | "hiscores";
+  hiscoresFetchedAt?: number;
+  questImportStatus?:
+    "available" | "private-or-unavailable" | "service-unavailable";
 }
 export interface QuestRecord {
   id: string;
@@ -37,26 +46,37 @@ export interface QuestRecord {
   rewards: string[];
   wiki: string;
 }
-export interface SkillRecord {
+export interface ItemReference {
   name: string;
+  wiki: string;
+  image: string;
+  aliases?: string[];
+}
+export interface SkillRecord {
+  name: SkillName;
   category: string;
   icon: string;
-  artwork: string;
+  artwork?: string;
   description: string;
   goal: number;
   payoff: string;
+  freeToPlayCap?: number;
+  trainingWiki?: string;
   stages: {
     from: number;
     to: number;
     title: string;
     locations: string[];
     memberLocations?: string[];
+    members?: boolean;
     method: string;
     supplies: string[];
   }[];
   membersNote: string;
   wiki: string;
 }
+// Quest preparation: https://runescape.wiki/w/Dragon_Slayer/Quick_guide
+// Mining locations and ore boxes: https://runescape.wiki/w/Adamant_ore_box
 export const QUESTS: QuestRecord[] = [
   {
     id: "cooks-assistant",
@@ -140,18 +160,19 @@ export const QUESTS: QuestRecord[] = [
     },
     why: "A major F2P quest milestone that brings your combat, equipment, and self-supplied preparation together.",
     requirements: [
-      { skill: "Crafting", level: 8, recommended: true },
+      { skill: "Crafting", level: 8 },
       { skill: "Smithing", level: 20, recommended: true },
     ],
     questRequirements: [],
     supplies: [
-      "90 steel nails",
-      "3 planks",
-      "2,000 coins for ship repairs",
-      "Combat food and appropriate equipment",
+      "An unfired bowl, wizard's mind bomb, silk, and a crayfish cage or lobster pot",
+      "A weapon to defeat Wormbrain and use area loot, or 10,000 coins",
+      "90 steel nails, 3 planks, and a hammer",
+      "2,000 coins to purchase the ship",
+      "Anti-dragon shield (obtained during the quest), combat food and equipment",
     ],
     rewards: [
-      "Combat experience",
+      "Strength XP lamp and Defence XP lamp (each requires level 40 in its skill)",
       "Quest points",
       "A core F2P journey milestone",
     ],
@@ -244,8 +265,11 @@ export const SKILLS: SkillRecord[] = [
         title: "Iron ore",
         locations: ["Lumbridge south-west mine"],
         method:
-          "Mine iron ore and fill an iron ore box. Deposit at a furnace or anvil metal bank.",
-        supplies: ["A level-appropriate pickaxe", "Space in your ore box"],
+          "Mine iron ore; use an iron ore box once you can smith one at 10 Smithing. Until then, bank ore in your inventory.",
+        supplies: [
+          "A level-appropriate pickaxe",
+          "An iron ore box if available",
+        ],
       },
       {
         from: 20,
@@ -254,8 +278,8 @@ export const SKILLS: SkillRecord[] = [
         locations: ["Lumbridge south-west mine"],
         memberLocations: ["Lumbridge south-west mine", "Coal truck mine"],
         method:
-          "Mine coal for steel bars. Carry a steel ore box and deposit your ore for Smithing.",
-        supplies: ["An upgraded pickaxe", "A steel ore box"],
+          "Mine coal for steel bars. Upgrade to a steel ore box when you can smith one at 20 Smithing; bank inventory loads until then.",
+        supplies: ["An upgraded pickaxe", "A steel ore box if available"],
       },
       {
         from: 30,
@@ -263,8 +287,8 @@ export const SKILLS: SkillRecord[] = [
         title: "Mithril ore",
         locations: ["Varrock south-east mine"],
         method:
-          "Mine mithril ore, fill a mithril ore box, and bank at Varrock east bank.",
-        supplies: ["An upgraded pickaxe", "A mithril ore box"],
+          "Mine mithril ore and bank at Varrock east bank. Make a mithril ore box at 30 Smithing when materials permit; before then, bank inventory loads.",
+        supplies: ["An upgraded pickaxe", "A mithril ore box if available"],
       },
       {
         from: 40,
@@ -272,8 +296,8 @@ export const SKILLS: SkillRecord[] = [
         title: "Adamantite ore & luminite",
         locations: ["Rimmington mine", "Dwarven luminite mine"],
         method:
-          "Mine adamantite ore at Rimmington and luminite in the Dwarven mine. Use an adamant ore box; Port Sarim has a metal bank.",
-        supplies: ["An upgraded pickaxe", "An adamant ore box"],
+          "Mine adamantite ore at Rimmington and luminite in the Dwarven mine. Make an adamant ore box at 40 Smithing when materials permit; until then bank inventory loads. Port Sarim has a metal bank.",
+        supplies: ["An upgraded pickaxe", "An adamant ore box if available"],
       },
     ],
     membersNote:
@@ -353,6 +377,9 @@ export const SKILLS: SkillRecord[] = [
       "These river spots work in both modes; membership alone does not unlock quest-gated fishing areas.",
     wiki: "Fishing",
   },
+  ...COMBAT_SKILLS,
+  ...ARTISAN_SKILLS,
+  ...SUPPORT_SKILLS,
 ];
 export const SAMPLE_PROFILES: Profile[] = [
   {
@@ -402,6 +429,7 @@ export function stageLocations(
   stage: SkillRecord["stages"][number],
   mode: AccessMode,
 ): string[] {
+  if (mode === "f2p" && stage.members) return [];
   return mode === "members" && stage.memberLocations
     ? stage.memberLocations
     : stage.locations;
@@ -431,13 +459,34 @@ export function toggleItem(items: string[], id: string) {
   return items.includes(id) ? items.filter((x) => x !== id) : [...items, id];
 }
 
+export function availableStages(skill: SkillRecord, mode: AccessMode) {
+  return mode === "members"
+    ? skill.stages
+    : skill.stages.filter(
+        (stage) =>
+          !stage.members &&
+          (skill.freeToPlayCap === undefined ||
+            stage.from < skill.freeToPlayCap),
+      );
+}
+
+export function skillNeedsMembership(skill: SkillRecord, profile: Profile) {
+  const cap = skill.freeToPlayCap;
+  return (
+    profile.mode === "f2p" &&
+    cap !== undefined &&
+    (cap === 0 || (profile.levels[skill.name] ?? 1) >= cap)
+  );
+}
+
 export function trainingStage(skill: SkillRecord, profile: Profile) {
   const level = profile.levels[skill.name] ?? 1;
+  const stages = availableStages(skill, profile.mode);
   return (
-    skill.stages.find(
+    stages.find(
       (stage) => stage.from === profile.trainingRanges?.[skill.name],
     ) ??
-    skill.stages.find((stage) => level >= stage.from && level < stage.to) ??
-    skill.stages[skill.stages.length - 1]
+    stages.find((stage) => level >= stage.from && level < stage.to) ??
+    stages[stages.length - 1]
   );
 }

@@ -1,0 +1,250 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { get } from "svelte/store";
+import { createCompassController } from "../src/lib/profileStore.ts";
+
+const KEY = "rs3-compass-design-v1";
+const player = {
+  name: "Real Player",
+  levels: { Mining: 55, Smithing: 40 },
+  fetchedAt: 1234,
+  quests: { status: "unavailable", reason: "private-or-unavailable" },
+};
+const current = (controller) => {
+  const saved = get(controller.state);
+  return saved.profiles.find((p) => p.id === saved.activeId);
+};
+
+test("A real lookup creates an isolated profile without fictional sample achievements or notes", () => {
+  const controller = createCompassController();
+  const samples = structuredClone(get(controller.state).profiles);
+  controller.addPlayer(player, "Group Ironman", "members");
+  const real = current(controller);
+  assert.deepEqual(
+    get(controller.state).profiles.filter((p) => p.id !== real.id),
+    samples,
+  );
+  assert.equal(real.id, "rs3:real player");
+  assert.equal(real.source, "hiscores");
+  assert.equal(real.kind, "Group Ironman");
+  assert.equal(real.mode, "members");
+  assert.deepEqual(real.levels, player.levels);
+  assert.deepEqual(
+    [
+      real.completedQuests,
+      real.packed,
+      real.completedTasks,
+      real.notes,
+      real.trainingRanges,
+    ],
+    [[], [], [], {}, {}],
+  );
+});
+
+test("Refreshing public levels retains manual progress, chosen session and access settings", () => {
+  const controller = createCompassController();
+  controller.addPlayer(player, "Group Ironman", "members");
+  controller.updateProfile((p) => ({
+    ...p,
+    levels: { ...p.levels, Cooking: 71 },
+    completedQuests: ["cook"],
+    packed: ["train-Mining::Iron ore"],
+    completedTasks: ["train-Smithing"],
+    notes: { "train-Mining": "Bank first" },
+    trainingRanges: { Mining: 30 },
+    activeTask: "train-Mining",
+  }));
+  const before = structuredClone(current(controller));
+  controller.addPlayer(
+    {
+      ...player,
+      name: "REAL PLAYER",
+      levels: { Mining: 60, Smithing: 45 },
+      fetchedAt: 4567,
+    },
+    "Solo Ironman",
+    "f2p",
+  );
+  const after = current(controller);
+  assert.deepEqual(after, {
+    ...before,
+    name: "REAL PLAYER",
+    levels: { ...before.levels, Mining: 60, Smithing: 45 },
+    hiscoresFetchedAt: 4567,
+  });
+  assert.equal(
+    get(controller.state).profiles.filter((p) => p.id === before.id).length,
+    1,
+  );
+});
+
+test("Controllers do not share mutable user state across SSR requests", () => {
+  const first = createCompassController(),
+    second = createCompassController();
+  const untouched = structuredClone(get(second.state));
+  first.updateProfile((p) => ({
+    ...p,
+    notes: { ...p.notes, cook: "Only this browser" },
+    mode: "members",
+  }));
+  first.addPlayer(player, "Solo Ironman", "f2p");
+  assert.deepEqual(get(second.state), untouched);
+});
+
+test("Legacy profiles survive the framework cutover and later storage writes recover after quota failure", (t) => {
+  const descriptor = Object.getOwnPropertyDescriptor(
+    globalThis,
+    "localStorage",
+  );
+  const controller = createCompassController();
+  const legacy = structuredClone(get(controller.state));
+  legacy.profiles.forEach((p) => delete p.trainingRanges);
+  legacy.profiles[0].notes = { "train-Smithing": "Keep this legacy note" };
+  const storage = new Map([[KEY, JSON.stringify(legacy)]]);
+  let full = false;
+  Object.defineProperty(globalThis, "localStorage", {
+    configurable: true,
+    value: {
+      getItem: (key) => storage.get(key) ?? null,
+      setItem: (key, value) => {
+        if (full) throw new Error("Quota exceeded");
+        storage.set(key, value);
+      },
+    },
+  });
+  t.after(() => {
+    controller.destroy();
+    if (descriptor)
+      Object.defineProperty(globalThis, "localStorage", descriptor);
+    else delete globalThis.localStorage;
+  });
+  controller.initialize();
+  assert.deepEqual(get(controller.state), legacy);
+  full = true;
+  controller.updateProfile((p) => ({
+    ...p,
+    notes: { ...p.notes, cook: "Unsaved change" },
+  }));
+  assert.equal(get(controller.storageError), true);
+  assert.deepEqual(JSON.parse(storage.get(KEY)), legacy);
+  full = false;
+  controller.updateProfile((p) => ({
+    ...p,
+    notes: { ...p.notes, cook: "Recovered change" },
+  }));
+  assert.equal(get(controller.storageError), false);
+  const restored = JSON.parse(storage.get(KEY));
+  assert.equal(restored.profiles[0].notes.cook, "Recovered change");
+  assert.equal(
+    restored.profiles[0].notes["train-Smithing"],
+    "Keep this legacy note",
+  );
+  assert.deepEqual(restored.profiles[1], legacy.profiles[1]);
+});
+
+test("An unsupported saved format is not overwritten with sample data", (t) => {
+  const descriptor = Object.getOwnPropertyDescriptor(
+    globalThis,
+    "localStorage",
+  );
+  const original = JSON.stringify({
+    version: 2,
+    profiles: [{ name: "Future progress" }],
+  });
+  let stored = original;
+  Object.defineProperty(globalThis, "localStorage", {
+    configurable: true,
+    value: { getItem: () => stored, setItem: (_, value) => (stored = value) },
+  });
+  const controller = createCompassController();
+  t.after(() => {
+    controller.destroy();
+    if (descriptor)
+      Object.defineProperty(globalThis, "localStorage", descriptor);
+    else delete globalThis.localStorage;
+  });
+  controller.initialize();
+  controller.updateProfile((p) => ({ ...p, mode: "members" }));
+  assert.equal(get(controller.storageError), true);
+  assert.equal(stored, original);
+});
+
+test("Public completion matches Compass quest identities without importing sample progress", () => {
+  const controller = createCompassController();
+  controller.addPlayer(
+    {
+      ...player,
+      quests: {
+        status: "available",
+        completedTitles: [
+          "COOK’S ASSISTANT",
+          "Dragon Slayer",
+          "A quest outside this catalogue",
+        ],
+      },
+    },
+    "Solo Ironman",
+    "f2p",
+  );
+  const real = current(controller);
+  assert.deepEqual(real.completedQuests, ["cooks-assistant", "dragon-slayer"]);
+  assert.equal(real.activeTask, "knights-sword");
+  assert.equal(real.questImportStatus, "available");
+  assert.deepEqual(real.packed, []);
+});
+
+test("Public refresh adds completion without removing manual checks or duplicating quest identities", () => {
+  const controller = createCompassController();
+  controller.addPlayer(player, "Solo Ironman", "f2p");
+  controller.updateProfile((p) => ({
+    ...p,
+    completedQuests: ["knights-sword"],
+    notes: { cook: "Keep this" },
+  }));
+  controller.addPlayer(
+    {
+      ...player,
+      quests: {
+        status: "available",
+        completedTitles: ["Cook's Assistant", "Cook's Assistant"],
+      },
+    },
+    "Solo Ironman",
+    "f2p",
+  );
+  const real = current(controller);
+  assert.deepEqual(real.completedQuests.sort(), [
+    "cooks-assistant",
+    "knights-sword",
+  ]);
+  assert.deepEqual(real.notes, { cook: "Keep this" });
+});
+
+test("Private or unavailable quest responses never erase previously imported or manual completion", () => {
+  const controller = createCompassController();
+  controller.addPlayer(
+    {
+      ...player,
+      quests: { status: "available", completedTitles: ["Cook's Assistant"] },
+    },
+    "Solo Ironman",
+    "members",
+  );
+  controller.updateProfile((p) => ({
+    ...p,
+    completedQuests: [...p.completedQuests, "dragon-slayer"],
+  }));
+  for (const reason of ["private-or-unavailable", "service-unavailable"]) {
+    controller.addPlayer(
+      { ...player, quests: { status: "unavailable", reason } },
+      "Solo Ironman",
+      "f2p",
+    );
+    assert.deepEqual(current(controller).completedQuests, [
+      "cooks-assistant",
+      "dragon-slayer",
+    ]);
+    assert.equal(current(controller).questImportStatus, reason);
+    assert.equal(current(controller).mode, "members");
+  }
+});

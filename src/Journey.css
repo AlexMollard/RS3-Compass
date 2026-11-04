@@ -3,33 +3,17 @@
   gap: 20px;
   min-width: 0;
 }
-.progression-page .home-resume {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  padding: 8px 12px 8px 18px;
-  border: 1px solid var(--line);
-  border-left: 3px solid var(--gold);
-  background: var(--panel);
-}
-.home-resume-label {
-  color: var(--muted);
-  font-size: var(--font-caption);
-  flex: none;
-}
-.progression-page .home-resume .navigation-card {
-  flex: 1;
+.progression-page .home-lower {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 20px;
   min-width: 0;
-  margin: 0;
-  border: 0;
-  background: none;
 }
-.progression-page .home-resume .navigation-main {
-  padding: 4px 8px;
-}
-.progression-page .home-resume .navigation-icon {
-  width: 32px;
-  height: 32px;
+@media (max-width: 1000px) {
+  .progression-page .home-lower {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 .progression-page .next-quest-workspace {
   display: grid;
@@ -106,25 +90,6 @@
   height: 100%;
   min-height: 330px;
 }
-.progression-page .home-levels > summary,
-.progression-page .home-route > summary {
-  cursor: pointer;
-  list-style: none;
-}
-.home-levels > summary::-webkit-details-marker,
-.home-route > summary::-webkit-details-marker {
-  display: none;
-}
-.progression-page .home-levels > summary > svg {
-  margin-left: auto;
-}
-.home-route > summary > svg {
-  margin-left: 8px;
-}
-.home-levels[open] > summary > svg,
-.home-route[open] > summary > svg {
-  transform: rotate(180deg);
-}
 .progression-page .home-levels .level-register {
   grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
 }
@@ -152,14 +117,6 @@
   }
 }
 @media (max-width: 600px) {
-  .progression-page .home-resume {
-    display: block;
-    padding: 10px;
-  }
-  .home-resume-label {
-    display: block;
-    margin: 0 8px 4px;
-  }
   .progression-page .home-workspace {
     gap: 16px;
   }
@@ -167,8 +124,5 @@
   .home-preparation-body,
   .home-map {
     padding: 14px;
-  }
-  .progression-page .home-resume .navigation-value {
-    font-size: var(--font-caption);
   }
 }

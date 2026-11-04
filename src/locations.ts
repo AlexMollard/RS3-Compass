@@ -1,3 +1,7 @@
+import { COMBAT_LOCATIONS } from "./skillsCombat.ts";
+import { ARTISAN_LOCATIONS } from "./skillsArtisan.ts";
+import { SUPPORT_LOCATIONS } from "./skillsSupport.ts";
+
 export interface LocationRecord {
   name: string;
   wiki: string;
@@ -129,14 +133,15 @@ export const LOCATIONS: Record<string, LocationRecord> = {
     image: "NewDraynor.png",
     members: false,
     summary:
-      "Catch raw shrimps with a small fishing net; raw anchovies unlock at 15 Fishing. A bank is nearby.",
+      "A village with a bank, coastal fishing spots and nearby willow trees.",
   },
   Lumbridge: {
     name: "Lumbridge",
     wiki: "Lumbridge",
     image: "Lumbridge.png",
     members: false,
-    summary: "Catch raw crayfish east of the church.",
+    summary:
+      "A River Lum town with a castle, church, farms and beginner training areas.",
   },
   Gunnarsgrunn: {
     name: "Gunnarsgrunn",
@@ -144,7 +149,10 @@ export const LOCATIONS: Record<string, LocationRecord> = {
     image: "Barbarian_Village.png",
     members: false,
     summary:
-      "Fly-fish raw trout and raw salmon with a fly fishing rod and feathers.",
+      "A village on the River Lum with fly-fishing spots and pottery facilities.",
     access: "Trout requires 20 Fishing; salmon requires 30.",
   },
+  ...COMBAT_LOCATIONS,
+  ...ARTISAN_LOCATIONS,
+  ...SUPPORT_LOCATIONS,
 };

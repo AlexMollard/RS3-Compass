@@ -1,0 +1,35 @@
+.lookup-trigger {
+  min-height: var(--control-size);
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--panel-raised);
+  color: var(--text);
+  white-space: nowrap;
+}
+.lookup-field {
+  display: grid;
+  gap: 5px;
+  margin: 12px 0;
+}
+.lookup-field input,
+.lookup-field select {
+  width: 100%;
+  min-height: var(--control-size);
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--text);
+}
+@media (max-width: 600px) {
+  .character-select small {
+    display: block;
+    letter-spacing: 0;
+  }
+  .lookup-trigger {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    justify-self: end;
+  }
+}

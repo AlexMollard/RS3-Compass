@@ -1,0 +1,69 @@
+<script lang="ts">
+  import { Check, ChevronRight } from "@lucide/svelte";
+  import type { QuestRecord } from "../../data";
+  import GameArt from "./GameArt.svelte";
+  let {
+    quest,
+    completed,
+    selected,
+    recommended = false,
+    variant = "journal",
+    position,
+    onOpen,
+  }: {
+    quest: QuestRecord;
+    completed: boolean;
+    selected?: boolean;
+    recommended?: boolean;
+    variant?: "queue" | "journal";
+    position?: number;
+    onOpen: (id: string) => void;
+  } = $props();
+</script>
+
+{#if variant === "queue"}<button
+    type="button"
+    class="queue-row"
+    class:complete={completed}
+    class:recommended
+    aria-label={"Open preparation for " + quest.name}
+    aria-pressed={selected}
+    onclick={() => onOpen(quest.id)}
+    ><span class="queue-position"
+      >{#if completed}<Check size={17} />{:else}{String(
+          position ?? "",
+        ).padStart(2, "0")}{/if}</span
+    ><GameArt className="queue-quest-icon" file={quest.icon} /><span
+      class="queue-quest-name"
+      ><strong>{quest.name}</strong><small
+        >{completed
+          ? "Recorded complete"
+          : recommended
+            ? "Next · prepare levels and items"
+            : quest.members
+              ? "Members quest"
+              : "Free-to-play quest"}</small
+      ></span
+    ><span class="queue-reward">{quest.rewards[0]}</span><ChevronRight
+      size={16}
+    /></button
+  >{:else}<button
+    type="button"
+    class="journal-row quest-nav-row"
+    class:selected
+    aria-label={"Open preparation for " + quest.name}
+    aria-pressed={selected}
+    onclick={() => onOpen(quest.id)}
+    ><span class="quest-state" class:is-complete={completed}
+      ><GameArt file={quest.icon} size={20} />{#if completed}<Check
+          class="quest-complete-mark"
+          size={12}
+        />{/if}</span
+    ><span
+      ><strong>{quest.name}</strong><small
+        >{quest.members ? "Members" : "Free-to-play"} · {quest.difficulty}</small
+      ></span
+    ><span class="reference-action" aria-hidden="true"
+      ><ChevronRight size={15} /></span
+    ></button
+  >{/if}

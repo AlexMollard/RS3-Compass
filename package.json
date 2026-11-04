@@ -5,22 +5,29 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
-    "build": "tsc -b && vite build",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "build": "npm run check && vite build",
     "test": "node --experimental-strip-types --test tests/*.test.mjs",
+    "format": "prettier --write src tests vite.config.ts tsconfig.json package.json deno.json",
     "preview": "vite preview --host 127.0.0.1"
   },
   "dependencies": {
+    "@lucide/svelte": "1.67.0",
     "leaflet": "1.9.4",
-    "lucide-react": "1.67.0",
-    "react": "19.3.1",
-    "react-dom": "19.3.1"
+    "svelte": "5.57.3"
   },
   "devDependencies": {
+    "@opentelemetry/api": "1.10.0",
+    "@sveltejs/adapter-node": "6.0.1",
+    "@sveltejs/kit": "3.1.1",
+    "@sveltejs/vite-plugin-svelte": "7.3.1",
+    "@tailwindcss/vite": "4.3.4",
     "@types/leaflet": "1.9.22",
-    "@types/react": "19.3.0",
-    "@types/react-dom": "19.3.0",
-    "@vitejs/plugin-react": "6.2.1",
-    "typescript": "7.0.2",
+    "prettier": "3.9.10",
+    "prettier-plugin-svelte": "4.1.1",
+    "svelte-check": "4.7.8",
+    "tailwindcss": "4.3.4",
+    "typescript": "6.0.3",
     "vite": "8.3.5"
   }
 }
