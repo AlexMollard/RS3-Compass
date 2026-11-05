@@ -25,8 +25,9 @@ export function selectEquipment(
   guide: EquipmentGuide,
   method: TrainingOption,
   profile: Profile,
+  planningLevel?: number,
 ) {
-  // The stage describes the training method, not an equipment level.
+  // Recorded use levels describe current options; the selected range describes the target.
   const available = guide.items.filter(
     (item) =>
       (profile.mode === "members" || !item.members) &&
@@ -39,9 +40,12 @@ export function selectEquipment(
   for (const item of available.filter((item) => !item.optional)) {
     // Conditional requirements are separate from ordinary equipped slots.
     const key = item.condition ? `${item.slot}:${item.condition}` : item.slot;
-    slots.set(key, [...(slots.get(key) ?? []), item]);
+    const group = slots.get(key);
+    if (group) group.push(item);
+    else slots.set(key, [item]);
   }
   const current: EquipmentRecommendation[] = [];
+  const target: EquipmentRecommendation[] = [];
   const upgrades: EquipmentRecommendation[] = [];
   for (const items of slots.values()) {
     const usable = items.filter((item) => {
@@ -70,13 +74,20 @@ export function selectEquipment(
           : best,
     );
     current.push(selected);
+    let goal = selected;
+    if (planningLevel !== undefined && !selected.condition)
+      for (const item of items)
+        if (item.from <= planningLevel && item.from > goal.from) goal = item;
+    target.push(goal);
     upgrades.push(
-      ...items.filter((item) => item !== selected && item.from > selected.from),
+      ...items.filter((item) => item.from > selected.from && item !== goal),
     );
   }
   return {
     note: guide.note,
     current,
+    target,
+    planningLevel,
     upgrades,
     optional: available.filter((item) => item.optional),
   };
@@ -86,16 +97,20 @@ export type CombatStyle = "Attack" | "Ranged" | "Magic" | "Necromancy";
 
 export function resolveTrainingEquipment(
   skill: SkillRecord,
+  stage: SkillRecord["stages"][number],
   method: TrainingOption,
   profile: Profile,
   style: CombatStyle = "Attack",
 ) {
+  const planningLevel = COMBAT_EQUIPMENT[skill.name] ? stage.from : undefined;
   const chooseStyle = ["Defence", "Constitution", "Slayer"].includes(
     skill.name,
   );
   if (!chooseStyle) {
     const guide = EQUIPMENT_GUIDES[skill.name];
-    return guide ? selectEquipment(guide, method, profile) : undefined;
+    return guide
+      ? selectEquipment(guide, method, profile, planningLevel)
+      : undefined;
   }
   const guide = EQUIPMENT_GUIDES[style];
   if (!guide) return undefined;
@@ -107,6 +122,8 @@ export function resolveTrainingEquipment(
     return {
       note: "The dual-weapon Necromancy example needs members' super antifire. Choose another equipment style for this F2P dragon method.",
       current: [],
+      target: [],
+      planningLevel,
       upgrades: [],
       optional: [],
     };
@@ -121,7 +138,12 @@ export function resolveTrainingEquipment(
       : skill.name === "Slayer" && masters.includes(method.id)
         ? "slayer-assignment"
         : method.id;
-  const result = selectEquipment(guide, { ...method, id: context }, profile);
+  const result = selectEquipment(
+    guide,
+    { ...method, id: context },
+    profile,
+    planningLevel,
+  );
   if (skill.name !== "Slayer") return result;
   const taskGuide = EQUIPMENT_GUIDES.Slayer;
   if (!taskGuide) return result;
@@ -132,6 +154,8 @@ export function resolveTrainingEquipment(
   return {
     note: result.note,
     current: [...withoutFinisher(result.current), ...task.current],
+    target: [...withoutFinisher(result.target), ...task.target],
+    planningLevel,
     upgrades: [...withoutFinisher(result.upgrades), ...task.upgrades],
     optional: [...withoutFinisher(result.optional), ...task.optional],
   };

@@ -78,7 +78,7 @@
         <strong>Take care</strong>
         <GameText text={selected.risks} />
       </p>{/if}
-    <TrainingEquipment {skill} {profile} method={selected} />
+    <TrainingEquipment {skill} {stage} {profile} method={selected} />
     {#if stage.method || skill.payoff}<details class="training-guidance">
         <summary>Training setup and unlocks</summary>
         {#if stage.method}<p><GameText text={stage.method} /></p>{/if}

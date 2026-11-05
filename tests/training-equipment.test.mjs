@@ -110,7 +110,7 @@ export function assertEquipmentCatalogue(skills, guides) {
         for (const option of availableTrainingOptions(stage, mode)) {
           const context = `${skill.name} ${stage.from} ${mode} ${option.id}`;
           const p = character({ [skill.name]: stage.from }, mode);
-          const selected = selectEquipment(guide, option, p);
+          const selected = selectEquipment(guide, option, p, stage.from);
           assert.ok(
             selected.current.length || selected.upgrades.length || guide.note,
             context + " has no equipment or explanation",
@@ -124,7 +124,11 @@ export function assertEquipmentCatalogue(skills, guides) {
             selected.current.length,
             context + " conflicting equipment slots",
           );
-          for (const items of [selected.upgrades, selected.optional])
+          for (const items of [
+            selected.target,
+            selected.upgrades,
+            selected.optional,
+          ])
             assert.equal(
               new Set(items.map((item) => item.name)).size,
               items.length,
@@ -132,6 +136,7 @@ export function assertEquipmentCatalogue(skills, guides) {
             );
           for (const item of [
             ...selected.current,
+            ...selected.target,
             ...selected.upgrades,
             ...selected.optional,
           ]) {
@@ -206,21 +211,21 @@ test("Equipment baseline follows recorded use levels without mutating the catalo
   );
 });
 
-test("Combat slots follow their actual equip skills, including levels beyond the range", () => {
+test("Current combat options use actual equip skills while the range target remains separate", () => {
   const strength = SKILLS.find((skill) => skill.name === "Strength");
   const strengthStage = strength.stages.find((stage) => stage.from === 80);
   const ankou = strengthStage.options.find((option) => option.id === "ankou");
   const melee = resolveTrainingEquipment(
     strength,
+    strengthStage,
     ankou,
     character({ Strength: 80, Attack: 1, Defence: 1 }, "members"),
   );
   const weapon = melee.current.find((item) => item.slot === "melee weapon");
   assert.equal(weapon.from, 1);
-  assert.ok(
-    melee.upgrades.some(
-      (item) => item.slot === "melee weapon" && item.from === 80,
-    ),
+  assert.equal(
+    melee.target.find((item) => item.slot === "melee weapon").from,
+    80,
   );
 
   const ranged = SKILLS.find((skill) => skill.name === "Ranged");
@@ -230,6 +235,7 @@ test("Combat slots follow their actual equip skills, including levels beyond the
   );
   const lowDefence = resolveTrainingEquipment(
     ranged,
+    rangedStage,
     rangedMethod,
     character({ Ranged: 50, Defence: 1 }, "members"),
   );
@@ -239,6 +245,7 @@ test("Combat slots follow their actual equip skills, including levels beyond the
   );
   const highDefence = resolveTrainingEquipment(
     ranged,
+    rangedStage,
     rangedMethod,
     character({ Ranged: 90, Defence: 90 }, "members"),
   );
@@ -251,6 +258,7 @@ test("Combat slots follow their actual equip skills, including levels beyond the
 
   const unknown = resolveTrainingEquipment(
     strength,
+    strengthStage,
     ankou,
     character({}, "members"),
   );
@@ -278,6 +286,7 @@ test("Defence and Constitution style choices resolve one coherent dragon setup",
     ]) {
       const result = resolveTrainingEquipment(
         skill,
+        stage,
         method,
         character(
           { Attack: 50, Ranged: 50, Magic: 50, Necromancy: 50, Defence: 50 },
@@ -303,6 +312,7 @@ test("Defence and Constitution style choices resolve one coherent dragon setup",
     }
     const freeNecro = resolveTrainingEquipment(
       skill,
+      stage,
       method,
       character({ Necromancy: 20, Defence: 50 }),
       "Necromancy",
@@ -322,6 +332,7 @@ test("Slayer master style gear keeps conditional assignment tools and the select
   for (const style of ["Attack", "Ranged", "Magic", "Necromancy"]) {
     const result = resolveTrainingEquipment(
       skill,
+      stage,
       method,
       character(
         {
@@ -496,4 +507,140 @@ test("Recipe plurals and potion names resolve to the intended item and dose", ()
     ["Spider silk", "Spider_silk.png"],
     ["Phoenix feather", "Phoenix_feather.png"],
   ]);
+});
+
+test("A future blue-dragon range targets rune armour instead of capping the kit at current steel", () => {
+  const stage = attack.stages.find((stage) =>
+    stage.options.some((option) => option.id === "blue-dragons"),
+  );
+  const dragons = stage.options.find((option) => option.id === "blue-dragons");
+  const profile = character(
+    { Attack: 60, Defence: 20, Mining: 20, Smithing: 20 },
+    "members",
+  );
+  const before = structuredClone(profile);
+  const result = resolveTrainingEquipment(attack, stage, dragons, profile);
+  assert.equal(
+    result.current.find((item) => item.slot === "melee body").name,
+    "Steel platebody",
+  );
+  assert.equal(
+    result.target.find((item) => item.slot === "melee weapon").name,
+    "Orikalkum warhammer",
+  );
+  const body = result.target.find((item) => item.slot === "melee body");
+  assert.equal(body.name, "Rune platebody");
+  assert.deepEqual(
+    equipmentLevels(body, profile).map((check) => [
+      check.skill,
+      check.level,
+      check.recorded,
+      check.status,
+    ]),
+    [["Defence", 50, 20, "below"]],
+  );
+  assert.deepEqual(
+    equipmentLevels(body.acquisition[0], profile).map((check) => [
+      check.skill,
+      check.level,
+      check.status,
+    ]),
+    [
+      ["Mining", 50, "below"],
+      ["Smithing", 50, "below"],
+    ],
+  );
+  assert.ok(!result.upgrades.some((item) => item.name === body.name));
+  assert.ok(result.upgrades.some((item) => item.name === "Mithril platebody"));
+  assert.deepEqual(profile, before);
+});
+
+test("Prospective kits keep stronger use-level options, respect F2P and leave unknown checks unrecorded", () => {
+  const stage = attack.stages.find((stage) =>
+    stage.options.some((option) => option.id === "wilderness-blue-dragons"),
+  );
+  const dragons = stage.options.find(
+    (option) => option.id === "wilderness-blue-dragons",
+  );
+  const high = resolveTrainingEquipment(
+    attack,
+    stage,
+    dragons,
+    character({ Attack: 85, Defence: 85, Smithing: 1 }, "members"),
+  );
+  assert.equal(
+    high.target.find((item) => item.slot === "melee weapon").name,
+    "Bane longsword",
+  );
+  assert.equal(
+    high.target.find((item) => item.slot === "melee body").name,
+    "Bane platebody",
+  );
+  const free = resolveTrainingEquipment(
+    attack,
+    stage,
+    dragons,
+    character({ Attack: 60, Defence: 20 }),
+  );
+  assert.equal(
+    free.target.find((item) => item.slot === "melee weapon").name,
+    "Rune dagger",
+  );
+  assert.equal(
+    free.target.find((item) => item.slot === "melee body").name,
+    "Rune platebody",
+  );
+  assert.ok(free.target.every((item) => !item.members));
+  const unknownProfile = character();
+  const unknown = resolveTrainingEquipment(
+    attack,
+    stage,
+    dragons,
+    unknownProfile,
+  );
+  const body = unknown.target.find((item) => item.slot === "melee body");
+  assert.equal(body.name, "Rune platebody");
+  assert.deepEqual(
+    equipmentLevels(body, unknownProfile).map((check) => [
+      check.recorded,
+      check.status,
+    ]),
+    [[undefined, "unknown"]],
+  );
+});
+
+test("Range targets preserve coherent dragon weapon and protection combinations for each style", () => {
+  const skill = SKILLS.find((skill) => skill.name === "Defence");
+  const stage = skill.stages.find((stage) =>
+    stage.options.some((option) => option.id === "blue-dragons"),
+  );
+  const method = stage.options.find((option) => option.id === "blue-dragons");
+  for (const style of ["Attack", "Ranged", "Magic", "Necromancy"]) {
+    const result = resolveTrainingEquipment(
+      skill,
+      stage,
+      method,
+      character(
+        { Attack: 20, Ranged: 20, Magic: 20, Necromancy: 20, Defence: 20 },
+        "members",
+      ),
+      style,
+    );
+    const names = result.target.map((item) => item.name);
+    if (style === "Attack") assert.ok(names.includes("Rune dagger"));
+    if (style === "Ranged") {
+      assert.ok(names.includes("Rune crossbow"));
+      assert.ok(names.includes("Rune bolts"));
+    }
+    if (style === "Magic") {
+      assert.ok(names.includes("Mystic wand"));
+      assert.ok(!result.target.some((item) => item.slot === "magic off hand"));
+    }
+    if (style === "Necromancy") {
+      assert.ok(names.includes("Death guard (tier 50)"));
+      assert.ok(names.includes("Skull lantern (tier 50)"));
+      assert.ok(names.includes("Super antifire (3)"));
+      assert.ok(!names.includes("Anti-dragon shield"));
+    } else assert.ok(names.includes("Anti-dragon shield"));
+  }
 });

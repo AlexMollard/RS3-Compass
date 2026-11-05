@@ -12,10 +12,12 @@
   import GameText from "./GameText.svelte";
   let {
     skill,
+    stage,
     method,
     profile,
   }: {
     skill: SkillRecord;
+    stage: SkillRecord["stages"][number];
     method: TrainingOption;
     profile: Profile;
   } = $props();
@@ -30,7 +32,12 @@
     ["Defence", "Constitution", "Slayer"].includes(skill.name),
   );
   const equipment = $derived(
-    resolveTrainingEquipment(skill, method, profile, style),
+    resolveTrainingEquipment(skill, stage, method, profile, style),
+  );
+  const currentAlternatives = $derived(
+    equipment?.current.filter(
+      (item) => !equipment.target.some((target) => target.name === item.name),
+    ) ?? [],
   );
 </script>
 
@@ -44,7 +51,7 @@
       <small
         >{check.status === "unknown"
           ? "· unrecorded"
-          : `· recorded ${check.recorded}`}</small
+          : `· recorded ${check.recorded}${check.status === "below" ? " — below" : ""}`}</small
       >
     </span>
   {/each}
@@ -120,7 +127,11 @@
 
 {#if equipment}
   <section class="training-equipment" aria-label="Recommended equipment">
-    <h3>Recommended equipment</h3>
+    <h3>
+      {equipment.planningLevel === undefined
+        ? "Recommended equipment"
+        : "Recommended target kit"}
+    </h3>
     {#if chooseStyle}
       <ChoiceStrip
         label="Equipment combat style"
@@ -135,14 +146,34 @@
     {#if equipment.note}<p class="equipment-guide-note">
         <GameText text={equipment.note} />
       </p>{/if}
+    {#if equipment.planningLevel !== undefined && equipment.target.length}
+      <p class="equipment-guide-note">
+        Aim for this kit in the selected range; unmet checks show preparation
+        gaps.
+      </p>
+    {/if}
     <div class="equipment-list">
-      {#each equipment.current as item (item.slot + (item.condition ?? ""))}{@render equipmentRow(
+      {#each equipment.target as item (item.slot + (item.condition ?? ""))}{@render equipmentRow(
           item,
         )}{/each}
     </div>
+    {#if currentAlternatives.length}<details
+        class="equipment-group current-options"
+      >
+        <summary
+          >Current-level alternatives <span>{currentAlternatives.length}</span
+          ></summary
+        >
+        <p class="equipment-guide-note">
+          Based on recorded use levels, not owned items or what you can craft.
+        </p>
+        {#each currentAlternatives as item (item.name)}{@render equipmentRow(
+            item,
+          )}{/each}
+      </details>{/if}
     {#if equipment.upgrades.length}<details class="equipment-group">
         <summary
-          >Equipment upgrade previews
+          >Other equipment upgrades
           <span>{equipment.upgrades.length}</span></summary
         >
         {#each equipment.upgrades as item (item.name)}{@render equipmentRow(
@@ -158,8 +189,8 @@
           )}{/each}
       </details>{/if}
     <p class="ownership-note">
-      Recorded levels are not ownership. Check unrecorded levels and unlocks;
-      basic examples may still need preparation.
+      Suggestions, not a required minimum kit or proof of ownership. Check
+      unlocks and combat risks.
     </p>
   </section>
 {/if}
