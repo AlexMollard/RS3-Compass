@@ -17,7 +17,7 @@
 ## Your preparation journal
 
 - **Quests:** Prepare for all 54 F2P quests and 9 miniquests/sagas, checked against November 2026 sources. Requirements, linked item artwork, packing, notes, combat risks, NPC start maps and completion tracking share one workspace.
-- **Skills:** Plan all 29 skills through their current level caps. Compare level-range methods, Ironman drops and resource benefits, access checks and risks; save a chosen method with its packing list and notes.
+- **Skills:** Browse all 29 guides from a sticky, in-game-style skill grid. Compare training methods, Ironman benefits and equipment with separate use/acquisition checks; save training with packing and notes.
 - **Players:** Look up and cache public player data, keep separate local plans, or explore with removable fictional sample players. Public quest completion may be unavailable when RuneMetrics data is private or inaccessible.
 - **Training locations:** Switch between creature areas and individual resource sites on Wiki maps, with linked creature/resource artwork. Portable processing explains where to prepare without inventing a fixed node.
 

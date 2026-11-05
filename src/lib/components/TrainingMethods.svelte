@@ -6,10 +6,10 @@
     type SkillRecord,
   } from "../../data";
   import { wikiHref } from "../../wiki";
-  import Button from "./Button.svelte";
+  import ChoiceStrip from "./ChoiceStrip.svelte";
   import GameArt from "./GameArt.svelte";
   import GameText from "./GameText.svelte";
-  import LocationGallery from "./LocationGallery.svelte";
+  import TrainingEquipment from "./TrainingEquipment.svelte";
   let {
     skill,
     stage,
@@ -28,144 +28,117 @@
 </script>
 
 {#if selected}
-  <div
-    class="training-options"
-    role="group"
-    aria-label="Training method choices"
-  >
-    {#each options as option (option.id)}
-      <div class="training-choice" class:selected={selected.id === option.id}>
-        <a
-          class="training-target"
-          href={wikiHref(option.wiki)}
-          target="_blank"
-          rel="noopener noreferrer"
-          title={option.title + " on RuneScape Wiki (opens a new tab)"}
+  <div class="training-method-view">
+    {#if options.length > 1}
+      <ChoiceStrip
+        label="Training method"
+        name={`training-method-${skill.name}`}
+        value={selected.id}
+        choices={options.map((option) => ({
+          value: option.id,
+          label: option.title,
+          image: option.image,
+          detail:
+            profile.mode === "members" && option.members && !stage.members
+              ? "Members"
+              : undefined,
+        }))}
+        onChange={onSelect}
+      />
+    {/if}
+    <a
+      class="selected-target"
+      href={wikiHref(selected.wiki)}
+      target="_blank"
+      rel="noopener noreferrer"
+      title={selected.title + " on RuneScape Wiki (opens a new tab)"}
+    >
+      <GameArt file={selected.image} size={48} />
+      <strong>{selected.title}</strong>
+    </a>
+    <p class="method-description"><GameText text={selected.method} /></p>
+    <p class="method-benefit">
+      <strong>Ironman benefit</strong>
+      <GameText text={selected.benefit} />
+    </p>
+    {#if selected.requirements?.length}
+      <details class="method-requirements">
+        <summary
+          >Access requirements <span>{selected.requirements.length}</span
+          ></summary
         >
-          <GameArt file={option.image} size={36} />
-          <span
-            ><strong>{option.title}</strong><small
-              >{option.members || stage.members
-                ? "Members"
-                : "Free-to-play"}</small
-            ></span
-          >
-        </a>
-        <Button
-          variant="quiet"
-          aria-label={"Choose " + option.title}
-          aria-pressed={selected.id === option.id}
-          onclick={() => {
-            if (selected?.id !== option.id) onSelect(option.id);
-          }}>{selected.id === option.id ? "Selected" : "Choose"}</Button
-        >
-      </div>
-    {/each}
-  </div>
-  <div class="selected-training-method">
-    <p><GameText text={selected.method} /></p>
-    <dl class="training-facts">
-      <div>
-        <dt>Ironman benefit</dt>
-        <dd><GameText text={selected.benefit} /></dd>
-      </div>
-      {#if selected.requirements?.length}
-        <div>
-          <dt>Check first</dt>
-          <dd>
-            <ul>
-              {#each selected.requirements as requirement}<li>
-                  <GameText text={requirement} />
-                </li>{/each}
-            </ul>
-          </dd>
-        </div>
-      {/if}
-      {#if selected.risks}<div class="training-risk">
-          <dt>Take care</dt>
-          <dd><GameText text={selected.risks} /></dd>
-        </div>{/if}
-    </dl>
-    <LocationGallery locations={selected.locations} {profile} />
+        <ul>
+          {#each selected.requirements as requirement}<li>
+              <GameText text={requirement} />
+            </li>{/each}
+        </ul>
+      </details>
+    {/if}
+    {#if selected.risks}<p class="method-risk">
+        <strong>Take care</strong>
+        <GameText text={selected.risks} />
+      </p>{/if}
+    <TrainingEquipment {skill} {profile} method={selected} />
+    {#if stage.method || skill.payoff}<details class="training-guidance">
+        <summary>Training setup and unlocks</summary>
+        {#if stage.method}<p><GameText text={stage.method} /></p>{/if}
+        <p><GameText text={skill.payoff} /></p>
+      </details>{/if}
   </div>
 {/if}
 
 <style>
-  .training-options {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
-    gap: 0.65rem;
-    margin-block: 1rem;
-  }
-  .training-choice {
+  .selected-target {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 0.65rem;
-    padding: 0.75rem;
-    border: 1px solid var(--line);
-    background: var(--panel);
-  }
-  .training-choice.selected {
-    border-color: var(--gold);
-  }
-  .training-target {
-    display: flex;
-    align-items: center;
-    gap: 0.65rem;
-    min-width: 0;
+    gap: 0.75rem;
     color: inherit;
-    text-decoration: none;
-  }
-  .training-target :global(.game-art) {
-    width: 36px;
-    height: 48px;
-  }
-  .training-target strong {
     text-decoration: underline;
     text-underline-offset: 3px;
-    text-decoration-color: var(--muted);
+    margin-block: 0.5rem 0.65rem;
   }
-  .training-target small {
-    display: block;
-    margin-top: 0.25rem;
-    color: var(--muted);
-    font-size: 0.8rem;
+  .selected-target :global(.game-art) {
+    width: 48px;
+    height: 56px;
   }
-  .training-choice :global(.btn) {
-    flex-shrink: 0;
-    min-height: 44px;
-    padding-inline: 0.65rem;
-  }
-  .selected-training-method > p {
-    line-height: 1.65;
-  }
-  .training-facts {
-    display: grid;
-    gap: 0.8rem;
-    margin-block: 1rem 1.25rem;
-  }
-  .training-facts > div {
-    padding-left: 0.85rem;
-    border-left: 2px solid var(--line);
-  }
-  .training-facts dt {
-    font-weight: 600;
-    margin-bottom: 0.3rem;
-  }
-  .training-facts dd {
-    margin: 0;
+  .method-description,
+  .method-benefit,
+  .method-risk {
     line-height: 1.6;
+    margin-block: 0.65rem;
+  }
+  .method-benefit {
     color: var(--muted);
   }
-  .training-facts ul {
-    margin: 0;
-    padding-left: 1.1rem;
+  .method-benefit > strong,
+  .method-risk > strong {
+    color: var(--text);
+    margin-right: 0.35rem;
   }
-  .training-facts li + li {
-    margin-top: 0.3rem;
+  .method-risk {
+    border-left: 2px solid var(--gold);
+    padding-left: 0.75rem;
   }
-  .training-facts .training-risk {
-    border-color: var(--gold);
+  .method-requirements,
+  .training-guidance {
+    margin-top: 0.65rem;
+  }
+  summary {
+    min-height: 44px;
+    padding-block: 0.65rem;
+  }
+  summary span {
+    color: var(--muted);
+    margin-left: 0.35rem;
+  }
+  ul {
+    margin-block: 0.25rem 0.75rem;
+    padding-left: 1.25rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .training-guidance p {
+    color: var(--muted);
+    line-height: 1.6;
   }
 </style>

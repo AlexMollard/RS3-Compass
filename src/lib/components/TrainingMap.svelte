@@ -1,10 +1,12 @@
 <script lang="ts">
-  import type { TrainingOption, TrainingSite } from "../../data";
+  import type { Profile, TrainingOption, TrainingSite } from "../../data";
   import { wikiHref } from "../../wiki";
   import GameArt from "./GameArt.svelte";
   import GameText from "./GameText.svelte";
+  import LocationGallery from "./LocationGallery.svelte";
   import WorldMap from "./WorldMap.svelte";
-  let { method }: { method: TrainingOption } = $props();
+  let { method, profile }: { method: TrainingOption; profile: Profile } =
+    $props();
   let selectedKey = $state("");
   const key = (site: TrainingSite) =>
     `${site.label}:${site.map.mapId ?? 28}:${site.map.plane}:${site.map.x}:${site.map.y}`;
@@ -14,12 +16,12 @@
   const art = $derived(site?.image ?? method.image);
 </script>
 
-{#if site}
-  <section class="training-map" aria-label="Training location map">
-    <h3>Where to train</h3>
+<section class="training-map" aria-label="Training location">
+  <h3>Where to train</h3>
+  {#if site}
     {#if method.sites.length > 1}
-      <label>
-        Training location
+      <label
+        >Training location
         <select
           aria-label="Training location"
           value={key(site)}
@@ -36,30 +38,38 @@
       href={wikiHref(site.wiki)}
       target="_blank"
       rel="noopener noreferrer"
+      >{#if method.sites.length > 1}<GameArt
+          file={art}
+          size={32}
+        />{/if}{site.label} ↗</a
     >
-      <GameArt file={art} size={72} />
-      <strong>{site.label} ↗</strong>
-    </a>
-    {#if method.locationNote}<p><GameText text={method.locationNote} /></p>{/if}
     {#if site.access}<p><GameText text={site.access} /></p>{/if}
+    {#if method.locationNote}<p><GameText text={method.locationNote} /></p>{/if}
     <WorldMap
       point={site.map}
       label={site.label}
       markerIcon={art}
       markerWiki={site.wiki}
     />
-  </section>
-{:else if method.locationNote}
-  <p class="portable-location"><GameText text={method.locationNote} /></p>
-{/if}
+  {:else if method.locationNote}
+    <p><GameText text={method.locationNote} /></p>
+  {/if}
+  {#if method.locations.length}
+    <details class="location-details">
+      <summary>Location details and artwork</summary><LocationGallery
+        locations={method.locations}
+        {profile}
+      />
+    </details>
+  {/if}
+</section>
 
 <style>
   .training-map {
     min-width: 0;
-    margin-top: 1.25rem;
   }
   h3 {
-    margin-bottom: 0.65rem;
+    margin-bottom: 0.7rem;
     font-size: 1rem;
   }
   label {
@@ -75,14 +85,15 @@
   .site-reference {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.5rem;
     text-decoration: underline;
     text-underline-offset: 3px;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.65rem;
+    line-height: 1.5;
   }
   .site-reference :global(.game-art) {
-    width: 72px;
-    height: 96px;
+    width: 32px;
+    height: 36px;
   }
   p {
     color: var(--muted);
@@ -90,7 +101,12 @@
     margin-bottom: 0.65rem;
     line-height: 1.6;
   }
-  .portable-location {
-    margin-block: 1rem;
+  .location-details {
+    margin-top: 0.5rem;
+  }
+  summary {
+    min-height: 44px;
+    padding-block: 0.65rem;
+    font-size: 0.875rem;
   }
 </style>

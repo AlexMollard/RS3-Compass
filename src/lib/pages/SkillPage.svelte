@@ -3,8 +3,6 @@
   import {
     SKILLS,
     availableStages,
-    availableTrainingOptions,
-    type SkillRecord,
     skillNeedsMembership,
     trainingStage,
     trainingMethod,
@@ -12,17 +10,16 @@
     trainingRangeLabel,
   } from "../../data";
   import { getCompass } from "../compassContext";
-  import { skillPath } from "../navigation";
   import ActivityHeader from "../components/ActivityHeader.svelte";
   import Button from "../components/Button.svelte";
+  import ChoiceStrip from "../components/ChoiceStrip.svelte";
   import GameArt from "../components/GameArt.svelte";
   import GameText from "../components/GameText.svelte";
   import ItemList from "../components/ItemList.svelte";
-  import NavigationCard from "../components/NavigationCard.svelte";
+  import SkillGrid from "../components/SkillGrid.svelte";
   import PageHeading from "../components/PageHeading.svelte";
   import ResponsivePicker from "../components/ResponsivePicker.svelte";
   import SearchField from "../components/SearchField.svelte";
-  import SectionHeading from "../components/SectionHeading.svelte";
   import TrainingMethods from "../components/TrainingMethods.svelte";
   import TrainingMap from "../components/TrainingMap.svelte";
   import WikiAction from "../components/WikiAction.svelte";
@@ -80,14 +77,6 @@
   let supplies = $derived(
     stage && method ? trainingSupplies(stage, method) : [],
   );
-  function rangeTitle(range: SkillRecord["stages"][number]) {
-    if (profile.mode === "members") return range.title;
-    const options = availableTrainingOptions(range, profile.mode);
-    return (
-      options[0].title +
-      (options.length > 1 ? ` + ${options.length - 1} alternatives` : "")
-    );
-  }
   let targetOptions = $derived.by(() => {
     const cap = profile.mode === "f2p" ? skill.freeToPlayCap : undefined;
     return [
@@ -160,28 +149,23 @@
   <div class="journal-layout skill-layout">
     <ResponsivePicker label="Skill" selection={skill.name}
       ><aside class="panel journal-list">
-        <SearchField
-          label="Search skills"
-          placeholder="Find a skill…"
-          value={search}
-          onChange={(v) => (search = v)}
+        <div class="skill-picker-search">
+          <SearchField
+            label="Search skills"
+            placeholder="Find a skill…"
+            value={search}
+            onChange={(v) => (search = v)}
+          />
+        </div>
+        <SkillGrid
+          skills={filtered}
+          levels={profile.levels}
+          selected={skill.name}
+          compact
         />
-        <p class="list-kicker">SKILL GUIDES</p>
-        {#each filtered as s (s.name)}<NavigationCard
-            title={s.name}
-            label={"Open training for " + s.name}
-            image={s.icon}
-            detail={s.category +
-              (s.freeToPlayCap === 0
-                ? " · Members"
-                : s.freeToPlayCap !== undefined
-                  ? " · F2P trial to " + s.freeToPlayCap
-                  : "")}
-            value={profile.levels[s.name] ?? "—"}
-            selected={s.name === skill.name}
-            wiki={s.wiki}
-            onOpen={() => void goto(skillPath(s.name))}
-          />{:else}<p class="empty-state">No skills match.</p>{/each}
+        <div class="skill-picker-wiki">
+          <WikiAction page={skill.wiki} label={skill.name + " on the Wiki"} />
+        </div>
       </aside></ResponsivePicker
     >
     <article class="panel skill-detail">
@@ -246,36 +230,26 @@
             />
           </p>
         </section>
-        <div class="why-card">
-          <div>
-            <span class="eyebrow">WHAT THIS TRAINING UNLOCKS</span>
-            <p><GameText text={skill.payoff} /></p>
-          </div>
-        </div>
         <div class="training-workspace">
           <section class="training-content">
             {#if stage && method}
-              <label class="training-range">
-                Training range
-                <select
-                  aria-label="Training range"
-                  value={stage.from}
-                  onchange={(event) => {
-                    band = Number(event.currentTarget.value);
-                    methodId = undefined;
-                  }}
-                >
-                  {#each stages as range (range.from)}
-                    <option value={range.from}>
-                      {trainingRangeLabel(skill, range, profile.mode)} · {rangeTitle(
-                        range,
-                      )}
-                    </option>
-                  {/each}
-                </select>
-              </label>
-              <h3>{rangeTitle(stage)}</h3>
-              {#if stage.method}<p><GameText text={stage.method} /></p>{/if}
+              <ChoiceStrip
+                label="Training range"
+                name={`training-range-${skill.name}`}
+                value={String(stage.from)}
+                choices={stages.map((range) => ({
+                  value: String(range.from),
+                  label: trainingRangeLabel(skill, range, profile.mode).replace(
+                    /^Levels? /,
+                    "",
+                  ),
+                  description: trainingRangeLabel(skill, range, profile.mode),
+                }))}
+                onChange={(value) => {
+                  band = Number(value);
+                  methodId = undefined;
+                }}
+              />
               <TrainingMethods
                 {skill}
                 {stage}
@@ -308,19 +282,19 @@
           </section>
           <aside class="training-preparation">
             {#if stage && method}
-              <SectionHeading title="Prepare this method" />
-              <ItemList items={supplies} />
               <Button variant="primary" onclick={start}
                 >Prepare training →</Button
               >
-              <p class="muted">
-                Your chosen method, packing checks and notes stay on this
-                device.
-              </p>
-              <TrainingMap {method} />
+              <TrainingMap {method} {profile} />
+              <details class="session-supplies">
+                <summary
+                  >Session supplies <span>{supplies.length}</span></summary
+                >
+                <ItemList items={supplies} />
+              </details>
             {/if}
-            <div class="training-access">
-              <h3>Access and progression</h3>
+            <details class="training-access">
+              <summary>Access and progression</summary>
               <p><GameText text={skill.membersNote} /></p>
               <WikiAction
                 page={profile.mode === "f2p"
@@ -328,7 +302,7 @@
                   : skill.wiki}
                 label="Wiki training reference"
               />
-            </div>
+            </details>
           </aside>
         </div>
       </div>
@@ -337,15 +311,44 @@
 </div>
 
 <style>
-  @media (min-width: 1001px) {
+  .skill-detail {
+    container: skill-detail / inline-size;
+  }
+  .skill-picker-search {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding-bottom: 12px;
+    background: var(--panel);
+  }
+  .skill-picker-wiki {
+    margin-top: 12px;
+    padding-top: 8px;
+    border-top: 1px solid var(--line);
+  }
+  .skill-picker-wiki :global(a) {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  @container skill-detail (min-width: 740px) {
     .training-workspace {
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(220px, 0.5fr);
       gap: 1.5rem;
     }
-    :global(.skill-layout .journal-list) {
-      max-height: calc(100dvh - 170px);
+  }
+  @media (min-width: 1001px) {
+    .skill-layout {
+      grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+    }
+    .skill-page :global(.guide-picker) {
+      position: sticky;
+      top: calc(var(--topbar-height, 72px) + 16px);
+      max-height: calc(100dvh - var(--topbar-height, 72px) - 32px);
+      align-self: start;
       overflow-y: auto;
+      overscroll-behavior: contain;
     }
   }
   @media (max-width: 1000px) {
@@ -354,43 +357,36 @@
       overflow-y: auto;
     }
   }
-  .training-range {
-    display: grid;
-    gap: 0.5rem;
-    margin-block: 0 1rem;
-  }
-  .training-range select {
-    width: 100%;
-    min-height: 44px;
-    min-width: 0;
-  }
   .training-content,
   .training-preparation {
     min-width: 0;
   }
   .training-preparation {
-    padding: 1rem;
-    border: 1px solid var(--line);
+    padding-top: 0;
     align-self: start;
   }
   .training-preparation > :global(.btn) {
-    margin-block: 1rem 0.5rem;
+    margin-block: 0 1rem;
     width: 100%;
   }
-  .training-preparation > p,
   .training-access p {
     font-size: 0.875rem;
     line-height: 1.6;
   }
-  .training-access {
+  .training-access,
+  .session-supplies {
     border-top: 1px solid var(--line);
-    margin-top: 1rem;
-    padding-top: 1rem;
+    margin-top: 0.5rem;
   }
-  .training-access h3 {
-    font-size: 0.95rem;
+  .training-access > summary,
+  .session-supplies > summary {
+    min-height: 44px;
+    padding-block: 0.7rem;
+    cursor: pointer;
+    font-size: 0.875rem;
   }
-  .training-content > p {
-    line-height: 1.6;
+  .session-supplies summary span {
+    color: var(--muted);
+    margin-left: 0.35rem;
   }
 </style>

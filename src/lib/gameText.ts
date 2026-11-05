@@ -12,6 +12,7 @@ import { ADVENTURE_ITEMS } from "../questsAdventures.ts";
 import { SIDE_ITEMS } from "../questsSideActivities.ts";
 import { SEASONAL_ITEMS } from "../questsSeasonal.ts";
 import { QUEST_REWARD_ITEMS } from "../questRewardItems.ts";
+import { EQUIPMENT_ITEMS } from "../trainingEquipment.ts";
 
 interface Reference {
   name: string;
@@ -200,6 +201,7 @@ const items: ItemReference[] = [
   ...SIDE_ITEMS,
   ...SEASONAL_ITEMS,
   ...QUEST_REWARD_ITEMS,
+  ...EQUIPMENT_ITEMS,
 ];
 const references: Reference[] = [
   ...items.map((item) => ({ ...item, kind: "item" as const })),
@@ -236,9 +238,18 @@ const references: Reference[] = [
     { name: "The Branches of Darkmeyer", wiki: "The_Branches_of_Darkmeyer" },
     { name: "As a First Resort", wiki: "As_a_First_Resort" },
     { name: "Barbarian Training", wiki: "Barbarian_Training" },
+    { name: "Family Crest", wiki: "Family_Crest" },
+    {
+      name: "A Fairy Tale I - Growing Pains",
+      wiki: "A_Fairy_Tale_I_-_Growing_Pains",
+      aliases: ["Fairy Tale I"],
+    },
+    { name: "A Guild of Our Own", wiki: "A_Guild_of_Our_Own" },
+    { name: "Temple of Ikov", wiki: "Temple_of_Ikov" },
+    { name: "Necromancy!", wiki: "Necromancy!" },
   ].map((quest) => ({
     ...quest,
-    aliases: [quest.name.replaceAll("'", "’")],
+    aliases: [...(quest.aliases ?? []), quest.name.replaceAll("'", "’")],
     kind: "quest" as const,
   })),
   ...RS3_SKILL_NAMES.map((name) => ({
@@ -250,6 +261,11 @@ const references: Reference[] = [
   { name: "Metal bank", wiki: "Metal_bank", kind: "reference" },
   { name: "Food", wiki: "Food", image: "Cooked_meat.png", kind: "reference" },
   { name: "Sostratus", wiki: "Sostratus", kind: "reference" },
+  ...["I", "II", "III", "IV", "V", "VI", "VII"].map((tier) => ({
+    name: `Kili's Knowledge ${tier}`,
+    wiki: `Kili's Knowledge ${tier}`,
+    kind: "reference" as const,
+  })),
 ];
 const byAlias = new Map<string, Reference>();
 for (const reference of references) {

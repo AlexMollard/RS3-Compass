@@ -2,8 +2,8 @@
   import { goto } from "$app/navigation";
   import { progressionQuests, nextQuest, SKILLS } from "../../data";
   import { getCompass } from "../compassContext";
-  import { questPath, skillPath } from "../navigation";
-  import GameArt from "../components/GameArt.svelte";
+  import { questPath } from "../navigation";
+  import SkillGrid from "../components/SkillGrid.svelte";
   import GameText from "../components/GameText.svelte";
   import LevelEditor from "../components/LevelEditor.svelte";
   import QuestStart from "../components/QuestStart.svelte";
@@ -105,18 +105,11 @@
         </p>
       </GameWindow>
       <GameWindow className="home-levels" title="Recorded levels">
-        <div class="level-register">
-          {#each SKILLS as skill (skill.name)}<button
-              type="button"
-              class="level-register-cell"
-              aria-label={"Open training for " + skill.name}
-              title={"Open training for " + skill.name}
-              onclick={() => void goto(skillPath(skill.name))}
-              ><GameArt file={skill.icon} /><span>{skill.name}</span><strong
-                >{profile.levels[skill.name] ?? "—"}</strong
-              ></button
-            >{/each}
-        </div>
+        <SkillGrid
+          skills={SKILLS}
+          levels={profile.levels}
+          label="Recorded skill levels"
+        />
       </GameWindow>
     </div>
   </div>

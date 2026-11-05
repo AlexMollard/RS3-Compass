@@ -548,13 +548,20 @@ const dragons: TrainingOption = {
     "Access to the dragons and effective dragonfire protection",
     "An anti-dragon shield requires a compatible one-handed weapon; verify protection for your chosen style",
   ],
-  supplies: [
-    "Anti-dragon shield or an effective alternative",
-    "Food",
-    "Teleport",
-  ],
+  supplies: ["Dragonfire protection for your weapon setup", "Food", "Teleport"],
   risks:
     "Dragonfire is dangerous; bring food and a teleport, and check your protection before engaging.",
+};
+const necroDragons: TrainingOption = {
+  ...dragons,
+  id: "necro-blue-dragons",
+  requirements: [
+    "Access to the dragons",
+    "Super antifire protects against ordinary dragonfire while keeping both Necromancy weapons equipped; an anti-dragon shield replaces the skull lantern",
+  ],
+  supplies: ["Super antifire (3)", "Food", "Teleport"],
+  risks:
+    "Do not engage without effective dragonfire protection. Keep potion protection active; bring food and a teleport for the dragons' other attacks.",
 };
 const wildDragons: TrainingOption = {
   id: "wilderness-blue-dragons",
@@ -579,11 +586,7 @@ const wildDragons: TrainingOption = {
     "Appropriate equipment and dragonfire protection",
     "Use an anti-dragon shield with a compatible one-handed weapon unless you have verified effective alternative protection",
   ],
-  supplies: [
-    "Anti-dragon shield or an effective alternative",
-    "Food",
-    "Teleport",
-  ],
+  supplies: ["Dragonfire protection for your weapon setup", "Food", "Teleport"],
   risks:
     "Dragonfire and Wilderness threats can be dangerous; bring food and an escape.",
 };
@@ -1548,7 +1551,7 @@ export const COMBAT_SKILLS: SkillRecord[] = [
         [
           { ...moss, id: "necro-moss", members: true },
           memberRitual,
-          { ...dragons, id: "necro-blue-dragons" },
+          necroDragons,
         ],
         true,
       ),
@@ -1559,7 +1562,7 @@ export const COMBAT_SKILLS: SkillRecord[] = [
         "Use greater communion for souls; improve equipment and choose combat targets for your gear and Slayer level.",
         [
           greaterRitual,
-          { ...dragons, id: "necro-blue-dragons" },
+          necroDragons,
           { ...gargoyles, id: "necro-gargoyles" },
           { ...abyssals, id: "necro-abyssals" },
         ],

@@ -2304,36 +2304,6 @@ textarea {
   font-size: var(--font-caption);
   line-height: 1.7;
 }
-.level-register {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  padding: 9px;
-  gap: 2px;
-}
-.level-register-cell {
-  display: grid;
-  grid-template-columns: 22px minmax(0, 1fr) 22px;
-  gap: 7px;
-  align-items: center;
-  padding: 11px 6px;
-  border-bottom: 1px solid #395363;
-}
-.level-register-cell img {
-  width: 22px;
-  height: 22px;
-  object-fit: contain;
-}
-.level-register-cell > span {
-  font-size: var(--font-caption);
-  color: #9fb5c3;
-}
-.level-register-cell > strong {
-  color: #d8c99d;
-  font:
-    18px Georgia,
-    serif;
-  text-align: right;
-}
 
 .activity-header {
   display: flex;
@@ -2543,17 +2513,6 @@ textarea {
   font-size: 22px;
   flex-shrink: 0;
 }
-button.level-register-cell {
-  width: 100%;
-  text-align: left;
-}
-button.level-register-cell:hover {
-  background: #c4a36d10;
-}
-button.level-register-cell > strong {
-  text-decoration: underline dotted;
-  text-underline-offset: 4px;
-}
 .level-editor {
   width: min(540px, calc(100vw - 32px));
   max-height: calc(100dvh - 32px);
@@ -2690,9 +2649,6 @@ textarea::placeholder {
 }
 .section-heading {
   flex-wrap: wrap;
-}
-.level-register-cell {
-  padding: 10px 6px;
 }
 .navigation-main > strong,
 .queue-quest-name strong {

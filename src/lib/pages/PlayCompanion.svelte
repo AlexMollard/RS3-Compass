@@ -114,9 +114,25 @@
               </div>
             </div>
           {:else if stage && method}
-            <div class="session-context">
-              <p><GameText text={skill.payoff} /></p>
-            </div>
+            <section class="detail-section">
+              <SectionHeading title="Your training method" />
+              <TrainingMethods
+                {skill}
+                {stage}
+                {profile}
+                onSelect={(id) =>
+                  controller.updateProfile((p) => ({
+                    ...p,
+                    trainingMethods: {
+                      ...p.trainingMethods,
+                      [skill!.name]: id,
+                    },
+                    completedTasks: p.completedTasks.filter(
+                      (entry) => entry !== task,
+                    ),
+                  }))}
+              />
+            </section>
             <section class="panel packing-card">
               <SectionHeading title="Before you go">
                 {#snippet aside()}{#if packing.length}<span class="badge"
@@ -144,26 +160,6 @@
               {#if packing.length}<p class="sample-note">
                   Checks are manual; they do not read your bank or inventory.
                 </p>{/if}
-            </section>
-            <section class="detail-section">
-              <SectionHeading title="Your training method" />
-              {#if stage.method}<p><GameText text={stage.method} /></p>{/if}
-              <TrainingMethods
-                {skill}
-                {stage}
-                {profile}
-                onSelect={(id) =>
-                  controller.updateProfile((p) => ({
-                    ...p,
-                    trainingMethods: {
-                      ...p.trainingMethods,
-                      [skill!.name]: id,
-                    },
-                    completedTasks: p.completedTasks.filter(
-                      (entry) => entry !== task,
-                    ),
-                  }))}
-              />
             </section>
             <div class="session-warning">
               <p>
@@ -215,7 +211,7 @@
         </div>
       </article>
       <aside class="play-rail">
-        {#if !locked && method}<TrainingMap {method} />{/if}
+        {#if !locked && method}<TrainingMap {method} {profile} />{/if}
         <ActivityNotes
           value={profile.notes[task] || ""}
           onChange={(value) => {
