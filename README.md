@@ -15,12 +15,14 @@ _Quest preparation with fictional sample-player data. Game artwork and maps: Jag
 
 ## What you can plan
 
-| Workspace     | What it does                                                                                                                                                                                    |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Quests**    | Check levels, gather supplies, review combat risks and find the starting NPC on a map. Packing, notes and completion share one page.                                                            |
-| **Skills**    | Browse all 29 skills in an in-game-style grid. Compare level ranges, training methods, creature/resource locations and Ironman benefits.                                                        |
-| **Equipment** | Compare a training range's target kit with current-level alternatives. Use requirements and self-supply requirements stay separate: being able to equip mithril does not mean you can smith it. |
-| **Players**   | Import public player data, switch between saved profiles and keep each player's plans separate. Removable fictional players let you explore without a lookup.                                   |
+| Workspace                                                        | What it does                                                                                                                                                                                    |
+| ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Quests**                                                       | Check levels, gather supplies, review combat risks and find the starting NPC on a map. Packing, notes and completion share one page.                                                            |
+| **Skills**                                                       | Browse all 29 skills in an in-game-style grid. Compare level ranges, training methods, creature/resource locations and Ironman benefits.                                                        |
+| **Equipment**                                                    | Compare a training range's target kit with current-level alternatives. Use requirements and self-supply requirements stay separate: being able to equip mithril does not mean you can smith it. |
+| **[Players](https://rs3-compass.mollard.deno.net/players)**      | Find, switch, refresh and remove saved players. Manage each character's planning settings without mixing their notes, packing or quest completion.                                              |
+| **[Group Ironman](https://rs3-compass.mollard.deno.net/groups)** | Load an official 2–5-player roster, compare published skill levels and open a member's training guide. Manual planning edits are excluded from group comparisons.                               |
+| **[Activity](https://rs3-compass.mollard.deno.net/activity)**    | Read individual or combined-group feeds, newest first. Filter by player and event type, follow Wiki references and see availability separately for each player.                                 |
 
 Switch between **F2P and Members** planning. The catalogue includes all 54 F2P quests and 9 miniquests/sagas, checked against November 2026 sources; Members quest coverage is selective. Seasonal quests and the tutorial remain available outside the regular progression route.
 
@@ -33,6 +35,8 @@ Lookups use the official [RuneScape Platform APIs](https://developer.runescape.c
 - **Hiscores:** recorded levels, XP, overall and skill ranks, and activity scores. Ranks are from the main RS3 Hiscores, not Ironman-only rankings.
 - **Quest progress:** completed and started quests, reported eligibility, and authoritative quest-point totals. Eligibility is not a packing check.
 - **Recent activity:** up to 20 published events, with linked references where a subject can be identified. Availability depends on active membership and the in-game RuneMetrics Event Log settings.
+
+These sources are independent: a player without a main Hiscores entry can still import public quests or activity. Missing levels, XP and ranks remain unknown, not zero. A teammate's quest completion never completes your own quests.
 
 The Members planning toggle does not change an account's actual membership. Public data does not reveal your bank, inventory or owned equipment.
 
@@ -48,19 +52,23 @@ Group Hiscores are separate from the Platform APIs. Compass validates the exact 
 <details>
 <summary>Refresh timing and unavailable data</summary>
 
-Compass caches successful player lookups for 10 minutes and coalesces matching requests. Jagex also caches data, so delays can stack; quest progress may update after logout, a world hop or periodic synchronization.
+Public snapshots refresh when their cache expires while the relevant workspace is visible. Refresh a player without switching characters, or refresh all saved players from Players. Matching requests are coalesced, with at most two player requests running at once; background tabs pause the queue and leaving a view withdraws its queued automatic work.
 
-If quests or activity become unavailable, Compass keeps the last successful snapshot and its original timestamp, labels it as stale, and preserves your local plans. A missing public snapshot is not treated as zero progress.
+Successful player lookups are cached for 10 minutes. Refresh does not bypass that cache. Temporary source failures retry sooner with a cooldown; rate-limit responses are respected. Jagex also caches data, so delays can stack; quest progress may update after logout, a world hop or periodic synchronization.
 
-Artwork and map tiles use browser caching. Additional activity references are resolved in bounded, cached Wiki requests only when the activity view is opened.
+If a source becomes unavailable, Compass keeps its last successful snapshot and original timestamp. A failed overall refresh shows an error without erasing data or changing source privacy settings. Removing a player cancels pending work; late responses cannot recreate the removed profile.
+
+Artwork and map tiles use browser caching. Additional activity references are resolved only for displayed feed entries, using bounded, cached Wiki requests with at most 50 subjects per batch.
 
 </details>
 
 ## Your data stays in this browser
 
-Notes, packing and plans are **local, not cloud-synced**. A functional cookie remembers the selected player name; public lookup responses are server-cached. Removing a saved profile does not change its RuneScape account.
+Notes, packing, planning settings and saved group references are **local, not cloud-synced**. Export progress to back them up. A functional cookie remembers the explicitly selected player name; background refreshes do not change it. Public lookup responses are server-cached. Removing a saved profile does not change its RuneScape account; removing a cached group keeps its individual player journals.
 
 Changing domains, browsers or devices does not carry your local workspace across. Export progress before moving or clearing site data. Wiki images, map tiles and activity-reference queries contact the RuneScape Wiki directly.
+
+Group support is a public-data dashboard, not shared storage or a collaborative board. There is no sign-in, cross-device synchronization, task claiming or visibility into private inventories.
 
 ## Run locally
 

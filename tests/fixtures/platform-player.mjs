@@ -20,6 +20,7 @@ export function availableQuests(titles, overrides = {}) {
 export function platformPlayer(overrides = {}) {
   return {
     name: "Real Player",
+    hiscoresImportStatus: "available",
     levels: { Mining: 55, Smithing: 40 },
     statistics: { overall: {}, skills: {}, activities: [] },
     fetchedAt: 1234,

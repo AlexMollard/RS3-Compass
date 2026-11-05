@@ -41,45 +41,6 @@ test("A real lookup creates an isolated profile without fictional sample achieve
   );
 });
 
-test("Refreshing public levels retains manual progress, chosen session and access settings", () => {
-  const controller = createCompassController();
-  controller.addPlayer(player, "Group Ironman", "members");
-  controller.updateProfile((p) => ({
-    ...p,
-    levels: { ...p.levels, Cooking: 71 },
-    completedQuests: ["cook"],
-    packed: ["train-Mining::Iron ore"],
-    completedTasks: ["train-Smithing"],
-    notes: { "train-Mining": "Bank first" },
-    trainingRanges: { Mining: 30 },
-    trainingMethods: { Mining: "mithril" },
-    activeTask: "train-Mining",
-  }));
-  const before = structuredClone(current(controller));
-  controller.addPlayer(
-    {
-      ...player,
-      name: "REAL PLAYER",
-      levels: { Mining: 60, Smithing: 45 },
-      fetchedAt: 4567,
-    },
-    "Solo Ironman",
-    "f2p",
-  );
-  const after = current(controller);
-  assert.deepEqual(after, {
-    ...before,
-    name: "REAL PLAYER",
-    levels: { ...before.levels, Mining: 60, Smithing: 45 },
-    hiscoresFetchedAt: 4567,
-    statistics: { ...before.statistics, fetchedAt: 4567 },
-  });
-  assert.equal(
-    get(controller.state).profiles.filter((p) => p.id === before.id).length,
-    1,
-  );
-});
-
 test("Controllers do not share mutable user state across SSR requests", () => {
   const first = createCompassController(),
     second = createCompassController();

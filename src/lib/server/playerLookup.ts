@@ -28,6 +28,7 @@ const platformSkillNames: Readonly<Record<string, SkillName>> = {
 
 export function playerCacheMs(player: PlayerLookup): number {
   const transient =
+    player.hiscoresImportStatus === "service-unavailable" ||
     (player.quests.status === "unavailable" &&
       player.quests.reason === "service-unavailable") ||
     (player.events.status === "unavailable" &&
@@ -191,61 +192,107 @@ export function createPlayerLookupService(
         429,
       );
     const request = (async () => {
-      try {
-        const url = new URL(
-          "https://secure.runescape.com/m=hiscore/index_lite.json",
-        );
-        url.searchParams.set("player", name);
-        const response = await boundedFetch(url, {
-          signal: AbortSignal.timeout(8000),
-          headers: {
-            accept: "application/json",
-            "user-agent": "RS3 Compass public Hiscores lookup",
-          },
-        });
-        if (response.status === 404)
-          throw new PlayerLookupError(
-            "No public RS3 Hiscores entry was found. Check the name; the player may be unranked.",
-            404,
+      let rateLimited = false;
+      const notFound = new Set<string>();
+      const sourceFetch: typeof fetch = async (input, init) => {
+        try {
+          const response = await boundedFetch(input, init);
+          if (response.status === 429) rateLimited = true;
+          if (response.status === 404)
+            notFound.add(new URL(String(input)).pathname);
+          return response;
+        } catch (error) {
+          if (error instanceof PlayerLookupError && error.status === 429)
+            rateLimited = true;
+          throw error;
+        }
+      };
+      const hiscores = async (): Promise<{
+        status: "available" | "unranked-or-unavailable" | "service-unavailable";
+        data?: PlayerLevels;
+      }> => {
+        try {
+          const url = new URL(
+            "https://secure.runescape.com/m=hiscore/index_lite.json",
           );
-        if (!response.ok)
-          throw new PlayerLookupError(
-            "RuneScape's player service is unavailable. Try again later.",
-            502,
-          );
-        const levels = parseHiscores(await response.json(), name, now());
-        const [quests, events] = await Promise.all([
-          lookupQuests(name, boundedFetch),
-          lookupEvents(name, boundedFetch),
-        ]);
-        const player: PlayerLookup = {
-          ...levels,
-          name:
-            quests.status === "available"
-              ? quests.name
-              : events.status === "available"
-                ? events.name
-                : levels.name,
-          quests,
-          events,
-        };
-        cacheEntry(key, {
-          expiresAt: player.fetchedAt + playerCacheMs(player),
-          player,
-        });
-        return player;
-      } catch (cause) {
-        const error =
-          cause instanceof PlayerLookupError
-            ? cause
+          url.searchParams.set("player", name);
+          const response = await sourceFetch(url, {
+            signal: AbortSignal.timeout(8000),
+            headers: {
+              accept: "application/json",
+              "user-agent": "RS3 Compass public Hiscores lookup",
+            },
+          });
+          if (response.status === 404)
+            return { status: "unranked-or-unavailable" };
+          if (!response.ok) return { status: "service-unavailable" };
+          return {
+            status: "available",
+            data: parseHiscores(await response.json(), name, now()),
+          };
+        } catch {
+          return { status: "service-unavailable" };
+        }
+      };
+      const [scores, quests, events] = await Promise.all([
+        hiscores(),
+        lookupQuests(name, sourceFetch),
+        lookupEvents(name, sourceFetch),
+      ]);
+      if (
+        !scores.data &&
+        quests.status !== "available" &&
+        events.status !== "available"
+      ) {
+        const missingAux = (endpoint: string, reason: string) =>
+          reason === "private-or-unavailable" ||
+          [...notFound].some((path) => path.includes(`/${endpoint}/`));
+        const allMissing =
+          scores.status === "unranked-or-unavailable" &&
+          missingAux("playerQuests", quests.reason) &&
+          missingAux("playerEvents", events.reason);
+        const error = rateLimited
+          ? new PlayerLookupError(
+              "Player lookup is busy. Wait a moment before trying again.",
+              429,
+            )
+          : allMissing
+            ? new PlayerLookupError(
+                "No public RS3 player data was found. Check the name; the player may be unranked or private.",
+                404,
+              )
             : new PlayerLookupError(
-                "RuneScape's player service could not be reached. Try again later.",
+                "RuneScape's player service is unavailable. Try again later.",
                 502,
               );
         if (error.status === 404)
           cacheEntry(key, { expiresAt: now() + NEGATIVE_CACHE_MS, error });
         throw error;
       }
+      const fetchedAt = now();
+      const player: PlayerLookup = {
+        ...(scores.data ?? {
+          name,
+          levels: {},
+          statistics: { overall: {}, skills: {}, activities: [] },
+          fetchedAt,
+        }),
+        name:
+          quests.status === "available"
+            ? quests.name
+            : events.status === "available"
+              ? events.name
+              : scores.data!.name,
+        fetchedAt,
+        hiscoresImportStatus: scores.status,
+        quests,
+        events,
+      };
+      cacheEntry(key, {
+        expiresAt: fetchedAt + playerCacheMs(player),
+        player,
+      });
+      return player;
     })().finally(() => inFlight.delete(key));
     inFlight.set(key, request);
     return request;

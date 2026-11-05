@@ -5,12 +5,16 @@ import { normalizePlayerName } from "./playerName.ts";
 import { clearRememberedPlayer, rememberPlayer } from "./rememberedPlayer.ts";
 import {
   isFetchedAt,
+  isHiscoresImportStatus,
   isPlayerEvents,
   isPlayerImportStatus,
   isPlayerStatistics,
   isQuestProgress,
 } from "./playerData.ts";
 import { questTitleKey } from "./playerProgress.ts";
+import { createPlayerSynchronizer, type SyncTarget } from "./playerSync.ts";
+import { isGroupLookup } from "./groupData.ts";
+import { isSkillName } from "../skillNames.ts";
 
 const KEY = "rs3-compass-design-v1";
 
@@ -30,6 +34,21 @@ function validProfile(value: unknown): value is Profile {
       (typeof p.hiscoresFetchedAt === "number" &&
         Number.isFinite(p.hiscoresFetchedAt) &&
         p.hiscoresFetchedAt >= 0)) &&
+    (p.publicFetchedAt === undefined || isFetchedAt(p.publicFetchedAt)) &&
+    (p.hiscoresImportStatus === undefined ||
+      isHiscoresImportStatus(p.hiscoresImportStatus)) &&
+    (p.hiscoresLevels === undefined ||
+      (!!p.hiscoresLevels &&
+        typeof p.hiscoresLevels === "object" &&
+        !Array.isArray(p.hiscoresLevels) &&
+        Object.keys(p.hiscoresLevels).length > 0 &&
+        Object.entries(p.hiscoresLevels).every(
+          ([name, level]) =>
+            isSkillName(name) &&
+            Number.isInteger(level) &&
+            level >= 1 &&
+            level <= 120,
+        ))) &&
     (p.questImportStatus === undefined ||
       isPlayerImportStatus(p.questImportStatus)) &&
     (p.eventImportStatus === undefined ||
@@ -93,18 +112,116 @@ export function createCompassController(): CompassController {
   let unsubscribe: (() => void) | undefined;
   let timer: ReturnType<typeof setTimeout> | undefined;
   let initialized = false;
+  const synchronizer = createPlayerSynchronizer({
+    profile: (id) => get(state).profiles.find((p) => p.id === id),
+    allowed(target) {
+      const current = get(state);
+      if (
+        current.profiles.some(
+          (p) => p.id === target.id && p.source === "hiscores",
+        )
+      )
+        return true;
+      if (target.groupId !== undefined)
+        return (
+          current.groups?.some(
+            (group) =>
+              group.id === target.groupId &&
+              group.members.some(
+                (member) =>
+                  normalizePlayerName(member.name).toLowerCase() ===
+                  normalizePlayerName(target.name).toLowerCase(),
+              ),
+          ) ?? false
+        );
+      return false;
+    },
+    apply(player, target) {
+      controller.addPlayer(player, target.kind, target.mode, { select: false });
+    },
+  });
   function notify(message: string) {
     notice.set(message);
     clearTimeout(timer);
     timer = setTimeout(() => notice.set(""), 4500);
   }
-  return {
+  const controller: CompassController = {
     state,
     storageError,
     ready,
     compact,
     notice,
     notify,
+    syncState: synchronizer.state,
+    async refreshPlayers(ids, options) {
+      const profiles = get(state).profiles.filter(
+        (p) => p.source === "hiscores" && (!ids || ids.includes(p.id)),
+      );
+      await Promise.all(
+        profiles.map((p) =>
+          synchronizer.refresh(
+            {
+              id: p.id,
+              name: p.name,
+              kind: p.kind,
+              mode: p.mode,
+            },
+            options?.staleOnly,
+            options?.scope,
+          ),
+        ),
+      );
+    },
+    cancelRefreshScope(scope) {
+      synchronizer.cancelScope(scope);
+    },
+    async importGroupMembers(id) {
+      const current = get(state);
+      const group = current.groups?.find((g) => g.id === id);
+      if (!group) return;
+      const mode =
+        current.profiles.find((p) => p.id === current.activeId)?.mode ?? "f2p";
+      await Promise.all(
+        group.members.map((member) => {
+          const target: SyncTarget = {
+            id: "rs3:" + normalizePlayerName(member.name).toLowerCase(),
+            name: member.name,
+            groupId: group.id,
+            kind: "Group Ironman",
+            mode,
+          };
+          return synchronizer.refresh(target, false, "group-import:" + id);
+        }),
+      );
+    },
+    saveGroup(group) {
+      if (!isGroupLookup(group)) return;
+      state.update((current) => {
+        const old = current.groups?.find((g) => g.id === group.id);
+        if (old && old.fetchedAt > group.fetchedAt) return current;
+        return {
+          ...current,
+          groups: old
+            ? current.groups!.map((g) => (g.id === group.id ? group : g))
+            : [...(current.groups ?? []), group],
+        };
+      });
+    },
+    removeGroup(id) {
+      synchronizer.cancelGroup(id);
+      state.update((current) => ({
+        ...current,
+        groups: (current.groups ?? []).filter((g) => g.id !== id),
+      }));
+    },
+    updatePlayer(id, settings) {
+      state.update((current) => ({
+        ...current,
+        profiles: current.profiles.map((p) =>
+          p.id === id ? { ...p, ...settings } : p,
+        ),
+      }));
+    },
     initialize() {
       if (initialized) return;
       initialized = true;
@@ -117,6 +234,8 @@ export function createCompassController(): CompassController {
             if (
               s.version === 1 &&
               Array.isArray(s.profiles) &&
+              (s.groups === undefined ||
+                (Array.isArray(s.groups) && s.groups.every(isGroupLookup))) &&
               s.profiles.every(validProfile) &&
               (s.profiles.length === 0
                 ? s.activeId === ""
@@ -149,11 +268,16 @@ export function createCompassController(): CompassController {
           storageError.set(true);
         }
       });
+      if (typeof document !== "undefined")
+        document.addEventListener?.("visibilitychange", synchronizer.wake);
       ready.set(true);
     },
     destroy() {
       unsubscribe?.();
       clearTimeout(timer);
+      synchronizer.destroy();
+      if (typeof document !== "undefined")
+        document.removeEventListener?.("visibilitychange", synchronizer.wake);
     },
     updateProfile(update) {
       state.update((current) => ({
@@ -171,8 +295,9 @@ export function createCompassController(): CompassController {
       );
       rememberSelection(profile);
     },
-    addPlayer(player, kind, mode) {
+    addPlayer(player, kind, mode, options) {
       const id = "rs3:" + normalizePlayerName(player.name).toLowerCase();
+      const previousActiveId = get(state).activeId;
       const completed = new Set<string>();
       if (player.quests.status === "available") {
         for (const quest of player.quests.records) {
@@ -186,12 +311,24 @@ export function createCompassController(): CompassController {
       const sourceData: Pick<
         Profile,
         | "statistics"
+        | "hiscoresImportStatus"
+        | "hiscoresLevels"
+        | "hiscoresFetchedAt"
+        | "publicFetchedAt"
         | "questProgress"
         | "eventLog"
         | "questImportStatus"
         | "eventImportStatus"
       > = {
-        statistics: { ...player.statistics, fetchedAt: player.fetchedAt },
+        publicFetchedAt: player.fetchedAt,
+        hiscoresImportStatus: player.hiscoresImportStatus,
+        ...(player.hiscoresImportStatus === "available"
+          ? {
+              statistics: { ...player.statistics, fetchedAt: player.fetchedAt },
+              hiscoresLevels: { ...player.levels },
+              hiscoresFetchedAt: player.fetchedAt,
+            }
+          : {}),
         questImportStatus:
           player.quests.status === "available"
             ? "available"
@@ -221,6 +358,12 @@ export function createCompassController(): CompassController {
       };
       state.update((current) => {
         const existing = current.profiles.find((p) => p.id === id);
+        const fetchedAt =
+          existing?.publicFetchedAt ?? existing?.hiscoresFetchedAt;
+        if (fetchedAt !== undefined && fetchedAt > player.fetchedAt)
+          return options?.select === false
+            ? current
+            : { ...current, activeId: id };
         let profile: Profile;
         if (existing)
           profile = {
@@ -231,7 +374,6 @@ export function createCompassController(): CompassController {
               ...new Set([...existing.completedQuests, ...imported]),
             ],
             source: "hiscores",
-            hiscoresFetchedAt: player.fetchedAt,
             ...sourceData,
           };
         else {
@@ -248,24 +390,26 @@ export function createCompassController(): CompassController {
             trainingRanges: {},
             activeTask: "",
             source: "hiscores",
-            hiscoresFetchedAt: player.fetchedAt,
             ...sourceData,
           };
           profile.activeTask = nextQuest(profile)?.id ?? "train-Mining";
         }
         return {
           ...current,
-          activeId: id,
+          activeId: options?.select === false ? current.activeId || id : id,
           profiles: existing
             ? current.profiles.map((p) => (p.id === id ? profile : p))
             : [...current.profiles, profile],
         };
       });
-      rememberSelection(
-        get(state).profiles.find((profile) => profile.id === id)!,
-      );
+      synchronizer.received(id, player);
+      if (options?.select !== false || get(state).activeId !== previousActiveId)
+        rememberSelection(
+          get(state).profiles.find((profile) => profile.id === id)!,
+        );
     },
     removePlayer(id) {
+      synchronizer.cancel(id);
       let selectionChanged = false;
       let selected: Profile | undefined;
       state.update((current) => {
@@ -296,6 +440,9 @@ export function createCompassController(): CompassController {
                 format: "rs3-compass-design-preview",
                 version: 1,
                 profiles: get(state).profiles,
+                ...(get(state).groups?.length
+                  ? { groups: get(state).groups }
+                  : {}),
               },
               null,
               2,
@@ -311,4 +458,5 @@ export function createCompassController(): CompassController {
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     },
   };
+  return controller;
 }

@@ -128,7 +128,7 @@ test("concurrent aliases share all three requests and ten minute cache", async (
   assert.equal(calls.length, 6);
 });
 
-test("not-found caching skips auxiliary requests but recovers when a public entry becomes available", async () => {
+test("all-source not-found caching recovers when public data becomes available", async () => {
   let time = 0,
     found = false;
   const calls = [];
@@ -145,10 +145,113 @@ test("not-found caching skips auxiliary requests but recovers when a public entr
   found = true;
   time = 29_999;
   await assert.rejects(service.lookup("example"), { status: 404 });
-  assert.equal(calls.length, 1);
+  assert.equal(calls.length, 3);
   time = 30_000;
   assert.equal((await service.lookup("Example")).levels.Mining, 50);
-  assert.equal(calls.length, 4);
+  assert.equal(calls.length, 6);
+});
+
+test("unranked Hiscores retain matching public quests and events for the normal cache", async () => {
+  let time = 0;
+  let calls = 0;
+  const service = createPlayerLookupService(
+    async (url) => {
+      calls++;
+      if (url.pathname.includes("index_lite"))
+        return new Response(null, { status: 404 });
+      if (url.pathname.includes("playerQuests"))
+        return json({
+          name: "ExAmPlE",
+          qp: 1,
+          qp_max: 10,
+          quests: {
+            1: {
+              title: "Quest",
+              eligible: true,
+              members: false,
+              difficulty: 0,
+              qp: 1,
+              status: "COMPLETED",
+            },
+          },
+        });
+      return json({ name: "Example", events: [] });
+    },
+    () => time,
+  );
+  const result = await service.lookup("example");
+  assert.equal(result.name, "ExAmPlE");
+  assert.equal(result.hiscoresImportStatus, "unranked-or-unavailable");
+  assert.deepEqual(result.levels, {});
+  assert.deepEqual(result.statistics, {
+    overall: {},
+    skills: {},
+    activities: [],
+  });
+  assert.equal(result.quests.records[0].title, "Quest");
+  assert.equal(result.events.status, "available");
+  time = PLAYER_CACHE_MS - 1;
+  await service.lookup("Example");
+  assert.equal(calls, 3);
+  time++;
+  await service.lookup("Example");
+  assert.equal(calls, 6);
+});
+
+test("transient Hiscores failure keeps auxiliary data and retries after 30 seconds", async () => {
+  let time = 0;
+  let calls = 0;
+  let recovered = false;
+  const service = createPlayerLookupService(
+    async (url) => {
+      calls++;
+      if (url.pathname.includes("index_lite"))
+        return recovered ? json(payload("Example")) : json({ broken: true });
+      return auxiliary(url);
+    },
+    () => time,
+  );
+  const partial = await service.lookup("Example");
+  assert.equal(partial.hiscoresImportStatus, "service-unavailable");
+  assert.deepEqual(partial.levels, {});
+  assert.equal(partial.quests.status, "available");
+  assert.equal(partial.events.status, "available");
+  recovered = true;
+  time = 29_999;
+  await service.lookup("Example");
+  assert.equal(calls, 3);
+  time++;
+  const full = await service.lookup("Example");
+  assert.equal(full.hiscoresImportStatus, "available");
+  assert.equal(full.levels.Mining, 50);
+  assert.equal(calls, 6);
+});
+
+test("failed auxiliary sources retain Hiscores and mismatched identities cannot supply a profile", async () => {
+  const service = createPlayerLookupService(async (url) => {
+    if (url.pathname.includes("index_lite")) return json(payload("Example"));
+    if (url.pathname.includes("playerQuests"))
+      return json({ name: "Someone Else", qp: 0, qp_max: 0, quests: {} });
+    return new Response(null, { status: 503 });
+  });
+  const result = await service.lookup("Example");
+  assert.equal(result.name, "Example");
+  assert.equal(result.hiscoresImportStatus, "available");
+  assert.equal(result.levels.Mining, 50);
+  assert.equal(result.quests.reason, "service-unavailable");
+  assert.equal(result.events.reason, "service-unavailable");
+  const noMatchingSource = createPlayerLookupService(async (url) =>
+    url.pathname.includes("index_lite")
+      ? new Response(null, { status: 404 })
+      : json({
+          name: "Someone Else",
+          qp: 0,
+          qp_max: 0,
+          quests: {},
+          events: [],
+        }),
+  );
+  await assert.rejects(noMatchingSource.lookup("Example"), { status: 502 });
 });
 
 test("budget counts actual calls, allows hits, and avoids reserving unsent requests", async () => {
@@ -166,34 +269,33 @@ test("budget counts actual calls, allows hits, and avoids reserving unsent reque
   assert.equal(calls.length, 63);
 });
 
-test("partial response at budget boundary keeps levels and retries after short cache", async () => {
+test("partial response at budget boundary keeps available data and retries after short cache", async () => {
   let time = 0;
   let calls = 0;
   const service = createPlayerLookupService(
     async (url) => {
       calls++;
-      if (url.pathname.includes("index_lite"))
-        return url.searchParams.get("player").startsWith("Missing")
-          ? new Response(null, { status: 404 })
-          : json(payload());
-      return auxiliary(url);
+      if (calls === 2) time = 1;
+      return url.pathname.includes("index_lite")
+        ? json(payload(url.searchParams.get("player")))
+        : auxiliary(url);
     },
     () => time,
   );
-  for (let i = 0; i < 58; i++)
-    await assert.rejects(service.lookup("Missing " + i), { status: 404 });
+  for (let i = 0; i < 20; i++) await service.lookup("Player " + i);
+  time = 60_000;
   const result = await service.lookup("Example");
-  assert.equal(calls, 60);
+  assert.equal(calls, 62);
   assert.equal(result.levels.Mining, 50);
   assert.equal(result.quests.status, "available");
   assert.deepEqual(result.events, {
     status: "unavailable",
     reason: "service-unavailable",
   });
-  time = 60000;
+  time = 90_000;
   const refreshed = await service.lookup("Example");
   assert.equal(refreshed.events.status, "available");
-  assert.equal(calls, 63);
+  assert.equal(calls, 65);
 });
 
 test("bounded concurrency joins pending aliases and releases after failure", async () => {
@@ -210,7 +312,7 @@ test("bounded concurrency joins pending aliases and releases after failure", asy
       if (fail) return new Response(null, { status: 503 });
       return json(payload(url.searchParams.get("player")));
     }
-    return auxiliary(url);
+    return fail ? new Response(null, { status: 503 }) : auxiliary(url);
   });
   const pending = Array.from({ length: 8 }, (_, i) =>
     service.lookup("Player " + i).catch((e) => e),
@@ -219,10 +321,10 @@ test("bounded concurrency joins pending aliases and releases after failure", asy
   await assert.rejects(service.lookup("Player 9"), { status: 429 });
   release();
   await Promise.all([...pending, alias]);
-  assert.equal(calls, 8);
+  assert.equal(calls, 24);
   fail = false;
   assert.equal((await service.lookup("Player 0")).levels.Mining, 50);
-  assert.equal(calls, 11);
+  assert.equal(calls, 27);
 });
 
 test("LRU eviction preserves recently used entries", async () => {
@@ -279,21 +381,21 @@ test("the rolling request budget expires old calls without forgetting more recen
     },
     () => time,
   );
-  for (let index = 0; index < 40; index++)
+  for (let index = 0; index < 10; index++)
     await assert.rejects(service.lookup("Absent " + index), { status: 404 });
   time = 59_000;
-  for (let index = 40; index < 60; index++)
+  for (let index = 10; index < 20; index++)
     await assert.rejects(service.lookup("Absent " + index), { status: 404 });
   time = 60_000;
-  for (let index = 60; index < 100; index++)
+  for (let index = 20; index < 30; index++)
     await assert.rejects(service.lookup("Absent " + index), { status: 404 });
-  await assert.rejects(service.lookup("Absent 100"), { status: 429 });
-  assert.equal(calls, 100);
-  await assert.rejects(service.lookup("Absent 40"), { status: 404 });
-  assert.equal(calls, 100);
+  await assert.rejects(service.lookup("Absent 30"), { status: 429 });
+  assert.equal(calls, 90);
+  await assert.rejects(service.lookup("Absent 10"), { status: 404 });
+  assert.equal(calls, 90);
   time = 119_000;
-  await assert.rejects(service.lookup("Absent 100"), { status: 404 });
-  assert.equal(calls, 101);
+  await assert.rejects(service.lookup("Absent 30"), { status: 404 });
+  assert.equal(calls, 93);
 });
 
 test("Jagex wire names import Constitution and Runecrafting without relying on row position", () => {

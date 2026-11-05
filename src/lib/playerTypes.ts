@@ -22,6 +22,9 @@ export interface PlayerLevels {
   fetchedAt: number;
 }
 
+export type HiscoresImportStatus =
+  "available" | "unranked-or-unavailable" | "service-unavailable";
+
 export type PlayerImportStatus =
   "available" | "private-or-unavailable" | "not-member" | "service-unavailable";
 
@@ -66,6 +69,7 @@ export type PlayerEventsImport =
     };
 
 export interface PlayerLookup extends PlayerLevels {
+  hiscoresImportStatus: HiscoresImportStatus;
   quests: QuestImport;
   events: PlayerEventsImport;
 }

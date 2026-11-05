@@ -1,6 +1,7 @@
 import { isSkillName } from "../skillNames.ts";
 import { normalizePlayerName } from "./playerName.ts";
 import type {
+  HiscoresImportStatus,
   PlayerEvent,
   PlayerImportStatus,
   PlayerLookup,
@@ -47,6 +48,16 @@ export function isPlayerImportStatus(
     value === "available" ||
     value === "private-or-unavailable" ||
     value === "not-member" ||
+    value === "service-unavailable"
+  );
+}
+
+export function isHiscoresImportStatus(
+  value: unknown,
+): value is HiscoresImportStatus {
+  return (
+    value === "available" ||
+    value === "unranked-or-unavailable" ||
     value === "service-unavailable"
   );
 }
@@ -139,6 +150,7 @@ export function isPlayerLookup(value: unknown): value is PlayerLookup {
     !record(value) ||
     !playerName(value.name) ||
     !isFetchedAt(value.fetchedAt) ||
+    !isHiscoresImportStatus(value.hiscoresImportStatus) ||
     !record(value.levels) ||
     !Object.entries(value.levels).every(
       ([name, level]) => isSkillName(name) && positive(level) && level <= 120,
@@ -146,6 +158,23 @@ export function isPlayerLookup(value: unknown): value is PlayerLookup {
     !isPlayerStatistics(value.statistics) ||
     !record(value.quests) ||
     !record(value.events)
+  )
+    return false;
+  if (value.hiscoresImportStatus === "available") {
+    if (Object.keys(value.levels).length === 0) return false;
+  } else if (
+    Object.keys(value.levels).length !== 0 ||
+    Object.keys(value.statistics).length !== 3 ||
+    Object.keys(value.statistics.overall).length !== 0 ||
+    Object.keys(value.statistics.skills).length !== 0 ||
+    value.statistics.activities.length !== 0
+  ) {
+    return false;
+  }
+  if (
+    value.hiscoresImportStatus !== "available" &&
+    value.quests.status !== "available" &&
+    value.events.status !== "available"
   )
     return false;
   const key = normalizePlayerName(value.name).toLocaleLowerCase("en");

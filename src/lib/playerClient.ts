@@ -2,13 +2,23 @@ import { normalizePlayerName } from "./playerName.ts";
 import { isPlayerLookup } from "./playerData.ts";
 import type { PlayerLookup } from "./playerTypes";
 
+export class PlayerFetchError extends Error {
+  readonly retryAfterMs?: number;
+
+  constructor(message: string, retryAfterMs?: number) {
+    super(message);
+    this.name = "PlayerFetchError";
+    this.retryAfterMs = retryAfterMs;
+  }
+}
+
 export async function fetchPlayer(
   name: string,
   signal?: AbortSignal,
 ): Promise<PlayerLookup> {
   const normalized = normalizePlayerName(name);
   const response = await fetch(
-    `/api/player?name=${encodeURIComponent(normalized)}&schema=3`,
+    `/api/player?name=${encodeURIComponent(normalized)}&schema=4`,
     { signal },
   );
   const data: unknown = await response.json();
@@ -20,7 +30,15 @@ export async function fetchPlayer(
       typeof data.error === "string"
         ? data.error
         : "Player lookup is unavailable. Try again later.";
-    throw new Error(message);
+    const seconds = Number(response.headers.get("retry-after"));
+    throw new PlayerFetchError(
+      message,
+      response.status === 429
+        ? Number.isFinite(seconds) && seconds > 0
+          ? Math.min(seconds, 3600) * 1000
+          : 60_000
+        : undefined,
+    );
   }
   if (
     !isPlayerLookup(data) ||

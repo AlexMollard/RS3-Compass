@@ -10,6 +10,7 @@ import { ADVENTURE_QUESTS } from "./questsAdventures.ts";
 import { SIDE_QUESTS } from "./questsSideActivities.ts";
 import { SEASONAL_QUESTS } from "./questsSeasonal.ts";
 import type {
+  HiscoresImportStatus,
   PlayerEvent,
   PlayerImportStatus,
   PlayerQuestProgress,
@@ -33,6 +34,9 @@ export interface Profile {
   trainingMethods?: Record<string, string>;
   source?: "sample" | "hiscores";
   hiscoresFetchedAt?: number;
+  hiscoresImportStatus?: HiscoresImportStatus;
+  hiscoresLevels?: Record<string, number>;
+  publicFetchedAt?: number;
   questImportStatus?: PlayerImportStatus;
   eventImportStatus?: PlayerImportStatus;
   statistics?: PlayerStatistics & { fetchedAt: number };

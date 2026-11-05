@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { get } from "svelte/store";
 import { createCompassController } from "../src/lib/profileStore.ts";
 import { fetchPlayer } from "../src/lib/playerClient.ts";
+import { isPlayerLookup } from "../src/lib/playerData.ts";
 import { findPlayerQuest } from "../src/lib/playerProgress.ts";
 import { QUESTS } from "../src/data.ts";
 import {
@@ -162,6 +163,9 @@ test("legacy imported players restore without optional Platform snapshots or los
     "questProgress",
     "eventLog",
     "eventImportStatus",
+    "hiscoresImportStatus",
+    "hiscoresLevels",
+    "publicFetchedAt",
   ])
     delete legacy[key];
   const storage = storageFor(t, saved);
@@ -243,4 +247,79 @@ test("malformed and cross-player responses cannot be imported; valid empty logs 
     globalThis.fetch = async () => new Response(JSON.stringify(bad));
     await assert.rejects(fetchPlayer("Real Player"), /invalid player data/);
   }
+});
+
+test("lookup validation accepts independent available sources and rejects conflicting or empty primary data", () => {
+  const emptyStatistics = () => ({ overall: {}, skills: {}, activities: [] });
+  const partial = platformPlayer({
+    hiscoresImportStatus: "unranked-or-unavailable",
+    levels: {},
+    statistics: emptyStatistics(),
+    quests: availableQuests([], { questPoints: 0, maxQuestPoints: 0 }),
+  });
+  assert.equal(isPlayerLookup(partial), true);
+  assert.equal(
+    isPlayerLookup({
+      ...partial,
+      hiscoresImportStatus: "service-unavailable",
+      quests: { status: "unavailable", reason: "service-unavailable" },
+      events: { status: "available", name: "Real_Player", events: [] },
+    }),
+    true,
+  );
+  assert.equal(isPlayerLookup(platformPlayer()), true);
+
+  for (const mutate of [
+    (p) => {
+      delete p.hiscoresImportStatus;
+    },
+    (p) => {
+      p.hiscoresImportStatus = "private-or-unavailable";
+    },
+    (p) => {
+      p.levels = { Mining: 1 };
+    },
+    (p) => {
+      p.statistics.overall = { xp: 0 };
+    },
+    (p) => {
+      p.statistics.skills = { Mining: {} };
+    },
+    (p) => {
+      p.statistics.activities = [{ name: "RuneScore", score: 0 }];
+    },
+    (p) => {
+      p.statistics.extra = {};
+    },
+    (p) => {
+      p.quests = { status: "unavailable", reason: "service-unavailable" };
+    },
+    (p) => {
+      p.quests.name = "Other Player";
+    },
+    (p) => {
+      p.hiscoresImportStatus = "available";
+    },
+  ]) {
+    const bad = structuredClone(partial);
+    mutate(bad);
+    assert.equal(isPlayerLookup(bad), false);
+  }
+  for (const levels of [
+    {},
+    { Unknown: 1 },
+    { Mining: 0 },
+    { Mining: 121 },
+    { Mining: 1.5 },
+  ]) {
+    assert.equal(isPlayerLookup(platformPlayer({ levels })), false);
+  }
+  assert.equal(
+    isPlayerLookup(
+      platformPlayer({
+        statistics: { overall: {}, skills: { Unknown: {} }, activities: [] },
+      }),
+    ),
+    false,
+  );
 });

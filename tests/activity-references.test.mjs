@@ -245,3 +245,40 @@ test("reported text links only its typed subjects, not item words inside an NPC 
   assert.equal(skills.length, 1);
   assert.equal(skills[0].wiki, "Mining");
 });
+
+test("combined feeds resolve every subject within MediaWiki's 50-title query limit", async () => {
+  const titles = Array.from(
+    { length: 76 },
+    (_, index) => "Activity relic " + index,
+  );
+  const sizes = [];
+  const service = createActivityWikiLookup(async (url) => {
+    const requested = url.searchParams.get("titles").split("|");
+    sizes.push(requested.length);
+    if (requested.length > 50)
+      return json({ error: { code: "toomanyvalues" } });
+    return json({
+      query: {
+        pages: Object.fromEntries(
+          requested.map((title, index) => [
+            index,
+            {
+              ns: 0,
+              title,
+              pageimage: "Bonecrusher_maul_detail.png",
+              thumbnail: {
+                source:
+                  "https://runescape.wiki/images/Bonecrusher_maul_detail.png",
+              },
+            },
+          ]),
+        ),
+      },
+    });
+  });
+  const result = await service.lookup(titles);
+  assert.equal(result.size, titles.length);
+  assert.ok(sizes.every((size) => size <= 50));
+  assert.equal(sizes.length, 2);
+  assert.equal(result.get(titles.at(-1)).image, "Bonecrusher_maul_detail.png");
+});

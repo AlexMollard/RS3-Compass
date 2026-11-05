@@ -15,7 +15,7 @@
 
 <span class="game-text"
   >{#each segments as segment}{#if segment.reference}<a
-        class="wiki-ref {segment.reference.kind === 'item' ? 'item-ref' : ''}"
+        class="wiki-ref"
         data-reference-kind={segment.reference.kind}
         href={segment.reference.search
           ? "https://runescape.wiki/w/Special:Search?search=" +

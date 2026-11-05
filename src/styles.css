@@ -2103,7 +2103,7 @@ textarea {
   color: var(--gold-bright);
   text-decoration-style: solid;
 }
-.item-ref {
+.wiki-ref {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -2111,7 +2111,7 @@ textarea {
   max-width: 100%;
   line-height: inherit;
 }
-.item-ref img {
+.wiki-ref img {
   width: 22px;
   height: 22px;
   flex-shrink: 0;
@@ -2628,7 +2628,7 @@ textarea::placeholder {
   min-width: var(--control-size);
   min-height: var(--control-size);
 }
-.item-ref {
+.wiki-ref {
   min-height: 26px;
 }
 .detail-tabs {

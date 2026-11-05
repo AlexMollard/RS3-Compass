@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, tick } from "svelte";
+  import { onMount, untrack } from "svelte";
   import type { Snippet } from "svelte";
   import { page } from "$app/state";
   import { goto } from "$app/navigation";
@@ -15,7 +15,7 @@
     X,
   } from "@lucide/svelte";
   import { QUESTS, SKILLS, type Profile } from "../data";
-  import { getCompass } from "./compassContext";
+  import { getCompass, setPlayerActions } from "./compassContext";
   import { fetchPlayer } from "./playerClient";
   import { normalizePlayerName } from "./playerName";
   import { readRememberedPlayer } from "./rememberedPlayer";
@@ -24,7 +24,6 @@
   import SearchField from "./components/SearchField.svelte";
   import Button from "./components/Button.svelte";
   import IconButton from "./components/IconButton.svelte";
-  import PlayerManager from "./components/PlayerManager.svelte";
   import "./shell.css";
 
   let { children }: { children: Snippet } = $props();
@@ -33,16 +32,23 @@
     storageError = controller.storageError,
     ready = controller.ready,
     compact = controller.compact,
-    notice = controller.notice;
+    notice = controller.notice,
+    sync = controller.syncState;
   let profile = $derived($saved.profiles.find((p) => p.id === $saved.activeId));
   let route = $derived(
-    page.url.pathname.startsWith("/quests")
-      ? "quests"
-      : page.url.pathname.startsWith("/skills")
-        ? "skills"
-        : page.url.pathname.startsWith("/play")
-          ? "play"
-          : "journey",
+    page.url.pathname.startsWith("/players")
+      ? "players"
+      : page.url.pathname.startsWith("/groups")
+        ? "groups"
+        : page.url.pathname.startsWith("/activity")
+          ? "activity"
+          : page.url.pathname.startsWith("/quests")
+            ? "quests"
+            : page.url.pathname.startsWith("/skills")
+              ? "skills"
+              : page.url.pathname.startsWith("/play")
+                ? "play"
+                : "journey",
   );
   const navigation = [
     {
@@ -63,6 +69,24 @@
       image: "Skills_icon.png",
       href: "/skills",
     },
+    {
+      id: "players",
+      label: "Players",
+      image: "Ironman_badge.png",
+      href: "/players",
+    },
+    {
+      id: "groups",
+      label: "Group Ironman",
+      image: "Group_Ironman_badge.png",
+      href: "/groups",
+    },
+    {
+      id: "activity",
+      label: "Activity",
+      image: "Quest_map_icon.png",
+      href: "/activity",
+    },
   ];
   let mobileNav = $state(false),
     search = $state(""),
@@ -71,13 +95,35 @@
     lookupLoading = $state(false),
     shortcut = $state("Ctrl K");
   let lookupKind = $state<Profile["kind"]>("Solo Ironman");
-  let managingPlayers = $state(false);
   let searchDialog: HTMLDialogElement,
     aboutDialog: HTMLDialogElement,
     lookupDialog: HTMLDialogElement;
   let request: AbortController | undefined;
   let rememberedStarted = false;
   let main: HTMLElement, topbar: HTMLElement;
+  setPlayerActions({ lookup: (name) => openLookup(name ?? "") });
+  let selectedView = $derived(
+    ["journey", "quests", "skills", "play"].includes(route),
+  );
+  let syncSelection = $derived(
+    $ready && selectedView && profile?.source === "hiscores" ? profile.id : "",
+  );
+  $effect(() => {
+    const id = syncSelection;
+    if (
+      id &&
+      typeof document !== "undefined" &&
+      document.visibilityState !== "hidden"
+    )
+      untrack(
+        () =>
+          void controller.refreshPlayers([id], {
+            staleOnly: true,
+            scope: "shell",
+          }),
+      );
+    return () => controller.cancelRefreshScope("shell");
+  });
   function abortLookup() {
     request?.abort();
     request = undefined;
@@ -101,13 +147,7 @@
   function openPlayerManager() {
     abortLookup();
     if (lookupDialog.open) lookupDialog.close();
-    managingPlayers = true;
-  }
-  async function lookupFromManager(name?: string, refresh = false) {
-    managingPlayers = false;
-    await tick();
-    openLookup(name);
-    if (refresh) void lookup(name!);
+    navigate("/players");
   }
   function openSearch() {
     if (!searchDialog.open) searchDialog.showModal();
@@ -171,11 +211,25 @@
         (p) => p.id === id && p.source === "hiscores",
       );
       if (existing) controller.selectProfile(existing.id);
-      if (!existing || !existing.questImportStatus) {
+      if (!existing) {
         openLookup(name);
         void lookup(name);
       }
     });
+    const refreshSelected = () => {
+      if (
+        $ready &&
+        selectedView &&
+        document.visibilityState !== "hidden" &&
+        profile?.source === "hiscores"
+      )
+        void controller.refreshPlayers([profile.id], {
+          staleOnly: true,
+          scope: "shell",
+        });
+    };
+    const refreshTimer = window.setInterval(refreshSelected, 60_000);
+    document.addEventListener("visibilitychange", refreshSelected);
     const keydown = (event: KeyboardEvent) => {
       if (event.key === "Escape") mobileNav = false;
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
@@ -197,6 +251,8 @@
       abortLookup();
       window.removeEventListener("keydown", keydown);
       headerSize.disconnect();
+      window.clearInterval(refreshTimer);
+      document.removeEventListener("visibilitychange", refreshSelected);
       document.documentElement.style.removeProperty("--topbar-height");
     };
   });
@@ -345,7 +401,40 @@
             ><ArrowDownToLine size={16} /> Export progress</Button
           >
         </div>{/if}
-      {#if $ready && route !== "skills" && profile?.source === "hiscores" && profile.questImportStatus && profile.questImportStatus !== "available"}<div
+      {#if $ready && selectedView && profile?.source === "hiscores" && $sync[profile.id]?.state === "error"}
+        <div class="notice" role="status">
+          <div>
+            <strong>The latest public-data refresh failed</strong>
+            <p>Showing previously saved data. {$sync[profile.id].message}</p>
+            {#if $sync[profile.id].nextRefreshAt}<small
+                >Next request after {new Date(
+                  $sync[profile.id].nextRefreshAt!,
+                ).toLocaleString()}</small
+              >{/if}
+          </div>
+          <Button
+            variant="quiet"
+            onclick={() => {
+              if (profile) void controller.refreshPlayers([profile.id]);
+            }}>Retry refresh</Button
+          >
+        </div>
+      {:else if $ready && selectedView && profile?.hiscoresImportStatus && profile.hiscoresImportStatus !== "available"}
+        <div class="notice" role="status">
+          <div>
+            <strong>Hiscores data unavailable</strong>
+            <p>
+              {profile.hiscoresImportStatus === "unranked-or-unavailable"
+                ? "Jagex has no main Hiscores entry for this player."
+                : "The Hiscores source could not be refreshed."} Available quest and
+              activity data is kept. {profile.hiscoresLevels
+                ? "Previous public skill data is retained."
+                : "Skill levels remain unrecorded unless entered manually."}
+            </p>
+          </div>
+        </div>
+      {/if}
+      {#if $ready && ["journey", "quests", "play"].includes(route) && profile?.source === "hiscores" && $sync[profile.id]?.state !== "error" && profile.questImportStatus && profile.questImportStatus !== "available"}<div
           class="notice quest-import-notice"
           role="status"
         >
@@ -362,11 +451,14 @@
                 : ""}
             </p>
           </div>
-          <Button variant="quiet" onclick={() => openLookup(profile?.name)}
-            >Retry lookup</Button
+          <Button
+            variant="quiet"
+            onclick={() => {
+              if (profile) void controller.refreshPlayers([profile.id]);
+            }}>Retry lookup</Button
           >
         </div>{/if}
-      {#if $ready && profile}
+      {#if $ready && (profile || ["players", "groups", "activity"].includes(route))}
         {@render children()}
       {:else if $ready}
         <section class="panel empty-player-state">
@@ -553,8 +645,9 @@
         the header after import).
       </p>
       <p>
-        Public data may be cached for up to five minutes. Refreshing keeps your
-        existing planning settings, packing checks and notes.
+        Public data is cached for up to ten minutes; Jagex caching can add
+        delay. Refreshing keeps your planning settings, packing checks and
+        notes.
       </p>
       {#if lookupError}<p role="alert">{lookupError}</p>{/if}
       {#if lookupLoading}<p role="status">Looking up player…</p>{/if}
@@ -565,8 +658,4 @@
       </div>
     </form>
   </dialog>
-  {#if managingPlayers}<PlayerManager
-      onDismiss={() => (managingPlayers = false)}
-      onLookup={(name, refresh) => void lookupFromManager(name, refresh)}
-    />{/if}
 </div>

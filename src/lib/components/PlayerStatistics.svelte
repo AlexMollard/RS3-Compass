@@ -86,11 +86,19 @@
         profile.questProgress?.fetchedAt === profile.statistics.fetchedAt &&
         profile.questImportStatus === "available"
           ? "Public snapshot"
-          : "Main RS3 Hiscores"} · fetched {date(profile.statistics.fetchedAt)}
+          : "Main RS3 Hiscores"} · {profile.hiscoresImportStatus &&
+        profile.hiscoresImportStatus !== "available"
+          ? "last available"
+          : "fetched"}
+        {date(profile.statistics.fetchedAt)}
       </p>
     {:else}
       <p class="statistics-source">
-        Refresh in Saved players to load public XP and ranks.
+        {profile.hiscoresImportStatus === "unranked-or-unavailable"
+          ? "Jagex has no main Hiscores entry. Available quests and activity are separate."
+          : profile.hiscoresImportStatus === "service-unavailable"
+            ? "The Hiscores refresh is unavailable; other public sources may still be loaded."
+            : "Refresh in Players to load public XP and ranks."}
       </p>
     {/if}
     {#if !skill && profile.questProgress && (profile.questProgress.fetchedAt !== profile.statistics?.fetchedAt || profile.questImportStatus !== "available")}

@@ -1,248 +1,338 @@
 <script lang="ts">
-  import { onMount, tick } from "svelte";
-  import { ChevronRight, X } from "@lucide/svelte";
-  import { getCompass } from "../compassContext";
-  import Button from "./Button.svelte";
-  import IconButton from "./IconButton.svelte";
+  import { getCompass, getPlayerActions } from "../compassContext";
   import GameArt from "./GameArt.svelte";
+  import Button from "./Button.svelte";
+  import SearchField from "./SearchField.svelte";
+  import ChoiceStrip from "./ChoiceStrip.svelte";
   import PlayerStatistics from "./PlayerStatistics.svelte";
   import RecentActivity from "./RecentActivity.svelte";
 
-  let {
-    onDismiss,
-    onLookup,
-  }: {
-    onDismiss: () => void;
-    onLookup: (name?: string, refresh?: boolean) => void;
-  } = $props();
   const controller = getCompass();
+  const actions = getPlayerActions();
   const saved = controller.state;
-  const storageError = controller.storageError;
-  let players = $derived($saved.profiles);
+  const sync = controller.syncState;
+  let search = $state("");
+  let scope = $state("all");
   let removing = $state<string | null>(null);
-  let expandedSnapshot = $state<string | null>(null);
-  let dialog: HTMLDialogElement;
-  onMount(() => {
-    dialog.showModal();
-    return () => dialog.close();
-  });
-  function select(id: string) {
-    controller.selectProfile(id);
-    onDismiss();
-  }
-  async function remove(id: string) {
-    controller.removePlayer(id);
-    removing = null;
-    await tick();
-    dialog
-      .querySelector<HTMLButtonElement>(".player-open, .player-manager-add")
-      ?.focus();
-  }
+  let expanded = $state<Record<string, boolean>>({});
+  let players = $derived(
+    $saved.profiles
+      .filter(
+        (p) =>
+          p.name
+            .toLocaleLowerCase()
+            .includes(search.trim().toLocaleLowerCase()) &&
+          (scope === "all" ||
+            (scope === "public"
+              ? p.source === "hiscores"
+              : p.source !== "hiscores")),
+      )
+      .toSorted(
+        (a, b) =>
+          Number(b.id === $saved.activeId) - Number(a.id === $saved.activeId) ||
+          a.name.localeCompare(b.name),
+      ),
+  );
+  const date = (value: number) => new Date(value).toLocaleString();
 </script>
 
-<dialog
-  class="app-dialog player-manager"
-  bind:this={dialog}
-  aria-labelledby="players-title"
-  oncancel={(event) => {
-    event.preventDefault();
-    onDismiss();
-  }}
->
-  <div class="dialog-heading">
-    <h2 id="players-title">Saved players</h2>
-    <IconButton framed={false} label="Close player manager" onclick={onDismiss}
-      ><X size={20} /></IconButton
+<div class="player-tools">
+  <SearchField
+    value={search}
+    onChange={(value) => (search = value)}
+    label="Find a saved player"
+    placeholder="Find a player…"
+  />
+  <ChoiceStrip
+    label="Show players"
+    name="player-scope"
+    value={scope}
+    choices={[
+      { value: "all", label: "All" },
+      { value: "public", label: "Public players" },
+      { value: "sample", label: "Sample / manual" },
+    ]}
+    onChange={(value) => (scope = value)}
+  />
+</div>
+<div class="player-list">
+  {#each players as player (player.id)}
+    {@const status = $sync[player.id]}
+    {@const busy = status?.state === "queued" || status?.state === "refreshing"}
+    <section
+      class="player-card"
+      class:selected={player.id === $saved.activeId}
+      aria-label={player.name}
     >
-  </div>
-  <p>
-    Players and their Compass progress are stored on this device. Refreshing
-    reads public game data; it keeps your notes and packing checks.
-  </p>
-  <div class="player-list">
-    {#each players as player (player.id)}
-      <section
-        class="player-row"
-        class:is-active={player.id === $saved.activeId}
-        aria-label={player.name}
-      >
-        <button
-          type="button"
-          class="player-open"
-          aria-label={"Open " + player.name}
-          aria-current={player.id === $saved.activeId ? "true" : undefined}
-          onclick={() => select(player.id)}
-        >
-          <GameArt
-            file={player.kind === "Group Ironman"
-              ? "Group_Ironman_badge.png"
-              : "Ironman_badge.png"}
-            size={28}
-          />
-          <span
-            ><strong
-              >{player.name}{#if player.id === $saved.activeId}<small>
-                  · Selected</small
-                >{/if}</strong
-            ><small
-              >{player.mode === "f2p" ? "F2P" : "Members"} · {Object.keys(
-                player.levels,
-              ).length} recorded skills</small
-            ></span
-          ><ChevronRight size={17} />
-        </button>
-        <p class="player-updated">
-          {player.source !== "hiscores"
-            ? "Fictional sample profile"
-            : player.hiscoresFetchedAt
-              ? "Data fetched: " +
-                new Date(player.hiscoresFetchedAt).toLocaleString()
-              : "Not refreshed yet"}
-        </p>
-        {#if player.id === $saved.activeId && player.source === "hiscores"}
-          <details
-            class="player-snapshot"
-            ontoggle={(event) =>
-              (expandedSnapshot = event.currentTarget.open ? player.id : null)}
-          >
-            <summary>Quest points, XP &amp; recent activity</summary>
-            <PlayerStatistics profile={player} activities />
-            {#if player.questImportStatus && player.questImportStatus !== "available"}
-              <p class="player-updated">
-                {player.questImportStatus === "not-member"
-                  ? "Jagex reports this account is not an active member."
-                  : player.questImportStatus === "private-or-unavailable"
-                    ? "Quest data is private or unavailable."
-                    : "The quest service is unavailable."} Existing Compass checks
-                are kept.
-              </p>
-            {/if}
-            <RecentActivity
-              playerName={player.name}
-              events={player.eventLog?.events}
-              fetchedAt={player.eventLog?.fetchedAt}
-              status={player.eventImportStatus}
-              active={expandedSnapshot === player.id}
-            />
-          </details>
-        {/if}
-        {#if removing === player.id}
-          <p class="removal-warning" role="alert">
-            Remove {player.name} and their locally saved Compass progress? This cannot
-            be undone and does not affect RuneScape.
+      <div class="player-heading">
+        <GameArt
+          file={player.kind === "Group Ironman"
+            ? "Group_Ironman_badge.png"
+            : "Ironman_badge.png"}
+          size={36}
+        />
+        <div>
+          <h2>
+            <a href="/" onclick={() => controller.selectProfile(player.id)}
+              >{player.name}</a
+            >
+          </h2>
+          <p>
+            {player.id === $saved.activeId
+              ? "Selected character · "
+              : ""}{player.source === "hiscores"
+              ? "Public player"
+              : "Fictional sample / manual"}
           </p>
-          <div class="player-actions">
+        </div>
+      </div>
+      <div class="player-facts">
+        <span>{Object.keys(player.levels).length} recorded skills</span>
+        {#if player.questProgress}<span
+            >{player.questProgress.questPoints} / {player.questProgress
+              .maxQuestPoints} quest points</span
+          >{/if}
+        <span>{player.mode === "f2p" ? "F2P" : "Members"} planning</span>
+      </div>
+      <p class="source">
+        {(player.publicFetchedAt ?? player.hiscoresFetchedAt) != null
+          ? "Public lookup · " +
+            date((player.publicFetchedAt ?? player.hiscoresFetchedAt)!)
+          : "No public snapshot"}
+        {#if player.hiscoresImportStatus && player.hiscoresImportStatus !== "available"}<small
+            >{player.hiscoresImportStatus === "unranked-or-unavailable"
+              ? "No main Hiscores entry; available quests and activity are kept."
+              : "Latest Hiscores refresh unavailable; previous public levels are kept."}</small
+          >{/if}
+      </p>
+      {#if status}<p
+          class="sync-status"
+          class:error={status.state === "error"}
+          role="status"
+        >
+          {status.state === "queued"
+            ? "Queued for refresh…"
+            : status.state === "refreshing"
+              ? "Refreshing public data…"
+              : (status.message ?? "Snapshot loaded.")}
+          {#if status.nextRefreshAt && !busy}<small
+              >Next request after {date(status.nextRefreshAt)}</small
+            >{/if}
+        </p>{/if}
+      <div class="actions">
+        <Button
+          variant={player.id === $saved.activeId ? "quiet" : "secondary"}
+          aria-pressed={player.id === $saved.activeId}
+          onclick={() => controller.selectProfile(player.id)}
+          >{player.id === $saved.activeId ? "Selected" : "Use player"}</Button
+        >
+        {#if player.source === "hiscores"}<Button
+            disabled={busy}
+            onclick={() => void controller.refreshPlayers([player.id])}
+            >{busy ? "Refreshing…" : "Refresh"}</Button
+          >{/if}
+        <a
+          class="activity-link"
+          href={"/activity?player=" + encodeURIComponent(player.id)}
+          >Activity →</a
+        >
+      </div>
+      <details class="settings">
+        <summary>Planning settings</summary>
+        <ChoiceStrip
+          label={"Planning type for " + player.name}
+          name={"kind-" + player.id}
+          value={player.kind}
+          choices={[
+            {
+              value: "Solo Ironman",
+              label: "Solo Ironman",
+              image: "Ironman_badge.png",
+            },
+            {
+              value: "Group Ironman",
+              label: "Group Ironman",
+              image: "Group_Ironman_badge.png",
+            },
+          ]}
+          onChange={(value) =>
+            controller.updatePlayer(player.id, {
+              kind: value as "Solo Ironman" | "Group Ironman",
+              mode: player.mode,
+            })}
+        />
+        <ChoiceStrip
+          label={"Access planning for " + player.name}
+          name={"mode-" + player.id}
+          value={player.mode}
+          choices={[
+            { value: "f2p", label: "F2P" },
+            { value: "members", label: "Members" },
+          ]}
+          onChange={(value) =>
+            controller.updatePlayer(player.id, {
+              kind: player.kind,
+              mode: value as "f2p" | "members",
+            })}
+        />
+        <p class="source">
+          Planning settings do not verify account type, membership or group
+          membership.
+        </p>
+      </details>
+      {#if player.source === "hiscores"}<details
+          class="snapshot"
+          ontoggle={(event) => (expanded[player.id] = event.currentTarget.open)}
+        >
+          <summary>Public statistics and recent activity</summary>
+          <PlayerStatistics profile={player} activities />
+          {#if player.questImportStatus && player.questImportStatus !== "available"}<p
+              class="source"
+            >
+              Latest quest data is unavailable. Existing Compass checks and any
+              previous snapshot are kept.
+            </p>{/if}
+          <RecentActivity
+            playerName={player.name}
+            events={player.eventLog?.events}
+            fetchedAt={player.eventLog?.fetchedAt}
+            status={player.eventImportStatus}
+            active={expanded[player.id] ?? false}
+          />
+        </details>{/if}
+      <div class="removal">
+        {#if removing === player.id}<p role="alert">
+            Remove {player.name} and their local notes, packing and plans? This cannot
+            be undone. Export anything you want to keep first.
+          </p>
+          <div class="actions">
             <Button
-              className="remove-confirm"
-              onclick={() => void remove(player.id)}
-              >Remove from this device</Button
+              onclick={() => {
+                controller.removePlayer(player.id);
+                removing = null;
+              }}>Remove from this device</Button
             ><Button onclick={() => (removing = null)}>Keep player</Button>
           </div>
-        {:else}
-          <div class="player-actions">
-            {#if player.source === "hiscores"}
-              <Button
-                variant="quiet"
-                onclick={() => onLookup(player.name, true)}
-                >Refresh &amp; open</Button
-              >
-            {/if}
-            <Button
-              variant="quiet"
-              aria-label={"Remove " + player.name + " from this device"}
-              onclick={() => (removing = player.id)}>Remove</Button
-            >
-          </div>
-        {/if}
-      </section>
-    {:else}
-      <p class="empty-state">
-        No saved players yet. Look up a player to get started.
-      </p>
-    {/each}
-  </div>
-  {#if $storageError}<div class="notice" role="alert">
-      <div>
-        <strong>Changes could not be saved.</strong>
-        <p>
-          Export your progress before closing this tab. A removed player may
-          return after reloading if the browser cannot save the removal.
-        </p>
-        <Button onclick={controller.exportProgress}>Export progress</Button>
+        {:else}<Button
+            variant="quiet"
+            aria-label={"Remove " + player.name + " from this device"}
+            onclick={() => (removing = player.id)}>Remove</Button
+          >{/if}
       </div>
-    </div>{/if}
-  <div class="detail-actions">
-    <Button
-      className="player-manager-add"
-      variant="primary"
-      onclick={() => onLookup()}>Look up another player</Button
-    ><Button onclick={onDismiss}>Done</Button>
-  </div>
-</dialog>
+    </section>
+  {:else}<div class="empty-state">
+      <h2>
+        {search || scope !== "all" ? "No matching players" : "No saved players"}
+      </h2>
+      <p>
+        {search || scope !== "all"
+          ? "Change the search or filter."
+          : "Look up a public player to start a separate preparation journal."}
+      </p>
+      <Button onclick={() => actions.lookup()}>Add a player</Button>
+    </div>{/each}
+</div>
 
 <style>
+  .player-tools {
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) auto;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
   .player-list {
     display: grid;
-    gap: 12px;
-    margin: 18px 0;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+    gap: 18px;
+    align-items: start;
   }
-  .player-row {
+  .player-card {
     min-width: 0;
-    padding: 10px;
+    padding: 20px;
     border: 1px solid var(--line);
-    border-radius: 5px;
+    background: var(--panel);
+    border-radius: 4px;
   }
-  .player-row.is-active {
+  .player-card.selected {
     border-color: var(--gold);
   }
-  .player-open {
-    width: 100%;
+  .player-heading {
     display: flex;
     align-items: center;
-    gap: 10px;
-    text-align: left;
-    padding: 4px;
+    gap: 12px;
   }
-  .player-open > span {
-    flex: 1;
-    min-width: 0;
+  h2 {
+    margin: 0;
+    font-size: 1.2rem;
   }
-  .player-open small {
-    display: block;
+  h2 a {
+    color: var(--text);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .player-heading p {
+    margin: 4px 0 0;
     color: var(--muted);
     font-size: var(--font-caption);
   }
-  .player-open strong small {
-    display: inline;
-    color: var(--gold-bright);
-  }
-  .player-updated {
-    color: var(--muted);
-    font-size: var(--font-caption);
-    padding: 4px;
-  }
-  .player-snapshot {
-    margin-top: 8px;
-    padding: 0 4px;
-  }
-  .player-snapshot > summary {
-    cursor: pointer;
-    min-height: 44px;
-    padding-top: 10px;
-  }
-  .player-actions {
+  .player-facts {
     display: flex;
     flex-wrap: wrap;
+    gap: 6px 16px;
+    margin: 16px 0 8px;
+    font-size: var(--font-caption);
+  }
+  .source,
+  .sync-status {
+    color: var(--muted);
+    font-size: var(--font-caption);
+    overflow-wrap: anywhere;
+  }
+  .sync-status small,
+  .source small {
+    display: block;
+    margin-top: 4px;
+  }
+  .sync-status.error {
+    color: var(--gold-bright);
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
     gap: 8px;
-    margin-top: 8px;
+    margin: 14px 0;
   }
-  .removal-warning {
-    color: #e8b3a8;
-    padding: 8px 4px;
+  .activity-link {
+    margin-left: auto;
+    color: var(--gold-bright);
+    text-underline-offset: 3px;
   }
-  .player-manager :global(.remove-confirm) {
-    color: #f1c1b7;
-    border-color: #ad6d60;
-    background: #5b302b;
+  details {
+    border-top: 1px solid var(--line);
+    padding-top: 12px;
+    margin-top: 12px;
+  }
+  summary {
+    cursor: pointer;
+    min-height: 36px;
+  }
+  .removal {
+    border-top: 1px solid var(--line);
+    margin-top: 12px;
+    padding-top: 8px;
+  }
+  .removal p {
+    font-size: var(--font-caption);
+  }
+  @media (max-width: 700px) {
+    .player-tools {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .player-card {
+      padding: 16px;
+    }
   }
 </style>

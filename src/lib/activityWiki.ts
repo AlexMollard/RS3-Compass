@@ -138,6 +138,17 @@ export function createActivityWikiLookup(
   ): Promise<Map<string, ActivityWikiArticle>> {
     const result = new Map<string, ActivityWikiArticle>();
     if (signal?.aborted) return result;
+    if (titles.length > 50) {
+      for (
+        let start = 0;
+        start < titles.length && !signal?.aborted;
+        start += 50
+      ) {
+        const batch = await lookup(titles.slice(start, start + 50), signal);
+        for (const [title, article] of batch) result.set(title, article);
+      }
+      return result;
+    }
     const waiting = new Map<string, Promise<ActivityWikiArticle | null>>();
     const missing = new Map<string, string>();
     for (const title of titles) {
@@ -170,7 +181,7 @@ export function createActivityWikiLookup(
       return lookup(titles, signal);
     }
     if (missing.size) {
-      // The source log is capped at 20 events, so one query covers every new subject.
+      // Anonymous MediaWiki queries accept at most 50 titles.
       const batchTitles = [...missing.values()].sort();
       const url = new URL("https://runescape.wiki/api.php");
       url.search = new URLSearchParams({
