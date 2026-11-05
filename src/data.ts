@@ -1,4 +1,5 @@
 import type { SkillName } from "./skillNames.ts";
+import { CORE_SKILLS } from "./skillsCore.ts";
 import { COMBAT_SKILLS } from "./skillsCombat.ts";
 import { ARTISAN_SKILLS } from "./skillsArtisan.ts";
 import { SUPPORT_SKILLS } from "./skillsSupport.ts";
@@ -23,6 +24,7 @@ export interface Profile {
   activeTask: string;
   notes: Record<string, string>;
   trainingRanges?: Record<string, number>;
+  trainingMethods?: Record<string, string>;
   source?: "sample" | "hiscores";
   hiscoresFetchedAt?: number;
   questImportStatus?:
@@ -67,6 +69,28 @@ export interface ItemReference {
   image: string;
   aliases?: string[];
 }
+export interface TrainingSite {
+  label: string;
+  wiki: string;
+  map: QuestRecord["start"]["map"];
+  access?: string;
+  image?: string;
+}
+export interface TrainingOption {
+  id: string;
+  title: string;
+  wiki: string;
+  image: string;
+  members?: boolean;
+  locations: string[];
+  sites: TrainingSite[];
+  locationNote?: string;
+  method: string;
+  benefit: string;
+  requirements?: string[];
+  risks?: string;
+  supplies?: string[];
+}
 export interface SkillRecord {
   name: SkillName;
   category: string;
@@ -75,17 +99,17 @@ export interface SkillRecord {
   description: string;
   goal: number;
   payoff: string;
+  maxLevel: number;
   freeToPlayCap?: number;
   trainingWiki?: string;
   stages: {
     from: number;
     to: number;
     title: string;
-    locations: string[];
-    memberLocations?: string[];
     members?: boolean;
-    method: string;
+    method?: string;
     supplies: string[];
+    options: TrainingOption[];
   }[];
   membersNote: string;
   wiki: string;
@@ -341,143 +365,7 @@ export const QUESTS: QuestRecord[] = QUEST_ORDER.map((id) =>
 );
 
 export const SKILLS: SkillRecord[] = [
-  {
-    name: "Mining",
-    category: "Gathering",
-    icon: "Mining.png",
-    artwork: "Mining_detail.png",
-    description:
-      "Mining methods and equipment for gathering your next Smithing materials.",
-    goal: 20,
-    payoff: "Gather the ores for your next Smithing milestone.",
-    stages: [
-      {
-        from: 1,
-        to: 10,
-        title: "Copper ore & tin ore",
-        locations: ["Burthorpe mine"],
-        method:
-          "Mine copper ore and tin ore for bronze bars. Fill an ore box and deposit at the nearby furnace's metal bank.",
-        supplies: ["A suitable pickaxe", "An ore box if available"],
-      },
-      {
-        from: 10,
-        to: 20,
-        title: "Iron ore",
-        locations: ["Lumbridge south-west mine"],
-        method:
-          "Mine iron ore; use an iron ore box once you can smith one at 10 Smithing. Until then, bank ore in your inventory.",
-        supplies: [
-          "A level-appropriate pickaxe",
-          "An iron ore box if available",
-        ],
-      },
-      {
-        from: 20,
-        to: 30,
-        title: "Coal",
-        locations: ["Lumbridge south-west mine"],
-        memberLocations: ["Lumbridge south-west mine", "Coal truck mine"],
-        method:
-          "Mine coal for steel bars. Upgrade to a steel ore box when you can smith one at 20 Smithing; bank inventory loads until then.",
-        supplies: ["An upgraded pickaxe", "A steel ore box if available"],
-      },
-      {
-        from: 30,
-        to: 40,
-        title: "Mithril ore",
-        locations: ["Varrock south-east mine"],
-        method:
-          "Mine mithril ore and bank at Varrock east bank. Make a mithril ore box at 30 Smithing when materials permit; before then, bank inventory loads.",
-        supplies: ["An upgraded pickaxe", "A mithril ore box if available"],
-      },
-      {
-        from: 40,
-        to: 50,
-        title: "Adamantite ore & luminite",
-        locations: ["Rimmington mine", "Dwarven luminite mine"],
-        method:
-          "Mine adamantite ore at Rimmington and luminite in the Dwarven mine. Make an adamant ore box at 40 Smithing when materials permit; until then bank inventory loads. Port Sarim has a metal bank.",
-        supplies: ["An upgraded pickaxe", "An adamant ore box if available"],
-      },
-    ],
-    membersNote:
-      "Shared mines remain useful. Coal trucks are a members alternative, not an automatic upgrade.",
-    wiki: "Mining",
-  },
-  {
-    name: "Smithing",
-    category: "Artisan",
-    icon: "Smithing.png",
-    artwork: "Smithing_detail.png",
-    description: "Smelt your gathered ore and make equipment or quest items.",
-    goal: 20,
-    payoff: "Make useful equipment and prepare your own quest inputs.",
-    stages: [
-      {
-        from: 1,
-        to: 10,
-        title: "Bronze foundations",
-        locations: ["Artisans' Workshop"],
-        method:
-          "Smelt your gathered copper and tin into bronze bars, then smith useful equipment. Complete What’s Mine is Yours when eligible.",
-        supplies: ["Copper and tin ore", "A hammer or tool-belt hammer"],
-      },
-      {
-        from: 10,
-        to: 20,
-        title: "Iron equipment",
-        locations: ["Artisans' Workshop"],
-        method:
-          "Make iron equipment from your own ore and complete The Knight’s Sword when ready. Check your new level after claiming the reward.",
-        supplies: ["Iron ore", "Smithing tools"],
-      },
-      {
-        from: 20,
-        to: 30,
-        title: "Build your steel supply",
-        locations: ["Artisans' Workshop"],
-        method:
-          "Gather the required ores for steel, and make upgrades or quest inputs you actually need.",
-        supplies: ["Ore for steel bars", "A hammer"],
-      },
-    ],
-    membersNote:
-      "These shared workshops work in both modes; quest-gated alternatives are not assumed unlocked.",
-    wiki: "Smithing",
-  },
-  {
-    name: "Fishing",
-    category: "Gathering",
-    icon: "Fishing.png",
-    artwork: "Fishing_detail.png",
-    description: "Fishing methods and equipment for a renewable food supply.",
-    goal: 20,
-    payoff: "Support questing and combat with renewable food.",
-    stages: [
-      {
-        from: 1,
-        to: 20,
-        title: "Your first food reserve",
-        locations: ["Lumbridge", "Draynor Village"],
-        method:
-          "Catch raw crayfish in Lumbridge, or raw shrimps at Draynor. Cook your catch for questing and combat.",
-        supplies: ["Appropriate fishing equipment", "Bait where required"],
-      },
-      {
-        from: 20,
-        to: 40,
-        title: "Fly-fishing loop",
-        locations: ["Gunnarsgrunn"],
-        method:
-          "Fly-fish raw trout with feathers; raw salmon unlock at 30 Fishing. Bank or cook what you need.",
-        supplies: ["A fly-fishing rod", "Feathers"],
-      },
-    ],
-    membersNote:
-      "These river spots work in both modes; membership alone does not unlock quest-gated fishing areas.",
-    wiki: "Fishing",
-  },
+  ...CORE_SKILLS,
   ...COMBAT_SKILLS,
   ...ARTISAN_SKILLS,
   ...SUPPORT_SKILLS,
@@ -526,15 +414,6 @@ export const SAMPLE_PROFILES: Profile[] = [
     notes: {},
   },
 ];
-export function stageLocations(
-  stage: SkillRecord["stages"][number],
-  mode: AccessMode,
-): string[] {
-  if (mode === "f2p" && stage.members) return [];
-  return mode === "members" && stage.memberLocations
-    ? stage.memberLocations
-    : stage.locations;
-}
 export function progressionQuests(profile: Profile) {
   return QUESTS.filter(
     (quest) =>
@@ -596,4 +475,42 @@ export function trainingStage(skill: SkillRecord, profile: Profile) {
     stages.find((stage) => level >= stage.from && level < stage.to) ??
     stages[stages.length - 1]
   );
+}
+
+export function availableTrainingOptions(
+  stage: SkillRecord["stages"][number],
+  mode: AccessMode,
+): TrainingOption[] {
+  if (mode === "f2p" && stage.members) return [];
+  return stage.options.filter(
+    (option) => mode === "members" || !option.members,
+  );
+}
+
+export function trainingMethod(
+  skill: SkillRecord,
+  profile: Profile,
+  stage = trainingStage(skill, profile),
+  selectedId = profile.trainingMethods?.[skill.name],
+) {
+  const options = stage ? availableTrainingOptions(stage, profile.mode) : [];
+  return options.find((option) => option.id === selectedId) ?? options[0];
+}
+
+export function trainingSupplies(
+  stage: SkillRecord["stages"][number],
+  option: TrainingOption,
+) {
+  return [...new Set([...stage.supplies, ...(option.supplies ?? [])])];
+}
+
+export function trainingRangeLabel(
+  skill: SkillRecord,
+  stage: SkillRecord["stages"][number],
+  mode: AccessMode,
+) {
+  const cap =
+    mode === "f2p" ? (skill.freeToPlayCap ?? skill.maxLevel) : skill.maxLevel;
+  const end = stage.to >= cap ? cap : stage.to - 1;
+  return `Levels ${stage.from}–${end}`;
 }

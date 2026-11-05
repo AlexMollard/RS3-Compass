@@ -69,7 +69,7 @@
             </div>
           </div>
           <div class="home-map">
-            <WorldMap point={next.start.map} npc={next.start.npc} />
+            <WorldMap point={next.start.map} label={next.start.npc} />
           </div>
         </div>
       {:else}<div class="home-empty">

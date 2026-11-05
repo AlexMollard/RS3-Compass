@@ -33,6 +33,13 @@ function validProfile(value: unknown): value is Profile {
         Object.values(p.trainingRanges).every(
           (n) => Number.isInteger(n) && n >= 1 && n <= 120,
         ))) &&
+    (p.trainingMethods === undefined ||
+      (!!p.trainingMethods &&
+        typeof p.trainingMethods === "object" &&
+        !Array.isArray(p.trainingMethods) &&
+        Object.values(p.trainingMethods).every(
+          (id) => typeof id === "string" && id.length > 0 && id.length <= 128,
+        ))) &&
     !!p.levels &&
     typeof p.levels === "object" &&
     !Array.isArray(p.levels) &&

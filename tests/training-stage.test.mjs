@@ -1,6 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { SAMPLE_PROFILES, SKILLS, trainingStage } from "../src/data.ts";
+import {
+  SAMPLE_PROFILES,
+  SKILLS,
+  trainingStage,
+  trainingMethod,
+  trainingSupplies,
+  availableTrainingOptions,
+} from "../src/data.ts";
 
 const mining = SKILLS.find((skill) => skill.name === "Mining");
 const [first, second] = mining.stages;
@@ -31,4 +38,29 @@ test("interleaved characters retain their own selected method", () => {
   assert.equal(trainingStage(mining, aster), first);
   assert.equal(trainingStage(mining, rowan), mining.stages[2]);
   assert.equal(trainingStage(mining, aster), first);
+});
+
+test("a removed creature choice falls back within the selected range without editing saved preferences", () => {
+  const range = mining.stages[1];
+  const character = {
+    ...profile(),
+    trainingMethods: { Mining: "removed-method" },
+  };
+  const before = structuredClone(character);
+  const method = trainingMethod(mining, character, range);
+  assert.ok(availableTrainingOptions(range, character.mode).includes(method));
+  assert.notEqual(method.id, "removed-method");
+  assert.deepEqual(character, before);
+});
+
+test("packing combines common kit and selected-method ingredients without duplicate checks", () => {
+  const range = { supplies: ["Food", "Coins"] };
+  const choice = { supplies: ["Food", "Feathers"] };
+  assert.deepEqual(trainingSupplies(range, choice), [
+    "Food",
+    "Coins",
+    "Feathers",
+  ]);
+  assert.deepEqual(range.supplies, ["Food", "Coins"]);
+  assert.deepEqual(choice.supplies, ["Food", "Feathers"]);
 });

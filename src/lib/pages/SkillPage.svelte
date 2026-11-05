@@ -3,9 +3,13 @@
   import {
     SKILLS,
     availableStages,
+    availableTrainingOptions,
+    type SkillRecord,
     skillNeedsMembership,
     trainingStage,
-    stageLocations,
+    trainingMethod,
+    trainingSupplies,
+    trainingRangeLabel,
   } from "../../data";
   import { getCompass } from "../compassContext";
   import { skillPath } from "../navigation";
@@ -19,9 +23,9 @@
   import ResponsivePicker from "../components/ResponsivePicker.svelte";
   import SearchField from "../components/SearchField.svelte";
   import SectionHeading from "../components/SectionHeading.svelte";
-  import Tabs from "../components/Tabs.svelte";
+  import TrainingMethods from "../components/TrainingMethods.svelte";
+  import TrainingMap from "../components/TrainingMap.svelte";
   import WikiAction from "../components/WikiAction.svelte";
-  import LocationGallery from "../components/LocationGallery.svelte";
   let { selectedSkill = "" }: { selectedSkill?: string } = $props();
   const controller = getCompass();
   const saved = controller.state;
@@ -33,8 +37,8 @@
     SKILLS.find((s) => s.name === selectedSkill) ?? SKILLS[0],
   );
   let search = $state("");
-  let tab = $state("method");
   let band = $state<number | null>(null);
+  let methodId = $state<string | undefined>(undefined);
   let target = $state(20);
   let level = $state("");
   let message = $state("");
@@ -44,10 +48,21 @@
     if (key !== identity) {
       identity = key;
       band = null;
-      target = skill.goal;
+      methodId = undefined;
+      const recorded = profile.levels[skill.name];
+      target =
+        recorded == null
+          ? Math.min(
+              skill.goal,
+              profile.mode === "f2p"
+                ? (skill.freeToPlayCap ?? skill.maxLevel)
+                : skill.maxLevel,
+            )
+          : (targetOptions.find((value) => value > recorded) ??
+            targetOptions.at(-1) ??
+            skill.goal);
       level = profile.levels[skill.name]?.toString() ?? "";
       message = "";
-      tab = "method";
     }
   });
   let current = $derived(profile.levels[skill.name]);
@@ -61,6 +76,18 @@
       ? undefined
       : (stages.find((s) => s.from === band) ?? trainingStage(skill, profile)),
   );
+  let method = $derived(trainingMethod(skill, profile, stage, methodId));
+  let supplies = $derived(
+    stage && method ? trainingSupplies(stage, method) : [],
+  );
+  function rangeTitle(range: SkillRecord["stages"][number]) {
+    if (profile.mode === "members") return range.title;
+    const options = availableTrainingOptions(range, profile.mode);
+    return (
+      options[0].title +
+      (options.length > 1 ? ` + ${options.length - 1} alternatives` : "")
+    );
+  }
   let targetOptions = $derived.by(() => {
     const cap = profile.mode === "f2p" ? skill.freeToPlayCap : undefined;
     return [
@@ -70,10 +97,12 @@
         30,
         50,
         99,
+        skill.maxLevel,
+        ...stages.map((range) => range.to),
         ...(cap && cap > 0 ? [cap] : []),
       ]),
     ]
-      .filter((value) => cap === undefined || value <= cap)
+      .filter((value) => value <= (cap ?? skill.maxLevel))
       .sort((a, b) => a - b);
   });
   $effect(() => {
@@ -102,11 +131,15 @@
       : skill.name + " level saved on this device.";
   }
   function start() {
-    if (!stage || needsMembership) return;
+    if (!stage || !method || needsMembership) return;
     controller.updateProfile((p) => ({
       ...p,
       activeTask: "train-" + skill.name,
       trainingRanges: { ...p.trainingRanges, [skill.name]: stage!.from },
+      trainingMethods: { ...p.trainingMethods, [skill.name]: method!.id },
+      completedTasks: p.completedTasks.filter(
+        (id) => id !== "train-" + skill.name,
+      ),
     }));
     void goto("/play");
   }
@@ -219,93 +252,85 @@
             <p><GameText text={skill.payoff} /></p>
           </div>
         </div>
-        {#if stage}
-          <section class="detail-section">
-            <SectionHeading title="Choose a training range"
-              >{#snippet aside()}<span class="muted">Training methods</span
-                >{/snippet}</SectionHeading
-            ><ResponsivePicker
-              label="Range"
-              selection={"Levels " + stage.from + "–" + stage.to}
-              ><div class="range-selector">
-                {#each stages as s (s.from)}<NavigationCard
-                    title={"Levels " + s.from + "–" + s.to}
-                    label={"Select levels " + s.from + " to " + s.to}
-                    detail={s.title}
-                    selected={stage === s}
-                    onOpen={() => (band = s.from)}
-                  />{/each}
-              </div></ResponsivePicker
-            >
-          </section>
-          <Tabs
-            variant="detail"
-            label="Training guide sections"
-            value={tab}
-            onChange={(v) => (tab = v)}
-            items={[
-              { value: "method", label: "Method" },
-              { value: "equipment", label: "Gear & tools" },
-              { value: "supplies", label: "Supplies" },
-            ]}
-          />
-          <section class="training-method">
-            {#if tab === "method"}<span class="eyebrow"
-                >LEVEL {stage.from}–{stage.to}</span
-              >
-              <h3><GameText text={stage.title} /></h3>
-              <LocationGallery
-                locations={stageLocations(stage, profile.mode)}
+        <div class="training-workspace">
+          <section class="training-content">
+            {#if stage && method}
+              <label class="training-range">
+                Training range
+                <select
+                  aria-label="Training range"
+                  value={stage.from}
+                  onchange={(event) => {
+                    band = Number(event.currentTarget.value);
+                    methodId = undefined;
+                  }}
+                >
+                  {#each stages as range (range.from)}
+                    <option value={range.from}>
+                      {trainingRangeLabel(skill, range, profile.mode)} · {rangeTitle(
+                        range,
+                      )}
+                    </option>
+                  {/each}
+                </select>
+              </label>
+              <h3>{rangeTitle(stage)}</h3>
+              {#if stage.method}<p><GameText text={stage.method} /></p>{/if}
+              <TrainingMethods
+                {skill}
+                {stage}
                 {profile}
+                selectedId={methodId}
+                onSelect={(id) => (methodId = id)}
               />
-              <p><GameText text={stage.method} /></p>
-              <div class="method-note">
-                Compare full sessions, including travel and banking. No measured
-                XP/hour estimates.
-              </div>{:else if tab === "equipment"}<span class="eyebrow"
-                >TOOLS</span
-              >
-              <h3>Equipment to prepare</h3>
-              <p>Use the best equipment you own and can use.</p>
-              <ItemList items={stage.supplies} />{:else}<span class="eyebrow"
-                >TRAINING SESSION</span
-              >
-              <h3>Gather before you go</h3>
-              <ItemList items={stage.supplies} />
-              <p>Check off items and save notes in Play Companion.</p>{/if}
-          </section>
-          {#if profile.mode === "members"}<div class="notice">
-              <GameArt file={skill.icon} size={20} />
-              <div>
-                <strong>Members content preview</strong>
-                <p><GameText text={skill.membersNote} /></p>
+            {:else}
+              <div class="notice">
+                <div>
+                  <strong
+                    >{needsMembership
+                      ? "Free-to-play access limit"
+                      : "No training method in this view"}</strong
+                  >
+                  <p>
+                    {needsMembership
+                      ? skill.freeToPlayCap === 0
+                        ? "This skill requires membership."
+                        : `The free-to-play trial ends at level ${skill.freeToPlayCap}.`
+                      : "Open the skill reference to review available training."}
+                    Your recorded progress remains safe.
+                  </p>
+                  {#if needsMembership}<Button onclick={switchMembers}
+                      >Switch to Members</Button
+                    >{/if}
+                </div>
               </div>
-            </div>{/if}
-          <div class="detail-actions">
-            <Button variant="primary" onclick={start}>Start packing →</Button
-            ><WikiAction
-              page={skill.trainingWiki ?? skill.wiki}
-              label="Skill reference"
-            />
-          </div>
-        {:else}
-          <div class="notice">
-            <div>
-              <strong>Membership needed for this training</strong>
-              <p>
-                {skill.freeToPlayCap === 0
-                  ? "This skill cannot be trained in free-to-play."
-                  : "Your free-to-play trial has reached its limit, or no free-to-play method is available."}
-                Your recorded progress remains safe.
+            {/if}
+          </section>
+          <aside class="training-preparation">
+            {#if stage && method}
+              <SectionHeading title="Prepare this method" />
+              <ItemList items={supplies} />
+              <Button variant="primary" onclick={start}
+                >Prepare training →</Button
+              >
+              <p class="muted">
+                Your chosen method, packing checks and notes stay on this
+                device.
               </p>
-              <Button onclick={switchMembers}>Switch to Members</Button
-              ><WikiAction
-                page={skill.trainingWiki ?? skill.wiki}
-                label="Skill reference"
+              <TrainingMap {method} />
+            {/if}
+            <div class="training-access">
+              <h3>Access and progression</h3>
+              <p><GameText text={skill.membersNote} /></p>
+              <WikiAction
+                page={profile.mode === "f2p"
+                  ? (skill.trainingWiki ?? skill.wiki)
+                  : skill.wiki}
+                label="Wiki training reference"
               />
             </div>
-          </div>
-        {/if}
+          </aside>
+        </div>
       </div>
     </article>
   </div>
@@ -313,6 +338,11 @@
 
 <style>
   @media (min-width: 1001px) {
+    .training-workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(220px, 0.5fr);
+      gap: 1.5rem;
+    }
     :global(.skill-layout .journal-list) {
       max-height: calc(100dvh - 170px);
       overflow-y: auto;
@@ -323,5 +353,44 @@
       max-height: 60dvh;
       overflow-y: auto;
     }
+  }
+  .training-range {
+    display: grid;
+    gap: 0.5rem;
+    margin-block: 0 1rem;
+  }
+  .training-range select {
+    width: 100%;
+    min-height: 44px;
+    min-width: 0;
+  }
+  .training-content,
+  .training-preparation {
+    min-width: 0;
+  }
+  .training-preparation {
+    padding: 1rem;
+    border: 1px solid var(--line);
+    align-self: start;
+  }
+  .training-preparation > :global(.btn) {
+    margin-block: 1rem 0.5rem;
+    width: 100%;
+  }
+  .training-preparation > p,
+  .training-access p {
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+  .training-access {
+    border-top: 1px solid var(--line);
+    margin-top: 1rem;
+    padding-top: 1rem;
+  }
+  .training-access h3 {
+    font-size: 0.95rem;
+  }
+  .training-content > p {
+    line-height: 1.6;
   }
 </style>

@@ -2,13 +2,23 @@
   import { onMount } from "svelte";
   import type * as Leaflet from "leaflet";
   import type { QuestRecord } from "../../data";
-  import { wikiImage } from "../../wiki";
+  import { wikiHref, wikiImage } from "../../wiki";
   import { externalMapUrl, questMapCenter, wikiTileUrl } from "../../wikiMap";
   import "leaflet/dist/leaflet.css";
   import "../../WorldMap.css";
 
   type Point = QuestRecord["start"]["map"];
-  let { point, npc }: { point: Point; npc: string } = $props();
+  let {
+    point,
+    label,
+    markerIcon = "Quest_map_icon.png",
+    markerWiki,
+  }: {
+    point: Point;
+    label: string;
+    markerIcon?: string;
+    markerWiki?: string;
+  } = $props();
   const bounds: Leaflet.LatLngBoundsExpression = [
     [0, 0],
     [12800, 6400],
@@ -17,19 +27,25 @@
   let map: Leaflet.Map | undefined;
   let marker: Leaflet.Marker | undefined;
   let tiles: Leaflet.TileLayer | undefined;
+  let makeIcon: ((file: string) => Leaflet.Icon) | undefined;
   let plane: Point["plane"] = 0;
   let mapId = 28;
   let visible = $state(false);
   let ready = $state(false);
   let tileFailed = $state(false);
-  let rendered = $state<{ point: Point; npc: string } | null>(null);
+  let rendered = $state<{
+    point: Point;
+    label: string;
+    markerIcon: string;
+  } | null>(null);
   let pending = $derived(
     !rendered ||
       rendered.point.x !== point.x ||
       rendered.point.y !== point.y ||
       rendered.point.plane !== point.plane ||
       rendered.point.mapId !== point.mapId ||
-      rendered.npc !== npc,
+      rendered.label !== label ||
+      rendered.markerIcon !== markerIcon,
   );
 
   onMount(() => {
@@ -62,14 +78,20 @@
       tiles.on("tileerror", () => {
         tileFailed = true;
       });
-      marker = L.marker(questMapCenter(point), {
-        icon: L.icon({
-          iconUrl: wikiImage("Quest_map_icon.png"),
+      makeIcon = (file) =>
+        L.icon({
+          iconUrl: wikiImage(file),
           iconSize: [28, 28],
           iconAnchor: [14, 14],
-        }),
+        });
+      marker = L.marker(questMapCenter(point), {
+        icon: makeIcon(markerIcon),
         keyboard: true,
       }).addTo(map);
+      marker.on("click", () => {
+        if (markerWiki)
+          window.open(wikiHref(markerWiki), "_blank", "noopener,noreferrer");
+      });
       intersection = new IntersectionObserver(([entry]) => {
         visible = entry.isIntersecting;
       });
@@ -94,12 +116,14 @@
   $effect(() => {
     const selected = {
       point: { x: point.x, y: point.y, plane: point.plane, mapId: point.mapId },
-      npc,
+      label,
+      markerIcon,
     };
-    if (!ready || !map || !tiles || !marker) return;
+    if (!ready || !map || !tiles || !marker || !makeIcon) return;
     const currentMap = map;
     const currentTiles = tiles;
     const currentMarker = marker;
+    const icon = makeIcon;
     // Detach immediately while hidden or changing selection, so no old-view tiles load.
     if (currentMap.hasLayer(currentTiles)) currentMap.removeLayer(currentTiles);
     if (!visible) return;
@@ -109,18 +133,18 @@
       tileFailed = false;
       const position = questMapCenter(selected.point);
       currentMarker.setLatLng(position);
-      const label = document.createElement("span");
-      label.textContent = selected.npc;
-      currentMarker.bindTooltip(label, {
+      if (rendered?.markerIcon !== selected.markerIcon)
+        currentMarker.setIcon(icon(selected.markerIcon));
+      const tooltip = document.createElement("span");
+      tooltip.textContent = selected.label;
+      currentMarker.bindTooltip(tooltip, {
         permanent: true,
         direction: "top",
         offset: [0, -16],
       });
       currentMap.invalidateSize();
       currentMap.setView(position, 2, { animate: false });
-      currentMarker
-        .getElement()
-        ?.setAttribute("aria-label", `${selected.npc} — quest start`);
+      currentMarker.getElement()?.setAttribute("aria-label", selected.label);
       currentTiles.addTo(currentMap);
       rendered = selected;
     }, 300);
@@ -128,7 +152,7 @@
   });
 </script>
 
-<section class="world-map" aria-label={`Map of ${npc}'s quest start`}>
+<section class="world-map" aria-label={`Map of ${label}`}>
   <div class="world-map-stage" aria-busy={pending}>
     <button
       class="world-map-recenter"
@@ -142,7 +166,7 @@
       class="world-map-canvas"
       inert={pending}
       aria-hidden={pending}
-      aria-label={`Interactive map showing ${npc}'s quest start`}
+      aria-label={`Interactive map showing ${label}`}
     ></div>
     {#if pending}<div class="world-map-loading" role="status">
         Preparing map…

@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { get } from "svelte/store";
 import { createCompassController } from "../src/lib/profileStore.ts";
+import { SKILLS, trainingMethod } from "../src/data.ts";
 
 const KEY = "rs3-compass-design-v1";
 const player = {
@@ -52,6 +53,7 @@ test("Refreshing public levels retains manual progress, chosen session and acces
     completedTasks: ["train-Smithing"],
     notes: { "train-Mining": "Bank first" },
     trainingRanges: { Mining: 30 },
+    trainingMethods: { Mining: "mithril" },
     activeTask: "train-Mining",
   }));
   const before = structuredClone(current(controller));
@@ -323,4 +325,51 @@ test("Private or unavailable quest responses never erase previously imported or 
     assert.equal(current(controller).questImportStatus, reason);
     assert.equal(current(controller).mode, "members");
   }
+});
+
+test("a cached training choice survives reload and a temporary free-play view without affecting other players", (t) => {
+  const descriptor = Object.getOwnPropertyDescriptor(
+    globalThis,
+    "localStorage",
+  );
+  const storage = new Map();
+  Object.defineProperty(globalThis, "localStorage", {
+    configurable: true,
+    value: {
+      getItem: (key) => storage.get(key) ?? null,
+      setItem: (key, value) => storage.set(key, value),
+    },
+  });
+  const first = createCompassController();
+  const restored = createCompassController();
+  t.after(() => {
+    first.destroy();
+    restored.destroy();
+    if (descriptor)
+      Object.defineProperty(globalThis, "localStorage", descriptor);
+    else delete globalThis.localStorage;
+  });
+  const mining = SKILLS.find((skill) => skill.name === "Mining");
+  const range = mining.stages.find(
+    (stage) => !stage.members && stage.options.some((option) => option.members),
+  );
+  const chosen = range.options.find((option) => option.members);
+  first.initialize();
+  const otherPlayers = structuredClone(get(first.state).profiles.slice(1));
+  first.updateProfile((p) => ({
+    ...p,
+    mode: "members",
+    trainingRanges: { Mining: range.from },
+    trainingMethods: { Mining: chosen.id },
+  }));
+  restored.initialize();
+  assert.equal(trainingMethod(mining, current(restored)).id, chosen.id);
+  restored.updateProfile((p) => ({ ...p, mode: "f2p" }));
+  assert.equal(
+    trainingMethod(mining, current(restored)).members ?? false,
+    false,
+  );
+  restored.updateProfile((p) => ({ ...p, mode: "members" }));
+  assert.equal(trainingMethod(mining, current(restored)).id, chosen.id);
+  assert.deepEqual(get(restored.state).profiles.slice(1), otherPlayers);
 });

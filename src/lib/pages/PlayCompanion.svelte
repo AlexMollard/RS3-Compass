@@ -4,9 +4,11 @@
     SKILLS,
     nextQuest,
     skillNeedsMembership,
-    stageLocations,
     toggleItem,
     trainingStage,
+    trainingMethod,
+    trainingRangeLabel,
+    trainingSupplies,
   } from "../../data";
   import { getCompass } from "../compassContext";
   import { questPath, skillPath } from "../navigation";
@@ -17,8 +19,8 @@
   import ItemList from "../components/ItemList.svelte";
   import PageHeading from "../components/PageHeading.svelte";
   import SectionHeading from "../components/SectionHeading.svelte";
-  import WikiAction from "../components/WikiAction.svelte";
-  import LocationGallery from "../components/LocationGallery.svelte";
+  import TrainingMethods from "../components/TrainingMethods.svelte";
+  import TrainingMap from "../components/TrainingMap.svelte";
   const controller = getCompass();
   const saved = controller.state;
   const compact = controller.compact;
@@ -32,12 +34,14 @@
       : undefined,
   );
   let stage = $derived(skill ? trainingStage(skill, profile) : undefined);
-  let locked = $derived(
-    !!skill && (skillNeedsMembership(skill, profile) || !stage),
+  let locked = $derived(!!skill && skillNeedsMembership(skill, profile));
+  let method = $derived(
+    skill ? trainingMethod(skill, profile, stage) : undefined,
   );
   let done = $derived(profile.completedTasks.includes(task));
-  let places = $derived(stage ? stageLocations(stage, profile.mode) : []);
-  let packing = $derived(stage?.supplies ?? []);
+  let packing = $derived(
+    stage && method ? trainingSupplies(stage, method) : [],
+  );
   let packedItems = $derived(
     packing.filter((item) => profile.packed.includes(task + "::" + item)),
   );
@@ -79,7 +83,9 @@
           wiki={skill.wiki}
           image={skill.icon}
           artwork={skill.artwork}
-          eyebrow={stage ? `LEVELS ${stage.from}–${stage.to}` : "TRAINING"}
+          eyebrow={stage
+            ? trainingRangeLabel(skill, stage, profile.mode).toUpperCase()
+            : "TRAINING"}
         />
         <div class="detail-body">
           {#if locked}
@@ -107,7 +113,7 @@
                   >{/if}
               </div>
             </div>
-          {:else if stage}
+          {:else if stage && method}
             <div class="session-context">
               <p><GameText text={skill.payoff} /></p>
             </div>
@@ -139,27 +145,25 @@
                   Checks are manual; they do not read your bank or inventory.
                 </p>{/if}
             </section>
-            {#if places.length}<section class="detail-section">
-                <SectionHeading title="Where to train" /><LocationGallery
-                  locations={places}
-                  {profile}
-                />
-              </section>{/if}
             <section class="detail-section">
-              <SectionHeading title="Your training method">
-                {#snippet aside()}<WikiAction
-                    page={skill.trainingWiki ?? skill.wiki}
-                    label="Skill reference"
-                  />{/snippet}
-              </SectionHeading>
-              <ol class="session-steps">
-                {#each [stage.method, "Allow for gathering, travel and banking; update your level when finished."] as instruction, index}
-                  <li>
-                    <span>{String(index + 1).padStart(2, "0")}</span>
-                    <p><GameText text={instruction} /></p>
-                  </li>
-                {/each}
-              </ol>
+              <SectionHeading title="Your training method" />
+              {#if stage.method}<p><GameText text={stage.method} /></p>{/if}
+              <TrainingMethods
+                {skill}
+                {stage}
+                {profile}
+                onSelect={(id) =>
+                  controller.updateProfile((p) => ({
+                    ...p,
+                    trainingMethods: {
+                      ...p.trainingMethods,
+                      [skill!.name]: id,
+                    },
+                    completedTasks: p.completedTasks.filter(
+                      (entry) => entry !== task,
+                    ),
+                  }))}
+              />
             </section>
             <div class="session-warning">
               <p>
@@ -199,10 +203,19 @@
                     >{/if}
                 </div>
               </div>{/if}
+          {:else}
+            <p>
+              No training method is available in this planning view. <Button
+                variant="link"
+                onclick={() => void goto(skillPath(skill!.name))}
+                >Review skill guide →</Button
+              >
+            </p>
           {/if}
         </div>
       </article>
       <aside class="play-rail">
+        {#if !locked && method}<TrainingMap {method} />{/if}
         <ActivityNotes
           value={profile.notes[task] || ""}
           onChange={(value) => {

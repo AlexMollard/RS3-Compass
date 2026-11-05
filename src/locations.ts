@@ -1,3 +1,4 @@
+import { CORE_LOCATIONS } from "./skillsCore.ts";
 import { COMBAT_LOCATIONS } from "./skillsCombat.ts";
 import { ARTISAN_LOCATIONS } from "./skillsArtisan.ts";
 import { SUPPORT_LOCATIONS } from "./skillsSupport.ts";
@@ -164,6 +165,7 @@ export const LOCATIONS: Record<string, LocationRecord> = {
       "A village on the River Lum with fly-fishing spots and pottery facilities.",
     access: "Trout requires 20 Fishing; salmon requires 30.",
   },
+  ...CORE_LOCATIONS,
   ...COMBAT_LOCATIONS,
   ...ARTISAN_LOCATIONS,
   ...SUPPORT_LOCATIONS,

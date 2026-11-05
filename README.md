@@ -1,24 +1,25 @@
 <div align="center">
   <img src="static/compass.svg" alt="RS3 Compass" width="88">
 
-  # RS3 Compass
+# RS3 Compass
 
-  **RuneScape 3 quest preparation and skill planning.**
+**RuneScape 3 quest preparation and skill planning.**
 
-  [Open RS3 Compass](https://rs3-compass.mollard.deno.net/) · [RuneScape Wiki](https://runescape.wiki/)
+[Open RS3 Compass](https://rs3-compass.mollard.deno.net/) · [RuneScape Wiki](https://runescape.wiki/)
 
-  <a href="https://runescape.wiki/w/Iron_bar"><img src="https://runescape.wiki/images/Iron_bar.png?0292b" alt="Iron bar" width="40"></a>
-  &nbsp;&nbsp;
-  <a href="https://runescape.wiki/w/Redberry_pie"><img src="https://runescape.wiki/images/Redberry_pie.png?19b0c" alt="Redberry pie" width="40"></a>
-  &nbsp;&nbsp;
-  <a href="https://runescape.wiki/w/Coins"><img src="https://runescape.wiki/images/Coins_1000.png?1a0ce" alt="Coins" width="40"></a>
+<a href="https://runescape.wiki/w/Iron_bar"><img src="https://runescape.wiki/images/Iron_bar.png?0292b" alt="Iron bar" width="40"></a>
+&nbsp;&nbsp;
+<a href="https://runescape.wiki/w/Redberry_pie"><img src="https://runescape.wiki/images/Redberry_pie.png?19b0c" alt="Redberry pie" width="40"></a>
+&nbsp;&nbsp;
+<a href="https://runescape.wiki/w/Coins"><img src="https://runescape.wiki/images/Coins_1000.png?1a0ce" alt="Coins" width="40"></a>
 </div>
 
 ## Your preparation journal
 
 - **Quests:** Prepare for all 54 F2P quests and 9 miniquests/sagas, checked against November 2026 sources. Requirements, linked item artwork, packing, notes, combat risks, NPC start maps and completion tracking share one workspace.
-- **Skills:** Explore starter and early-to-mid training guides for all 29 skills, with destinations and preparation references.
+- **Skills:** Plan all 29 skills through their current level caps. Compare level-range methods, Ironman drops and resource benefits, access checks and risks; save a chosen method with its packing list and notes.
 - **Players:** Look up and cache public player data, keep separate local plans, or explore with removable fictional sample players. Public quest completion may be unavailable when RuneMetrics data is private or inaccessible.
+- **Training locations:** Switch between creature areas and individual resource sites on Wiki maps, with linked creature/resource artwork. Portable processing explains where to prepare without inventing a fixed node.
 
 Compass is a preparation companion, not a walkthrough or an exhaustive guide to the game. Check the in-game journal and linked Wiki articles for current details.
 

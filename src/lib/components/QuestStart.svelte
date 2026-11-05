@@ -36,5 +36,5 @@
     </p>
     {#if start.access}<p class="quest-start-access">{start.access}</p>{/if}
   </div>
-  {#if showMap}<WorldMap point={start.map} npc={start.npc} />{/if}
+  {#if showMap}<WorldMap point={start.map} label={start.npc} />{/if}
 </article>

@@ -1,6 +1,7 @@
 import { QUESTS, type ItemReference } from "../data.ts";
 import { LOCATIONS } from "../locations.ts";
 import { RS3_SKILL_NAMES } from "../skillNames.ts";
+import { CORE_ITEMS } from "../skillsCore.ts";
 import { COMBAT_ITEMS } from "../skillsCombat.ts";
 import { ARTISAN_ITEMS } from "../skillsArtisan.ts";
 import { SUPPORT_ITEMS } from "../skillsSupport.ts";
@@ -188,6 +189,7 @@ const items: ItemReference[] = [
     wiki: "Deathwarden_robe_armour",
     image: "Deathwarden_robe_top_(tier_10).png",
   },
+  ...CORE_ITEMS,
   ...COMBAT_ITEMS,
   ...ARTISAN_ITEMS,
   ...SUPPORT_ITEMS,
@@ -223,6 +225,17 @@ const references: Reference[] = [
   ...[
     { name: "Kili Row", wiki: "Kili_Row" },
     { name: "Bar Crawl", wiki: "Bar_Crawl_(miniquest)" },
+    { name: "Priest in Peril", wiki: "Priest_in_Peril" },
+    { name: "Ghosts Ahoy", wiki: "Ghosts_Ahoy" },
+    { name: "Smoking Kills", wiki: "Smoking_Kills" },
+    { name: "The Jack of Spades", wiki: "The_Jack_of_Spades" },
+    { name: "Jack of Spades", wiki: "The_Jack_of_Spades" },
+    { name: "Swan Song", wiki: "Swan_Song" },
+    { name: "Plague's End", wiki: "Plague's_End" },
+    { name: "The Great Brain Robbery", wiki: "The_Great_Brain_Robbery" },
+    { name: "The Branches of Darkmeyer", wiki: "The_Branches_of_Darkmeyer" },
+    { name: "As a First Resort", wiki: "As_a_First_Resort" },
+    { name: "Barbarian Training", wiki: "Barbarian_Training" },
   ].map((quest) => ({
     ...quest,
     aliases: [quest.name.replaceAll("'", "’")],

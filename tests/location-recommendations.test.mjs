@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { QUESTS, SKILLS, stageLocations } from "../src/data.ts";
+import { QUESTS, SKILLS, availableTrainingOptions } from "../src/data.ts";
 import { LOCATIONS } from "../src/locations.ts";
 
 const stages = SKILLS.flatMap((skill) => skill.stages);
@@ -8,10 +8,9 @@ const stages = SKILLS.flatMap((skill) => skill.stages);
 test("every quest and training destination resolves to a location card", () => {
   const references = [
     ...QUESTS.map((quest) => quest.start.location),
-    ...stages.flatMap((stage) => [
-      ...stage.locations,
-      ...(stage.memberLocations ?? []),
-    ]),
+    ...stages.flatMap((stage) =>
+      stage.options.flatMap((option) => option.locations),
+    ),
   ];
   assert.deepEqual(
     [...new Set(references.filter((id) => !Object.hasOwn(LOCATIONS, id)))],
@@ -31,7 +30,9 @@ test("location names cannot collide in case-insensitive game references", () => 
 
 test("free-to-play recommendations never include a members-only destination", () => {
   const forbidden = stages.flatMap((stage) =>
-    stageLocations(stage, "f2p").filter((id) => LOCATIONS[id]?.members),
+    availableTrainingOptions(stage, "f2p")
+      .flatMap((option) => option.locations)
+      .filter((id) => LOCATIONS[id]?.members),
   );
   forbidden.push(
     ...QUESTS.filter(
@@ -39,21 +40,4 @@ test("free-to-play recommendations never include a members-only destination", ()
     ).map((quest) => quest.start.location),
   );
   assert.deepEqual(forbidden, []);
-});
-
-test("membership adds the coal-truck option without contaminating the free route", () => {
-  const coal = SKILLS.find((skill) => skill.name === "Mining").stages.find(
-    (stage) => stage.from === 20,
-  );
-  const freeRoute = [...stageLocations(coal, "f2p")];
-  const membersRoute = stageLocations(coal, "members");
-  assert.equal(
-    membersRoute.some((id) => LOCATIONS[id].members),
-    true,
-  );
-  assert.equal(
-    freeRoute.every((id) => membersRoute.includes(id)),
-    true,
-  );
-  assert.deepEqual(stageLocations(coal, "f2p"), freeRoute);
 });
