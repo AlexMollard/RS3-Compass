@@ -9,6 +9,12 @@ import { TALE_QUESTS } from "./questsTales.ts";
 import { ADVENTURE_QUESTS } from "./questsAdventures.ts";
 import { SIDE_QUESTS } from "./questsSideActivities.ts";
 import { SEASONAL_QUESTS } from "./questsSeasonal.ts";
+import type {
+  PlayerEvent,
+  PlayerImportStatus,
+  PlayerQuestProgress,
+  PlayerStatistics,
+} from "./lib/playerTypes.ts";
 
 export type AccessMode = "f2p" | "members";
 export type Page = "journey" | "play" | "quests" | "skills";
@@ -27,8 +33,11 @@ export interface Profile {
   trainingMethods?: Record<string, string>;
   source?: "sample" | "hiscores";
   hiscoresFetchedAt?: number;
-  questImportStatus?:
-    "available" | "private-or-unavailable" | "service-unavailable";
+  questImportStatus?: PlayerImportStatus;
+  eventImportStatus?: PlayerImportStatus;
+  statistics?: PlayerStatistics & { fetchedAt: number };
+  questProgress?: PlayerQuestProgress & { fetchedAt: number };
+  eventLog?: { events: PlayerEvent[]; fetchedAt: number };
 }
 export interface QuestRecord {
   id: string;

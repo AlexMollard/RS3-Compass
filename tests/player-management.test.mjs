@@ -2,13 +2,9 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { get } from "svelte/store";
 import { createCompassController } from "../src/lib/profileStore.ts";
+import { platformPlayer } from "./fixtures/platform-player.mjs";
 
-const player = (name) => ({
-  name,
-  levels: { Mining: 30 },
-  fetchedAt: 1234,
-  quests: { status: "unavailable", reason: "private-or-unavailable" },
-});
+const player = (name) => platformPlayer({ name, levels: { Mining: 30 } });
 
 test("Removing an inactive player does not select another account or alter remaining progress", () => {
   const controller = createCompassController();

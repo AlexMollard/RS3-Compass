@@ -1,61 +1,47 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { normalizePlayerName } from "../src/lib/playerName.ts";
 import {
   createPlayerLookupService,
   parseHiscores,
   PLAYER_CACHE_MS,
 } from "../src/lib/server/playerLookup.ts";
+import { normalizePlayerName } from "../src/lib/playerName.ts";
+import { RS3_SKILL_NAMES } from "../src/skillNames.ts";
 
-const names = [
-  "Attack",
-  "Defence",
-  "Strength",
-  "Constitution",
-  "Ranged",
-  "Prayer",
-  "Magic",
-  "Cooking",
-  "Woodcutting",
-  "Fletching",
-  "Fishing",
-  "Firemaking",
-  "Crafting",
-  "Smithing",
-  "Mining",
-  "Herblore",
-  "Agility",
-  "Thieving",
-  "Slayer",
-  "Farming",
-  "Runecrafting",
-  "Hunter",
-  "Construction",
-  "Summoning",
-  "Dungeoneering",
-  "Divination",
-  "Invention",
-  "Archaeology",
-  "Necromancy",
-];
-const rows = () => [
-  "50,3232,5709998811",
-  ...names.map((_, i) => `${9000 + i},${10 + i},${1000000 + i}`),
-  "500,40",
-];
-const response = () => new Response(rows().join("\r\n"));
-const withQuests = (hiscores) => (url, options) =>
-  url.hostname === "apps.runescape.com"
-    ? Promise.resolve(
-        new Response(
-          JSON.stringify({
-            quests: [{ title: "Cook's Assistant", status: "NOT_STARTED" }],
-          }),
-        ),
-      )
-    : hiscores(url, options);
+const payload = (name = "Example") => ({
+  name,
+  skills: [
+    { name: "Overall", rank: 2, level: 2000, xp: 5000000000 },
+    ...RS3_SKILL_NAMES.map((name) => ({
+      name:
+        name === "Constitution"
+          ? "Hitpoints"
+          : name === "Runecrafting"
+            ? "Runecraft"
+            : name,
+      rank: 10,
+      level: 50,
+      xp: 100,
+    })),
+  ],
+  activities: [{ id: 999, name: "RuneScore", rank: 4, score: 0 }],
+});
+const json = (value, status = 200) =>
+  new Response(JSON.stringify(value), { status });
+const auxiliary = (url) => {
+  const name = decodeURIComponent(url.pathname.split("/").at(-1));
+  return url.pathname.includes("playerQuests")
+    ? json({ name, qp: 0, qp_max: 500, quests: {} })
+    : json({ name, events: [] });
+};
+const fetchAll = (calls) => async (url) => {
+  calls.push(url.toString());
+  return url.pathname.includes("index_lite")
+    ? json(payload(url.searchParams.get("player")))
+    : auxiliary(url);
+};
 
-test("Names normalise RuneScape separators without admitting URL or control-character payloads", () => {
+test("names normalize RuneScape separators while rejecting URL, control and length payloads", () => {
   assert.equal(normalizePlayerName("  Iron__Name  "), "Iron Name");
   assert.equal(normalizePlayerName("Abcdefghijkl"), "Abcdefghijkl");
   for (const value of [
@@ -64,176 +50,274 @@ test("Names normalise RuneScape separators without admitting URL or control-char
     "name&player=x",
     "name\r\nHost:x",
     "https://x",
+    "../bad",
     null,
   ])
     assert.throws(() => normalizePlayerName(value));
 });
 
-test("Hiscores levels map to all current RS3 skills, not rank, XP, Overall or activity rows", () => {
-  const player = parseHiscores(rows().join("\r\n"), "Example", 1234);
-  assert.deepEqual(player, {
-    name: "Example",
-    fetchedAt: 1234,
-    levels: Object.fromEntries(names.map((name, i) => [name, i + 10])),
+test("named shuffled skills and activities preserve unknowns and zeroes", () => {
+  const data = payload();
+  data.skills.reverse();
+  const attack = data.skills.find((s) => s.name === "Attack");
+  attack.level = 0;
+  attack.rank = -1;
+  attack.xp = 0;
+  const mining = data.skills.find((s) => s.name === "Mining");
+  mining.level = -1;
+  mining.xp = -1;
+  data.activities.push({
+    id: 0,
+    name: "Clue Scrolls (easy)",
+    rank: -1,
+    score: -1,
   });
+  const result = parseHiscores(data, "Example", 1);
+  assert.equal(result.levels.Attack, undefined);
+  assert.equal(result.levels.Mining, undefined);
+  assert.deepEqual(result.statistics.skills.Attack, { xp: 0 });
+  assert.deepEqual(result.statistics.skills.Mining, { rank: 10 });
+  assert.deepEqual(result.statistics.overall, {
+    level: 2000,
+    xp: 5000000000,
+    rank: 2,
+  });
+  assert.equal(result.levels.Overall, undefined);
+  assert.deepEqual(result.statistics.activities, [
+    { name: "RuneScore", rank: 4, score: 0 },
+    { name: "Clue Scrolls (easy)" },
+  ]);
 });
 
-test("Unranked skills stay unknown, while published level one is retained", () => {
-  const input = rows();
-  input[1] = "-1,-1,-1";
-  input[2] = "-1,0,0";
-  input[3] = "-1,1,0";
-  const { levels } = parseHiscores(input.join("\n"), "Example", 0);
-  assert.equal("Attack" in levels, false);
-  assert.equal("Defence" in levels, false);
-  assert.equal(levels.Strength, 1);
-  assert.equal(levels.Necromancy, 38);
+test("missing, duplicate, invalid and malformed skill responses fail closed", () => {
+  for (const mutate of [
+    (d) => d.skills.pop(),
+    (d) => d.skills.push(d.skills[0]),
+    (d) => {
+      d.skills[1].rank = 0;
+    },
+    (d) => {
+      d.skills[1].level = 121;
+    },
+    (d) => {
+      d.activities[0].score = -2;
+    },
+  ]) {
+    const data = payload();
+    mutate(data);
+    assert.throws(() => parseHiscores(data, "Example", 1));
+  }
+  assert.throws(() => parseHiscores("<html>", "Example", 1));
 });
 
-test("Incomplete, HTML and out-of-bound upstream responses cannot become saved player data", () => {
-  const invalid = rows();
-  invalid[15] = "3,121,42";
-  for (const input of [
-    "<html>Unavailable</html>",
-    rows().slice(0, 12).join("\n"),
-    invalid.join("\n"),
-  ])
-    assert.throws(
-      () => parseHiscores(input, "Example", 0),
-      (error) => error.status === 502,
-    );
+test("concurrent aliases share all three requests and ten minute cache", async () => {
+  let time = 1000;
+  const calls = [];
+  const service = createPlayerLookupService(fetchAll(calls), () => time);
+  const [a, b] = await Promise.all([
+    service.lookup("Example_Name"),
+    service.lookup("example name"),
+  ]);
+  assert.strictEqual(a, b);
+  assert.equal(calls.length, 3);
+  time += PLAYER_CACHE_MS - 1;
+  await service.lookup("example name");
+  assert.equal(calls.length, 3);
+  time++;
+  await service.lookup("example name");
+  assert.equal(calls.length, 6);
 });
 
-test("Concurrent case/separator aliases share one combined lookup, cache valid data, then refresh after expiry", async () => {
-  let clock = 1000,
-    calls = 0,
-    release;
-  const gate = new Promise((resolve) => (release = resolve));
+test("not-found caching skips auxiliary requests but recovers when a public entry becomes available", async () => {
+  let time = 0,
+    found = false;
+  const calls = [];
+  const success = fetchAll(calls);
   const service = createPlayerLookupService(
-    withQuests(async () => {
-      calls++;
-      await gate;
-      return response();
-    }),
-    () => clock,
+    async (url) => {
+      if (found) return success(url);
+      calls.push(url.toString());
+      return new Response(null, { status: 404 });
+    },
+    () => time,
   );
-  const first = service.lookup("Iron_Name"),
-    second = service.lookup("iron name");
-  release();
-  assert.deepEqual(await first, await second);
-  assert.equal(calls, 1);
-  await service.lookup("IRON NAME");
-  assert.equal(calls, 1);
-  clock += PLAYER_CACHE_MS + 1;
-  const refreshed = await service.lookup("Iron Name");
-  assert.equal(calls, 2);
-  assert.equal(refreshed.fetchedAt, clock);
+  await assert.rejects(service.lookup("Example"), { status: 404 });
+  found = true;
+  time = 29_999;
+  await assert.rejects(service.lookup("example"), { status: 404 });
+  assert.equal(calls.length, 1);
+  time = 30_000;
+  assert.equal((await service.lookup("Example")).levels.Mining, 50);
+  assert.equal(calls.length, 4);
 });
 
-test("A transient rejection releases single-flight state so the next attempt can recover", async () => {
+test("budget counts actual calls, allows hits, and avoids reserving unsent requests", async () => {
+  let time = 0;
+  const calls = [];
+  const service = createPlayerLookupService(fetchAll(calls), () => time);
+  for (let i = 0; i < 20; i++) await service.lookup("Player " + i);
+  assert.equal(calls.length, 60);
+  await service.lookup("Player 0");
+  assert.equal(calls.length, 60);
+  await assert.rejects(service.lookup("Player 20"), { status: 429 });
+  assert.equal(calls.length, 60);
+  time = 60000;
+  await service.lookup("Player 20");
+  assert.equal(calls.length, 63);
+});
+
+test("partial response at budget boundary keeps levels and retries after short cache", async () => {
+  let time = 0;
   let calls = 0;
   const service = createPlayerLookupService(
-    withQuests(() => {
-      if (++calls === 1) throw new Error("Network down");
-      return Promise.resolve(response());
-    }),
-  );
-  await assert.rejects(
-    service.lookup("Example"),
-    (error) => error.status === 502,
-  );
-  assert.equal((await service.lookup("Example")).levels.Mining, 24);
-  assert.equal(calls, 2);
-});
-
-test("Not-found results are short-cached without blocking recovery after expiry", async () => {
-  let clock = 0,
-    calls = 0;
-  const service = createPlayerLookupService(
-    withQuests(async () =>
-      ++calls === 1 ? new Response("Not found", { status: 404 }) : response(),
-    ),
-    () => clock,
-  );
-  await assert.rejects(
-    service.lookup("Unranked"),
-    (error) => error.status === 404,
-  );
-  await assert.rejects(
-    service.lookup("unranked"),
-    (error) => error.status === 404,
-  );
-  assert.equal(calls, 1);
-  clock += 31_000;
-  assert.equal((await service.lookup("Unranked")).levels.Attack, 10);
-  assert.equal(calls, 2);
-});
-
-test("Upstream concurrency is bounded while identical pending names can still join", async () => {
-  let release,
-    calls = 0;
-  const gate = new Promise((resolve) => (release = resolve));
-  const service = createPlayerLookupService(
-    withQuests(async () => {
+    async (url) => {
       calls++;
-      await gate;
-      return response();
-    }),
+      if (url.pathname.includes("index_lite"))
+        return url.searchParams.get("player").startsWith("Missing")
+          ? new Response(null, { status: 404 })
+          : json(payload());
+      return auxiliary(url);
+    },
+    () => time,
   );
-  const pending = Array.from({ length: 8 }, (_, i) =>
-    service.lookup("Player " + i),
-  );
-  await assert.rejects(
-    service.lookup("Extra"),
-    (error) => error.status === 429,
-  );
-  const joined = service.lookup("player 0");
-  release();
-  await Promise.all([...pending, joined]);
-  assert.equal(calls, 8);
-});
-
-test("The per-minute miss budget protects the upstream without rejecting cached lookups", async () => {
-  let clock = 0,
-    calls = 0;
-  const service = createPlayerLookupService(
-    withQuests(async () => {
-      calls++;
-      return response();
-    }),
-    () => clock,
-  );
-  for (let i = 0; i < 60; i++) await service.lookup("Player " + i);
-  await assert.rejects(
-    service.lookup("Over budget"),
-    (error) => error.status === 429,
-  );
-  await service.lookup("Player 0");
+  for (let i = 0; i < 58; i++)
+    await assert.rejects(service.lookup("Missing " + i), { status: 404 });
+  const result = await service.lookup("Example");
   assert.equal(calls, 60);
-  clock = 60_001;
-  await service.lookup("Over budget");
-  assert.equal(calls, 61);
+  assert.equal(result.levels.Mining, 50);
+  assert.equal(result.quests.status, "available");
+  assert.deepEqual(result.events, {
+    status: "unavailable",
+    reason: "service-unavailable",
+  });
+  time = 60000;
+  const refreshed = await service.lookup("Example");
+  assert.equal(refreshed.events.status, "available");
+  assert.equal(calls, 63);
 });
 
-test("The bounded player cache retains a hot entry while evicting the least recently used account", async () => {
-  let clock = 0;
-  const calls = new Map();
-  const service = createPlayerLookupService(
-    withQuests(async (url) => {
-      const name = url.searchParams.get("player");
-      calls.set(name, (calls.get(name) ?? 0) + 1);
-      return response();
-    }),
-    () => clock,
+test("bounded concurrency joins pending aliases and releases after failure", async () => {
+  let release,
+    fail = true,
+    calls = 0;
+  const gate = new Promise((resolve) => {
+    release = resolve;
+  });
+  const service = createPlayerLookupService(async (url) => {
+    calls++;
+    if (url.pathname.includes("index_lite")) {
+      await gate;
+      if (fail) return new Response(null, { status: 503 });
+      return json(payload(url.searchParams.get("player")));
+    }
+    return auxiliary(url);
+  });
+  const pending = Array.from({ length: 8 }, (_, i) =>
+    service.lookup("Player " + i).catch((e) => e),
   );
-  for (let index = 0; index < 128; index++) {
-    if (index > 0 && index % 50 === 0) clock += 60_001;
-    await service.lookup("Cached " + index);
+  const alias = service.lookup("PLAYER 0").catch((e) => e);
+  await assert.rejects(service.lookup("Player 9"), { status: 429 });
+  release();
+  await Promise.all([...pending, alias]);
+  assert.equal(calls, 8);
+  fail = false;
+  assert.equal((await service.lookup("Player 0")).levels.Mining, 50);
+  assert.equal(calls, 11);
+});
+
+test("LRU eviction preserves recently used entries", async () => {
+  let time = 0;
+  const calls = [];
+  const service = createPlayerLookupService(fetchAll(calls), () => time);
+  // Move time so rate window resets without expiring the positive cache.
+  for (let i = 0; i < 128; i++) {
+    if (i % 20 === 0) time += 60000;
+    await service.lookup("Player " + i);
   }
-  await service.lookup("Cached 0");
-  await service.lookup("Cached 128");
-  await service.lookup("Cached 0");
-  await service.lookup("Cached 1");
-  assert.equal(calls.get("Cached 0"), 1);
-  assert.equal(calls.get("Cached 1"), 2);
+  await service.lookup("Player 0");
+  time += 60000;
+  await service.lookup("Player 128");
+  const before = calls.length;
+  await service.lookup("Player 0");
+  assert.equal(calls.length, before);
+  await service.lookup("Player 1");
+  assert.equal(calls.length, before + 3);
+});
+
+test("known nonmember events use the normal cache without hiding a later membership change", async () => {
+  let time = 0,
+    member = false;
+  const calls = [];
+  const success = fetchAll(calls);
+  const service = createPlayerLookupService(
+    async (url) => {
+      if (!member && url.pathname.includes("playerEvents")) {
+        calls.push(url.toString());
+        return json({ error: "PLAYER_NOT_MEMBER" }, 403);
+      }
+      return success(url);
+    },
+    () => time,
+  );
+  assert.equal((await service.lookup("Example")).events.reason, "not-member");
+  member = true;
+  time = PLAYER_CACHE_MS - 1;
+  assert.equal((await service.lookup("example")).events.reason, "not-member");
+  assert.equal(calls.length, 3);
+  time++;
+  assert.equal((await service.lookup("Example")).events.status, "available");
+  assert.equal(calls.length, 6);
+});
+
+test("the rolling request budget expires old calls without forgetting more recent traffic", async () => {
+  let time = 0,
+    calls = 0;
+  const service = createPlayerLookupService(
+    async () => {
+      calls++;
+      return new Response(null, { status: 404 });
+    },
+    () => time,
+  );
+  for (let index = 0; index < 40; index++)
+    await assert.rejects(service.lookup("Absent " + index), { status: 404 });
+  time = 59_000;
+  for (let index = 40; index < 60; index++)
+    await assert.rejects(service.lookup("Absent " + index), { status: 404 });
+  time = 60_000;
+  for (let index = 60; index < 100; index++)
+    await assert.rejects(service.lookup("Absent " + index), { status: 404 });
+  await assert.rejects(service.lookup("Absent 100"), { status: 429 });
+  assert.equal(calls, 100);
+  await assert.rejects(service.lookup("Absent 40"), { status: 404 });
+  assert.equal(calls, 100);
+  time = 119_000;
+  await assert.rejects(service.lookup("Absent 100"), { status: 404 });
+  assert.equal(calls, 101);
+});
+
+test("Jagex wire names import Constitution and Runecrafting without relying on row position", () => {
+  const data = payload();
+  Object.assign(
+    data.skills.find((skill) => skill.name === "Hitpoints"),
+    { level: 99, xp: 200000000, rank: 311 },
+  );
+  Object.assign(
+    data.skills.find((skill) => skill.name === "Runecraft"),
+    { level: 110, xp: 200000000, rank: 147 },
+  );
+  data.skills.reverse();
+  const player = parseHiscores(data, "Example", 1234);
+  assert.equal(player.levels.Constitution, 99);
+  assert.equal(player.levels.Runecrafting, 110);
+  assert.equal(player.levels.Hitpoints, undefined);
+  assert.equal(player.levels.Runecraft, undefined);
+  assert.deepEqual(player.statistics.skills.Constitution, {
+    xp: 200000000,
+    rank: 311,
+  });
+  assert.deepEqual(player.statistics.skills.Runecrafting, {
+    xp: 200000000,
+    rank: 147,
+  });
 });

@@ -5,6 +5,8 @@
   import Button from "./Button.svelte";
   import IconButton from "./IconButton.svelte";
   import GameArt from "./GameArt.svelte";
+  import PlayerStatistics from "./PlayerStatistics.svelte";
+  import RecentActivity from "./RecentActivity.svelte";
 
   let {
     onDismiss,
@@ -18,6 +20,7 @@
   const storageError = controller.storageError;
   let players = $derived($saved.profiles);
   let removing = $state<string | null>(null);
+  let expandedSnapshot = $state<string | null>(null);
   let dialog: HTMLDialogElement;
   onMount(() => {
     dialog.showModal();
@@ -96,6 +99,33 @@
                 new Date(player.hiscoresFetchedAt).toLocaleString()
               : "Not refreshed yet"}
         </p>
+        {#if player.id === $saved.activeId && player.source === "hiscores"}
+          <details
+            class="player-snapshot"
+            ontoggle={(event) =>
+              (expandedSnapshot = event.currentTarget.open ? player.id : null)}
+          >
+            <summary>Quest points, XP &amp; recent activity</summary>
+            <PlayerStatistics profile={player} activities />
+            {#if player.questImportStatus && player.questImportStatus !== "available"}
+              <p class="player-updated">
+                {player.questImportStatus === "not-member"
+                  ? "Jagex reports this account is not an active member."
+                  : player.questImportStatus === "private-or-unavailable"
+                    ? "Quest data is private or unavailable."
+                    : "The quest service is unavailable."} Existing Compass checks
+                are kept.
+              </p>
+            {/if}
+            <RecentActivity
+              playerName={player.name}
+              events={player.eventLog?.events}
+              fetchedAt={player.eventLog?.fetchedAt}
+              status={player.eventImportStatus}
+              active={expandedSnapshot === player.id}
+            />
+          </details>
+        {/if}
         {#if removing === player.id}
           <p class="removal-warning" role="alert">
             Remove {player.name} and their locally saved Compass progress? This cannot
@@ -190,6 +220,15 @@
     color: var(--muted);
     font-size: var(--font-caption);
     padding: 4px;
+  }
+  .player-snapshot {
+    margin-top: 8px;
+    padding: 0 4px;
+  }
+  .player-snapshot > summary {
+    cursor: pointer;
+    min-height: 44px;
+    padding-top: 10px;
   }
   .player-actions {
     display: flex;

@@ -23,6 +23,7 @@
   import TrainingMethods from "../components/TrainingMethods.svelte";
   import TrainingMap from "../components/TrainingMap.svelte";
   import WikiAction from "../components/WikiAction.svelte";
+  import PlayerStatistics from "../components/PlayerStatistics.svelte";
   let { selectedSkill = "" }: { selectedSkill?: string } = $props();
   const controller = getCompass();
   const saved = controller.state;
@@ -181,6 +182,7 @@
       >
       <div class="detail-body">
         <section class="skill-progress-card">
+          <PlayerStatistics {profile} skill={skill.name} />
           <div class="skill-progress-top">
             <div>
               <span class="eyebrow">YOUR RECORDED LEVEL</span>

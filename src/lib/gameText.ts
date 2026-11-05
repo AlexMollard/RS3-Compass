@@ -14,10 +14,12 @@ import { SEASONAL_ITEMS } from "../questsSeasonal.ts";
 import { QUEST_REWARD_ITEMS } from "../questRewardItems.ts";
 import { EQUIPMENT_ITEMS } from "../trainingEquipment.ts";
 
-interface Reference {
+export interface GameTextReference {
   name: string;
   wiki: string;
   image?: string;
+  imageUrl?: string;
+  search?: boolean;
   aliases?: string[];
   kind: "item" | "quest" | "skill" | "place" | "reference";
 }
@@ -203,7 +205,7 @@ const items: ItemReference[] = [
   ...QUEST_REWARD_ITEMS,
   ...EQUIPMENT_ITEMS,
 ];
-const references: Reference[] = [
+const references: GameTextReference[] = [
   ...items.map((item) => ({ ...item, kind: "item" as const })),
   ...Object.values(LOCATIONS).map((location) => ({
     name: location.name,
@@ -267,7 +269,7 @@ const references: Reference[] = [
     kind: "reference" as const,
   })),
 ];
-const byAlias = new Map<string, Reference>();
+const byAlias = new Map<string, GameTextReference>();
 for (const reference of references) {
   for (const alias of [reference.name, ...(reference.aliases || [])]) {
     byAlias.set(alias.toLocaleLowerCase("en"), reference);
@@ -285,9 +287,57 @@ const pattern = new RegExp(
   "giu",
 );
 
-export type GameTextSegment = { text: string; reference?: Reference };
+export type GameTextSegment = { text: string; reference?: GameTextReference };
 
-export function tokenizeGameText(text: string): GameTextSegment[] {
+export function tokenizeGameText(
+  text: string,
+  extra?: readonly GameTextReference[],
+  catalogue = true,
+): GameTextSegment[] {
+  if (extra?.length) {
+    const dynamic = new Map<string, GameTextReference>();
+    for (const reference of extra) {
+      for (const alias of [reference.name, ...(reference.aliases ?? [])]) {
+        if (alias.trim()) dynamic.set(alias.toLocaleLowerCase("en"), reference);
+      }
+    }
+    if (dynamic.size) {
+      const names = [...dynamic.keys()].sort(
+        (left, right) => right.length - left.length,
+      );
+      const expression = new RegExp(
+        "(?<![\\p{L}\\p{N}])(" +
+          names
+            .map((name) => name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+            .join("|") +
+          ")(?![\\p{L}\\p{N}])",
+        "giu",
+      );
+      const result: GameTextSegment[] = [];
+      let cursor = 0;
+      for (const match of text.matchAll(expression)) {
+        if (match.index! > cursor)
+          result.push(
+            ...tokenizeGameText(
+              text.slice(cursor, match.index!),
+              undefined,
+              catalogue,
+            ),
+          );
+        result.push({
+          text: match[0],
+          reference: dynamic.get(match[0].toLocaleLowerCase("en")),
+        });
+        cursor = match.index! + match[0].length;
+      }
+      if (cursor < text.length)
+        result.push(
+          ...tokenizeGameText(text.slice(cursor), undefined, catalogue),
+        );
+      return result;
+    }
+  }
+  if (!catalogue) return text ? [{ text }] : [];
   const segments: GameTextSegment[] = [];
   let cursor = 0;
   for (const match of text.matchAll(pattern)) {

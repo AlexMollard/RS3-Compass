@@ -3,14 +3,13 @@ import assert from "node:assert/strict";
 import { get } from "svelte/store";
 import { createCompassController } from "../src/lib/profileStore.ts";
 import { SKILLS, trainingMethod } from "../src/data.ts";
+import {
+  availableQuests,
+  platformPlayer,
+} from "./fixtures/platform-player.mjs";
 
 const KEY = "rs3-compass-design-v1";
-const player = {
-  name: "Real Player",
-  levels: { Mining: 55, Smithing: 40 },
-  fetchedAt: 1234,
-  quests: { status: "unavailable", reason: "private-or-unavailable" },
-};
+const player = platformPlayer();
 const current = (controller) => {
   const saved = get(controller.state);
   return saved.profiles.find((p) => p.id === saved.activeId);
@@ -73,6 +72,7 @@ test("Refreshing public levels retains manual progress, chosen session and acces
     name: "REAL PLAYER",
     levels: { ...before.levels, Mining: 60, Smithing: 45 },
     hiscoresFetchedAt: 4567,
+    statistics: { ...before.statistics, fetchedAt: 4567 },
   });
   assert.equal(
     get(controller.state).profiles.filter((p) => p.id === before.id).length,
@@ -244,17 +244,14 @@ test("Public completion matches Compass quest identities without importing sampl
   controller.addPlayer(
     {
       ...player,
-      quests: {
-        status: "available",
-        completedTitles: [
-          "COOK’S ASSISTANT",
-          "Dragon Slayer",
-          "DORIC’S TASK IV (MINIQUEST)",
-          "Three's Company (saga)",
-          "Visions of Havenhythe",
-          "A quest outside this catalogue",
-        ],
-      },
+      quests: availableQuests([
+        "COOK’S ASSISTANT",
+        "Dragon Slayer",
+        "DORIC’S TASK IV (MINIQUEST)",
+        "Three's Company (saga)",
+        "Visions of Havenhythe",
+        "A quest outside this catalogue",
+      ]),
     },
     "Solo Ironman",
     "f2p",
@@ -282,10 +279,7 @@ test("Public refresh adds completion without removing manual checks or duplicati
   controller.addPlayer(
     {
       ...player,
-      quests: {
-        status: "available",
-        completedTitles: ["Cook's Assistant", "Cook's Assistant"],
-      },
+      quests: availableQuests(["Cook's Assistant", "Cook's Assistant"]),
     },
     "Solo Ironman",
     "f2p",
@@ -303,7 +297,7 @@ test("Private or unavailable quest responses never erase previously imported or 
   controller.addPlayer(
     {
       ...player,
-      quests: { status: "available", completedTitles: ["Cook's Assistant"] },
+      quests: availableQuests(["Cook's Assistant"]),
     },
     "Solo Ironman",
     "members",
@@ -312,7 +306,11 @@ test("Private or unavailable quest responses never erase previously imported or 
     ...p,
     completedQuests: [...p.completedQuests, "dragon-slayer"],
   }));
-  for (const reason of ["private-or-unavailable", "service-unavailable"]) {
+  for (const reason of [
+    "private-or-unavailable",
+    "not-member",
+    "service-unavailable",
+  ]) {
     controller.addPlayer(
       { ...player, quests: { status: "unavailable", reason } },
       "Solo Ironman",

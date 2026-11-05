@@ -14,6 +14,7 @@
   import PageHeading from "../components/PageHeading.svelte";
   import QuestNavigationCard from "../components/QuestNavigationCard.svelte";
   import WikiAction from "../components/WikiAction.svelte";
+  import PlayerStatistics from "../components/PlayerStatistics.svelte";
   import "../../Journey.css";
   const controller = getCompass();
   const saved = controller.state;
@@ -105,6 +106,7 @@
         </p>
       </GameWindow>
       <GameWindow className="home-levels" title="Recorded levels">
+        {#if profile.source === "hiscores"}<PlayerStatistics {profile} />{/if}
         <SkillGrid
           skills={SKILLS}
           levels={profile.levels}

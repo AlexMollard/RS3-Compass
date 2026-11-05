@@ -17,6 +17,7 @@
   import QuestCombat from "../components/QuestCombat.svelte";
   import QuestStart from "../components/QuestStart.svelte";
   import ActivityNotes from "../components/ActivityNotes.svelte";
+  import QuestPlayerStatus from "../components/QuestPlayerStatus.svelte";
   let { selectedId = "" }: { selectedId?: string } = $props();
   const controller = getCompass();
   const saved = controller.state;
@@ -133,7 +134,7 @@
         <div class="quest-facts">
           <span>{quest.difficulty}</span><span>{quest.length}</span><span
             class:text-green={complete}
-            >{complete ? "Completed" : "Not recorded complete"}</span
+            >{complete ? "Compass: Completed" : "Not marked complete"}</span
           >
           {#if quest.kind && quest.kind !== "quest"}<span
               >{quest.kind === "saga" ? "Saga" : "Miniquest"}</span
@@ -147,6 +148,7 @@
               class="badge">Members to finish</span
             >{/if}
         </div>
+        <QuestPlayerStatus {profile} {quest} />
         <section class="prep-reason">
           <h3>Purpose</h3>
           <p><GameText text={quest.why} /></p>

@@ -129,9 +129,7 @@
       lookupLoading = false;
       lookupDialog.close();
       controller.notify(
-        player.quests.status === "available"
-          ? "Levels and public quest completion imported. Manual checks are kept."
-          : "Levels imported. Jagex quest data was unavailable; existing checks are kept.",
+        "Public player snapshot loaded. Existing checks are kept.",
       );
     } catch (error) {
       if (current.signal.aborted || request !== current) return;
@@ -356,7 +354,12 @@
             <p>
               {profile.questImportStatus === "private-or-unavailable"
                 ? "Jagex did not expose quest status for this player. Existing checks are kept; you can mark completion manually."
-                : "The quest service could not be reached. Existing checks are kept."}
+                : profile.questImportStatus === "not-member"
+                  ? "Jagex reports this account is not an active member. Existing checks are kept; planning mode does not change membership."
+                  : "The quest service could not be reached. Existing checks are kept."}
+              {profile.questProgress
+                ? " The last successful snapshot is stale."
+                : ""}
             </p>
           </div>
           <Button variant="quiet" onclick={() => openLookup(profile?.name)}
@@ -471,10 +474,10 @@
     </p>
     <h3>Your data</h3>
     <p>
-      Hiscores supplies public levels. RuneMetrics supplies quest completion
-      when available; private or unavailable quest data never clears existing
-      checks. Membership and Ironman kind are your planning choices. Sample
-      profiles are fictional.
+      Hiscores supplies public levels and statistics. Jagex's Adventurer's Log
+      supplies available quest status and recent events; unavailable data never
+      clears existing checks. Membership and Ironman kind are planning choices,
+      not account membership. Sample profiles are fictional.
     </p>
     <p>
       Progress stays in this browser. A functional cookie remembers the selected
@@ -519,9 +522,9 @@
       >
     </div>
     <p>
-      Import public Hiscores levels and available RuneMetrics quest completion.
-      Private or unavailable quest data will not erase your manual checks.
-      Membership and Ironman type remain planning settings.
+      Import public Hiscores and available Adventurer's Log quest and event
+      data. Unavailable data will not erase your manual checks or last
+      successful snapshot. Membership and Ironman type remain planning settings.
     </p>
     <form
       onsubmit={(event) => {

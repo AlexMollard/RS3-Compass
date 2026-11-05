@@ -1,104 +1,138 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { parseQuestResponse } from "../src/lib/server/questLookup.ts";
+import {
+  parseQuestResponse,
+  lookupQuests,
+} from "../src/lib/server/questLookup.ts";
 import { createPlayerLookupService } from "../src/lib/server/playerLookup.ts";
 import { RS3_SKILL_NAMES } from "../src/skillNames.ts";
+const quest = (title, status, eligible = false) => ({
+  title,
+  status,
+  eligible,
+  members: true,
+  difficulty: 2,
+  qp: 2,
+});
+const data = () => ({
+  name: "Example",
+  qp: 7,
+  qp_max: 500,
+  quests: {
+    1: quest("Finished", "COMPLETED", true),
+    2: quest("Ongoing", "STARTED"),
+    3: quest("Future", "NOT_STARTED"),
+  },
+});
+const json = (value, status = 200) =>
+  new Response(JSON.stringify(value), { status });
 
-const hiscores = () =>
-  new Response(
-    ["1,3000,5000000000", ...RS3_SKILL_NAMES.map(() => "100,50,100000")].join(
-      "\n",
-    ),
-  );
-
-test("Only genuinely completed public quests are imported", () => {
+test("quest statuses, eligibility, numeric IDs and authoritative QP survive import", () => {
+  const result = parseQuestResponse(data());
+  assert.equal(result.status, "available");
+  assert.equal(result.name, "Example");
+  assert.equal(result.questPoints, 7);
+  assert.equal(result.maxQuestPoints, 500);
   assert.deepEqual(
-    parseQuestResponse({
-      quests: [
-        { title: "Cook's Assistant", status: "COMPLETED" },
-        { title: "The Knight's Sword", status: "STARTED" },
-        { title: "Dragon Slayer", status: "NOT_STARTED" },
-      ],
-    }),
-    { status: "available", completedTitles: ["Cook's Assistant"] },
-  );
-  assert.deepEqual(
-    parseQuestResponse({
-      quests: [{ title: "Cook's Assistant", status: "NOT_STARTED" }],
-    }),
-    { status: "available", completedTitles: [] },
+    result.records.map((q) => [q.id, q.status, q.eligible, q.questPoints]),
+    [
+      ["1", "COMPLETED", true, 2],
+      ["2", "STARTED", false, 2],
+      ["3", "NOT_STARTED", false, 2],
+    ],
   );
 });
 
-test("An empty/private quest response is unavailable, not a successful zero-completion import", () => {
-  for (const value of [
-    { quests: [], loggedIn: "false" },
-    { error: "PROFILE_PRIVATE" },
-  ])
-    assert.deepEqual(parseQuestResponse(value), {
-      status: "unavailable",
-      reason: "private-or-unavailable",
-    });
-});
-
-test("Malformed or unknown statuses fail quest import closed rather than marking completion", () => {
-  for (const value of [
-    null,
-    [],
-    { quests: [{ title: "Cook's Assistant", status: "ELIGIBLE" }] },
-    { quests: [{ title: "", status: "COMPLETED" }] },
-    { quests: [{ title: "Cook's Assistant", status: "COMPLETED" }, null] },
-  ])
-    assert.deepEqual(parseQuestResponse(value), {
+test("malformed quest payloads cannot replace a good snapshot", () => {
+  for (const mutate of [
+    (d) => {
+      d.quests[1].status = "UNKNOWN";
+    },
+    (d) => {
+      d.quests[1].eligible = "true";
+    },
+    (d) => {
+      delete d.qp;
+    },
+    (d) => {
+      d.qp = d.qp_max + 1;
+    },
+    (d) => {
+      d.quests = [];
+    },
+    (d) => {
+      d.quests.bad = d.quests[1];
+    },
+  ]) {
+    const input = data();
+    mutate(input);
+    assert.deepEqual(parseQuestResponse(input), {
       status: "unavailable",
       reason: "service-unavailable",
     });
+  }
+  assert.deepEqual(parseQuestResponse({ error: "PLAYER_NOT_FOUND" }), {
+    status: "unavailable",
+    reason: "private-or-unavailable",
+  });
+  assert.equal(
+    parseQuestResponse({ name: "Example", qp: 0, qp_max: 500, quests: {} })
+      .status,
+    "available",
+  );
 });
 
-test("A quest-service outage does not discard valid public skill levels", async () => {
-  const service = createPlayerLookupService(async (url) => {
-    if (url.hostname === "apps.runescape.com")
-      throw new Error("Quest service down");
-    return hiscores();
+test("non-200 errors are decoded, paths escaped, and different accounts rejected", async () => {
+  let path;
+  const fetcher = async (url) => {
+    path = url.pathname;
+    return json({ error: "PLAYER_NOT_MEMBER" }, 403);
+  };
+  assert.deepEqual(await lookupQuests("Example Name", fetcher), {
+    status: "unavailable",
+    reason: "not-member",
   });
-  const player = await service.lookup("Example");
-  assert.equal(player.levels.Mining, 50);
-  assert.deepEqual(player.quests, {
+  assert.ok(path.endsWith("Example%20Name"));
+  assert.deepEqual(await lookupQuests("Other", async () => json(data())), {
     status: "unavailable",
     reason: "service-unavailable",
   });
 });
 
-test("A combined lookup coalesces and caches both upstream services, while a Hiscores failure skips quests", async () => {
-  const calls = { levels: 0, quests: 0 };
-  const service = createPlayerLookupService(async (url) => {
-    if (url.hostname === "apps.runescape.com") {
-      calls.quests++;
-      return new Response(
-        JSON.stringify({
-          quests: [{ title: "Cook's Assistant", status: "COMPLETED" }],
-        }),
-      );
-    }
-    calls.levels++;
-    return url.searchParams.get("player") === "Missing"
-      ? new Response("Missing", { status: 404 })
-      : hiscores();
-  });
-  const [first, second] = await Promise.all([
-    service.lookup("Example"),
-    service.lookup("example"),
-  ]);
-  assert.deepEqual(first.quests, {
-    status: "available",
-    completedTitles: ["Cook's Assistant"],
-  });
-  assert.deepEqual(first, second);
-  await service.lookup("EXAMPLE");
-  assert.deepEqual(calls, { levels: 1, quests: 1 });
-  await assert.rejects(
-    service.lookup("Missing"),
-    (error) => error.status === 404,
+test("quest outage leaves levels and successful events intact, then retries", async () => {
+  let time = 0;
+  let fail = true;
+  const service = createPlayerLookupService(
+    async (url) => {
+      if (url.pathname.includes("index_lite"))
+        return json({
+          name: "Example",
+          skills: [
+            { name: "Overall", rank: 1, level: 1000, xp: 100 },
+            ...RS3_SKILL_NAMES.map((name) => ({
+              name,
+              rank: 1,
+              level: 50,
+              xp: 100,
+            })),
+          ],
+          activities: [],
+        });
+      if (url.pathname.includes("playerQuests"))
+        return fail ? json({ error: "INTERNAL_ERROR" }, 500) : json(data());
+      return json({ name: "EXAMPLE", events: [] });
+    },
+    () => time,
   );
-  assert.deepEqual(calls, { levels: 2, quests: 1 });
+  const first = await service.lookup("Example");
+  assert.equal(first.levels.Mining, 50);
+  assert.equal(first.name, "EXAMPLE");
+  assert.deepEqual(first.quests, {
+    status: "unavailable",
+    reason: "service-unavailable",
+  });
+  assert.equal(first.events.status, "available");
+  fail = false;
+  time = 30000;
+  assert.equal((await service.lookup("Example")).quests.status, "available");
 });

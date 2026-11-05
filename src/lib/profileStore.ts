@@ -3,6 +3,14 @@ import { QUESTS, SAMPLE_PROFILES, nextQuest, type Profile } from "../data.ts";
 import type { CompassController, SavedState } from "./compassContext";
 import { normalizePlayerName } from "./playerName.ts";
 import { clearRememberedPlayer, rememberPlayer } from "./rememberedPlayer.ts";
+import {
+  isFetchedAt,
+  isPlayerEvents,
+  isPlayerImportStatus,
+  isPlayerStatistics,
+  isQuestProgress,
+} from "./playerData.ts";
+import { questTitleKey } from "./playerProgress.ts";
 
 const KEY = "rs3-compass-design-v1";
 
@@ -23,9 +31,19 @@ function validProfile(value: unknown): value is Profile {
         Number.isFinite(p.hiscoresFetchedAt) &&
         p.hiscoresFetchedAt >= 0)) &&
     (p.questImportStatus === undefined ||
-      ["available", "private-or-unavailable", "service-unavailable"].includes(
-        p.questImportStatus,
-      )) &&
+      isPlayerImportStatus(p.questImportStatus)) &&
+    (p.eventImportStatus === undefined ||
+      isPlayerImportStatus(p.eventImportStatus)) &&
+    (p.statistics === undefined ||
+      (isPlayerStatistics(p.statistics) &&
+        isFetchedAt(p.statistics.fetchedAt))) &&
+    (p.questProgress === undefined ||
+      (isQuestProgress(p.questProgress) &&
+        isFetchedAt(p.questProgress.fetchedAt))) &&
+    (p.eventLog === undefined ||
+      (!!p.eventLog &&
+        isPlayerEvents(p.eventLog.events) &&
+        isFetchedAt(p.eventLog.fetchedAt))) &&
     (p.trainingRanges === undefined ||
       (!!p.trainingRanges &&
         typeof p.trainingRanges === "object" &&
@@ -155,23 +173,52 @@ export function createCompassController(): CompassController {
     },
     addPlayer(player, kind, mode) {
       const id = "rs3:" + normalizePlayerName(player.name).toLowerCase();
-      const titleKey = (title: string) =>
-        title
-          .normalize("NFKC")
-          .replaceAll("’", "'")
-          .trim()
-          .toLocaleLowerCase("en");
-      const completed =
-        player.quests.status === "available"
-          ? new Set(player.quests.completedTitles.map(titleKey))
-          : new Set<string>();
+      const completed = new Set<string>();
+      if (player.quests.status === "available") {
+        for (const quest of player.quests.records) {
+          if (quest.status === "COMPLETED")
+            completed.add(questTitleKey(quest.title));
+        }
+      }
       const imported = QUESTS.filter((quest) =>
-        completed.has(titleKey(quest.name)),
+        completed.has(questTitleKey(quest.name)),
       ).map((quest) => quest.id);
-      const questImportStatus =
-        player.quests.status === "available"
-          ? "available"
-          : player.quests.reason;
+      const sourceData: Pick<
+        Profile,
+        | "statistics"
+        | "questProgress"
+        | "eventLog"
+        | "questImportStatus"
+        | "eventImportStatus"
+      > = {
+        statistics: { ...player.statistics, fetchedAt: player.fetchedAt },
+        questImportStatus:
+          player.quests.status === "available"
+            ? "available"
+            : player.quests.reason,
+        eventImportStatus:
+          player.events.status === "available"
+            ? "available"
+            : player.events.reason,
+        ...(player.quests.status === "available"
+          ? {
+              questProgress: {
+                records: player.quests.records,
+                questPoints: player.quests.questPoints,
+                maxQuestPoints: player.quests.maxQuestPoints,
+                fetchedAt: player.fetchedAt,
+              },
+            }
+          : {}),
+        ...(player.events.status === "available"
+          ? {
+              eventLog: {
+                events: player.events.events,
+                fetchedAt: player.fetchedAt,
+              },
+            }
+          : {}),
+      };
       state.update((current) => {
         const existing = current.profiles.find((p) => p.id === id);
         let profile: Profile;
@@ -185,7 +232,7 @@ export function createCompassController(): CompassController {
             ],
             source: "hiscores",
             hiscoresFetchedAt: player.fetchedAt,
-            questImportStatus,
+            ...sourceData,
           };
         else {
           profile = {
@@ -202,7 +249,7 @@ export function createCompassController(): CompassController {
             activeTask: "",
             source: "hiscores",
             hiscoresFetchedAt: player.fetchedAt,
-            questImportStatus,
+            ...sourceData,
           };
           profile.activeTask = nextQuest(profile)?.id ?? "train-Mining";
         }

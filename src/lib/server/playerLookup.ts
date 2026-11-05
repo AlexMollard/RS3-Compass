@@ -1,13 +1,39 @@
-import { RS3_SKILL_NAMES } from "../../skillNames.ts";
+import {
+  isSkillName,
+  RS3_SKILL_NAMES,
+  type SkillName,
+} from "../../skillNames.ts";
 import { normalizePlayerName } from "../playerName.ts";
-import type { PlayerLevels, PlayerLookup } from "../playerTypes.ts";
+import type {
+  PlayerLevels,
+  PlayerLookup,
+  PlayerSkillStatistics,
+} from "../playerTypes.ts";
 import { lookupQuests } from "./questLookup.ts";
+import { samePlayerName } from "./adventurerLookup.ts";
+import { lookupEvents } from "./eventLookup.ts";
 
-export const PLAYER_CACHE_MS = 5 * 60 * 1000;
+export const PLAYER_CACHE_MS = 10 * 60 * 1000;
+export const PLAYER_PARTIAL_CACHE_MS = 30 * 1000;
 const NEGATIVE_CACHE_MS = 30 * 1000;
 const MAX_CACHED_PLAYERS = 128;
 const MAX_IN_FLIGHT = 8;
 const MAX_UPSTREAM_PER_MINUTE = 60;
+
+// The public JSON API retains these two names from the shared Hiscores service.
+const platformSkillNames: Readonly<Record<string, SkillName>> = {
+  Hitpoints: "Constitution",
+  Runecraft: "Runecrafting",
+};
+
+export function playerCacheMs(player: PlayerLookup): number {
+  const transient =
+    (player.quests.status === "unavailable" &&
+      player.quests.reason === "service-unavailable") ||
+    (player.events.status === "unavailable" &&
+      player.events.reason === "service-unavailable");
+  return transient ? PLAYER_PARTIAL_CACHE_MS : PLAYER_CACHE_MS;
+}
 
 export class PlayerLookupError extends Error {
   readonly status: number;
@@ -19,39 +45,89 @@ export class PlayerLookupError extends Error {
 }
 
 export function parseHiscores(
-  text: string,
+  value: unknown,
   name: string,
   fetchedAt: number,
 ): PlayerLevels {
-  const rows = text.trim().split(/\r?\n/);
-  if (rows.length < RS3_SKILL_NAMES.length + 1)
+  const invalid = (): never => {
     throw new PlayerLookupError(
-      "RuneScape returned incomplete player data. Existing progress has not changed.",
+      "RuneScape returned incomplete or invalid player data. Existing progress has not changed.",
       502,
     );
+  };
+  if (!value || typeof value !== "object" || Array.isArray(value))
+    return invalid();
+  const response = value as Record<string, unknown>;
+  if (
+    typeof response.name !== "string" ||
+    !samePlayerName(response.name, name) ||
+    !Array.isArray(response.skills) ||
+    !Array.isArray(response.activities)
+  )
+    return invalid();
   const levels: Record<string, number> = {};
-  for (let index = 0; index <= RS3_SKILL_NAMES.length; index++) {
-    if (!/^-?\d+,-?\d+,-?\d+$/.test(rows[index]))
-      throw new PlayerLookupError(
-        "RuneScape returned an unexpected player response. Try again later.",
-        502,
-      );
-    const [rank, level, xp] = rows[index].split(",").map(Number);
+  const skills: Record<string, PlayerSkillStatistics> = {};
+  let overall: (PlayerSkillStatistics & { level?: number }) | undefined;
+  const seen = new Set<string>();
+  const valid = (v: unknown, min: number): v is number =>
+    typeof v === "number" && Number.isSafeInteger(v) && (v === -1 || v >= min);
+  for (const entry of response.skills) {
+    if (!entry || typeof entry !== "object" || Array.isArray(entry))
+      return invalid();
+    const skill = entry as Record<string, unknown>;
+    if (typeof skill.name !== "string" || !skill.name.trim()) return invalid();
+    const name = Object.hasOwn(platformSkillNames, skill.name)
+      ? platformSkillNames[skill.name]
+      : skill.name;
+    if (name !== "Overall" && !isSkillName(name)) continue;
     if (
-      ![rank, level, xp].every(Number.isSafeInteger) ||
-      rank < -1 ||
-      xp < -1 ||
-      level < -1 ||
-      (index > 0 && level > 120)
+      seen.has(name) ||
+      !valid(skill.rank, 1) ||
+      !valid(skill.level, 0) ||
+      !valid(skill.xp, 0) ||
+      (name !== "Overall" && skill.level > 120)
     )
-      throw new PlayerLookupError(
-        "RuneScape returned invalid player levels. Existing progress has not changed.",
-        502,
-      );
-    // Unranked/undisclosed skills stay unknown rather than becoming fabricated zeroes.
-    if (index > 0 && level >= 1) levels[RS3_SKILL_NAMES[index - 1]] = level;
+      return invalid();
+    seen.add(name);
+    const stats: PlayerSkillStatistics = {};
+    if (skill.rank !== -1) stats.rank = skill.rank;
+    if (skill.xp !== -1) stats.xp = skill.xp;
+    if (name === "Overall")
+      overall = {
+        ...stats,
+        ...(skill.level > 0 ? { level: skill.level } : {}),
+      };
+    else {
+      skills[name] = stats;
+      if (skill.level > 0) levels[name] = skill.level;
+    }
   }
-  return { name, levels, fetchedAt };
+  if (!overall || RS3_SKILL_NAMES.some((skill) => !seen.has(skill)))
+    return invalid();
+  const activities: PlayerLevels["statistics"]["activities"] = [];
+  for (const entry of response.activities) {
+    if (!entry || typeof entry !== "object" || Array.isArray(entry))
+      return invalid();
+    const activity = entry as Record<string, unknown>;
+    if (
+      typeof activity.name !== "string" ||
+      !activity.name.trim() ||
+      !valid(activity.rank, 1) ||
+      !valid(activity.score, 0)
+    )
+      return invalid();
+    activities.push({
+      name: activity.name,
+      ...(activity.rank !== -1 ? { rank: activity.rank } : {}),
+      ...(activity.score !== -1 ? { score: activity.score } : {}),
+    });
+  }
+  return {
+    name,
+    levels,
+    statistics: { overall, skills, activities },
+    fetchedAt,
+  };
 }
 
 type CacheEntry = { expiresAt: number } & (
@@ -64,16 +140,30 @@ export function createPlayerLookupService(
 ) {
   const cache = new Map<string, CacheEntry>();
   const inFlight = new Map<string, Promise<PlayerLookup>>();
-  let windowStart = now();
-  let upstreamRequests = 0;
-
+  const requestTimes = new Float64Array(MAX_UPSTREAM_PER_MINUTE);
+  let requestHead = 0;
+  let requestCount = 0;
   function cacheEntry(key: string, entry: CacheEntry) {
     cache.delete(key);
     cache.set(key, entry);
     while (cache.size > MAX_CACHED_PLAYERS)
       cache.delete(cache.keys().next().value!);
   }
-
+  const boundedFetch: typeof fetch = (input, init) => {
+    const time = now();
+    while (requestCount > 0 && time - requestTimes[requestHead] >= 60_000) {
+      requestHead = (requestHead + 1) % MAX_UPSTREAM_PER_MINUTE;
+      requestCount--;
+    }
+    if (requestCount >= MAX_UPSTREAM_PER_MINUTE)
+      throw new PlayerLookupError(
+        "Player lookup is busy. Wait a moment before trying again.",
+        429,
+      );
+    requestTimes[(requestHead + requestCount) % MAX_UPSTREAM_PER_MINUTE] = time;
+    requestCount++;
+    return fetcher(input, init);
+  };
   async function lookup(rawName: unknown): Promise<PlayerLookup> {
     let name: string;
     try {
@@ -85,9 +175,8 @@ export function createPlayerLookupService(
       );
     }
     const key = name.toLocaleLowerCase("en");
-    const time = now();
     const cached = cache.get(key);
-    if (cached && cached.expiresAt > time) {
+    if (cached && cached.expiresAt > now()) {
       cache.delete(key);
       cache.set(key, cached);
       if ("error" in cached) throw cached.error;
@@ -96,29 +185,21 @@ export function createPlayerLookupService(
     if (cached) cache.delete(key);
     const pending = inFlight.get(key);
     if (pending) return pending;
-    if (time - windowStart >= 60_000) {
-      windowStart = time;
-      upstreamRequests = 0;
-    }
-    if (
-      inFlight.size >= MAX_IN_FLIGHT ||
-      upstreamRequests >= MAX_UPSTREAM_PER_MINUTE
-    )
+    if (inFlight.size >= MAX_IN_FLIGHT)
       throw new PlayerLookupError(
         "Player lookup is busy. Wait a moment before trying again.",
         429,
       );
-    upstreamRequests++;
     const request = (async () => {
       try {
         const url = new URL(
-          "https://secure.runescape.com/m=hiscore/index_lite.ws",
+          "https://secure.runescape.com/m=hiscore/index_lite.json",
         );
         url.searchParams.set("player", name);
-        const response = await fetcher(url, {
+        const response = await boundedFetch(url, {
           signal: AbortSignal.timeout(8000),
           headers: {
-            accept: "text/plain",
+            accept: "application/json",
             "user-agent": "RS3 Compass public Hiscores lookup",
           },
         });
@@ -132,13 +213,24 @@ export function createPlayerLookupService(
             "RuneScape's player service is unavailable. Try again later.",
             502,
           );
-        const levels = parseHiscores(await response.text(), name, now());
+        const levels = parseHiscores(await response.json(), name, now());
+        const [quests, events] = await Promise.all([
+          lookupQuests(name, boundedFetch),
+          lookupEvents(name, boundedFetch),
+        ]);
         const player: PlayerLookup = {
           ...levels,
-          quests: await lookupQuests(name, fetcher),
+          name:
+            quests.status === "available"
+              ? quests.name
+              : events.status === "available"
+                ? events.name
+                : levels.name,
+          quests,
+          events,
         };
         cacheEntry(key, {
-          expiresAt: player.fetchedAt + PLAYER_CACHE_MS,
+          expiresAt: player.fetchedAt + playerCacheMs(player),
           player,
         });
         return player;

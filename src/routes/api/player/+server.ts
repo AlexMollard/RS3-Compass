@@ -1,7 +1,7 @@
 import { json } from "@sveltejs/kit";
 import type { RequestHandler } from "@sveltejs/kit";
 import {
-  PLAYER_CACHE_MS,
+  playerCacheMs,
   PlayerLookupError,
   playerLookupService,
 } from "../../../lib/server/playerLookup";
@@ -13,7 +13,9 @@ export const GET: RequestHandler = async ({ url }) => {
     );
     const remaining = Math.max(
       0,
-      Math.floor((player.fetchedAt + PLAYER_CACHE_MS - Date.now()) / 1000),
+      Math.floor(
+        (player.fetchedAt + playerCacheMs(player) - Date.now()) / 1000,
+      ),
     );
     return json(player, {
       headers: {
