@@ -139,8 +139,8 @@
       tooltip.textContent = selected.label;
       currentMarker.bindTooltip(tooltip, {
         permanent: true,
-        direction: "top",
-        offset: [0, -16],
+        direction: "bottom",
+        offset: [0, 16],
       });
       currentMap.invalidateSize();
       currentMap.setView(position, 2, { animate: false });

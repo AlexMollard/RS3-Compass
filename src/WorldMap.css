@@ -54,6 +54,13 @@
 .world-map .leaflet-marker-icon {
   object-fit: contain;
 }
+.world-map .leaflet-tooltip {
+  width: max-content;
+  max-width: 160px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
 .world-map .leaflet-control.leaflet-control-attribution {
   color: #29251c;
   font-size: var(--font-caption);
