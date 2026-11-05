@@ -37,6 +37,15 @@ Lookups use the official [RuneScape Platform APIs](https://developer.runescape.c
 The Members planning toggle does not change an account's actual membership. Public data does not reveal your bank, inventory or owned equipment.
 
 <details>
+<summary>Group Ironman data source</summary>
+
+`GET /api/group?name=ironmanies&size=3&competitive=true` retrieves a public group snapshot from the official RuneScape group Hiscores.
+
+Group Hiscores are separate from the Platform APIs. Compass validates the exact name, size and category against the official listing's structured data, then reads member identities from the official roster. Successful lookups are cached for 10 minutes and matching requests are coalesced. If Jagex changes the source format, lookup reports unavailable rather than inventing a roster or zero progress.
+
+</details>
+
+<details>
 <summary>Refresh timing and unavailable data</summary>
 
 Compass caches successful player lookups for 10 minutes and coalesces matching requests. Jagex also caches data, so delays can stack; quest progress may update after logout, a world hop or periodic synchronization.
