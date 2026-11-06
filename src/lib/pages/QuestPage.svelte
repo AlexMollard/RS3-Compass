@@ -3,8 +3,7 @@
   import { nextQuest, QUESTS, toggleItem } from "../../data";
   import { wikiHref, wikiImage } from "../../wiki";
   import { getCompass } from "../compassContext";
-  import { lineArt } from "../gameText";
-  import { inventorySlots } from "../inventorySlots";
+  import { INVENTORY_SIZE, inventorySlots } from "../inventorySlots";
   import { questPath, skillPath } from "../navigation";
   import { questReadiness } from "../questReadiness";
   import Button from "../components/Button.svelte";
@@ -210,12 +209,14 @@
                 <div
                   class="inv"
                   role="img"
-                  aria-label={`Inventory preview: ${inventory.slots.length} of 28 slots used, ${packedItems.length} packed`}
+                  aria-label={`Inventory preview: ${inventory.slots.length} slots needed of 28, ${packedItems.length} packed`}
                 >
-                  {#each inventory.slots as slot (slot.key)}
-                    {@const art = lineArt(slot.line)}
-                    <span class="slot" class:full={slot.packed} title={slot.line}
-                      >{#if art}<img
+                  {#each inventory.slots.slice(0, INVENTORY_SIZE) as slot (slot.id)}
+                    {@const art = slot.art}
+                    <span class="slot" class:full={slot.packed} title={slot.title}
+                      >{#if slot.count}<span class="slot-count"
+                          >{slot.count.toLocaleString("en")}</span
+                        >{/if}{#if art}<img
                           src={art.imageUrl ?? wikiImage(art.image!)}
                           alt=""
                           loading="lazy"
@@ -229,8 +230,10 @@
                     ></span>{/each}
                 </div>
                 <span class="cap"
-                  >{inventory.slots.length} of 28 slots. Packing checks are manual;
-                  Compass can't see your bank or inventory.</span
+                  >{#if inventory.overflow}Needs {inventory.slots.length} slots, {inventory.overflow}
+                    more than one inventory holds, so plan extra trips.{:else}{inventory.slots.length}
+                    of 28 slots.{/if} Packing checks are manual; Compass can't see your
+                  bank or inventory.</span
                 >
               </div>
             {/if}
@@ -479,6 +482,7 @@
     box-shadow: inset 0 0 0 2px #1d1810;
   }
   .slot {
+    position: relative;
     aspect-ratio: 1;
     display: flex;
     align-items: center;
@@ -503,8 +507,20 @@
     height: 70%;
     object-fit: contain;
   }
-  .slot:not(.full):not(.empty) > * {
+  .slot:not(.full):not(.empty) > :not(.slot-count) {
     opacity: 0.45;
+  }
+  /* In-game stack count: yellow, top-left, over the item. */
+  .slot-count {
+    position: absolute;
+    top: 1px;
+    left: 3px;
+    font:
+      700 11px/1 "DM Sans",
+      sans-serif;
+    color: #ffff00;
+    text-shadow: 1px 1px 0 #000;
+    pointer-events: none;
   }
   .slot-label {
     display: -webkit-box;
