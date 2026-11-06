@@ -1,12 +1,12 @@
 <script lang="ts">
   import { onMount, untrack } from "svelte";
-  import { getCompass, getPlayerActions } from "../compassContext";
+  import { Download, RefreshCw } from "@lucide/svelte";
+  import { getCompass } from "../compassContext";
   import PlayerManager from "../components/PlayerManager.svelte";
   import PageHeading from "../components/PageHeading.svelte";
   import Button from "../components/Button.svelte";
 
   const controller = getCompass();
-  const actions = getPlayerActions();
   const saved = controller.state;
   const sync = controller.syncState;
   let mounted = $state(false);
@@ -47,48 +47,32 @@
 <div class="players-page page-enter">
   <PageHeading
     title="Players"
-    subtitle="Separate preparation journals and public game snapshots."
+    subtitle="Each character keeps its own notes, packing and plans."
   >
-    {#snippet trailing()}<Button
-        variant="primary"
-        onclick={() => actions.lookup()}>Add a player</Button
-      >{/snippet}
+    {#snippet trailing()}<div class="head-actions">
+        <a class="btn btn-quiet" href="/groups">Group Ironman</a>
+        <a class="btn btn-quiet" href="/activity">Activity feeds</a>
+        <Button variant="quiet" onclick={controller.exportProgress}
+          ><Download size={16} aria-hidden="true" />Export progress</Button
+        >
+        <Button disabled={!ids.length || busy} onclick={() => refresh(false)}
+          ><RefreshCw size={16} aria-hidden="true" />{busy
+            ? "Refreshing players…"
+            : "Refresh public players"}</Button
+        >
+      </div>{/snippet}
   </PageHeading>
-  <div class="workspace-actions">
-    <Button disabled={!ids.length || busy} onclick={() => refresh(false)}
-      >{busy ? "Refreshing players…" : "Refresh all players"}</Button
-    >
-    <Button variant="quiet" onclick={controller.exportProgress}
-      >Export progress</Button
-    >
-    <a href="/groups">Group Ironman →</a><a href="/activity">Activity feeds →</a
-    >
-  </div>
-  <p class="sync-policy">
-    Public snapshots refresh while this view is visible, when their cache
-    expires. Jagex and Compass caching can each add delay. Notes, packing and
-    planning settings stay on this device; refreshes do not switch your
-    character.
-  </p>
   <PlayerManager />
 </div>
 
 <style>
-  .workspace-actions {
+  .head-actions {
     display: flex;
-    align-items: center;
     flex-wrap: wrap;
-    gap: 10px 18px;
-    margin: 20px 0 12px;
+    align-items: center;
+    gap: 8px;
   }
-  .workspace-actions a {
-    color: var(--gold-bright);
-    text-underline-offset: 3px;
-  }
-  .sync-policy {
-    max-width: 85ch;
-    color: var(--muted);
-    font-size: var(--font-caption);
-    margin-bottom: 24px;
+  .head-actions :global(.btn) {
+    min-height: 40px;
   }
 </style>
