@@ -105,6 +105,47 @@ test("Legacy profiles survive the framework cutover and later storage writes rec
   assert.deepEqual(restored.profiles[1], legacy.profiles[1]);
 });
 
+test("A fresh controller is unwelcomed until a sample is picked", () => {
+  const controller = createCompassController();
+  assert.equal(get(controller.state).welcomed, false);
+  controller.selectProfile("aster");
+  assert.equal(get(controller.state).welcomed, true);
+  const other = createCompassController();
+  other.welcome();
+  assert.equal(get(other.state).welcomed, true);
+  const looked = createCompassController();
+  looked.addPlayer(player, "Solo Ironman", "f2p");
+  assert.equal(get(looked.state).welcomed, true);
+});
+
+test("A stored save without the welcomed field is treated as welcomed", (t) => {
+  const descriptor = Object.getOwnPropertyDescriptor(
+    globalThis,
+    "localStorage",
+  );
+  const saved = structuredClone(get(createCompassController().state));
+  delete saved.welcomed;
+  const storage = new Map([[KEY, JSON.stringify(saved)]]);
+  Object.defineProperty(globalThis, "localStorage", {
+    configurable: true,
+    value: {
+      getItem: (key) => storage.get(key) ?? null,
+      setItem: (key, value) => storage.set(key, value),
+    },
+  });
+  const controller = createCompassController();
+  t.after(() => {
+    controller.destroy();
+    if (descriptor)
+      Object.defineProperty(globalThis, "localStorage", descriptor);
+    else delete globalThis.localStorage;
+  });
+  controller.initialize();
+  assert.equal(get(controller.storageError), false);
+  assert.equal(get(controller.state).welcomed, true);
+  assert.equal(JSON.parse(storage.get(KEY)).version, 1);
+});
+
 test("Removing every sample persists an empty workspace across reload and permits a fresh lookup", (t) => {
   const descriptor = Object.getOwnPropertyDescriptor(
     globalThis,
@@ -130,7 +171,7 @@ test("Removing every sample persists an empty workspace across reload and permit
   first.initialize();
   for (const profile of get(first.state).profiles)
     first.removePlayer(profile.id);
-  const empty = { version: 1, activeId: "", profiles: [] };
+  const empty = { version: 1, activeId: "", profiles: [], welcomed: false };
   assert.deepEqual(JSON.parse(storage.get(KEY)), empty);
   first.destroy();
   reloaded.initialize();

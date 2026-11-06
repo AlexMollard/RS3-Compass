@@ -16,6 +16,8 @@ export interface SavedState {
   activeId: string;
   profiles: Profile[];
   groups?: GroupLookup[];
+  /** False only on a brand-new device until a player is chosen; missing means true. */
+  welcomed?: boolean;
 }
 
 export interface CompassController {
@@ -38,6 +40,7 @@ export interface CompassController {
   initialize(): void;
   destroy(): void;
   updateProfile(update: (profile: Profile) => Profile): void;
+  welcome(): void;
   selectProfile(id: string): void;
   addPlayer(
     player: PlayerLookup,

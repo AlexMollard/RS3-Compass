@@ -33,6 +33,40 @@ export const RS3_SKILL_NAMES = [
 
 export type SkillName = (typeof RS3_SKILL_NAMES)[number];
 
+// Row-major order from the RuneScape Skills interface:
+// https://runescape.wiki/images/Skill_screen.png
+export const SKILL_GAME_ORDER: readonly SkillName[] = [
+  "Attack",
+  "Constitution",
+  "Mining",
+  "Strength",
+  "Agility",
+  "Smithing",
+  "Defence",
+  "Herblore",
+  "Fishing",
+  "Ranged",
+  "Thieving",
+  "Cooking",
+  "Prayer",
+  "Crafting",
+  "Firemaking",
+  "Magic",
+  "Fletching",
+  "Woodcutting",
+  "Runecrafting",
+  "Slayer",
+  "Farming",
+  "Construction",
+  "Hunter",
+  "Summoning",
+  "Dungeoneering",
+  "Divination",
+  "Invention",
+  "Archaeology",
+  "Necromancy",
+];
+
 const skillLookup: Record<string, true> = {};
 for (const name of RS3_SKILL_NAMES) skillLookup[name] = true;
 

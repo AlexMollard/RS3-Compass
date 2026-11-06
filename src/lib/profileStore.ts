@@ -104,6 +104,7 @@ export function createCompassController(): CompassController {
     version: 1,
     activeId: SAMPLE_PROFILES[0].id,
     profiles: structuredClone(SAMPLE_PROFILES),
+    welcomed: false,
   });
   const storageError = writable(false),
     ready = writable(false),
@@ -241,7 +242,11 @@ export function createCompassController(): CompassController {
                 ? s.activeId === ""
                 : s.profiles.some((p) => p.id === s.activeId))
             ) {
-              state.set(s);
+              state.set({
+                ...s,
+                welcomed:
+                  typeof s.welcomed === "boolean" ? s.welcomed : true,
+              });
               if (!s.profiles.length && typeof document !== "undefined")
                 clearRememberedPlayer();
             } else {
@@ -287,11 +292,18 @@ export function createCompassController(): CompassController {
         ),
       }));
     },
+    welcome() {
+      state.update((current) =>
+        current.welcomed === false ? { ...current, welcomed: true } : current,
+      );
+    },
     selectProfile(id) {
       const profile = get(state).profiles.find((p) => p.id === id);
       if (!profile) return;
       state.update((current) =>
-        current.activeId === id ? current : { ...current, activeId: id },
+        current.activeId === id && current.welcomed !== false
+          ? current
+          : { ...current, activeId: id, welcomed: true },
       );
       rememberSelection(profile);
     },
@@ -363,7 +375,7 @@ export function createCompassController(): CompassController {
         if (fetchedAt !== undefined && fetchedAt > player.fetchedAt)
           return options?.select === false
             ? current
-            : { ...current, activeId: id };
+            : { ...current, activeId: id, welcomed: true };
         let profile: Profile;
         if (existing)
           profile = {
@@ -396,6 +408,7 @@ export function createCompassController(): CompassController {
         }
         return {
           ...current,
+          welcomed: true,
           activeId: options?.select === false ? current.activeId || id : id,
           profiles: existing
             ? current.profiles.map((p) => (p.id === id ? profile : p))

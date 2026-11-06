@@ -194,7 +194,7 @@
         </div>
         <p class="cap home-skill-note">
           Levels shown as ? are not recorded yet. Compass never treats them as
-          zero.
+          zero. <a href="/levels">Update levels</a>
         </p>
       </GameWindow>
 

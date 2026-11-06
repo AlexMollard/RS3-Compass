@@ -1,37 +1,5 @@
 <script module lang="ts">
-  // Row-major order from the RuneScape Skills interface:
-  // https://runescape.wiki/images/Skill_screen.png
-  const gameOrder = [
-    "Attack",
-    "Constitution",
-    "Mining",
-    "Strength",
-    "Agility",
-    "Smithing",
-    "Defence",
-    "Herblore",
-    "Fishing",
-    "Ranged",
-    "Thieving",
-    "Cooking",
-    "Prayer",
-    "Crafting",
-    "Firemaking",
-    "Magic",
-    "Fletching",
-    "Woodcutting",
-    "Runecrafting",
-    "Slayer",
-    "Farming",
-    "Construction",
-    "Hunter",
-    "Summoning",
-    "Dungeoneering",
-    "Divination",
-    "Invention",
-    "Archaeology",
-    "Necromancy",
-  ];
+  import { SKILL_GAME_ORDER as gameOrder } from "../../skillNames";
   const gamePosition = new Map(gameOrder.map((name, index) => [name, index]));
 </script>
 

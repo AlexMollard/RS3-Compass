@@ -18,6 +18,7 @@
   } from "@lucide/svelte";
   import {
     QUESTS,
+    SAMPLE_PROFILES,
     SKILLS,
     progressionQuests,
     type Profile,
@@ -40,7 +41,7 @@
   import SearchField from "./components/SearchField.svelte";
   import Button from "./components/Button.svelte";
   import SourceBanner from "./components/SourceBanner.svelte";
-  import LevelEditor from "./components/LevelEditor.svelte";
+  import FirstVisit from "./components/FirstVisit.svelte";
   import { profileSourceNotice } from "./sourceStatus";
   import IconButton from "./components/IconButton.svelte";
   import "./shell.css";
@@ -64,6 +65,16 @@
   };
   let profile = $derived($saved.profiles.find((p) => p.id === $saved.activeId));
   let route = $derived(routeFor(page.url.pathname));
+  let peopleRoute = $derived(["players", "groups", "activity"].includes(route));
+  let showFirstVisit = $derived(
+    $ready &&
+      !page.error &&
+      (($saved.welcomed === false && !$storageError) ||
+        (!profile && !peopleRoute)),
+  );
+  let samples = $derived(
+    $saved.profiles.filter((p) => SAMPLE_PROFILES.some((s) => s.id === p.id)),
+  );
   let questCount = $derived.by(() => {
     if (!profile) return "";
     const quests = progressionQuests(profile);
@@ -76,7 +87,6 @@
     lookupName = $state(""),
     lookupError = $state(""),
     lookupLoading = $state(false),
-    editingLevels = $state(false),
     shortcut = $state("Ctrl K");
   let query = $derived(search.toLowerCase());
   let questMatches = $derived(
@@ -86,6 +96,7 @@
     SKILLS.filter((s) => s.name.toLowerCase().includes(query)),
   );
   let lookupKind = $state<Profile["kind"]>("Solo Ironman");
+  let lookupMode = $state<Profile["mode"]>("f2p");
   let searchDialog: HTMLDialogElement,
     aboutDialog: HTMLDialogElement,
     lookupDialog: HTMLDialogElement;
@@ -93,9 +104,11 @@
   let rememberedStarted = false;
   let main: HTMLElement, topbar: HTMLElement;
   setPlayerActions({ lookup: (name) => openLookup(name ?? "") });
-  let selectedView = $derived(["home", "quests", "skills"].includes(route));
+  let selectedView = $derived(
+    !page.error && ["home", "quests", "skills"].includes(route),
+  );
   let sourceNotice = $derived(
-    $ready && selectedView && profile
+    $ready && selectedView && !showFirstVisit && profile
       ? profileSourceNotice(
           profile,
           $sync[profile.id],
@@ -135,6 +148,7 @@
     abortLookup();
     lookupName = name;
     lookupKind = profile?.kind ?? "Solo Ironman";
+    lookupMode = profile?.mode ?? "f2p";
     lookupError = "";
     if (!lookupDialog.open) lookupDialog.showModal();
   }
@@ -153,7 +167,7 @@
     lookupLoading = true;
     lookupError = "";
     const kind = lookupKind,
-      mode = profile?.mode ?? "f2p";
+      mode = lookupMode;
     try {
       const player = await fetchPlayer(name, current.signal);
       if (current.signal.aborted || request !== current) return;
@@ -178,10 +192,10 @@
     compact.set(false);
     void goto(href);
   }
-  function openLevels() {
-    // shortcut: interim until the /levels route lands in Task 9
-    navigate("/");
-    editingLevels = true;
+  function firstVisitLookup(name: string, mode: Profile["mode"]) {
+    openLookup(name);
+    lookupMode = mode;
+    void lookup(name);
   }
   onMount(() => {
     shortcut = /Mac|iPhone|iPad/.test(navigator.platform) ? "⌘ K" : "Ctrl K";
@@ -336,7 +350,9 @@
           <a
             class="nav-item"
             href={item.href}
-            aria-current={route === item.id ? "page" : undefined}
+            aria-current={!page.error && route === item.id
+              ? "page"
+              : undefined}
             onclick={() => compact.set(false)}
             ><GameArt file={item.image} size={22} /><span>{item.label}</span
             >{#if item.id === "quests" && questCount}<span class="nav-count"
@@ -372,7 +388,13 @@
         ><span class="brand-mark"><Compass size={20} strokeWidth={1.5} /></span
         ></a
       >
-      <span class="topbar-title">{TITLES[route]}</span>
+      <span class="topbar-title"
+        >{page.error
+          ? page.status === 404
+            ? "Page not found"
+            : "Something went wrong"
+          : TITLES[route]}</span
+      >
       <button
         class="search-trigger"
         aria-label="Search quests and skills"
@@ -383,9 +405,12 @@
         ></button
       >
       {#if profile}
-        <Button className="update-levels" onclick={openLevels}
-          >Update levels</Button
-        >
+        {#if !showFirstVisit}<a
+            class="btn btn-secondary update-levels"
+            href="/levels"
+            aria-current={route === "levels" ? "page" : undefined}
+            onclick={() => compact.set(false)}>Update levels</a
+          >{/if}
         <div class="player-chip">
           <a
             class="player-chip-link"
@@ -424,19 +449,19 @@
             if (profile) void controller.refreshPlayers([profile.id]);
           }}
         />{/if}
-      {#if $ready && (profile || ["players", "groups", "activity"].includes(route))}
+      {#if showFirstVisit}
+        <FirstVisit
+          {samples}
+          canEnterByHand={!!profile}
+          onLookup={firstVisitLookup}
+          onSample={(id) => {
+            controller.selectProfile(id);
+            navigate("/");
+          }}
+          onManual={() => controller.welcome()}
+        />
+      {:else if $ready && (profile || peopleRoute || page.error)}
         {@render children()}
-      {:else if $ready}
-        <section class="panel empty-player-state">
-          <h1>No saved players</h1>
-          <p>
-            Look up your RuneScape player to start planning. Removed profiles
-            stay removed on this device.
-          </p>
-          <Button variant="primary" onclick={() => openLookup("")}
-            >Look up a player</Button
-          >
-        </section>
       {/if}
       <footer class="workspace-footer">
         <span><span class="status-dot"></span> Local progress</span><span
@@ -450,7 +475,9 @@
       {#each PHONE_TABS as tab}
         <a
           href={tab.href}
-          aria-current={tab.matches.includes(route) ? "page" : undefined}
+          aria-current={!page.error && tab.matches.includes(route)
+            ? "page"
+            : undefined}
           onclick={() => compact.set(false)}
           ><GameArt file={tab.image} size={22} />{tab.label}</a
         >
@@ -460,18 +487,6 @@
   {#if $notice}<div class="toast" role="status">
       <Info size={17} />{$notice}
     </div>{/if}
-  {#if editingLevels && profile}{#key profile.id}<LevelEditor
-        {profile}
-        initialSkill="Mining"
-        onSave={(levels) => {
-          controller.updateProfile((p) => ({
-            ...p,
-            levels: { ...p.levels, ...levels },
-          }));
-          editingLevels = false;
-        }}
-        onDismiss={() => (editingLevels = false)}
-      />{/key}{/if}
   <dialog
     class="app-dialog search-dialog"
     bind:this={searchDialog}
@@ -681,7 +696,7 @@
         ></label
       >
       <p>
-        Access: {(profile?.mode ?? "f2p") === "f2p" ? "F2P" : "Members"} (change it
+        Access: {lookupMode === "f2p" ? "F2P" : "Members"} (change it
         with the F2P/Members switch or on Players after import).
       </p>
       <p>

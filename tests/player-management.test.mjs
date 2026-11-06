@@ -65,6 +65,7 @@ test("Both fictional profiles, including legacy samples, can be removed without 
     version: 1,
     activeId: "",
     profiles: [],
+    welcomed: true,
   });
 });
 
