@@ -3,6 +3,7 @@
   import { progressionQuests, SKILLS } from "../../data";
   import { isSnapshotStale } from "../sourceStatus";
   import { relativeTime } from "../relativeTime";
+  import GameArt from "./GameArt.svelte";
   import PlayerPortrait from "./PlayerPortrait.svelte";
   import StatusChip from "./StatusChip.svelte";
   import Button from "./Button.svelte";
@@ -96,7 +97,12 @@
       aria-label={player.name}
     >
       <div class="player-heading">
-        <PlayerPortrait name={player.name} size={64} />
+        {#if isPublic}<PlayerPortrait name={player.name} size={64} />{:else}<GameArt
+            file={player.kind === "Group Ironman"
+              ? "Group_Ironman_badge.png"
+              : "Ironman_badge.png"}
+            size={64}
+          />{/if}
         <div>
           <h2>{player.name}</h2>
           <p>
