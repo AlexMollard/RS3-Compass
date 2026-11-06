@@ -244,9 +244,6 @@
 </div>
 
 <style>
-  .activity-page {
-    max-width: 1100px;
-  }
   .activity-actions {
     display: flex;
     flex-wrap: wrap;

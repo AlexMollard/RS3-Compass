@@ -399,8 +399,8 @@
   }
   .quest-hero-art {
     position: relative;
-    flex: 0 0 128px;
-    min-height: 128px;
+    flex: 0 0 clamp(200px, 38%, 380px);
+    min-height: 240px;
     overflow: hidden;
     background: #0d161c;
   }

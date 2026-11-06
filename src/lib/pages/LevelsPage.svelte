@@ -156,8 +156,6 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
-    max-width: 1180px;
-    margin: 0 auto;
     padding-top: 4px;
   }
   .cap {

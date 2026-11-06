@@ -57,7 +57,7 @@
       aria-current={selected === skill.name ? "page" : undefined}
       title={description(skill)}
     >
-      <GameArt file={skill.icon} size={compact ? 28 : 22} />
+      <GameArt file={skill.icon} size={compact ? 24 : 22} />
       <span class="skill-name">{skill.name}</span>
       <strong
         class="skill-level"
@@ -120,15 +120,15 @@
     font-weight: 500;
   }
   .compact {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 6px;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr));
+    gap: 4px;
     padding: 0;
   }
   .compact .skill-tile {
-    grid-template-columns: minmax(0, 1fr) auto;
-    min-height: 64px;
-    padding: 7px 5px;
-    gap: 3px 4px;
+    grid-template-columns: 24px minmax(0, 1fr) auto;
+    min-height: 44px;
+    padding: 4px 10px 4px 8px;
+    gap: 8px;
     border: 1px solid var(--line);
     border-radius: 3px;
   }
@@ -137,23 +137,17 @@
     border-color: var(--gold);
   }
   .compact .skill-tile :global(.game-art) {
-    grid-column: 1;
-    grid-row: 1;
-    justify-self: center;
+    width: 24px;
+    height: 24px;
   }
   .compact .skill-level {
-    grid-column: 2;
-    grid-row: 1;
-    font-size: 1.15rem;
+    font-size: 1.05rem;
   }
   .compact .skill-name {
-    grid-column: 1 / -1;
-    grid-row: 2;
-    font-size: 0.775rem;
-    line-height: 1.3;
+    font-size: var(--font-caption);
+    line-height: 1.25;
     overflow-wrap: anywhere;
     color: var(--text);
-    text-align: center;
   }
   .empty-state {
     grid-column: 1 / -1;

@@ -81,26 +81,34 @@
   flex: 1 1 280px;
   display: flex;
   flex-direction: column;
+  gap: 12px;
+  padding: 12px;
   min-width: 0;
 }
 .next-quest-art {
   display: grid;
   place-items: center;
-  flex: 1 1 auto;
-  min-height: 200px;
+  position: relative;
+  flex: none;
+  height: 220px;
+  overflow: hidden;
   background: #0d161c;
+  border: 1px solid var(--line);
+  border-radius: 3px;
 }
 .next-quest-art img.next-quest-image {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
-  max-height: 320px;
-  object-fit: contain;
+  object-fit: cover;
 }
 .next-quest-map {
   flex: none;
   height: 170px;
   overflow: hidden;
-  border-top: 1px solid #5a4b37;
+  border: 1px solid var(--line);
+  border-radius: 3px;
 }
 .next-quest-map .world-map {
   height: 100%;
