@@ -23,6 +23,8 @@
   import NavigationCard from "./components/NavigationCard.svelte";
   import SearchField from "./components/SearchField.svelte";
   import Button from "./components/Button.svelte";
+  import SourceBanner from "./components/SourceBanner.svelte";
+  import { profileSourceNotice } from "./sourceStatus";
   import IconButton from "./components/IconButton.svelte";
   import "./shell.css";
 
@@ -101,6 +103,15 @@
   let main: HTMLElement, topbar: HTMLElement;
   setPlayerActions({ lookup: (name) => openLookup(name ?? "") });
   let selectedView = $derived(["journey", "quests", "skills"].includes(route));
+  let sourceNotice = $derived(
+    $ready && selectedView && profile
+      ? profileSourceNotice(
+          profile,
+          $sync[profile.id],
+          route === "journey" ? "home" : (route as "quests" | "skills"),
+        )
+      : null,
+  );
   let syncSelection = $derived(
     $ready && selectedView && profile?.source === "hiscores" ? profile.id : "",
   );
@@ -385,63 +396,12 @@
             ><ArrowDownToLine size={16} /> Export progress</Button
           >
         </div>{/if}
-      {#if $ready && selectedView && profile?.source === "hiscores" && $sync[profile.id]?.state === "error"}
-        <div class="notice" role="status">
-          <div>
-            <strong>The latest public-data refresh failed</strong>
-            <p>Showing previously saved data. {$sync[profile.id].message}</p>
-            {#if $sync[profile.id].nextRefreshAt}<small
-                >Next request after {new Date(
-                  $sync[profile.id].nextRefreshAt!,
-                ).toLocaleString()}</small
-              >{/if}
-          </div>
-          <Button
-            variant="quiet"
-            onclick={() => {
-              if (profile) void controller.refreshPlayers([profile.id]);
-            }}>Retry refresh</Button
-          >
-        </div>
-      {:else if $ready && selectedView && profile?.hiscoresImportStatus && profile.hiscoresImportStatus !== "available"}
-        <div class="notice" role="status">
-          <div>
-            <strong>Hiscores data unavailable</strong>
-            <p>
-              {profile.hiscoresImportStatus === "unranked-or-unavailable"
-                ? "Jagex has no main Hiscores entry for this player."
-                : "The Hiscores source could not be refreshed."} Available quest and
-              activity data is kept. {profile.hiscoresLevels
-                ? "Previous public skill data is retained."
-                : "Skill levels remain unrecorded unless entered manually."}
-            </p>
-          </div>
-        </div>
-      {/if}
-      {#if $ready && ["journey", "quests"].includes(route) && profile?.source === "hiscores" && $sync[profile.id]?.state !== "error" && profile.questImportStatus && profile.questImportStatus !== "available"}<div
-          class="notice quest-import-notice"
-          role="status"
-        >
-          <div>
-            <strong>Quest data unavailable</strong>
-            <p>
-              {profile.questImportStatus === "private-or-unavailable"
-                ? "Jagex did not expose quest status for this player. Existing checks are kept; you can mark completion manually."
-                : profile.questImportStatus === "not-member"
-                  ? "Jagex reports this account is not an active member. Existing checks are kept; planning mode does not change membership."
-                  : "The quest service could not be reached. Existing checks are kept."}
-              {profile.questProgress
-                ? " The last successful snapshot is stale."
-                : ""}
-            </p>
-          </div>
-          <Button
-            variant="quiet"
-            onclick={() => {
-              if (profile) void controller.refreshPlayers([profile.id]);
-            }}>Retry lookup</Button
-          >
-        </div>{/if}
+      {#if sourceNotice}<SourceBanner
+          notice={sourceNotice}
+          onRetry={() => {
+            if (profile) void controller.refreshPlayers([profile.id]);
+          }}
+        />{/if}
       {#if $ready && (profile || ["players", "groups", "activity"].includes(route))}
         {@render children()}
       {:else if $ready}
