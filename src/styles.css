@@ -2043,30 +2043,6 @@ textarea {
   border-bottom-color: #c6a66c;
   background: #c6a66c08;
 }
-.objective-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-top: 18px;
-}
-.queue-column-labels {
-  display: flex;
-  justify-content: space-between;
-  padding: 13px 47px 12px 20px;
-  font-size: var(--font-caption);
-  letter-spacing: 1.3px;
-  color: var(--muted);
-  border-bottom: 1px solid #344d5e;
-}
-.progression-queue {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  max-height: min(65dvh, 620px);
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
 .queue-row {
   display: grid;
   grid-template-columns: 26px 28px minmax(0, 1fr) 135px 16px;
@@ -2124,12 +2100,6 @@ textarea {
 .queue-row > svg {
   color: #8da4b5;
 }
-.window-footnote {
-  padding: 14px 17px;
-  color: var(--muted);
-  font-size: var(--font-caption);
-  line-height: 1.7;
-}
 
 .activity-header {
   display: flex;
@@ -2178,8 +2148,7 @@ textarea {
     gap: 9px;
     padding: 15px 13px;
   }
-  .queue-reward,
-  .queue-column-labels > span:last-child {
+  .queue-reward {
     display: none;
   }
   .queue-quest-name strong {

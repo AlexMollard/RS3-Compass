@@ -91,7 +91,12 @@
     >
       <GameArt file={skill.icon} size={compact ? 28 : 22} />
       <span class="skill-name">{skill.name}</span>
-      <strong class="skill-level">{levels[skill.name] ?? "—"}</strong>
+      <strong
+        class="skill-level"
+        class:unrecorded={levels[skill.name] === undefined}
+        title={levels[skill.name] === undefined ? "Not recorded" : undefined}
+        >{levels[skill.name] ?? "?"}</strong
+      >
     </a>
   {:else}<p class="empty-state">No skills match.</p>{/each}
 </nav>
@@ -141,6 +146,10 @@
       18px Georgia,
       serif;
     text-align: right;
+  }
+  .skill-level.unrecorded {
+    color: var(--muted);
+    font-weight: 500;
   }
   .compact {
     grid-template-columns: repeat(3, minmax(0, 1fr));

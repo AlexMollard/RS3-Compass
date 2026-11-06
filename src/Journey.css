@@ -1,98 +1,175 @@
+.progression-page {
+  display: grid;
+  gap: 0;
+  min-width: 0;
+}
+.progression-page .utility-heading {
+  margin-bottom: 14px;
+}
+.progression-page .utility-heading h1 {
+  font-size: 28px;
+  margin-bottom: 4px;
+}
+.utility-heading > .route-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 240px;
+}
+.route-progress-track {
+  display: block;
+  flex: 1;
+  height: 8px;
+  overflow: hidden;
+  background: #0b1318;
+  border: 1px solid #33434d;
+  border-radius: 4px;
+}
+.route-progress-track > span {
+  display: block;
+  min-width: 6px;
+  height: 100%;
+  background: linear-gradient(90deg, #b89b65, var(--gold-bright));
+}
+.route-progress-value {
+  font-size: var(--font-caption);
+  color: var(--muted);
+}
+.home-trim {
+  height: 2px;
+  margin-bottom: 24px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--gold) 20%,
+    var(--gold-bright) 50%,
+    var(--gold) 80%,
+    transparent
+  );
+}
 .progression-page .home-workspace {
   display: grid;
-  gap: 20px;
+  gap: 24px;
   min-width: 0;
 }
-.progression-page .home-lower {
+.progression-page .two {
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
-  align-items: start;
-  gap: 20px;
+  grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr);
+  gap: 24px;
+  align-items: stretch;
+}
+.progression-page .two > * {
   min-width: 0;
 }
-.progression-page .home-levels > .player-statistics {
-  padding: 18px;
-  border-bottom: 1px solid var(--line);
-}
-@media (max-width: 1000px) {
-  .progression-page .home-lower {
+@media (max-width: 900px) {
+  .progression-page .two {
     grid-template-columns: minmax(0, 1fr);
   }
 }
-.progression-page .next-quest-workspace {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(330px, 1.1fr);
+
+/* Next quest */
+.progression-page .home-next {
+  display: flex;
+  flex-direction: column;
 }
-.home-preparation {
+.next-quest {
+  display: flex;
+  flex-wrap: wrap;
+  flex: 1;
+}
+.next-quest-visual {
+  flex: 1 1 280px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.next-quest-art {
+  display: grid;
+  place-items: center;
+  flex: 1 1 auto;
+  min-height: 200px;
+  background: #0d161c;
+}
+.next-quest-art img.next-quest-image {
+  width: 100%;
+  height: 100%;
+  max-height: 320px;
+  object-fit: contain;
+}
+.next-quest-map {
+  flex: none;
+  height: 170px;
+  overflow: hidden;
+  border-top: 1px solid #5a4b37;
+}
+.next-quest-map .world-map {
+  height: 100%;
+}
+.next-quest-map .world-map-canvas {
+  height: 170px;
+  min-height: 170px;
+}
+.next-quest-body {
+  flex: 1 1 360px;
   min-width: 0;
   display: flex;
   flex-direction: column;
+  gap: 14px;
+  justify-content: space-between;
+  padding: 22px 24px;
 }
-.progression-page .home-preparation .activity-header {
-  padding: 18px;
-  min-height: 130px;
-  border-bottom: 1px solid var(--line);
+.next-quest-title {
+  margin: -6px 0 0;
+  font:
+    600 32px/36px "Cinzel",
+    Georgia,
+    serif;
+  color: var(--heading);
+  overflow-wrap: anywhere;
 }
-.progression-page .home-preparation .activity-header-icon {
-  width: 44px;
-  height: 44px;
-  flex-basis: 44px;
+.next-quest-why {
+  margin: 0;
+  color: #c9d4da;
 }
-.progression-page .home-preparation .activity-artwork-link {
-  flex-basis: 140px;
-  height: 100px;
-  max-width: 32%;
+.readiness {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
 }
-.home-preparation-body {
-  padding: 18px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+.readiness-tile {
+  padding: 10px;
+  border: 1px solid #33434d;
+  border-radius: 3px;
+  background: var(--well);
+  min-width: 0;
 }
-.home-quest-purpose {
-  margin: 0 0 18px;
+.readiness-tile strong {
+  display: block;
+  overflow-wrap: anywhere;
+}
+.readiness-tile .tone-ok {
+  color: var(--green);
+}
+.readiness-tile .tone-warn {
+  color: var(--warn);
+}
+.readiness-tile .tone-muted {
   color: var(--muted);
 }
-.home-preparation-body .objective-actions {
-  margin-top: auto;
-  padding-top: 16px;
+.next-quest-start {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
-.home-start {
-  min-width: 0;
-  margin-bottom: 10px;
+.next-quest-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
 }
-.home-start > h3 {
-  margin: 0 0 10px;
-  font-size: 14px;
-}
-.progression-page .home-start > .quest-start {
-  grid-template-columns: 56px minmax(0, 1fr);
-  padding: 0;
-  border: 0;
-  background: none;
-}
-.progression-page .home-start .quest-start-portrait {
-  min-height: 56px;
-}
-.progression-page .home-start .quest-start-portrait img {
-  width: 56px;
-  height: 56px;
-}
-.home-map {
-  min-width: 0;
-  display: grid;
-  padding: 14px;
-  background: #111e26;
-  border-left: 1px solid var(--line);
-}
-.home-map > .world-map {
-  display: grid;
-  grid-template-rows: 1fr auto;
-  min-height: 330px;
-}
-.progression-page .home-map .world-map-canvas {
-  height: 100%;
-  min-height: 330px;
+.next-quest-actions .btn {
+  min-height: 44px;
 }
 .home-empty {
   padding: 20px;
@@ -101,30 +178,200 @@
   margin-top: 8px;
   color: var(--muted);
 }
-@media (max-width: 1150px) {
-  .progression-page .next-quest-workspace {
-    grid-template-columns: 1fr;
-  }
-  .home-map {
-    border-left: 0;
-    border-top: 1px solid var(--line);
-  }
-  .home-map > .world-map {
-    min-height: 260px;
-  }
-  .progression-page .home-map .world-map-canvas {
-    min-height: 260px;
-    height: 260px;
-  }
+
+/* Route timeline */
+.route-list {
+  list-style: none;
+  margin: 0;
+  padding: 14px 16px 6px;
+  display: flex;
+  flex-direction: column;
 }
-@media (max-width: 600px) {
+.route-step {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+}
+.route-node {
+  position: relative;
+  flex: none;
+  width: 14px;
+  padding-top: 14px;
+}
+.route-node::before {
+  content: "";
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--edge);
+  background: var(--bg);
+}
+.route-node::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 32px;
+  bottom: -2px;
+  width: 2px;
+  background: #2f3e48;
+}
+.route-step:last-child .route-node::after {
+  display: none;
+}
+.route-done .route-node::before {
+  background: var(--green);
+  border-color: var(--green);
+}
+.route-now .route-node::before {
+  background: var(--gold);
+  border-color: var(--gold-bright);
+  box-shadow: 0 0 0 4px #c5a46b30;
+}
+.route-step > a {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  min-height: 44px;
+  padding: 8px 6px;
+  border-radius: 3px;
+  color: var(--text);
+  text-decoration: none;
+}
+.route-step > a:hover .route-title {
+  color: var(--gold-bright);
+}
+.route-name {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.route-title {
+  overflow-wrap: anywhere;
+}
+.route-done .route-title {
+  color: var(--muted);
+}
+.route-now .route-title {
+  color: #f0e2c2;
+  font-weight: 600;
+}
+.route-all {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 16px 8px;
+  font-weight: 600;
+  color: var(--text);
+}
+.route-all:hover {
+  color: var(--gold-bright);
+}
+.route-empty {
+  padding: 16px;
+  color: var(--muted);
+}
+
+/* Skills */
+.home-statistics {
+  padding: 18px;
+  border-bottom: 1px solid var(--line);
+}
+.home-skill-grid {
+  padding: 16px;
+}
+.home-skill-note {
+  margin: 0;
+  padding: 0 16px 16px;
+}
+
+/* Close to unlocking and recent activity */
+.home-side {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+.progression-page .home-activity {
+  flex: 1;
+}
+.unlock-list {
+  list-style: none;
+  margin: 0;
+  padding: 8px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.unlock-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid #24323b;
+}
+.unlock-list li:last-child {
+  border-bottom: 0;
+}
+.unlock-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.unlock-text a:first-child {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.unlock-empty {
+  padding: 16px;
+  color: var(--muted);
+}
+.home-activity-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 18px 16px;
+}
+.home-activity-body p {
+  margin: 0;
+  color: #c9d4da;
+}
+.home-activity-body .activity {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.home-activity-body .activity > h3 {
+  display: none;
+}
+
+@media (max-width: 760px) {
   .progression-page .home-workspace {
     gap: 16px;
   }
-  .progression-page .home-preparation .activity-header,
-  .home-preparation-body,
-  .home-map,
-  .progression-page .home-levels > .player-statistics {
-    padding: 14px;
+  .progression-page .utility-heading h1 {
+    font-size: 24px;
+  }
+  .utility-heading > .route-progress {
+    min-width: 0;
+    width: 100%;
+  }
+  .next-quest-body {
+    padding: 16px;
+  }
+  .next-quest-title {
+    font-size: 26px;
+    line-height: 30px;
+  }
+  .next-quest-actions .btn,
+  .next-quest-actions .text-link {
+    min-height: 44px;
+  }
+  .home-skill-grid {
+    padding: 12px;
   }
 }
