@@ -5,7 +5,7 @@
   import { wikiHref } from "../../wiki";
   import GameArt from "./GameArt.svelte";
   import GameText from "./GameText.svelte";
-  import SectionHeading from "./SectionHeading.svelte";
+  import GameWindow from "./GameWindow.svelte";
   import "../../QuestCombat.css";
   let { quest }: { quest: QuestRecord } = $props();
   let plan = $derived(QUEST_COMBAT[quest.id]);
@@ -39,15 +39,16 @@
     {/each}
   </ul>
 {/snippet}
-<section class="detail-section quest-combat" aria-label="Combat and danger">
-  <SectionHeading title="Combat and danger" />
-  {#if plan.required.length}<h4>Required fights</h4>
-    {@render enemies(plan.required)}{:else}<p class="combat-no-fights">
-      No required kills.
-    </p>{/if}
-  {#if plan.hazards.length}<h4>Dangerous or optional encounters</h4>
-    {@render enemies(plan.hazards)}{/if}
-  {#if plan.notes.length}<ul class="combat-notes">
-      {#each plan.notes as note (note)}<li><GameText text={note} /></li>{/each}
-    </ul>{/if}
-</section>
+<GameWindow title="Combat and danger" className="quest-combat">
+  <div class="quest-combat-body">
+    {#if plan.required.length}<h4>Required fights</h4>
+      {@render enemies(plan.required)}{:else}<p class="combat-no-fights">
+        No required kills.
+      </p>{/if}
+    {#if plan.hazards.length}<h4>Dangerous or optional encounters</h4>
+      {@render enemies(plan.hazards)}{/if}
+    {#if plan.notes.length}<ul class="combat-notes">
+        {#each plan.notes as note (note)}<li><GameText text={note} /></li>{/each}
+      </ul>{/if}
+  </div>
+</GameWindow>

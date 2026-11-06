@@ -1,8 +1,14 @@
+.quest-combat-body {
+  padding: 16px;
+}
 .quest-combat h4 {
   margin: 14px 0 8px;
   font-size: var(--font-ui);
   font-weight: 500;
   color: var(--muted);
+}
+.quest-combat h4:first-child {
+  margin-top: 0;
 }
 .quest-enemies {
   list-style: none;

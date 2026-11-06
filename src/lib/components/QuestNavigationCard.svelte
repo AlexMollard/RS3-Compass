@@ -7,6 +7,7 @@
     completed,
     selected,
     recommended = false,
+    next = false,
     variant = "journal",
     position,
     onOpen,
@@ -15,6 +16,7 @@
     completed: boolean;
     selected?: boolean;
     recommended?: boolean;
+    next?: boolean;
     variant?: "queue" | "journal";
     position?: number;
     onOpen: (id: string) => void;
@@ -77,7 +79,9 @@
         >{quest.members ? "Members" : "Free-to-play"} · {availability ||
           activityType} · {quest.difficulty}</small
       ></span
-    ><span class="reference-action" aria-hidden="true"
+    >{#if next && !completed}<em class="quest-next-mark">Next</em>{/if}<span
+      class="reference-action"
+      aria-hidden="true"
       ><ChevronRight size={15} /></span
     ></button
   >{/if}

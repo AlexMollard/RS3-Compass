@@ -1,17 +1,22 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import { QUESTS, toggleItem } from "../../data";
+  import { nextQuest, QUESTS, toggleItem } from "../../data";
+  import { wikiHref, wikiImage } from "../../wiki";
   import { getCompass } from "../compassContext";
+  import { lineArt } from "../gameText";
+  import { inventorySlots } from "../inventorySlots";
   import { questPath, skillPath } from "../navigation";
-  import ActivityHeader from "../components/ActivityHeader.svelte";
+  import { questReadiness } from "../questReadiness";
   import Button from "../components/Button.svelte";
+  import GameArt from "../components/GameArt.svelte";
   import GameText from "../components/GameText.svelte";
+  import GameWindow from "../components/GameWindow.svelte";
   import ItemList from "../components/ItemList.svelte";
-  import PageHeading from "../components/PageHeading.svelte";
   import QuestNavigationCard from "../components/QuestNavigationCard.svelte";
+  import ReadinessTiles from "../components/ReadinessTiles.svelte";
   import ResponsivePicker from "../components/ResponsivePicker.svelte";
-  import SectionHeading from "../components/SectionHeading.svelte";
   import SearchField from "../components/SearchField.svelte";
+  import SourceBanner from "../components/SourceBanner.svelte";
   import WikiAction from "../components/WikiAction.svelte";
   import QuestLevels from "../components/QuestLevels.svelte";
   import QuestCombat from "../components/QuestCombat.svelte";
@@ -22,6 +27,7 @@
   const controller = getCompass();
   const saved = controller.state;
   const compact = controller.compact;
+  const kindLabel = { quest: "Quest", miniquest: "Miniquest", saga: "Saga" };
   let profile = $derived(
     $saved.profiles.find((p) => p.id === $saved.activeId) ?? $saved.profiles[0],
   );
@@ -35,6 +41,9 @@
       profile.packed.includes(quest.id + "::" + item),
     ),
   );
+  let inventory = $derived(inventorySlots(quest, profile.packed));
+  let readiness = $derived(questReadiness(quest, profile));
+  let next = $derived(nextQuest(profile));
   let catalogueCounts = $derived.by(() => {
     let total = 0;
     let completed = 0;
@@ -76,100 +85,183 @@
 </script>
 
 <div class="quest-page page-enter">
-  <PageHeading
-    title="Quest workspace"
-    subtitle="Check requirements and prepare for a quest."
-    >{#snippet trailing()}<div class="quest-workspace-controls">
-        <span class="badge badge-gold"
-          >{catalogueCounts.completed} / {catalogueCounts.total} activities</span
-        >
-        <Button
-          variant="quiet"
-          aria-pressed={$compact}
-          onclick={() => compact.update((value) => !value)}
-        >
-          {$compact ? "Expand workspace" : "Compact quest"}
-        </Button>
-      </div>{/snippet}</PageHeading
-  >
-  <div class="journal-layout">
+  <div class="quest-toolbar">
+    <Button
+      variant="quiet"
+      aria-pressed={$compact}
+      onclick={() => compact.update((value) => !value)}
+    >
+      {$compact ? "Expand workspace" : "Compact quest"}
+    </Button>
+  </div>
+  <div class="journal-layout quest-layout">
     <ResponsivePicker label="Quest" selection={quest.name}>
-      <aside class="panel journal-list" aria-label="Quest catalogue">
-        <SearchField
-          label="Search quests and miniquests"
-          placeholder="Find a quest…"
-          value={query}
-          onChange={(v) => (query = v)}
-        />
-        <label class="small-checkbox"
-          ><input type="checkbox" bind:checked={hideCompleted} /> Hide completed</label
-        >
-        <p class="list-kicker">
-          {profile.mode === "members"
-            ? "FREE & MEMBERS QUESTS"
-            : "FREE WORLD QUESTS"}
-        </p>
-        {#each visible as q (q.id)}<QuestNavigationCard
-            quest={q}
-            completed={profile.completedQuests.includes(q.id)}
-            selected={quest.id === q.id}
-            onOpen={(id) => void goto(questPath(id))}
-          />{:else}<div class="empty-state">
-            No matching quests. Change your search or show completed quests.
-          </div>{/each}
-        <p class="sample-note">
-          Seasonal quests and tutorials are labelled separately.
-        </p>
+      <aside class="tool-window quest-log" aria-label="Quest log">
+        <header class="window-title">
+          <h2>Quest log</h2>
+          <span>{catalogueCounts.completed} / {catalogueCounts.total}</span>
+        </header>
+        <div class="journal-list">
+          <SearchField
+            label="Search quests and miniquests"
+            placeholder="Find a quest…"
+            value={query}
+            onChange={(v) => (query = v)}
+          />
+          <label class="small-checkbox"
+            ><input type="checkbox" bind:checked={hideCompleted} /> Hide completed</label
+          >
+          <p class="list-kicker">
+            {profile.mode === "members"
+              ? "FREE & MEMBERS QUESTS"
+              : "FREE WORLD QUESTS"}
+          </p>
+          {#each visible as q (q.id)}<QuestNavigationCard
+              quest={q}
+              completed={profile.completedQuests.includes(q.id)}
+              selected={quest.id === q.id}
+              next={next?.id === q.id}
+              onOpen={(id) => void goto(questPath(id))}
+            />{:else}<div class="empty-state">
+              No matching quests. Change your search or show completed quests.
+            </div>{/each}
+          <p class="sample-note">
+            Seasonal quests and tutorials are labelled separately.
+          </p>
+        </div>
       </aside>
     </ResponsivePicker>
-    <article class="panel quest-detail">
-      <ActivityHeader
-        title={quest.name}
-        wiki={quest.wiki}
-        image={quest.icon}
-        artwork={quest.artwork}
-        eyebrow={quest.members ? "MEMBERS" : "FREE-TO-PLAY"}
-      />
-      <div class="detail-body">
-        <div class="quest-facts">
-          <span>{quest.difficulty}</span><span>{quest.length}</span><span
-            class:text-green={complete}
-            >{complete ? "Compass: Completed" : "Not marked complete"}</span
+
+    <div class="quest-centre">
+      <section class="tool-window quest-hero" aria-labelledby="quest-title">
+        <div class="quest-hero-main">
+          <a
+            class="quest-hero-art"
+            href={wikiHref(quest.wiki)}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={quest.name + " on RuneScape Wiki"}
+            ><GameArt file={quest.artwork} size={300} thumbnail /></a
           >
-          {#if quest.kind && quest.kind !== "quest"}<span
-              >{quest.kind === "saga" ? "Saga" : "Miniquest"}</span
-            >{/if}
-          {#if quest.availability}<span class="badge"
-              >{quest.availability === "seasonal"
-                ? "Seasonal"
-                : "Tutorial"}</span
-            >{/if}
-          {#if quest.completionMembers && profile.mode === "f2p"}<span
-              class="badge">Members to finish</span
-            >{/if}
-        </div>
-        <QuestPlayerStatus {profile} {quest} />
-        <section class="prep-reason">
-          <h3>Purpose</h3>
-          <p><GameText text={quest.why} /></p>
-        </section>
-        {#if locked}<div class="notice">
-            <div>
-              <strong>Membership required</strong>
-              <p>
-                You can prepare items now. This quest requires membership to
-                play; your progress is kept when switching planning modes.
-              </p>
-            </div>
-          </div>{/if}
-        <div class="quest-preparation-grid">
-          <div class="quest-preparation-main">
-            {#if prerequisites.length}
-              <section
-                class="detail-section quest-preparation-section"
-                aria-label="Quest requirements"
+          <div class="quest-hero-copy">
+            <span class="eyebrow"
+              >{quest.members ? "Members" : "Free-to-play"} · {kindLabel[
+                quest.kind ?? "quest"
+              ]}</span
+            >
+            <h1 id="quest-title">{quest.name}</h1>
+            <p class="quest-why"><GameText text={quest.why} /></p>
+            <div class="quest-chips">
+              <span class="badge">{quest.difficulty}</span>
+              <span class="badge">{quest.length}</span>
+              <span class="badge" class:badge-green={complete}
+                >{complete ? "Compass: Completed" : "Not marked complete"}</span
               >
-                <SectionHeading title="Quest requirements" />
+              {#if quest.availability}<span class="badge"
+                  >{quest.availability === "seasonal"
+                    ? "Seasonal"
+                    : "Tutorial"}</span
+                >{/if}
+              {#if quest.completionMembers && profile.mode === "f2p"}<span
+                  class="badge">Members to finish</span
+                >{/if}
+            </div>
+            <QuestPlayerStatus {profile} {quest} />
+          </div>
+        </div>
+        <nav class="quest-jump" aria-label="Jump to">
+          <ReadinessTiles
+            {readiness}
+            anchors={{
+              levels: "#quest-levels",
+              pack: "#quest-pack",
+              danger: "#quest-danger",
+              start: "#quest-start",
+            }}
+          />
+        </nav>
+      </section>
+
+      {#if locked}<div class="quest-lock">
+          <SourceBanner
+            notice={{
+              tone: "info",
+              title: "Membership required",
+              message:
+                "You can prepare items now. This quest requires membership to play; your progress is kept when switching planning modes.",
+              retry: false,
+            }}
+          />
+        </div>{/if}
+
+      <div id="quest-pack" class="quest-pack">
+        <GameWindow
+          title="Pack your inventory"
+          className={packedItems.length < quest.supplies.length
+            ? "pack-window pack-short"
+            : "pack-window"}
+          trailing={quest.supplies.length
+            ? `${packedItems.length} of ${quest.supplies.length} packed`
+            : undefined}
+        >
+          <div class="pack-body">
+            {#if quest.supplies.length}
+              <div class="pack-inventory">
+                <div
+                  class="inv"
+                  role="img"
+                  aria-label={`Inventory preview: ${inventory.slots.length} of 28 slots used, ${packedItems.length} packed`}
+                >
+                  {#each inventory.slots as slot (slot.key)}
+                    {@const art = lineArt(slot.line)}
+                    <span class="slot" class:full={slot.packed} title={slot.line}
+                      >{#if art}<img
+                          src={art.imageUrl ?? wikiImage(art.image!)}
+                          alt=""
+                          loading="lazy"
+                          decoding="async"
+                        />{:else}<span class="slot-label">{slot.line}</span
+                        >{/if}</span
+                    >
+                  {/each}
+                  {#each { length: inventory.empty } as _}<span
+                      class="slot empty"
+                    ></span>{/each}
+                </div>
+                <span class="cap"
+                  >{inventory.slots.length} of 28 slots. Packing checks are manual;
+                  Compass can't see your bank or inventory.</span
+                >
+              </div>
+            {/if}
+            <div class="pack-list">
+              <ItemList
+                items={quest.supplies}
+                checked={packedItems}
+                onToggle={toggleSupply}
+              />
+            </div>
+          </div>
+        </GameWindow>
+      </div>
+
+      <div class="quest-checks">
+        <div id="quest-levels" class="quest-levels">
+          <GameWindow title="Level checks">
+            <QuestLevels {profile} {quest} onSkill={openSkill} />
+          </GameWindow>
+        </div>
+        <div id="quest-danger" class="quest-danger">
+          <QuestCombat {quest} />
+        </div>
+      </div>
+
+      {#if prerequisites.length || quest.preparationNotes?.length}
+        <div class="quest-before">
+          <GameWindow title="Before you go">
+            <div class="window-body">
+              {#if prerequisites.length}
+                <h3 class="window-subhead">Quest requirements</h3>
                 {#each prerequisites as prerequisite (prerequisite.id)}
                   <QuestNavigationCard
                     quest={prerequisite}
@@ -179,135 +271,326 @@
                     onOpen={(id) => void goto(questPath(id))}
                   />
                 {/each}
-              </section>
-            {/if}
-            {#if quest.preparationNotes?.length}
-              <section class="detail-section quest-preparation-section">
-                <SectionHeading title="Before you go" />
+              {/if}
+              {#if quest.preparationNotes?.length}
                 <ul class="plain-list">
                   {#each quest.preparationNotes as note}<li>
                       <GameText text={note} />
                     </li>{/each}
                 </ul>
-              </section>
-            {/if}
-            <section
-              class="detail-section quest-preparation-section"
-              aria-label="Level checks"
-            >
-              <SectionHeading title="Level checks" /><QuestLevels
-                {profile}
-                {quest}
-                onSkill={openSkill}
-              />
-            </section>
-            <section
-              class="detail-section quest-preparation-section quest-preparation-items"
-            >
-              <SectionHeading title="Gather these items">
-                {#snippet aside()}
-                  {#if quest.supplies.length}
-                    <span class="badge"
-                      >{packedItems.length}/{quest.supplies.length} packed</span
-                    >
-                  {/if}
-                {/snippet}
-              </SectionHeading>
-              <ItemList
-                items={quest.supplies}
-                checked={packedItems}
-                onToggle={toggleSupply}
-              />
-              <p class="sample-note">
-                Packing checks are manual; they do not read your bank or
-                inventory.
-              </p>
-            </section>
-            <QuestCombat {quest} />
-          </div>
-          <aside
-            class="quest-preparation-aside"
-            aria-label="Quest start and rewards"
-          >
-            <section class="detail-section quest-preparation-section">
-              <SectionHeading title="Where to start" /><QuestStart {quest} />
-            </section>
-            <section class="detail-section quest-preparation-section">
-              <SectionHeading title="What you gain" />
-              <ul class="plain-list reward-list">
-                {#each quest.rewards as reward}<li>
-                    ✓ <GameText text={reward} />
-                  </li>{/each}
-              </ul>
-              <small class="muted"
-                >Record reward levels after claiming them.</small
-              >
-            </section>
-            <ActivityNotes
-              value={profile.notes[quest.id] || ""}
-              onChange={(value) => {
-                const id = quest.id;
-                controller.updateProfile((p) => ({
-                  ...p,
-                  notes: { ...p.notes, [id]: value },
-                }));
-              }}
-            />
-          </aside>
+              {/if}
+            </div>
+          </GameWindow>
         </div>
-        <div class="detail-actions">
-          <Button
-            variant={complete ? "success" : "secondary"}
-            aria-pressed={complete}
-            onclick={() =>
-              controller.updateProfile((p) => ({
-                ...p,
-                completedQuests: toggleItem(p.completedQuests, quest.id),
-              }))}
-            >{complete ? "Undo completion" : "Mark quest complete"}</Button
-          ><WikiAction page={quest.wiki} label="Wiki walkthrough" />
-        </div>
-        <p class="sample-note">
-          Preparation checked against the RuneScape Wiki, November 2026. Use the
-          Wiki or in-game helper for walkthrough steps.
-        </p>
+      {/if}
+
+      <div class="quest-notes">
+        <ActivityNotes
+          value={profile.notes[quest.id] || ""}
+          onChange={(value) => {
+            const id = quest.id;
+            controller.updateProfile((p) => ({
+              ...p,
+              notes: { ...p.notes, [id]: value },
+            }));
+          }}
+        />
       </div>
-    </article>
+
+      <div class="quest-actions">
+        <Button
+          variant={complete ? "success" : "primary"}
+          aria-pressed={complete}
+          onclick={() =>
+            controller.updateProfile((p) => ({
+              ...p,
+              completedQuests: toggleItem(p.completedQuests, quest.id),
+            }))}
+          >{complete ? "Undo completion" : "Mark quest complete"}</Button
+        ><WikiAction page={quest.wiki} label="Wiki walkthrough" />
+        <span class="cap"
+          >Checked against the RuneScape Wiki, November 2026. Use the Wiki or
+          in-game helper for walkthrough steps.</span
+        >
+      </div>
+    </div>
+
+    <div class="quest-aside">
+      <div id="quest-start" class="quest-start-window">
+        <GameWindow title="Start here">
+          <QuestStart {quest} />
+        </GameWindow>
+      </div>
+      <div class="quest-rewards">
+        <GameWindow title="Rewards">
+          <ul class="reward-list">
+            {#each quest.rewards as reward}<li><GameText text={reward} /></li>{/each}
+          </ul>
+          <p class="cap rewards-note">Record reward levels after claiming them.</p>
+        </GameWindow>
+      </div>
+    </div>
   </div>
 </div>
 
 <style>
-  .quest-workspace-controls {
+  .quest-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 12px;
+  }
+  .cap {
+    font-size: var(--font-caption);
+    color: var(--muted);
+  }
+  .quest-centre,
+  .quest-aside {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+  }
+  .quest-centre > *,
+  .quest-aside > * {
+    min-width: 0;
+  }
+
+  /* Quest log */
+  .quest-log :global(.journal-list) {
+    padding: 12px 6px 10px;
+  }
+  .quest-log :global(.journal-list > .search-field),
+  .quest-log :global(.journal-list > .small-checkbox) {
+    margin-left: 6px;
+    margin-right: 6px;
+  }
+  .quest-log :global(.journal-row) {
+    min-height: 44px;
+    margin: 2px 0;
+    padding: 4px 10px;
+    border-radius: 3px;
+  }
+  .quest-log :global(.journal-row.selected) {
+    background: var(--panel-raised);
+    border-color: #c5a46b80;
+  }
+  .quest-log :global(.journal-row.selected strong) {
+    color: #f0e2c2;
+    font-weight: 600;
+  }
+  .quest-log :global(.journal-row small),
+  .quest-log :global(.journal-row .reference-action) {
+    display: none;
+  }
+  .quest-log :global(.journal-row strong) {
+    line-height: 1.4;
+  }
+  .quest-log :global(.quest-next-mark) {
+    flex: none;
+    font-size: var(--font-caption);
+    font-style: normal;
+    color: var(--gold-bright);
+  }
+
+  /* Hero */
+  .quest-hero-main {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .quest-hero-art {
+    position: relative;
+    flex: 0 0 128px;
+    min-height: 128px;
+    overflow: hidden;
+    background: #0d161c;
+  }
+  .quest-hero-art :global(img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .quest-hero-copy {
+    flex: 1 1 240px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px 22px;
+  }
+  .quest-hero-copy h1 {
+    margin: -4px 0 0;
+    font:
+      600 32px/36px "Cinzel",
+      Georgia,
+      serif;
+    letter-spacing: 0.3px;
+    color: var(--heading);
+  }
+  .quest-why {
+    margin: 0;
+    color: #c9d4da;
+  }
+  .quest-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .quest-jump {
+    border-top: 1px solid #2f3e48;
+  }
+  .quest-lock :global(.source-banner) {
+    margin-top: 0;
+  }
+
+  /* Pack */
+  .quest-pack :global(.pack-short .window-title > span) {
+    color: var(--warn);
+  }
+  .pack-body {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 22px;
+    padding: 18px;
+  }
+  .pack-inventory {
+    flex: 0 1 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .pack-list {
+    flex: 1 1 200px;
+    min-width: 0;
+  }
+  .pack-list :global(.pack-row:first-child) {
+    padding-top: 0;
+  }
+  .inv {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    padding: 10px;
+    background: #3b3226;
+    border: 1px solid #5a4b37;
+    border-radius: 3px;
+    box-shadow: inset 0 0 0 2px #1d1810;
+  }
+  .slot {
+    aspect-ratio: 1;
     display: flex;
     align-items: center;
+    justify-content: center;
+    min-width: 0;
+    overflow: hidden;
+    background: #2a231a;
+    border: 1px solid #4a3e2e;
+    border-radius: 2px;
+    box-shadow: inset 0 2px 3px #00000070;
+    font-size: 9px;
+    line-height: 1.1;
+    color: #b9a888;
+    text-align: center;
+  }
+  .slot.full {
+    background: #2f281e;
+    color: #e8dcc2;
+  }
+  .slot img {
+    width: 70%;
+    height: 70%;
+    object-fit: contain;
+  }
+  .slot:not(.full):not(.empty) > * {
+    opacity: 0.45;
+  }
+  .slot-label {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    overflow: hidden;
+    padding: 0 2px;
+    overflow-wrap: anywhere;
+  }
+
+  /* Checks */
+  .quest-checks {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    gap: 20px;
+    align-items: start;
+  }
+  .window-body {
+    padding: 16px;
+  }
+  .window-subhead {
+    margin: 0 0 8px;
+    font-size: var(--font-ui);
+    font-weight: 500;
+    color: var(--muted);
+  }
+  .quest-before :global(.plain-list:last-child) {
+    margin-bottom: 0;
+  }
+  .quest-notes :global(.notes-card) {
+    border-radius: 3px;
+  }
+
+  /* Actions */
+  .quest-actions {
+    display: flex;
     flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    padding: 4px 0;
+  }
+  .quest-actions :global(.text-link) {
+    min-height: var(--control-size);
+    padding: 0 16px;
+    border: 1px solid var(--edge);
+    border-radius: 4px;
+    background: #26394566;
+    color: var(--text);
+    font-weight: 600;
+  }
+  .quest-actions :global(.text-link:hover) {
+    background: #2c424f;
+    color: var(--text);
+  }
+  .quest-actions .cap {
+    flex: 1 1 200px;
+  }
+
+  /* Aside */
+  .quest-start-window :global(.quest-start) {
+    grid-template-columns: 64px minmax(0, 1fr);
+    gap: 12px;
+    border: 0;
+    background: none;
+  }
+  .quest-start-window :global(.quest-start-portrait) {
+    min-height: 64px;
+  }
+  .quest-start-window :global(.quest-start-portrait img) {
+    width: 64px;
+    height: 64px;
+  }
+  .reward-list {
+    list-style: none;
+    margin: 0;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
     gap: 10px;
   }
-  .quest-detail {
-    container: quest-detail / inline-size;
+  .rewards-note {
+    margin: 0;
+    padding: 0 16px 16px;
   }
-  .quest-preparation-grid {
-    display: grid;
-    gap: 24px;
-    margin-top: 24px;
-  }
-  .quest-preparation-main,
-  .quest-preparation-aside {
-    display: grid;
-    align-content: start;
-    gap: 24px;
-    min-width: 0;
-  }
-  .quest-preparation-section {
-    min-width: 0;
-    margin-top: 0;
-  }
-  .quest-preparation-main :global(.quest-combat) {
-    margin-top: 0;
-  }
-  .quest-preparation-items :global(.section-heading) {
-    flex-wrap: wrap;
-  }
+
   @media (min-width: 1001px) {
     .quest-page :global(.guide-picker) {
       position: sticky;
@@ -324,18 +607,87 @@
       overscroll-behavior: contain;
     }
   }
-  @container quest-detail (min-width: 740px) {
-    .quest-preparation-grid {
-      grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
-      gap: 24px;
+  /* Phone: QuestPhone order. Wrappers dissolve so their windows interleave. */
+  @media (max-width: 760px) {
+    .quest-toolbar {
+      display: none;
     }
-    .quest-preparation-main :global(.quest-enemies) {
-      grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+    .quest-centre,
+    .quest-aside,
+    .quest-checks {
+      display: contents;
     }
-  }
-  @container quest-detail (min-width: 1100px) {
-    .quest-preparation-aside :global(.world-map-canvas) {
-      height: 320px;
+    .quest-hero {
+      order: 1;
+    }
+    .quest-lock {
+      order: 2;
+    }
+    .quest-pack {
+      order: 3;
+    }
+    .quest-start-window {
+      order: 4;
+    }
+    .quest-danger {
+      order: 5;
+    }
+    .quest-levels {
+      order: 6;
+    }
+    .quest-before {
+      order: 7;
+    }
+    .quest-actions {
+      order: 8;
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .quest-actions .cap {
+      flex: none;
+    }
+    .quest-actions :global(.btn),
+    .quest-actions :global(.text-link) {
+      min-height: 48px;
+      justify-content: center;
+    }
+    .quest-notes {
+      order: 9;
+    }
+    .quest-rewards {
+      order: 10;
+    }
+    .quest-hero-art {
+      flex: 1 1 100%;
+      height: 150px;
+      min-height: 0;
+    }
+    .quest-hero-copy {
+      padding: 14px 16px 16px;
+    }
+    .quest-hero-copy h1 {
+      font-size: 28px;
+      line-height: 32px;
+    }
+    .quest-jump {
+      border-top: 0;
+    }
+    .pack-body {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+      padding: 14px;
+    }
+    .pack-inventory,
+    .pack-list {
+      flex: none;
+    }
+    .pack-inventory {
+      order: 2;
+    }
+    .inv {
+      gap: 5px;
+      padding: 8px;
     }
   }
 </style>

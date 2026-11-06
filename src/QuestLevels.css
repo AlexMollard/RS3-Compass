@@ -4,6 +4,7 @@
   align-items: start;
   gap: 18px;
   max-width: 980px;
+  padding: 16px;
 }
 .level-check-empty {
   grid-column: 1 / -1;

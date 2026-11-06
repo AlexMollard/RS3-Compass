@@ -131,31 +131,6 @@
   margin: 0;
   color: #c9d4da;
 }
-.readiness {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-}
-.readiness-tile {
-  padding: 10px;
-  border: 1px solid #33434d;
-  border-radius: 3px;
-  background: var(--well);
-  min-width: 0;
-}
-.readiness-tile strong {
-  display: block;
-  overflow-wrap: anywhere;
-}
-.readiness-tile .tone-ok {
-  color: var(--green);
-}
-.readiness-tile .tone-warn {
-  color: var(--warn);
-}
-.readiness-tile .tone-muted {
-  color: var(--muted);
-}
 .next-quest-start {
   display: flex;
   align-items: center;

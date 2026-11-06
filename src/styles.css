@@ -648,6 +648,37 @@ textarea {
   gap: 24px;
   align-items: start;
 }
+/* Quest workspace: log | centre | aside from 1200px; the aside drops under
+   the centre below that, and the log becomes a picker below 1001px. */
+.journal-layout.quest-layout {
+  grid-template-columns: 236px minmax(0, 1fr);
+  gap: 20px;
+}
+.quest-layout > .guide-picker {
+  grid-row: 1 / span 2;
+}
+.quest-layout > .quest-aside {
+  grid-column: 2;
+}
+@media (min-width: 1200px) {
+  .journal-layout.quest-layout {
+    grid-template-columns: 236px minmax(0, 1fr) 300px;
+  }
+  .quest-layout > .quest-aside {
+    grid-column: 3;
+    grid-row: 1;
+  }
+}
+@media (max-width: 1000px) {
+  .journal-layout.quest-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .quest-layout > .guide-picker,
+  .quest-layout > .quest-aside {
+    grid-column: auto;
+    grid-row: auto;
+  }
+}
 .journal-list {
   padding: 16px 12px;
 }
@@ -1284,6 +1315,10 @@ textarea {
 }
 .is-compact .quest-page .guide-picker {
   display: none;
+}
+.is-compact .quest-page .quest-aside {
+  grid-column: auto;
+  grid-row: auto;
 }
 
 .is-compact .detail-body {

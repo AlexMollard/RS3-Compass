@@ -289,6 +289,16 @@ const pattern = new RegExp(
 
 export type GameTextSegment = { text: string; reference?: GameTextReference };
 
+/** The first catalogue reference in a line that GameText would show art for, or undefined. */
+export function lineArt(text: string): GameTextReference | undefined {
+  return tokenizeGameText(text).find(
+    (segment) =>
+      segment.reference &&
+      !segment.reference.search &&
+      (segment.reference.imageUrl || segment.reference.image),
+  )?.reference;
+}
+
 export function tokenizeGameText(
   text: string,
   extra?: readonly GameTextReference[],

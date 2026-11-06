@@ -15,6 +15,7 @@
   import WikiAction from "../components/WikiAction.svelte";
   import PlayerStatistics from "../components/PlayerStatistics.svelte";
   import RecentActivity from "../components/RecentActivity.svelte";
+  import ReadinessTiles from "../components/ReadinessTiles.svelte";
   import "../../Journey.css";
   const controller = getCompass();
   const saved = controller.state;
@@ -111,38 +112,7 @@
               >
               <h3 class="next-quest-title">{next.name}</h3>
               <p class="next-quest-why"><GameText text={next.why} /></p>
-              <div class="readiness">
-                <div class="readiness-tile">
-                  <span class="cap">Levels</span>
-                  <strong
-                    class={readiness.levels.unknown > 0
-                      ? "tone-muted"
-                      : readiness.levels.met === readiness.levels.total
-                        ? "tone-ok"
-                        : "tone-warn"}
-                    >{readiness.levels.total === 0
-                      ? "None"
-                      : readiness.levels.unknown > 0
-                        ? "? unknown"
-                        : readiness.levels.met +
-                          " / " +
-                          readiness.levels.total}</strong
-                  >
-                </div>
-                <div class="readiness-tile">
-                  <span class="cap">Pack</span>
-                  <strong
-                    class={readiness.pack.packed === readiness.pack.total
-                      ? "tone-ok"
-                      : "tone-warn"}
-                    >{readiness.pack.packed} / {readiness.pack.total}</strong
-                  >
-                </div>
-                <div class="readiness-tile">
-                  <span class="cap">Danger</span>
-                  <strong>{readiness.danger ?? "None"}</strong>
-                </div>
-              </div>
+              <ReadinessTiles {readiness} />
               <div class="next-quest-start">
                 <GameArt file={start.image} alt="" size={48} thumbnail />
                 <span
