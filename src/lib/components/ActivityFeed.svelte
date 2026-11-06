@@ -279,13 +279,10 @@
     padding: 0;
     margin: 12px 0;
     display: grid;
-    gap: 10px;
+    gap: 0;
   }
   .feed-body {
     padding: 4px 18px 16px;
-  }
-  .events {
-    gap: 0;
   }
   .events > li {
     display: flex;
@@ -334,9 +331,6 @@
   .title {
     font-weight: 500;
     margin: 0;
-  }
-  .ev-main :global(.wiki-ref img) {
-    display: none;
   }
   details > summary {
     cursor: pointer;

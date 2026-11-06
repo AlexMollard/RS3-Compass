@@ -63,7 +63,27 @@
     watched.filter((p) => $sync[p.id]?.state === "queued").length,
   );
   let errors = $derived(watched.filter((p) => $sync[p.id]?.state === "error"));
-  const quiet = (status?: string) =>
+  function statusCopy(status?: string) {
+    if (status === "not-member")
+      return {
+        tone: "private" as const,
+        message:
+          "This event log requires active membership; Jagex reports this account is not a member.",
+      };
+    if (status === "private-or-unavailable")
+      return {
+        tone: "private" as const,
+        message: "Jagex did not expose an event log for this player.",
+      };
+    if (status === "service-unavailable")
+      return {
+        tone: "failed" as const,
+        message:
+          "The event service could not be reached. Any last available snapshot is kept.",
+      };
+    return undefined;
+  }
+  const quiet =(status?: string) =>
     status === "private-or-unavailable" || status === "not-member";
   function chipFor(profile: Profile): {
     tone: "ok" | "warn" | "bad" | "info" | "neutral";
@@ -86,7 +106,7 @@
     return { tone: "neutral", label: "Not loaded yet" };
   }
   $effect(() => {
-    groupFilter =page.url.searchParams.get("group") ?? "all";
+    groupFilter = page.url.searchParams.get("group") ?? "all";
   });
   $effect(() => {
     playerFilter = page.url.searchParams.get("player") ?? "all";
@@ -163,6 +183,17 @@
         onRetry={() =>
           void controller.refreshPlayers([profile.id], { staleOnly: false })}
       />{/each}
+    {#each profiles as profile (profile.id)}
+      {@const copy = statusCopy(profile.eventImportStatus)}
+      {#if copy && $sync[profile.id]?.state !== "error"}<SourceBanner
+          notice={{
+            tone: copy.tone,
+            title: `${profile.name}: event log unavailable`,
+            message: copy.message,
+            retry: false,
+          }}
+        />{/if}
+    {/each}
     <div class="two">
       <ActivityFeed
         {sources}
@@ -188,6 +219,16 @@
                     <time title={new Date(log.fetchedAt).toLocaleString()}
                       >{relativeTime(log.fetchedAt)}</time
                     >{:else}No events loaded yet{/if}</span
+                >
+                {#if log && !log.events.length && !statusCopy(profile.eventImportStatus)}<span
+                    class="cap">No public events were returned.</span
+                  >{/if}
+                <a
+                  class="cap"
+                  href={"https://secure.runescape.com/m=adventurers-log/api/v1/playerEvents/" +
+                    encodeURIComponent(profile.name)}
+                  target="_blank"
+                  rel="noopener noreferrer">Jagex source ↗</a
                 >
               </span>
               <StatusChip tone={chip.tone} label={chip.label} />
