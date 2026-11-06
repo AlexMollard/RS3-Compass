@@ -108,7 +108,6 @@ export interface SkillRecord {
   name: SkillName;
   category: string;
   icon: string;
-  artwork?: string;
   description: string;
   goal: number;
   payoff: string;

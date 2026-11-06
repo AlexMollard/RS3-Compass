@@ -82,7 +82,6 @@
           title={skill.name}
           wiki={skill.wiki}
           image={skill.icon}
-          artwork={skill.artwork}
           eyebrow={stage
             ? trainingRangeLabel(skill, stage, profile.mode).toUpperCase()
             : "TRAINING"}

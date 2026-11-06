@@ -13,7 +13,6 @@
   import ActivityHeader from "../components/ActivityHeader.svelte";
   import Button from "../components/Button.svelte";
   import ChoiceStrip from "../components/ChoiceStrip.svelte";
-  import GameArt from "../components/GameArt.svelte";
   import GameText from "../components/GameText.svelte";
   import ItemList from "../components/ItemList.svelte";
   import SkillGrid from "../components/SkillGrid.svelte";
@@ -143,8 +142,7 @@
     title="Skills"
     subtitle="Methods, equipment, and supplies for the selected skill."
     >{#snippet trailing()}<span class="badge badge-gold"
-        ><GameArt file={skill.icon} size={16} />
-        {profile.mode === "members" ? "Members view" : "F2P view"}</span
+        >{profile.mode === "members" ? "Members view" : "F2P view"}</span
       >{/snippet}</PageHeading
   >
   <div class="journal-layout skill-layout">
@@ -174,7 +172,6 @@
         title={skill.name}
         wiki={skill.wiki}
         image={skill.icon}
-        artwork={skill.artwork}
         eyebrow={skill.category.toUpperCase()}
         >{#snippet meta()}<p>
             <GameText text={skill.description} />

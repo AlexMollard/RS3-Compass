@@ -144,11 +144,6 @@
     abortLookup();
     lookupDialog.close();
   }
-  function openPlayerManager() {
-    abortLookup();
-    if (lookupDialog.open) lookupDialog.close();
-    navigate("/players");
-  }
   function openSearch() {
     if (!searchDialog.open) searchDialog.showModal();
     searchDialog.querySelector<HTMLInputElement>("input")?.focus();
@@ -386,9 +381,6 @@
             ></label
           >
         {/if}
-        <button class="lookup-trigger" onclick={openPlayerManager}
-          >Manage players</button
-        >
       </div>
     </header>
     <main id="main-content" class="main-content" bind:this={main} tabindex="-1">
