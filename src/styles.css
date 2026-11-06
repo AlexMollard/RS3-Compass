@@ -2163,6 +2163,18 @@ textarea {
   color: var(--muted);
   font-size: var(--font-ui);
 }
+.game-surface {
+  border: 1px solid #40515b;
+  border-radius: 3px;
+  background:
+    linear-gradient(125deg, #ffffff05, transparent 65%),
+    repeating-linear-gradient(0deg, #00000009 0 1px, transparent 1px 3px),
+    var(--panel);
+  box-shadow:
+    inset 0 1px 0 #ffffff0b,
+    inset 0 -1px 0 #00000045,
+    0 2px 5px #00000012;
+}
 .tool-window {
   border: 1px solid #596b78;
   border-radius: 2px;

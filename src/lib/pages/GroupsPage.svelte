@@ -11,7 +11,9 @@
   import ChoiceStrip from "../components/ChoiceStrip.svelte";
   import GameWindow from "../components/GameWindow.svelte";
   import GameArt from "../components/GameArt.svelte";
-  import GameText from "../components/GameText.svelte";
+  import GameStat from "../components/GameStat.svelte";
+  import PlayerPortrait from "../components/PlayerPortrait.svelte";
+  import { wikiHref } from "../../wiki";
   import Button from "../components/Button.svelte";
 
   const controller = getCompass();
@@ -191,7 +193,7 @@
         >{/if}{/snippet}
   </PageHeading>
   {#if !groups.length || adding}
-    <GameWindow title="Find your group">
+    <GameWindow title="Find your group" icon="Group_Ironman_badge.png">
       <form class="group-form" onsubmit={(event) => void add(event)}>
         <label class="group-name"
           >Group name<input
@@ -238,207 +240,287 @@
     </GameWindow>
   {/if}
   {#if group}
-    <div class="saved-group-picker">
-      <ChoiceStrip
-        label="Saved groups"
-        name="saved-group"
-        value={String(group.id)}
-        choices={groups.map((g) => ({
-          value: String(g.id),
-          label: g.name,
-          detail: `${g.size} players · ${g.isCompetitive ? "Competitive" : "Regular"}`,
-        }))}
-        onChange={(value) => {
-          cancelLookup();
-          selectedId = value;
-          removing = null;
-        }}
-      />
-    </div>
-    <GameWindow title={group.name}>
-      <div class="group-overview">
+    {#if groups.length > 1}<div class="saved-group-picker">
+        <ChoiceStrip
+          label="Saved groups"
+          name="saved-group"
+          value={String(group.id)}
+          choices={groups.map((g) => ({
+            value: String(g.id),
+            label: g.name,
+            detail: `${g.size} players · ${g.isCompetitive ? "Competitive" : "Regular"}`,
+          }))}
+          onChange={(value) => {
+            cancelLookup();
+            selectedId = value;
+            removing = null;
+          }}
+        />
+      </div>{/if}
+    <section
+      class="group-banner game-surface"
+      aria-label={group.name + " overview"}
+    >
+      <div class="group-summary">
         <div class="identity">
-          <GameArt file="Group_Ironman_badge.png" size={48} />
+          <GameArt
+            file={group.isCompetitive
+              ? "Competitive_Group_Ironman_helm.png"
+              : "Group_Ironman_helm.png"}
+            size={40}
+          />
           <div>
-            <h2>
-              {group.isCompetitive ? "Competitive" : "Regular"} · {group.size}-player
-              group
-            </h2>
+            <h2>{group.name}</h2>
             <p>
-              {group.founder ? "Founder group · " : ""}<a
-                href={sourceUrl(group)}
-                target="_blank"
-                rel="noopener noreferrer">Official group Hiscores ↗</a
-              >
+              {group.isCompetitive ? "Competitive" : "Regular"} · {group.size} players{group.founder
+                ? " · Founder group"
+                : ""}
             </p>
           </div>
         </div>
-        <dl class="totals">
-          <div>
-            <dt>Group total level</dt>
-            <dd>{number(group.totalLevel)}</dd>
-          </div>
-          <div>
-            <dt>Group XP</dt>
-            <dd>{number(group.totalXp)}</dd>
-          </div>
-          <div>
-            <dt>Group rank</dt>
-            <dd>{group.rank == null ? "Not reported" : number(group.rank)}</dd>
-          </div>
-        </dl>
-        <p class="source">
-          Group-reported snapshot · {date(group.fetchedAt)}. Individual player
-          snapshots below can have different refresh times.
-        </p>
-        <div class="actions">
-          <Button
-            disabled={refreshing || memberBusy}
-            onclick={() => void refresh(false)}
-            >{refreshing || memberBusy
-              ? "Refreshing…"
-              : "Refresh saved data"}</Button
-          ><Button
-            disabled={memberBusy}
-            onclick={() => void controller.importGroupMembers(group!.id)}
-            >Load / refresh member players</Button
-          ><a href={"/activity?group=" + group.id}>Group activity feeds →</a>
+        <div class="totals">
+          <GameStat
+            label="Group total level"
+            value={number(group.totalLevel)}
+          />
+          <GameStat label="Group XP" value={number(group.totalXp)} />
+          <GameStat
+            label="Group rank"
+            value={group.rank == null ? "Not reported" : number(group.rank)}
+          />
         </div>
-        {#if messages[group.id]}<p class="source" role="status">
-            {messages[group.id]}
-          </p>{/if}
-        <div class="table-scroll">
-          <table class="roster">
-            <caption
-              >Public member snapshots · {members.filter((m) => m.profile)
-                .length}/{members.length} loaded</caption
-            ><thead
-              ><tr
-                ><th scope="col">Player</th><th scope="col">Total level</th><th
-                  scope="col">Quest points</th
-                ><th scope="col">Public lookup</th><th scope="col">Character</th
-                ></tr
-              ></thead
-            ><tbody>
-              {#each members as member (member.member.name)}
-                {@const memberSync =
-                  $sync[
-                    "rs3:" +
-                      normalizePlayerName(member.member.name).toLowerCase()
-                  ]}
-                <tr>
-                  <th scope="row">{member.member.name}</th><td
-                    >{member.profile?.statistics?.overall.level ??
-                      "Unrecorded"}{#if member.profile?.statistics && (member.profile.hiscoresImportStatus !== "available" || memberSync?.state === "error")}<small
-                        title={member.profile.hiscoresFetchedAt != null
-                          ? date(member.profile.hiscoresFetchedAt)
-                          : undefined}>Last available</small
-                      >{/if}</td
-                  ><td
-                    >{#if member.profile?.questProgress}{member.profile
-                        .questProgress.questPoints} / {member.profile
-                        .questProgress.maxQuestPoints}
-                      {#if member.profile.questImportStatus !== "available" || memberSync?.state === "error"}<small
-                          title={"Quest snapshot from " +
-                            date(member.profile.questProgress.fetchedAt)}
-                          >Last available</small
-                        >{/if}
-                    {:else}Unavailable{/if}</td
-                  >
-                  <td
-                    >{#if member.profile}{(member.profile.publicFetchedAt ??
-                        member.profile.hiscoresFetchedAt) != null
-                        ? date(
-                            (member.profile.publicFetchedAt ??
-                              member.profile.hiscoresFetchedAt)!,
-                          )
-                        : "Not fetched"}
-                    {:else if memberSync?.state === "queued"}Queued
-                    {:else if memberSync?.state === "refreshing"}Loading public
-                      player…
-                    {:else}Not loaded{/if}
-                    {#if memberSync?.state === "error"}<small role="status"
-                        >{memberSync.message}</small
-                      >{/if}</td
-                  >
-                  <td
-                    >{#if member.profile}<Button
-                        variant="quiet"
-                        onclick={() =>
-                          controller.selectProfile(member.profile!.id)}
-                        >{member.profile.id === $saved.activeId
-                          ? "Selected"
-                          : "Use player"}</Button
-                      >{:else}<span class="source">Load member players</span
-                      >{/if}</td
-                  >
-                </tr>{/each}
-            </tbody>
-          </table>
+        <div class="group-source source">
+          <span>Group snapshot · {date(group.fetchedAt)}</span>
+          <a href={sourceUrl(group)} target="_blank" rel="noopener noreferrer"
+            >Official Hiscores ↗</a
+          >
         </div>
       </div>
-    </GameWindow>
-    <GameWindow title="Skill comparison">
-      <div class="comparisons">
-        <ChoiceStrip
-          label="Compare skills"
-          name="group-skills"
-          value={comparison}
-          choices={[
-            { value: "prep", label: "Gathering and crafting" },
-            { value: "all", label: "All 29 skills" },
-          ]}
-          onChange={(value) => (comparison = value)}
+      <a
+        class="enclave-art"
+        href={wikiHref("Iron Enclave")}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <GameArt
+          file="Iron_Enclave_camp.png"
+          size={360}
+          alt="The camp at the Iron Enclave, the Group Ironman hub"
         />
-        <p class="source">
-          Published Hiscores levels only; manual Compass edits are excluded.
-          Gold marks the highest published level, not item ownership or every
-          required unlock. Each character still needs their own use levels and
-          quest requirements.
-        </p>
-        <div class="table-scroll">
-          <table class="skills">
-            <thead
-              ><tr
-                ><th scope="col">Skill</th>{#each members as member}<th
-                    scope="col"
-                    >{member.member.name}<small
-                      >{member.profile?.hiscoresLevels
-                        ? member.profile.hiscoresImportStatus === "available" &&
-                          $sync[member.profile.id]?.state !== "error"
-                          ? "Hiscores"
-                          : "Last available Hiscores"
-                        : "Public levels unrecorded"}</small
-                    ></th
-                  >{/each}<th scope="col">Highest published</th></tr
-              ></thead
-            ><tbody>
-              {#each skills as skill (skill.name)}{@const summary =
-                  groupSkillSummary(members, skill.name)}<tr
-                  ><th scope="row"><GameText text={skill.name} /></th
-                  >{#each members as member}{@const level =
-                      member.profile?.hiscoresLevels?.[skill.name]}<td
-                      class:highest={level !== undefined &&
-                        level === summary.highest}
-                      >{#if level !== undefined}<button
-                          class="level-link"
-                          aria-label={`${member.member.name}: ${skill.name} ${level}. Open training as this player`}
-                          onclick={() => {
-                            controller.selectProfile(member.profile!.id);
-                            void goto(
-                              "/skills/" + encodeURIComponent(skill.name),
-                            );
-                          }}>{level}</button
-                        >{:else}<span aria-label="Unrecorded">—</span>{/if}</td
-                    >{/each}<td class="leaders"
-                    >{summary.leaders.length
-                      ? summary.leaders.join(", ")
-                      : "No data"}</td
-                  ></tr
-                >{/each}
-            </tbody>
-          </table>
+        <span>Iron Enclave ↗</span>
+      </a>
+    </section>
+    <div class="group-toolbar">
+      <div class="actions">
+        <Button
+          disabled={refreshing || memberBusy}
+          onclick={() => void refresh(false)}
+        >
+          {refreshing || memberBusy ? "Refreshing…" : "Refresh group & players"}
+        </Button>
+        {#if members.some((m) => !m.profile)}
+          <Button
+            disabled={memberBusy}
+            onclick={() => void controller.importGroupMembers(group!.id)}
+            >Load missing players</Button
+          >
+        {/if}
+      </div>
+      <a class="feed-link game-surface" href={"/activity?group=" + group.id}>
+        <GameArt file="Group_Ironman_badge.png" size={24} />
+        Group activity <span aria-hidden="true">→</span>
+      </a>
+    </div>
+    {#if messages[group.id]}<p class="source" role="status">
+        {messages[group.id]}
+      </p>{/if}
+    <GameWindow
+      title="Members"
+      icon="Group_Ironman_badge.png"
+      trailing={`${members.filter((m) => m.profile).length}/${members.length} loaded`}
+    >
+      <div
+        class="roster-grid"
+        style:--roster-columns={Math.min(members.length, 3)}
+      >
+        {#each members as member (member.member.name)}
+          {@const id =
+            "rs3:" + normalizePlayerName(member.member.name).toLowerCase()}
+          {@const memberSync = $sync[id]}
+          {@const profile = member.profile}
+          <section
+            class="member-card game-surface"
+            class:selected={profile?.id === $saved.activeId}
+            aria-label={member.member.name}
+          >
+            <div class="member-heading">
+              <PlayerPortrait name={member.member.name} />
+              <div>
+                <a
+                  class="member-name"
+                  href={"/activity?player=" + encodeURIComponent(id)}
+                  >{member.member.name}</a
+                >
+                <p class="source">
+                  {profile?.id === $saved.activeId
+                    ? "Selected character"
+                    : "Group member"}
+                </p>
+              </div>
+            </div>
+            <div class="member-stats">
+              <GameStat
+                label="Total level"
+                value={profile?.statistics?.overall.level ?? "Unrecorded"}
+                detail={profile?.statistics &&
+                (profile.hiscoresImportStatus !== "available" ||
+                  memberSync?.state === "error")
+                  ? "Last available"
+                  : undefined}
+              />
+              <GameStat
+                label="Quest points"
+                value={profile?.questProgress
+                  ? `${profile.questProgress.questPoints} / ${profile.questProgress.maxQuestPoints}`
+                  : "Unavailable"}
+                detail={profile?.questProgress &&
+                (profile.questImportStatus !== "available" ||
+                  memberSync?.state === "error")
+                  ? "Last available"
+                  : undefined}
+              />
+            </div>
+            {#if memberSync?.state === "error"}<p
+                class="member-status"
+                role="status"
+              >
+                {memberSync.message}
+              </p>
+            {:else if memberSync?.state === "queued" || memberSync?.state === "refreshing"}<p
+                class="source"
+                role="status"
+              >
+                {memberSync.state === "queued"
+                  ? "Queued for refresh"
+                  : "Loading public data…"}
+              </p>
+            {:else if !profile}<p class="source">
+                Player not loaded. Use Load missing players above.
+              </p>{/if}
+            {#if profile}
+              <details class="source source-times">
+                <summary
+                  >Public lookup · {(profile.publicFetchedAt ??
+                    profile.hiscoresFetchedAt) != null
+                    ? date(
+                        (profile.publicFetchedAt ?? profile.hiscoresFetchedAt)!,
+                      )
+                    : "Not fetched"}</summary
+                >
+                <p>
+                  Hiscores: {profile.hiscoresFetchedAt != null
+                    ? date(profile.hiscoresFetchedAt)
+                    : "Unrecorded"}<br />Quests: {profile.questProgress
+                    ? date(profile.questProgress.fetchedAt)
+                    : "Unrecorded"}
+                </p>
+              </details>
+              <div class="member-actions">
+                <Button
+                  disabled={profile.id === $saved.activeId}
+                  onclick={() => controller.selectProfile(profile.id)}
+                  >{profile.id === $saved.activeId
+                    ? "Selected"
+                    : "Use player"}</Button
+                >
+                <a href={"/activity?player=" + encodeURIComponent(id)}
+                  >Activity →</a
+                >
+              </div>
+            {/if}
+          </section>
+        {/each}
+      </div>
+    </GameWindow>
+    <GameWindow title="Skill comparison" icon="Mining.png">
+      <div class="comparisons">
+        <div class="comparison-toolbar">
+          <ChoiceStrip
+            label="Compare skills"
+            name="group-skills"
+            value={comparison}
+            choices={[
+              { value: "prep", label: "Gathering and crafting" },
+              { value: "all", label: "All 29 skills" },
+            ]}
+            onChange={(value) => (comparison = value)}
+          />
+          <p class="comparison-key">
+            <span aria-hidden="true"></span> Highest published level
+          </p>
         </div>
+        <div class="skill-comparisons">
+          {#each skills as skill (skill.name)}
+            {@const summary = groupSkillSummary(members, skill.name)}
+            <section
+              class="comparison-card game-surface"
+              aria-label={skill.name + " comparison"}
+            >
+              <a
+                class="skill-title"
+                href={wikiHref(skill.wiki)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <GameArt file={skill.icon} size={28} />
+                <span>{skill.name}</span><span
+                  class="wiki-arrow"
+                  aria-hidden="true">↗</span
+                >
+              </a>
+              <div class="member-levels">
+                {#each members as member}
+                  {@const level = member.profile?.hiscoresLevels?.[skill.name]}
+                  {@const highest =
+                    level !== undefined && level === summary.highest}
+                  {#if level !== undefined}
+                    <button
+                      class="level-link"
+                      class:highest
+                      aria-label={`${member.member.name}: ${skill.name} ${level}. ${highest ? "Highest published in the group. " : ""}Open training as this player`}
+                      onclick={() => {
+                        controller.selectProfile(member.profile!.id);
+                        void goto("/skills/" + encodeURIComponent(skill.name));
+                      }}
+                    >
+                      <span>{member.member.name}</span><strong>{level}</strong>
+                    </button>
+                  {:else}
+                    <div
+                      class="unknown-level"
+                      aria-label={member.member.name +
+                        ": " +
+                        skill.name +
+                        " unrecorded"}
+                    >
+                      <span>{member.member.name}</span><strong>—</strong>
+                    </div>
+                  {/if}
+                {/each}
+              </div>
+            </section>
+          {/each}
+        </div>
+        <details class="comparison-help source">
+          <summary>About these levels</summary>
+          <p>
+            Published Hiscores levels only; manual Compass edits are excluded.
+            Gold marks the highest published level, not item ownership or every
+            required unlock. Each character still needs their own use levels and
+            quest requirements. Individual source times are shown under each
+            member.
+          </p>
+        </details>
       </div>
     </GameWindow>
     <div class="remove-group">
@@ -477,16 +559,14 @@
     gap: 20px;
     min-width: 0;
   }
-  .group-form,
-  .group-overview,
-  .comparisons {
-    padding: 20px;
-    min-width: 0;
+  .groups-page :global(.btn) {
+    min-height: 44px;
   }
   .group-form {
     display: grid;
     grid-template-columns: minmax(180px, 1fr) auto;
     gap: 12px 24px;
+    padding: 20px;
   }
   .group-name {
     display: grid;
@@ -504,134 +584,316 @@
   }
   .group-form .actions,
   .group-form > p {
-    grid-column: 1/-1;
+    grid-column: 1 / -1;
   }
-  .actions,
+  .group-banner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 30%);
+    overflow: hidden;
+  }
+  .group-summary {
+    padding: 24px;
+    min-width: 0;
+  }
   .identity {
     display: flex;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 10px 16px;
-  }
-  .actions {
-    margin: 14px 0;
-  }
-  .actions a,
-  .identity a {
-    color: var(--gold-bright);
-    text-underline-offset: 3px;
+    gap: 16px;
   }
   .identity h2 {
-    font-size: 1.1rem;
+    font-family: "Cinzel", serif;
+    font-size: 1.35rem;
+    color: var(--gold-bright);
     margin: 0;
+    overflow-wrap: anywhere;
   }
   .identity p {
-    margin: 6px 0 0;
+    margin: 4px 0 0;
+    color: var(--muted);
   }
   .totals {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
-    padding: 18px 0;
-    margin: 16px 0;
-    border-block: 1px solid var(--line);
+    gap: 10px;
+    margin: 20px 0 14px;
   }
-  dt {
-    font-size: var(--font-caption);
-    color: var(--muted);
+  .group-source {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
   }
-  dd {
-    margin: 6px 0 0;
-    font-size: 1.4rem;
+  .groups-page a {
     color: var(--gold-bright);
+    text-underline-offset: 4px;
+  }
+  .enclave-art {
+    display: block;
+    position: relative;
+    min-height: 220px;
+    overflow: hidden;
+    border-left: 1px solid var(--line);
+  }
+  .enclave-art :global(img) {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 180ms ease;
+  }
+  .enclave-art:hover :global(img) {
+    transform: scale(1.025);
+  }
+  .enclave-art span {
+    position: absolute;
+    bottom: 0;
+    inset-inline: 0;
+    padding: 28px 16px 12px;
+    color: #fff;
+    background: linear-gradient(transparent, #071018e8);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .group-toolbar,
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+  }
+  .group-toolbar {
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .feed-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 16px;
+    min-height: 44px;
+    text-decoration: none;
+  }
+  .feed-link:hover {
+    border-color: var(--gold);
+  }
+  .feed-link span {
+    margin-left: 24px;
+  }
+  .roster-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--roster-columns), minmax(0, 1fr));
+    gap: 12px;
+    padding: 16px;
+  }
+  .member-card {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+  }
+  .member-card.selected {
+    border-color: var(--gold);
+  }
+  .member-heading {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .member-heading > div {
+    min-width: 0;
+  }
+  .member-name {
+    font-size: 1rem;
     font-weight: 600;
     overflow-wrap: anywhere;
   }
+  .member-heading p {
+    margin: 2px 0 0;
+  }
+  .member-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .source-times {
+    margin-top: auto;
+  }
+  .source-times summary,
+  .comparison-help summary {
+    cursor: pointer;
+    min-height: 32px;
+  }
+  .source-times p {
+    margin: 8px 0;
+  }
+  .member-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .member-status {
+    margin: 0;
+    color: var(--gold-bright);
+  }
   .source {
     color: var(--muted);
-    font-size: var(--font-caption);
+    font-size: var(--font-ui);
+    margin: 0;
   }
-  .table-scroll {
-    overflow-x: auto;
-    max-width: 100%;
+  .comparisons {
+    padding: 16px;
   }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: left;
-    font-size: var(--font-caption);
+  .comparison-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 16px;
   }
-  caption {
-    text-align: left;
-    padding: 12px 0;
+  .comparison-key {
     color: var(--muted);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin: 0 0 10px;
   }
-  th,
-  td {
-    padding: 12px 10px;
-    border-bottom: 1px solid var(--line);
-    vertical-align: middle;
-  }
-  thead th {
-    color: var(--muted);
-    font-weight: 500;
-  }
-  tbody th {
-    font-weight: 500;
-  }
-  th small {
+  .comparison-key span {
     display: block;
+    width: 10px;
+    height: 10px;
+    background: var(--gold);
+    border: 1px solid var(--gold-bright);
+  }
+  .skill-comparisons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr));
+    gap: 12px;
+  }
+  .comparison-card {
+    padding: 14px;
+    min-width: 0;
+  }
+  .skill-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: fit-content;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .wiki-arrow {
     font-weight: 400;
     color: var(--muted);
   }
-  td small {
-    display: block;
-    max-width: 24ch;
-    margin-top: 4px;
+  .member-levels {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 110px), 1fr));
+    gap: 8px;
+  }
+  .level-link,
+  .unknown-level {
+    min-height: 56px;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 10px;
+    color: var(--text);
+    background: #0c172060;
+    border: 1px solid var(--line);
+    text-align: left;
+  }
+  .level-link span,
+  .unknown-level span {
+    overflow-wrap: anywhere;
+    font-size: var(--font-ui);
+  }
+  .level-link strong,
+  .unknown-level strong {
+    font-size: 1.125rem;
+    font-weight: 500;
+  }
+  .level-link:hover {
+    background: var(--panel-raised);
+    border-color: var(--gold);
+  }
+  .level-link.highest {
     color: var(--gold-bright);
+    border-top-color: var(--gold);
+    background: linear-gradient(135deg, #c5a46b12, #0c172060);
   }
-  .roster {
-    min-width: 650px;
-  }
-  .skills {
-    min-width: 570px;
-  }
-  .skills th:first-child {
-    min-width: 140px;
-  }
-  .highest {
-    color: var(--gold-bright);
-  }
-  .leaders {
-    max-width: 20ch;
+  .unknown-level {
     color: var(--muted);
   }
-  .level-link {
-    border: 0;
-    background: none;
-    color: inherit;
-    font: inherit;
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    min-width: 44px;
-    min-height: 44px;
-    cursor: pointer;
+  .comparison-help {
+    margin-top: 18px;
   }
-  @media (max-width: 700px) {
+  .comparison-help p {
+    max-width: 90ch;
+    margin: 8px 0 0;
+  }
+  .remove-group {
+    padding-top: 4px;
+  }
+  @media (max-width: 1100px) {
+    .roster-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 950px) {
+    .group-banner {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .enclave-art {
+      min-height: 160px;
+      border-left: 0;
+      border-top: 1px solid var(--line);
+    }
+    .enclave-art :global(img) {
+      object-position: center 42%;
+    }
+  }
+  @media (max-width: 600px) {
+    .roster-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
     .group-form {
       grid-template-columns: 1fr;
+      padding: 16px;
     }
-    .group-form,
-    .group-overview,
-    .comparisons {
-      padding: 14px;
+    .group-summary {
+      padding: 16px;
     }
     .totals {
       grid-template-columns: 1fr 1fr;
     }
-    .totals > div:nth-child(2) {
+    .totals > :global(.game-stat:nth-child(2)) {
       grid-column: 1 / -1;
       order: 3;
+    }
+    .roster-grid,
+    .comparisons {
+      padding: 12px;
+    }
+    .member-card {
+      padding: 12px;
+    }
+    .feed-link {
+      width: 100%;
+      justify-content: flex-start;
+    }
+    .feed-link span {
+      margin-left: auto;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .enclave-art :global(img) {
+      transition: none;
     }
   }
 </style>
