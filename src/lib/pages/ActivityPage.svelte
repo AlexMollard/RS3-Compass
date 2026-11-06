@@ -83,7 +83,7 @@
       };
     return undefined;
   }
-  const quiet =(status?: string) =>
+  const quiet = (status?: string) =>
     status === "private-or-unavailable" || status === "not-member";
   function chipFor(profile: Profile): {
     tone: "ok" | "warn" | "bad" | "info" | "neutral";
