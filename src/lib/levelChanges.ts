@@ -10,9 +10,21 @@ export interface LevelChange {
 const caps = new Map(SKILLS.map((skill) => [skill.name, skill.maxLevel]));
 
 /**
+ * Reads a typed level. Blank means unknown (""); whole digits from 1 to the
+ * cap are a level; anything else, including out of range, is invalid (null).
+ */
+export function parseLevel(raw: string, cap: number): number | "" | null {
+  const text = raw.trim();
+  if (text === "") return "";
+  if (!/^\d+$/.test(text)) return null;
+  const value = Number(text);
+  return value >= 1 && value <= cap ? value : null;
+}
+
+/**
  * Lists recorded-level edits in in-game order. Blank ("") means unknown and
- * removes the level; it never becomes 0. Values above a skill's cap clamp to
- * it, and anything else that is not a whole level of at least 1 is ignored.
+ * removes the level; it never becomes 0. Invalid or out-of-range values are
+ * ignored, never clamped.
  */
 export function levelChanges(
   before: Record<string, number>,
@@ -21,15 +33,10 @@ export function levelChanges(
   const changes: LevelChange[] = [];
   for (const skill of SKILL_GAME_ORDER) {
     if (!(skill in after)) continue;
-    const raw = after[skill];
+    const parsed = parseLevel(String(after[skill]), caps.get(skill) ?? 120);
+    if (parsed === null) continue;
     const from = before[skill] ?? null;
-    let to: number | null;
-    if (typeof raw === "string" && raw.trim() === "") to = null;
-    else {
-      const value = typeof raw === "number" ? raw : Number(raw.trim());
-      if (!Number.isInteger(value) || value < 1) continue;
-      to = Math.min(value, caps.get(skill) ?? 120);
-    }
+    const to = parsed === "" ? null : parsed;
     if (to !== from) changes.push({ skill, from, to });
   }
   return changes;

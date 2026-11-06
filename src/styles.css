@@ -431,9 +431,9 @@ textarea {
   display: none;
 }
 .main-content {
-  max-width: 1580px;
+  max-width: 1260px;
   margin: 0 auto;
-  padding: 25px 36px 0;
+  padding: 28px 32px 0;
   outline: none;
   min-height: calc(100vh - 65px);
 }

@@ -14,6 +14,7 @@
   } from "../../data";
   import { wikiHref } from "../../wiki";
   import { getCompass } from "../compassContext";
+  import { parseLevel } from "../levelChanges";
   import { questPath } from "../navigation";
   import ActivityNotes from "../components/ActivityNotes.svelte";
   import Button from "../components/Button.svelte";
@@ -92,9 +93,9 @@
   );
   function saveLevel(event: SubmitEvent) {
     event.preventDefault();
-    const n = Number(level);
-    if (!Number.isInteger(n) || n < 1 || n > 120) {
-      message = "Enter a whole level from 1 to 120.";
+    const n = parseLevel(level, skill.maxLevel);
+    if (typeof n !== "number") {
+      message = `Enter a level from 1 to ${skill.maxLevel}`;
       return;
     }
     controller.updateProfile((p) => ({
@@ -259,7 +260,7 @@
                     aria-label={skill.name + " level"}
                     type="number"
                     min="1"
-                    max="120"
+                    max={skill.maxLevel}
                     step="1"
                     required
                     value={level}

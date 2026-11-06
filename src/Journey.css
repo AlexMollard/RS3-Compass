@@ -261,6 +261,16 @@
   margin: 0;
   padding: 0 16px 16px;
 }
+.home-skill-note a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--control-size);
+}
+@media (max-width: 760px) {
+  .home-skill-note a {
+    min-height: 44px;
+  }
+}
 
 /* Close to unlocking and recent activity */
 .home-side {

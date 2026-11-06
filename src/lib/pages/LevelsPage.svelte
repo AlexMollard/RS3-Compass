@@ -4,7 +4,7 @@
   import { SKILLS } from "../../data";
   import { SKILL_GAME_ORDER } from "../../skillNames";
   import { getCompass } from "../compassContext";
-  import { applyLevelChanges, levelChanges } from "../levelChanges";
+  import { applyLevelChanges, levelChanges, parseLevel } from "../levelChanges";
   import GameArt from "../components/GameArt.svelte";
   import GameWindow from "../components/GameWindow.svelte";
 
@@ -33,14 +33,15 @@
     if (draft.id !== profile.id) draft = { id: profile.id, values: {} };
     draft.values[name] = value;
   }
-  function invalid(name: string) {
-    const value = edits[name]?.trim();
-    if (!value) return false;
-    const level = Number(value);
-    return !Number.isInteger(level) || level < 1;
+  function invalid(name: string, cap: number) {
+    const value = edits[name];
+    return value !== undefined && parseLevel(value, cap) === null;
   }
+  let anyInvalid = $derived(
+    skills.some((skill) => invalid(skill.name, skill.maxLevel)),
+  );
   function note(name: string, cap: number) {
-    if (invalid(name)) return `Enter a level from 1 to ${cap}`;
+    if (invalid(name, cap)) return `Enter a level from 1 to ${cap}`;
     const change = changed.get(name);
     if (change) return change.from === null ? "Was unknown" : `Was ${change.from}`;
     return profile.levels[name] === undefined ? "Unknown" : "Recorded";
@@ -55,7 +56,7 @@
     void goto("/");
   }
   function save() {
-    if (!changes.length) return;
+    if (!changes.length || anyInvalid) return;
     const saving = changes;
     controller.updateProfile((p) => ({
       ...p,
@@ -108,7 +109,7 @@
         <div
           class="level-row"
           class:changed={changed.has(skill.name)}
-          class:invalid={invalid(skill.name)}
+          class:invalid={invalid(skill.name, skill.maxLevel)}
         >
           <GameArt file={skill.icon} size={32} />
           <label for={"level-" + skill.name}
@@ -123,7 +124,7 @@
             autocomplete="off"
             maxlength="3"
             placeholder="?"
-            aria-invalid={invalid(skill.name) || undefined}
+            aria-invalid={invalid(skill.name, skill.maxLevel) || undefined}
             value={edits[skill.name] ?? profile.levels[skill.name] ?? ""}
             oninput={(event) => edit(skill.name, event.currentTarget.value)}
           />
@@ -144,7 +145,7 @@
         >{/if}</span
     >
     <button type="button" class="btn btn-quiet" onclick={leave}>Cancel</button>
-    <button type="submit" class="btn btn-primary" disabled={!changes.length}
+    <button type="submit" class="btn btn-primary" disabled={!changes.length || anyInvalid}
       >Save levels</button
     >
   </div>

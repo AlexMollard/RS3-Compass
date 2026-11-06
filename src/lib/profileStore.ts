@@ -408,7 +408,7 @@ export function createCompassController(): CompassController {
         }
         return {
           ...current,
-          welcomed: true,
+          welcomed: options?.select !== false ? true : current.welcomed,
           activeId: options?.select === false ? current.activeId || id : id,
           profiles: existing
             ? current.profiles.map((p) => (p.id === id ? profile : p))

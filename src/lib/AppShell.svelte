@@ -194,6 +194,7 @@
   }
   function firstVisitLookup(name: string, mode: Profile["mode"]) {
     openLookup(name);
+    lookupKind = "Solo Ironman";
     lookupMode = mode;
     void lookup(name);
   }
@@ -304,7 +305,7 @@
       ><span><strong>RS3 COMPASS</strong><small>IRONMAN PLANNER</small></span
       ></a
     >
-    {#if profile}
+    {#if showFirstVisit}{:else if profile}
       <div class="rail-player tool-window">
         <div class="rail-player-row">
           {@render portrait(profile, 44)}<span class="rail-player-text"
@@ -350,12 +351,12 @@
           <a
             class="nav-item"
             href={item.href}
-            aria-current={!page.error && route === item.id
+            aria-current={!page.error && !showFirstVisit && route === item.id
               ? "page"
               : undefined}
             onclick={() => compact.set(false)}
             ><GameArt file={item.image} size={22} /><span>{item.label}</span
-            >{#if item.id === "quests" && questCount}<span class="nav-count"
+            >{#if item.id === "quests" && questCount && !showFirstVisit}<span class="nav-count"
                 >{questCount}</span
               >{:else if item.id === "players" && $ready}<span
                 class="nav-count">{$saved.profiles.length}</span
@@ -393,7 +394,9 @@
           ? page.status === 404
             ? "Page not found"
             : "Something went wrong"
-          : TITLES[route]}</span
+          : showFirstVisit
+            ? "Welcome"
+            : TITLES[route]}</span
       >
       <button
         class="search-trigger"
@@ -404,13 +407,13 @@
           >{shortcut}</kbd
         ></button
       >
-      {#if profile}
-        {#if !showFirstVisit}<a
-            class="btn btn-secondary update-levels"
-            href="/levels"
-            aria-current={route === "levels" ? "page" : undefined}
-            onclick={() => compact.set(false)}>Update levels</a
-          >{/if}
+      {#if profile && !showFirstVisit}
+        <a
+          class="btn btn-secondary update-levels"
+          href="/levels"
+          aria-current={route === "levels" ? "page" : undefined}
+          onclick={() => compact.set(false)}>Update levels</a
+        >
         <div class="player-chip">
           <a
             class="player-chip-link"
@@ -475,7 +478,9 @@
       {#each PHONE_TABS as tab}
         <a
           href={tab.href}
-          aria-current={!page.error && tab.matches.includes(route)
+          aria-current={!page.error &&
+          !showFirstVisit &&
+          tab.matches.includes(route)
             ? "page"
             : undefined}
           onclick={() => compact.set(false)}

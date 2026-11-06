@@ -314,6 +314,9 @@
     text-align: center;
   }
   @media (max-width: 760px) {
+    .first-visit-field {
+      font-size: 16px;
+    }
     .first-visit-intro h1 {
       font-size: 28px;
       line-height: 34px;

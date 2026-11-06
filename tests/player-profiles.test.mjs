@@ -118,6 +118,13 @@ test("A fresh controller is unwelcomed until a sample is picked", () => {
   assert.equal(get(looked.state).welcomed, true);
 });
 
+test("A background sync without selecting does not mark the visitor welcomed", () => {
+  const controller = createCompassController();
+  controller.addPlayer(player, "Solo Ironman", "f2p", { select: false });
+  assert.equal(get(controller.state).welcomed, false);
+  controller.destroy();
+});
+
 test("A stored save without the welcomed field is treated as welcomed", (t) => {
   const descriptor = Object.getOwnPropertyDescriptor(
     globalThis,

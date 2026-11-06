@@ -209,11 +209,11 @@
             onclick={() => void controller.refreshPlayers([player.id])}
             >{busy ? "Refreshing…" : "Refresh"}</Button
           >{/if}
-        <a
-          class="btn btn-quiet"
-          href={"/activity?player=" + encodeURIComponent(player.id)}
-          >Activity</a
-        >
+        {#if isPublic}<a
+            class="btn btn-quiet"
+            href={"/activity?player=" + encodeURIComponent(player.id)}
+            >Activity</a
+          >{/if}
         {#if removing !== player.id}<Button
             variant="quiet"
             className="danger"
@@ -545,6 +545,9 @@
     font: inherit;
   }
   @media (max-width: 760px) {
+    .add-row input {
+      font-size: 16px;
+    }
     .player-list {
       grid-template-columns: 1fr;
     }

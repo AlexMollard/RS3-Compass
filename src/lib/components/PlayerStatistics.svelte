@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { Profile } from "../../data";
   import GameText from "./GameText.svelte";
-  import SourceBanner from "./SourceBanner.svelte";
   let {
     profile,
     skill,
@@ -94,20 +93,12 @@
         {date(profile.statistics.fetchedAt)}
       </p>
     {:else if profile.hiscoresImportStatus === "unranked-or-unavailable" || profile.hiscoresImportStatus === "service-unavailable"}
-      <SourceBanner
-        notice={{
-          tone:
-            profile.hiscoresImportStatus === "unranked-or-unavailable"
-              ? "private"
-              : "failed",
-          title: "Hiscores data unavailable",
-          message:
-            profile.hiscoresImportStatus === "unranked-or-unavailable"
-              ? "Jagex has no main Hiscores entry. Available quests and activity are separate."
-              : "The Hiscores refresh is unavailable; other public sources may still be loaded.",
-          retry: false,
-        }}
-      />
+      <p class="statistics-source">
+        Hiscores data unavailable · {profile.hiscoresImportStatus ===
+        "unranked-or-unavailable"
+          ? "Jagex has no main Hiscores entry. Available quests and activity are separate."
+          : "The Hiscores refresh is unavailable; other public sources may still be loaded."}
+      </p>
     {:else}
       <p class="statistics-source">
         Refresh in Players to load public XP and ranks.

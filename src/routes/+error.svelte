@@ -41,7 +41,7 @@
   <div class="not-found-actions">
     <a class="btn btn-primary" href="/">Back to Home</a><a
       class="btn btn-secondary"
-      href="/quests">Search quests and skills</a
+      href="/quests">Browse quests</a
     >
   </div>
 </section>
