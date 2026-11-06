@@ -3,6 +3,9 @@
   import {
     SKILLS,
     availableStages,
+    nextQuest,
+    type Profile,
+    toggleItem,
     skillNeedsMembership,
     trainingStage,
     trainingMethod,
@@ -10,6 +13,9 @@
     trainingRangeLabel,
   } from "../../data";
   import { getCompass } from "../compassContext";
+  import { questPath } from "../navigation";
+  import ActivityNotes from "../components/ActivityNotes.svelte";
+  import SectionHeading from "../components/SectionHeading.svelte";
   import ActivityHeader from "../components/ActivityHeader.svelte";
   import Button from "../components/Button.svelte";
   import ChoiceStrip from "../components/ChoiceStrip.svelte";
@@ -26,6 +32,7 @@
   let { selectedSkill = "" }: { selectedSkill?: string } = $props();
   const controller = getCompass();
   const saved = controller.state;
+  const compact = controller.compact;
   const saveError = controller.storageError;
   let profile = $derived(
     $saved.profiles.find((p) => p.id === $saved.activeId) ?? $saved.profiles[0],
@@ -34,8 +41,6 @@
     SKILLS.find((s) => s.name === selectedSkill) ?? SKILLS[0],
   );
   let search = $state("");
-  let band = $state<number | null>(null);
-  let methodId = $state<string | undefined>(undefined);
   let target = $state(20);
   let level = $state("");
   let message = $state("");
@@ -44,8 +49,6 @@
     const key = profile.id + "::" + skill.name;
     if (key !== identity) {
       identity = key;
-      band = null;
-      methodId = undefined;
       const recorded = profile.levels[skill.name];
       target =
         recorded == null
@@ -69,14 +72,18 @@
   let stages = $derived(availableStages(skill, profile.mode));
   let needsMembership = $derived(skillNeedsMembership(skill, profile));
   let stage = $derived(
-    needsMembership
-      ? undefined
-      : (stages.find((s) => s.from === band) ?? trainingStage(skill, profile)),
+    needsMembership ? undefined : trainingStage(skill, profile),
   );
-  let method = $derived(trainingMethod(skill, profile, stage, methodId));
+  let method = $derived(trainingMethod(skill, profile, stage));
   let supplies = $derived(
     stage && method ? trainingSupplies(stage, method) : [],
   );
+  let task = $derived("train-" + skill.name);
+  let packedItems = $derived(
+    supplies.filter((item) => profile.packed.includes(task + "::" + item)),
+  );
+  let done = $derived(profile.completedTasks.includes(task));
+  let next = $derived(nextQuest(profile));
   let targetOptions = $derived.by(() => {
     const cap = profile.mode === "f2p" ? skill.freeToPlayCap : undefined;
     return [
@@ -119,18 +126,65 @@
       ? "Level changed in this tab, but the browser could not save it."
       : skill.name + " level saved on this device.";
   }
-  function start() {
-    if (!stage || !method || needsMembership) return;
-    controller.updateProfile((p) => ({
+  function selectTraining(from: number, selectedId?: string) {
+    const range = stages.find((entry) => entry.from === from);
+    if (!range || needsMembership) return;
+    const selected = trainingMethod(skill, profile, range, selectedId);
+    if (!selected) return;
+    controller.updateProfile((p) => {
+      const previousRange =
+        p.trainingRanges?.[skill.name] ?? trainingStage(skill, p)?.from;
+      const previousMethod =
+        p.trainingMethods?.[skill.name] ?? trainingMethod(skill, p, range)?.id;
+      const changed =
+        previousRange !== range.from || previousMethod !== selected.id;
+      return {
+        ...p,
+        activeTask: task,
+        trainingRanges: { ...p.trainingRanges, [skill.name]: range.from },
+        trainingMethods: { ...p.trainingMethods, [skill.name]: selected.id },
+        completedTasks: changed
+          ? p.completedTasks.filter((id) => id !== task)
+          : p.completedTasks,
+      };
+    });
+  }
+  function selectMethod(id: string) {
+    if (stage) selectTraining(stage.from, id);
+  }
+  function rememberTrainingSelection(p: Profile): Profile {
+    if (
+      !stage ||
+      !method ||
+      (p.trainingRanges?.[skill.name] !== undefined &&
+        p.trainingMethods?.[skill.name] !== undefined)
+    )
+      return p;
+    return {
       ...p,
-      activeTask: "train-" + skill.name,
-      trainingRanges: { ...p.trainingRanges, [skill.name]: stage!.from },
-      trainingMethods: { ...p.trainingMethods, [skill.name]: method!.id },
-      completedTasks: p.completedTasks.filter(
-        (id) => id !== "train-" + skill.name,
-      ),
+      trainingRanges: {
+        ...p.trainingRanges,
+        [skill.name]: p.trainingRanges?.[skill.name] ?? stage.from,
+      },
+      trainingMethods: {
+        ...p.trainingMethods,
+        [skill.name]: p.trainingMethods?.[skill.name] ?? method.id,
+      },
+    };
+  }
+  function toggleSupply(item: string) {
+    controller.updateProfile((p) => ({
+      ...rememberTrainingSelection(p),
+      activeTask: task,
+      packed: toggleItem(p.packed, task + "::" + item),
     }));
-    void goto("/play");
+  }
+  function complete() {
+    controller.updateProfile((p) => ({
+      ...rememberTrainingSelection(p),
+      activeTask: task,
+      completedTasks: toggleItem(p.completedTasks, task),
+    }));
   }
   function switchMembers() {
     controller.updateProfile((p) => ({ ...p, mode: "members" }));
@@ -141,9 +195,19 @@
   <PageHeading
     title="Skills"
     subtitle="Methods, equipment, and supplies for the selected skill."
-    >{#snippet trailing()}<span class="badge badge-gold"
-        >{profile.mode === "members" ? "Members view" : "F2P view"}</span
-      >{/snippet}</PageHeading
+    >{#snippet trailing()}<div class="skill-workspace-controls">
+        <span class="badge badge-gold"
+          >{profile.mode === "members" ? "Members view" : "F2P view"}</span
+        >
+        <Button
+          variant="quiet"
+          className="compact-switch"
+          aria-pressed={$compact}
+          onclick={() => compact.update((value) => !value)}
+        >
+          {$compact ? "Expand workspace" : "Compact training"}
+        </Button>
+      </div>{/snippet}</PageHeading
   >
   <div class="journal-layout skill-layout">
     <ResponsivePicker label="Skill" selection={skill.name}
@@ -244,17 +308,14 @@
                   ),
                   description: trainingRangeLabel(skill, range, profile.mode),
                 }))}
-                onChange={(value) => {
-                  band = Number(value);
-                  methodId = undefined;
-                }}
+                onChange={(value) => selectTraining(Number(value))}
               />
               <TrainingMethods
                 {skill}
                 {stage}
                 {profile}
-                selectedId={methodId}
-                onSelect={(id) => (methodId = id)}
+                selectedId={method.id}
+                onSelect={selectMethod}
               />
             {:else}
               <div class="notice">
@@ -279,18 +340,41 @@
               </div>
             {/if}
           </section>
-          <aside class="training-preparation">
+          <aside class="training-preparation" aria-label="Training preparation">
             {#if stage && method}
-              <Button variant="primary" onclick={start}
-                >Prepare training →</Button
-              >
+              <section class="panel packing-card">
+                <SectionHeading title="Before you go">
+                  {#snippet aside()}{#if supplies.length}<span class="badge"
+                        >{packedItems.length}/{supplies.length} packed</span
+                      >{/if}{/snippet}
+                </SectionHeading>
+                {#if supplies.length}
+                  <div
+                    class="packing-progress"
+                    role="progressbar"
+                    aria-label="Packed supplies"
+                    aria-valuemin={0}
+                    aria-valuemax={supplies.length}
+                    aria-valuenow={packedItems.length}
+                  >
+                    <span
+                      style:width={(packedItems.length / supplies.length) *
+                        100 +
+                        "%"}
+                    ></span>
+                  </div>
+                {/if}
+                <ItemList
+                  items={supplies}
+                  checked={packedItems}
+                  onToggle={toggleSupply}
+                />
+                <p class="sample-note">
+                  Packing checks are manual; they do not read your bank or
+                  inventory.
+                </p>
+              </section>
               <TrainingMap {method} {profile} />
-              <details class="session-supplies">
-                <summary
-                  >Session supplies <span>{supplies.length}</span></summary
-                >
-                <ItemList items={supplies} />
-              </details>
             {/if}
             <details class="training-access">
               <summary>Access and progression</summary>
@@ -302,6 +386,35 @@
                 label="Wiki training reference"
               />
             </details>
+            <ActivityNotes
+              value={profile.notes[task] || ""}
+              onChange={(value) => {
+                const id = task;
+                controller.updateProfile((p) => ({
+                  ...rememberTrainingSelection(p),
+                  activeTask: id,
+                  notes: { ...p.notes, [id]: value },
+                }));
+              }}
+            />
+            <div class="detail-actions">
+              <Button
+                variant={done ? "success" : "secondary"}
+                aria-pressed={done}
+                disabled={(!stage || !method || needsMembership) && !done}
+                onclick={complete}
+              >
+                {done ? "Recorded complete · undo" : "Mark session complete"}
+              </Button>
+              {#if done && next}<Button
+                  variant="link"
+                  onclick={() => void goto(questPath(next!.id))}
+                  >Open next quest →</Button
+                >{/if}
+            </div>
+            {#if done}<p class="training-completion" role="status">
+                Session recorded. Levels, XP and supplies are not changed.
+              </p>{/if}
           </aside>
         </div>
       </div>
@@ -310,6 +423,23 @@
 </div>
 
 <style>
+  .skill-workspace-controls {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .training-preparation {
+    display: grid;
+    gap: 16px;
+  }
+  .training-preparation .packing-card {
+    margin: 0;
+  }
+  .training-completion {
+    color: var(--green);
+    margin: 0;
+  }
   .skill-detail {
     container: skill-detail / inline-size;
   }
@@ -364,28 +494,18 @@
     padding-top: 0;
     align-self: start;
   }
-  .training-preparation > :global(.btn) {
-    margin-block: 0 1rem;
-    width: 100%;
-  }
   .training-access p {
     font-size: 0.875rem;
     line-height: 1.6;
   }
-  .training-access,
-  .session-supplies {
+  .training-access {
     border-top: 1px solid var(--line);
     margin-top: 0.5rem;
   }
-  .training-access > summary,
-  .session-supplies > summary {
+  .training-access > summary {
     min-height: 44px;
     padding-block: 0.7rem;
     cursor: pointer;
     font-size: 0.875rem;
-  }
-  .session-supplies summary span {
-    color: var(--muted);
-    margin-left: 0.35rem;
   }
 </style>

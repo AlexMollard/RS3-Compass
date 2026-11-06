@@ -46,9 +46,7 @@
             ? "quests"
             : page.url.pathname.startsWith("/skills")
               ? "skills"
-              : page.url.pathname.startsWith("/play")
-                ? "play"
-                : "journey",
+              : "journey",
   );
   const navigation = [
     {
@@ -102,9 +100,7 @@
   let rememberedStarted = false;
   let main: HTMLElement, topbar: HTMLElement;
   setPlayerActions({ lookup: (name) => openLookup(name ?? "") });
-  let selectedView = $derived(
-    ["journey", "quests", "skills", "play"].includes(route),
-  );
+  let selectedView = $derived(["journey", "quests", "skills"].includes(route));
   let syncSelection = $derived(
     $ready && selectedView && profile?.source === "hiscores" ? profile.id : "",
   );
@@ -257,7 +253,7 @@
   class:nav-open={mobileNav}
   class:is-compact={$compact &&
     !!profile &&
-    (route === "play" || route === "quests")}
+    (route === "skills" || route === "quests")}
   class="app-shell"
 >
   <a
@@ -320,11 +316,7 @@
           ><Menu size={21} /></IconButton
         ><Compass size={15} /><span>Workspace</span><ChevronRight
           size={13}
-        /><strong
-          >{route === "play"
-            ? "Training companion"
-            : navigation.find((item) => item.id === route)?.label}</strong
-        >
+        /><strong>{navigation.find((item) => item.id === route)?.label}</strong>
       </div>
       <div class="topbar-tools">
         <button
@@ -426,7 +418,7 @@
           </div>
         </div>
       {/if}
-      {#if $ready && ["journey", "quests", "play"].includes(route) && profile?.source === "hiscores" && $sync[profile.id]?.state !== "error" && profile.questImportStatus && profile.questImportStatus !== "available"}<div
+      {#if $ready && ["journey", "quests"].includes(route) && profile?.source === "hiscores" && $sync[profile.id]?.state !== "error" && profile.questImportStatus && profile.questImportStatus !== "available"}<div
           class="notice quest-import-notice"
           role="status"
         >

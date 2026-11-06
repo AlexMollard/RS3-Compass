@@ -1121,30 +1121,10 @@ textarea {
   margin-top: 17px;
 }
 
-.play-page-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 29px;
-}
-.play-page-top > .text-link {
-  color: #8fa8b8;
-  font-size: var(--font-ui);
-}
 .compact-switch {
   font-size: var(--font-caption);
   padding: 8px 11px;
   min-height: var(--control-size);
-}
-.play-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 300px;
-  gap: 23px;
-  align-items: start;
-}
-.play-layout > * {
-  min-width: 0;
 }
 
 .session-context {
@@ -1183,25 +1163,6 @@ textarea {
   font-size: var(--font-ui);
   color: #b8cbd5;
   line-height: 1.9;
-}
-.session-warning {
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-  background: #809f973a;
-  border: 1px solid #809f973a;
-  padding: 13px;
-  border-radius: 4px;
-  color: #9db6aa;
-}
-.session-warning p {
-  font-size: var(--font-caption);
-  color: #a4b9bc;
-  line-height: 1.8;
-}
-.play-rail {
-  display: grid;
-  gap: 18px;
 }
 .packing-card,
 .notes-card {
@@ -1289,39 +1250,6 @@ textarea {
   text-align: right;
   margin-top: 7px;
 }
-.play-smallprint {
-  display: flex;
-  gap: 11px;
-  align-items: center;
-  justify-content: center;
-  padding: 7px;
-  color: #7795a5;
-}
-.play-smallprint p {
-  font-size: var(--font-caption);
-  line-height: 1.9;
-}
-.completion-message {
-  display: flex;
-  gap: 12px;
-  margin-top: 20px;
-  padding: 17px;
-  background: #65957513;
-  border: 1px solid #668b6d75;
-  border-radius: 4px;
-  color: #a3c1aa;
-}
-.completion-message strong {
-  font-size: var(--font-ui);
-}
-.completion-message p {
-  font-size: var(--font-caption);
-  color: #8facaa;
-  margin-top: 8px;
-}
-.completion-message .text-link {
-  margin-top: 12px;
-}
 .is-compact {
   display: block;
 }
@@ -1334,12 +1262,11 @@ textarea {
   max-width: 580px;
   padding: 23px 22px;
 }
-.is-compact .play-layout {
+.is-compact .skill-page .skill-layout {
   grid-template-columns: minmax(0, 1fr);
-  gap: 17px;
 }
-.is-compact .play-rail {
-  gap: 17px;
+.is-compact .skill-page .guide-picker {
+  display: none;
 }
 .is-compact .quest-page .journal-layout {
   grid-template-columns: minmax(0, 1fr);
@@ -1348,22 +1275,11 @@ textarea {
   display: none;
 }
 
-.is-compact .play-page-top {
-  gap: 10px;
-}
-.is-compact .play-page-top > .text-link {
-  font-size: var(--font-caption);
-}
-
 .is-compact .detail-body {
   padding: 20px;
 }
 .is-compact .page-subtitle {
   font-size: var(--font-ui);
-}
-.is-compact .play-page-top > .btn {
-  font-size: var(--font-caption);
-  padding: 8px;
 }
 .app-dialog {
   width: min(560px, calc(100vw - 32px));
@@ -1532,9 +1448,6 @@ textarea {
   .journal-layout {
     grid-template-columns: 275px minmax(0, 1fr);
   }
-  .play-layout {
-    grid-template-columns: minmax(0, 1fr) 335px;
-  }
 
   .detail-body {
     padding: 27px 30px;
@@ -1607,10 +1520,6 @@ textarea {
     padding: 20px;
   }
 
-  .play-layout {
-    grid-template-columns: minmax(0, 1fr) 255px;
-    gap: 18px;
-  }
   .packing-card,
   .notes-card {
     padding: 18px 15px;
@@ -1699,16 +1608,6 @@ textarea {
   }
   .skill-level {
     font-size: var(--font-ui);
-  }
-  .play-layout {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .play-rail {
-    grid-template-columns: 1fr 1fr;
-    align-items: start;
-  }
-  .play-smallprint {
-    grid-column: 1/-1;
   }
 }
 @media (max-width: 760px) {
@@ -1831,19 +1730,10 @@ textarea {
   .detail-body {
     padding: 21px;
   }
-  .play-page-top {
-    margin-bottom: 24px;
-  }
-  .play-rail {
-    grid-template-columns: 1fr 1fr;
-  }
   .compact-switch {
     font-size: var(--font-caption);
     gap: 5px;
     padding: 8px;
-  }
-  .play-page-top > .text-link {
-    font-size: var(--font-caption);
   }
 
   .workspace-footer {
@@ -1858,9 +1748,6 @@ textarea {
   }
   .is-compact .main-content {
     padding: 20px 18px;
-  }
-  .is-compact .play-rail {
-    grid-template-columns: 1fr;
   }
   .detail-actions {
     gap: 9px;
@@ -2019,14 +1906,6 @@ textarea {
     font-size: 23px;
   }
 
-  .play-page-top {
-    align-items: center;
-    gap: 8px;
-  }
-  .play-page-top > .text-link {
-    font-size: var(--font-caption);
-    gap: 5px;
-  }
   .compact-switch {
     font-size: var(--font-caption);
     min-height: var(--control-size);
@@ -2034,9 +1913,6 @@ textarea {
   }
   .compact-switch > svg {
     width: 12px;
-  }
-  .play-rail {
-    grid-template-columns: 1fr;
   }
 
   .session-context p {
@@ -2050,9 +1926,6 @@ textarea {
   }
   .session-steps li > span {
     font-size: 17px;
-  }
-  .session-warning p {
-    font-size: var(--font-caption);
   }
   .packing-card,
   .notes-card {
@@ -2795,16 +2668,6 @@ textarea::placeholder {
   padding-top: 10px;
   border-top: 1px solid var(--line);
   color: #d5c19a;
-}
-.active-session .packing-card {
-  margin: 24px 0;
-  padding: 20px 0;
-  border: 0;
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-  border-radius: 0;
-  box-shadow: none;
-  background: none;
 }
 @media (max-width: 1000px) {
   .guide-picker > summary {
