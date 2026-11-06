@@ -6,8 +6,11 @@
     value,
     choices,
     onChange,
+    variant = "chips",
   }: {
     label: string;
+    /** "joined" is one bar of equal cells sharing a border; it scrolls inside itself when narrow. */
+    variant?: "chips" | "joined";
     name: string;
     value: string;
     choices: {
@@ -21,7 +24,7 @@
   } = $props();
 </script>
 
-<fieldset class="choice-fieldset">
+<fieldset class="choice-fieldset" class:joined={variant === "joined"}>
   <legend>{label}</legend>
   <div class="choice-strip">
     {#each choices as choice (choice.value)}
@@ -102,6 +105,50 @@
   .choice-option :global(.game-art) {
     width: 28px;
     height: 32px;
+  }
+  .joined legend {
+    font-weight: 600;
+    font-size: inherit;
+    margin-bottom: 10px;
+  }
+  .joined .choice-strip {
+    flex-wrap: nowrap;
+    gap: 0;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    border: 1px solid #33434d;
+    border-radius: 4px;
+    background: var(--well);
+  }
+  .joined .choice-option {
+    /* Equal cells; a long label ("100–110") keeps its width instead of clipping. */
+    flex: 1 0 0;
+    min-width: max-content;
+    min-height: 44px;
+    justify-content: center;
+    padding: 0 8px;
+    border: 0;
+    border-right: 1px solid #33434d;
+    border-radius: 0;
+    font-size: var(--font-caption);
+    font-weight: 600;
+    white-space: nowrap;
+    text-align: center;
+  }
+  .joined .choice-option:last-child {
+    border-right: 0;
+  }
+  .joined .choice-option:hover {
+    background: #17242e;
+  }
+  .joined .choice-option.selected {
+    color: #f0e2c2;
+    background: var(--panel-raised);
+    box-shadow: inset 0 -2px 0 var(--gold);
+  }
+  .joined .choice-option:has(input:focus-visible) {
+    outline-color: var(--gold-bright);
+    outline-offset: -3px;
   }
   small {
     display: block;
