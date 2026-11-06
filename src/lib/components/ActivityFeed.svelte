@@ -9,7 +9,11 @@
     activitySubject,
   } from "../activityPresentation";
   import { mergeActivity, type ActivitySource } from "../activityFeed";
+  import { Activity } from "@lucide/svelte";
+  import { wikiImage } from "../../wiki";
+  import { relativeTime } from "../relativeTime";
   import GameText from "./GameText.svelte";
+  import GameWindow from "./GameWindow.svelte";
   import ChoiceStrip from "./ChoiceStrip.svelte";
   import Button from "./Button.svelte";
 
@@ -20,6 +24,7 @@
     initialLimit = 20,
     playerId,
     onPlayerChange,
+    framed = false,
   }: {
     sources: ActivitySource[];
     active?: boolean;
@@ -27,7 +32,10 @@
     initialLimit?: number;
     playerId?: string;
     onPlayerChange?: (id: string) => void;
+    /** Page mode: the feed sits in a window and per-player status lives in a separate panel. */
+    framed?: boolean;
   } = $props();
+  const now = Date.now();
   const instance = $props.id();
   let player = $state("all");
   let category = $state("all");
@@ -127,7 +135,7 @@
       }}
     />
   {/if}
-  {#each scopedSources as source (source.playerId)}
+  {#if !framed}{#each scopedSources as source (source.playerId)}
     <div class="source">
       <strong>{source.name}</strong> ·
       <a
@@ -158,7 +166,17 @@
         <p>No public events were returned.</p>
       {/if}
     </div>
-  {/each}
+  {/each}{/if}
+  {#if framed}
+    <GameWindow title="Adventurer's Log" trailing={filtered.length + (filtered.length === 1 ? " event" : " events")}>
+      <div class="feed-body">{@render body()}</div>
+    </GameWindow>
+  {:else}
+    {@render body()}
+  {/if}
+</div>
+
+{#snippet body()}
   {#if resolving}<p class="source" role="status">
       Resolving Wiki artwork…
     </p>{/if}
@@ -169,26 +187,42 @@
         {@const references = subject
           ? [activityReference(subject, articles.get(subject.name))]
           : activitySkillReferences(row.event)}
+        {@const reference = references?.find((r) => r.imageUrl || r.image)}
+        {@const art = reference
+          ? (reference.imageUrl ?? wikiImage(reference.image!))
+          : undefined}
+        {@const when = Date.parse(row.event.date)}
         <li>
-          <div class="meta">
-            <strong>{row.playerName}</strong><span>{row.category}</span><time
-              datetime={row.event.date}>{date(row.event.date)}</time
-            >
+          <span class="art" aria-hidden="true"
+            >{#if art}<img src={art} alt="" loading="lazy" decoding="async" />{:else}<Activity
+                size={20}
+              />{/if}</span
+          >
+          <div class="ev-main">
+            <p class="title">
+              <strong>{row.playerName}</strong>
+              <GameText text={row.event.text} {references} catalogue={false} />
+            </p>
+            <div class="meta">
+              <span>{row.category}</span>
+              <time datetime={row.event.date} title={date(row.event.date)}
+                >{Number.isNaN(when)
+                  ? date(row.event.date)
+                  : relativeTime(when, now)}</time
+              >
+            </div>
+            <details>
+              <summary>Jagex details</summary>
+              {#if row.event.details && row.event.details !== row.event.text}<p>
+                  <GameText
+                    text={row.event.details}
+                    {references}
+                    catalogue={false}
+                  />
+                </p>{/if}
+              <small>Event type: <code>{row.event.type}</code></small>
+            </details>
           </div>
-          <p class="title">
-            <GameText text={row.event.text} {references} catalogue={false} />
-          </p>
-          <details>
-            <summary>Jagex details</summary>
-            {#if row.event.details && row.event.details !== row.event.text}<p>
-                <GameText
-                  text={row.event.details}
-                  {references}
-                  catalogue={false}
-                />
-              </p>{/if}
-            <small>Event type: <code>{row.event.type}</code></small>
-          </details>
         </li>
       {/each}
     </ul>
@@ -204,6 +238,8 @@
     {/if}
   {:else if rows.length}
     <p>No events match this category.</p>
+  {:else if framed}
+    <p class="source">No public events yet for the players in scope.</p>
   {/if}
   <p class="source">
     Reported activity is not current inventory. Jagex and Compass can each cache
@@ -219,7 +255,7 @@
       membership.
     </p>
   </details>
-</div>
+{/snippet}
 
 <style>
   .feed {
@@ -245,9 +281,45 @@
     display: grid;
     gap: 10px;
   }
+  .feed-body {
+    padding: 4px 18px 16px;
+  }
+  .events {
+    gap: 0;
+  }
   .events > li {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
     border-top: 1px solid var(--line);
-    padding-top: 10px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    min-width: 0;
+  }
+  .events > li:first-child {
+    border-top: 0;
+  }
+  .art {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    box-sizing: border-box;
+    padding: 3px;
+    background: var(--well);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    color: var(--muted);
+  }
+  .art img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+  .ev-main {
+    flex: 1 1 0;
     min-width: 0;
   }
   .meta {
@@ -255,12 +327,16 @@
     flex-wrap: wrap;
     gap: 4px 12px;
   }
-  .meta strong,
-  .meta span {
+  .title strong {
     color: var(--gold-bright);
+    margin-right: 4px;
   }
   .title {
-    font-weight: 600;
+    font-weight: 500;
+    margin: 0;
+  }
+  .ev-main :global(.wiki-ref img) {
+    display: none;
   }
   details > summary {
     cursor: pointer;

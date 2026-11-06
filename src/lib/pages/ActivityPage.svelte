@@ -8,6 +8,13 @@
   import PageHeading from "../components/PageHeading.svelte";
   import ChoiceStrip from "../components/ChoiceStrip.svelte";
   import Button from "../components/Button.svelte";
+  import GameWindow from "../components/GameWindow.svelte";
+  import PlayerPortrait from "../components/PlayerPortrait.svelte";
+  import SourceBanner from "../components/SourceBanner.svelte";
+  import StatusChip from "../components/StatusChip.svelte";
+  import { isSnapshotStale } from "../sourceStatus";
+  import { relativeTime } from "../relativeTime";
+  import type { Profile } from "../../data";
 
   const controller = getCompass();
   const actions = getPlayerActions();
@@ -56,8 +63,30 @@
     watched.filter((p) => $sync[p.id]?.state === "queued").length,
   );
   let errors = $derived(watched.filter((p) => $sync[p.id]?.state === "error"));
+  const quiet = (status?: string) =>
+    status === "private-or-unavailable" || status === "not-member";
+  function chipFor(profile: Profile): {
+    tone: "ok" | "warn" | "bad" | "info" | "neutral";
+    label: string;
+  } {
+    const status = profile.eventImportStatus;
+    const n = profile.eventLog?.events.length ?? 0;
+    if ($sync[profile.id]?.state === "error")
+      return { tone: "bad", label: "Refresh failed" };
+    if (status === "not-member")
+      return { tone: "info", label: "Needs membership and a public Event Log" };
+    if (status === "private-or-unavailable")
+      return { tone: "neutral", label: "Private or unavailable" };
+    if (isSnapshotStale(profile, $sync[profile.id]))
+      return { tone: "warn", label: "Stale snapshot" };
+    if (profile.eventLog)
+      return { tone: "ok", label: `${n} ${n === 1 ? "event" : "events"}` };
+    if (status === "service-unavailable")
+      return { tone: "bad", label: "Event service unavailable" };
+    return { tone: "neutral", label: "Not loaded yet" };
+  }
   $effect(() => {
-    groupFilter = page.url.searchParams.get("group") ?? "all";
+    groupFilter =page.url.searchParams.get("group") ?? "all";
   });
   $effect(() => {
     playerFilter = page.url.searchParams.get("player") ?? "all";
@@ -124,18 +153,52 @@
     {#if refreshing || queued}<p class="source" role="status">
         {refreshing} refreshing · {queued} queued. Existing events stay visible.
       </p>{/if}
-    {#each errors as profile (profile.id)}<p class="source error" role="status">
-        <strong>{profile.name}:</strong>
-        {$sync[profile.id].message} Any previous snapshot is kept.
-      </p>{/each}
-    <ActivityFeed
-      {sources}
-      active={true}
-      showFilters={true}
-      initialLimit={20}
-      playerId={selectedPlayer}
-      onPlayerChange={(id) => (playerFilter = id)}
-    />
+    {#each errors as profile (profile.id)}<SourceBanner
+        notice={{
+          tone: quiet(profile.eventImportStatus) ? "private" : "failed",
+          title: `${profile.name}: refresh failed`,
+          message: `${$sync[profile.id].message ?? ""} Any previous snapshot is kept.`.trim(),
+          retry: true,
+        }}
+        onRetry={() =>
+          void controller.refreshPlayers([profile.id], { staleOnly: false })}
+      />{/each}
+    <div class="two">
+      <ActivityFeed
+        {sources}
+        active={true}
+        showFilters={true}
+        framed={true}
+        initialLimit={20}
+        playerId={selectedPlayer}
+        onPlayerChange={(id) => (playerFilter = id)}
+      />
+      <GameWindow title="Who's included" className="included">
+        <ul class="people">
+          {#each profiles as profile (profile.id)}
+            {@const chip = chipFor(profile)}
+            {@const log = profile.eventLog}
+            <li>
+              <PlayerPortrait name={profile.name} size={36} />
+              <span class="who">
+                <b>{profile.name}</b>
+                <span class="cap"
+                  >{#if log}{log.events.length}
+                    {log.events.length === 1 ? "event" : "events"} · updated
+                    <time title={new Date(log.fetchedAt).toLocaleString()}
+                      >{relativeTime(log.fetchedAt)}</time
+                    >{:else}No events loaded yet{/if}</span
+                >
+              </span>
+              <StatusChip tone={chip.tone} label={chip.label} />
+            </li>
+          {/each}
+        </ul>
+        <p class="cap note">
+          Turn on the Event Log in RuneMetrics settings in-game to appear here.
+        </p>
+      </GameWindow>
+    </div>
   {/if}
 </div>
 
@@ -157,7 +220,48 @@
     color: var(--muted);
     font-size: var(--font-caption);
   }
-  .error {
-    color: var(--gold-bright);
+  .two {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 24px;
+    align-items: start;
+    margin-top: 20px;
+  }
+  .people {
+    list-style: none;
+    margin: 0;
+    padding: 6px 16px 10px;
+  }
+  .people li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 10px;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .people li:last-child {
+    border-bottom: 0;
+  }
+  .who {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 100px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .cap,
+  .note {
+    font-size: var(--font-caption);
+    color: var(--muted);
+  }
+  .note {
+    margin: 0;
+    padding: 0 16px 16px;
+  }
+  @media (max-width: 980px) {
+    .two {
+      grid-template-columns: minmax(0, 1fr);
+    }
   }
 </style>
