@@ -30,7 +30,9 @@
   import {
     NAV_GROUPS,
     PHONE_TABS,
+    questPath,
     routeFor,
+    skillPath,
     type RouteId,
   } from "./navigation";
   import GameArt from "./components/GameArt.svelte";
@@ -384,14 +386,26 @@
         <Button className="update-levels" onclick={openLevels}
           >Update levels</Button
         >
-        <a
-          class="player-chip"
-          href="/players"
-          aria-label={`${profile.name}, ${profile.mode === "f2p" ? "F2P" : "Members"} planning. Switch player`}
-          >{@render portrait(profile, 28)}<span class="player-chip-name"
-            >{profile.name}</span
-          ><small>{profile.mode === "f2p" ? "F2P" : "Members"}</small></a
-        >
+        <div class="player-chip">
+          <a
+            class="player-chip-link"
+            href="/players"
+            aria-label={`${profile.name}. Switch player`}
+            >{@render portrait(profile, 28)}<span class="player-chip-name"
+              >{profile.name}</span
+            ></a
+          ><button
+            class="player-chip-mode"
+            role="switch"
+            aria-checked={profile.mode === "members"}
+            aria-label="Members planning view"
+            onclick={() =>
+              controller.updateProfile((p) => ({
+                ...p,
+                mode: p.mode === "f2p" ? "members" : "f2p",
+              }))}>{profile.mode === "f2p" ? "F2P" : "Members"}</button
+          >
+        </div>
       {/if}
     </header>
     <main id="main-content" class="main-content" bind:this={main} tabindex="-1">
@@ -464,7 +478,27 @@
     aria-labelledby="search-title"
   >
     <h2 id="search-title" class="sr-only">Search quests and skills</h2>
-    <div class="search-dialog-bar">
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div
+      class="search-dialog-bar"
+      onkeydown={(event) => {
+        if (
+          event.key !== "Enter" ||
+          event.isComposing ||
+          !(event.target instanceof HTMLInputElement)
+        )
+          return;
+        const href = questMatches[0]
+          ? questPath(questMatches[0].id)
+          : skillMatches[0]
+            ? skillPath(skillMatches[0].name)
+            : null;
+        if (!href) return;
+        event.preventDefault();
+        searchDialog.close();
+        navigate(href);
+      }}
+    >
       <SearchField
         className="search-dialog-field"
         label="Search quests and skills"
@@ -648,7 +682,7 @@
       >
       <p>
         Access: {(profile?.mode ?? "f2p") === "f2p" ? "F2P" : "Members"} (change it
-        in the player card or on Players after import).
+        with the F2P/Members switch or on Players after import).
       </p>
       <p>
         Public data is cached for up to ten minutes; Jagex caching can add

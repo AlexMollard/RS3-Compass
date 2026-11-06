@@ -2691,14 +2691,20 @@ textarea::placeholder {
   }
   .player-chip {
     display: flex;
+    align-items: stretch;
+    min-width: 0;
+    border: 1px solid var(--edge);
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  .player-chip-link {
+    display: flex;
     align-items: center;
     gap: 6px;
     min-width: 0;
     min-height: var(--control-size);
-    padding: 0 8px;
-    border: 1px solid var(--edge);
-    border-radius: 4px;
-    font-weight: 600;
+    padding: 0 6px 0 8px;
+    outline-offset: -3px;
   }
   .player-chip-name {
     max-width: 10ch;
@@ -2706,9 +2712,16 @@ textarea::placeholder {
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  .player-chip small {
+  .player-chip-mode {
+    padding: 0 8px;
+    border-left: 1px solid #2f3e48;
     font-size: var(--font-caption);
+    font-weight: 600;
     color: var(--gold);
+    outline-offset: -3px;
+  }
+  .player-chip-mode:hover {
+    color: var(--gold-bright);
   }
   .phone-tabs {
     display: flex;
