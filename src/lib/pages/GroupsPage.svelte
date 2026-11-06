@@ -13,7 +13,7 @@
   import { normalizePlayerName } from "../playerName";
   import { relativeTime } from "../relativeTime";
   import { skillPath } from "../navigation";
-  import { isSnapshotStale } from "../sourceStatus";
+  import { isSnapshotStale, rateLimitNotice } from "../sourceStatus";
   import { RefreshCw } from "@lucide/svelte";
   import PageHeading from "../components/PageHeading.svelte";
   import ChoiceStrip from "../components/ChoiceStrip.svelte";
@@ -460,12 +460,16 @@
               <dd>{highestCounts[index] ?? "?"}</dd>
             </div>
           </dl>
-          {#if memberSync?.state === "error"}<p
-              class="member-status"
-              role="status"
-            >
-              {memberSync.message}
-            </p>
+          {#if memberSync?.state === "error"}<SourceBanner
+              notice={memberSync.rateLimited
+                ? rateLimitNotice(memberSync.nextRefreshAt)
+                : {
+                    tone: "failed",
+                    title: "Refresh failed",
+                    message: memberSync.message ?? "",
+                    retry: false,
+                  }}
+            />
           {:else if !profile}<p class="source">
               Player not loaded. Use Load missing players above.
             </p>{/if}
@@ -882,10 +886,6 @@
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-  }
-  .member-status {
-    margin: 0;
-    color: var(--gold-bright);
   }
   .source {
     color: var(--muted);

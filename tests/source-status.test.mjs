@@ -2,7 +2,9 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   isSnapshotStale,
+  mapTilesNotice,
   profileSourceNotice,
+  rateLimitNotice,
 } from "../src/lib/sourceStatus.ts";
 
 const hiscores = (extra = {}) => ({ source: "hiscores", ...extra });
@@ -99,4 +101,26 @@ test("isSnapshotStale follows the stale rule", () => {
     false,
   );
   assert.equal(isSnapshotStale({ source: "sample" }, { state: "error" }), false);
+});
+
+test("rateLimitNotice is a calm slowed notice with no retry button", () => {
+  const notice = rateLimitNotice(Date.now() + 60000);
+  assert.equal(notice.tone, "slowed");
+  assert.equal(notice.retry, false);
+  assert.match(notice.message, /about a minute/);
+});
+
+test("a rate-limited sync error shows the slowed notice, not the failure", () => {
+  const notice = profileSourceNotice(
+    hiscores(),
+    { state: "error", rateLimited: true, nextRefreshAt: Date.now() + 60000 },
+    "home",
+  );
+  assert.equal(notice.tone, "slowed");
+});
+
+test("mapTilesNotice reassures that the marker is right", () => {
+  const notice = mapTilesNotice();
+  assert.equal(notice.tone, "info");
+  assert.equal(notice.message, "The marker is still correct.");
 });

@@ -123,6 +123,10 @@ export function createPlayerSynchronizer(options: {
         state: "error",
         attemptedAt: clock(),
         nextRefreshAt: clock() + retryMs,
+        rateLimited:
+          error instanceof PlayerFetchError && !!error.retryAfterMs
+            ? true
+            : undefined,
         message:
           error instanceof Error
             ? error.message

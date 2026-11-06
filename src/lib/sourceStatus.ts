@@ -15,9 +15,38 @@ export interface SourceNotice {
   retry: boolean;
 }
 
-type SyncInfo = { state: string; message?: string; nextRefreshAt?: number };
+type SyncInfo = {
+  state: string;
+  message?: string;
+  nextRefreshAt?: number;
+  rateLimited?: boolean;
+};
 
 const isPublic = (profile: Profile) => profile.source === "hiscores";
+
+/** Jagex asked us to slow down: a calm wait, not a failure. */
+export function rateLimitNotice(nextRefreshAt?: number): SourceNotice {
+  const wait = nextRefreshAt ? nextRefreshAt - Date.now() : 60_000;
+  const when =
+    wait > 90_000
+      ? `in about ${Math.ceil(wait / 60_000)} minutes`
+      : "in about a minute";
+  return {
+    tone: "slowed",
+    title: "Waiting before the next refresh.",
+    message: `Jagex asked us to slow down. Compass will retry ${when}.`,
+    retry: false,
+  };
+}
+
+export function mapTilesNotice(): SourceNotice {
+  return {
+    tone: "info",
+    title: "Some map tiles couldn't load.",
+    message: "The marker is still correct.",
+    retry: false,
+  };
+}
 
 /** A public snapshot is stale when its sync errored, or an import failed while older data is kept. */
 export function isSnapshotStale(
@@ -42,6 +71,7 @@ export function profileSourceNotice(
 ): SourceNotice | null {
   if (!isPublic(profile)) return null;
   if (sync?.state === "error") {
+    if (sync.rateLimited) return rateLimitNotice(sync.nextRefreshAt);
     return {
       tone: "failed",
       title: "The latest public-data refresh failed",

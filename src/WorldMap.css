@@ -71,12 +71,6 @@
   color: #075a86;
   text-decoration: underline;
 }
-.world-map-error {
-  margin: 0;
-  padding: 9px 10px;
-  color: #f3d8a1;
-  font-size: var(--font-caption);
-}
 @media (max-width: 760px) {
   .world-map .world-map-canvas {
     height: 240px;

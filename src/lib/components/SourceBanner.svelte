@@ -1,11 +1,14 @@
 <script lang="ts">
   import { Clock, Lock, Search, TriangleAlert, XCircle } from "@lucide/svelte";
+  import type { Snippet } from "svelte";
   import type { SourceNotice } from "../sourceStatus";
   import Button from "./Button.svelte";
   let {
     notice,
     onRetry,
-  }: { notice: SourceNotice; onRetry?: () => void } = $props();
+    children,
+  }: { notice: SourceNotice; onRetry?: () => void; children?: Snippet } =
+    $props();
   const icons = {
     stale: TriangleAlert,
     failed: XCircle,
@@ -22,6 +25,7 @@
   <span class="source-text">
     <b>{notice.title}</b><br />{notice.message}
   </span>
+  {@render children?.()}
   {#if notice.retry && onRetry}<Button onclick={onRetry}>Try again</Button>{/if}
 </div>
 

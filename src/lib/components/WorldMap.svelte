@@ -3,6 +3,8 @@
   import type * as Leaflet from "leaflet";
   import type { QuestRecord } from "../../data";
   import { wikiHref, wikiImage } from "../../wiki";
+  import { mapTilesNotice } from "../sourceStatus";
+  import SourceBanner from "./SourceBanner.svelte";
   import { externalMapUrl, questMapCenter, wikiTileUrl } from "../../wikiMap";
   import "leaflet/dist/leaflet.css";
   import "../../WorldMap.css";
@@ -172,11 +174,12 @@
         Preparing map…
       </div>{/if}
   </div>
-  {#if tileFailed && !pending}<p class="world-map-error" role="status">
-      Some map tiles could not be loaded. <a
+  {#if tileFailed && !pending}<SourceBanner notice={mapTilesNotice()}>
+      <a
+        class="text-link"
         href={externalMapUrl(point)}
         target="_blank"
         rel="noreferrer">Open the world map</a
-      >.
-    </p>{/if}
+      >
+    </SourceBanner>{/if}
 </section>

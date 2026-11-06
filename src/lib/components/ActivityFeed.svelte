@@ -16,6 +16,7 @@
   import GameWindow from "./GameWindow.svelte";
   import ChoiceStrip from "./ChoiceStrip.svelte";
   import Button from "./Button.svelte";
+  import SourceBanner from "./SourceBanner.svelte";
 
   let {
     sources,
@@ -155,13 +156,20 @@
         <span> · Refresh this player to load public activity.</span>
       {/if}
       {#if source.status && source.status !== "available"}
-        <p>
-          {source.status === "not-member"
-            ? "This event log requires active membership; Jagex reports this account is not a member."
-            : source.status === "private-or-unavailable"
-              ? "Jagex did not expose an event log for this player."
-              : "The event service could not be reached. Any last available snapshot is kept."}
-        </p>
+        <SourceBanner
+          notice={{
+            tone:
+              source.status === "private-or-unavailable" ? "private" : "info",
+            title: "Event log unavailable",
+            message:
+              source.status === "not-member"
+                ? "This event log requires active membership; Jagex reports this account is not a member."
+                : source.status === "private-or-unavailable"
+                  ? "Jagex did not expose an event log for this player."
+                  : "The event service could not be reached. Any last available snapshot is kept.",
+            retry: false,
+          }}
+        />
       {:else if source.fetchedAt != null && !source.events?.length}
         <p>No public events were returned.</p>
       {/if}

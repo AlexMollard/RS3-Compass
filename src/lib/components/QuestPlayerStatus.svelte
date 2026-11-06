@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Profile, QuestRecord } from "../../data";
   import { findPlayerQuest } from "../playerProgress";
+  import StatusChip from "./StatusChip.svelte";
   let { profile, quest }: { profile: Profile; quest: QuestRecord } = $props();
   let source = $derived(findPlayerQuest(profile, quest));
   let stale = $derived(profile.questImportStatus !== "available");
@@ -25,7 +26,7 @@
               : "Requirements not met according to Jagex"}</span
           >
         {/if}
-        {#if stale}<span class="source-stale">Last available status</span>{/if}
+        {#if stale}<StatusChip tone="warn" label="Last available status" />{/if}
       </div>
       <details>
         <summary>Source details</summary>
@@ -60,9 +61,6 @@
   .quest-player-status p {
     font-size: var(--font-caption);
     color: var(--muted);
-  }
-  .source-status-row .source-stale {
-    color: var(--gold-bright);
   }
   .quest-player-status details > summary {
     width: fit-content;

@@ -1,7 +1,8 @@
 <script lang="ts">
   import { getCompass, getPlayerActions } from "../compassContext";
   import { progressionQuests, SKILLS } from "../../data";
-  import { isSnapshotStale } from "../sourceStatus";
+  import { isSnapshotStale, rateLimitNotice } from "../sourceStatus";
+  import SourceBanner from "./SourceBanner.svelte";
   import { relativeTime } from "../relativeTime";
   import GameArt from "./GameArt.svelte";
   import PlayerPortrait from "./PlayerPortrait.svelte";
@@ -156,16 +157,36 @@
             />{/if}
         {:else}<StatusChip label="No public data · sample player" />{/if}
       </div>
-      {#if player.hiscoresImportStatus && player.hiscoresImportStatus !== "available"}<p
-          class="note"
-        >
-          {player.hiscoresImportStatus === "unranked-or-unavailable"
-            ? "No main Hiscores entry; available quests and activity are kept."
-            : "Latest Hiscores refresh unavailable; previous public levels are kept."}
-        </p>{/if}
-      {#if status}<p
+      {#if player.hiscoresImportStatus && player.hiscoresImportStatus !== "available"}<SourceBanner
+          notice={{
+            tone:
+              player.hiscoresImportStatus === "unranked-or-unavailable"
+                ? "private"
+                : "failed",
+            title: "Hiscores data unavailable",
+            message:
+              player.hiscoresImportStatus === "unranked-or-unavailable"
+                ? "No main Hiscores entry; available quests and activity are kept."
+                : "Latest Hiscores refresh unavailable; previous public levels are kept.",
+            retry: false,
+          }}
+        />{/if}
+      {#if status?.state === "error"}<SourceBanner
+          notice={status.rateLimited
+            ? rateLimitNotice(status.nextRefreshAt)
+            : {
+                tone: "failed",
+                title: "The latest public-data refresh failed",
+                message:
+                  (status.message ?? "") +
+                  (status.nextRefreshAt && !busy
+                    ? ` Next request after ${date(status.nextRefreshAt)}.`
+                    : ""),
+                retry: false,
+              }}
+        />
+      {:else if status}<p
           class="note sync-status"
-          class:error={status.state === "error"}
           role="status"
         >
           {status.state === "queued"
@@ -442,9 +463,6 @@
   .note small {
     display: block;
     margin-top: 4px;
-  }
-  .sync-status.error {
-    color: var(--gold-bright);
   }
   .actions {
     display: flex;

@@ -8,6 +8,8 @@ export interface PlayerSyncStatus {
   state: "queued" | "refreshing" | "idle" | "error";
   attemptedAt?: number;
   nextRefreshAt?: number;
+  /** True when Jagex asked us to slow down (HTTP 429). */
+  rateLimited?: boolean;
   message?: string;
 }
 
