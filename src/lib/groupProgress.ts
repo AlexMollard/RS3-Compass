@@ -42,3 +42,41 @@ export function groupSkillSummary(
   }
   return { highest, known, leaders };
 }
+
+export interface SkillGap {
+  skill: string;
+  highest: number;
+  lowest: number;
+  gap: number;
+  leaders: string[];
+  trailing: string[];
+}
+
+/** Largest published-level spreads. `skills` order is the in-game tie-break. */
+export function widestGaps(
+  players: readonly GroupPlayer[],
+  skills: readonly string[],
+  limit = 5,
+): SkillGap[] {
+  const gaps: SkillGap[] = [];
+  for (const skill of skills) {
+    const known = players.flatMap(({ member, profile }) => {
+      const level = profile?.hiscoresLevels?.[skill];
+      return level === undefined ? [] : [{ name: member.name, level }];
+    });
+    if (known.length < 2) continue;
+    const highest = Math.max(...known.map((k) => k.level));
+    const lowest = Math.min(...known.map((k) => k.level));
+    if (highest === lowest) continue;
+    gaps.push({
+      skill,
+      highest,
+      lowest,
+      gap: highest - lowest,
+      leaders: known.filter((k) => k.level === highest).map((k) => k.name),
+      trailing: known.filter((k) => k.level === lowest).map((k) => k.name),
+    });
+  }
+  // Array.sort is stable, so equal gaps keep the in-game order.
+  return gaps.sort((a, b) => b.gap - a.gap).slice(0, limit);
+}

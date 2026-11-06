@@ -1,6 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { groupPlayers, groupSkillSummary } from "../src/lib/groupProgress.ts";
+import {
+  groupPlayers,
+  groupSkillSummary,
+  widestGaps,
+} from "../src/lib/groupProgress.ts";
 
 const group = {
   members: [{ name: "Alice" }, { name: "Bob" }, { name: "Missing" }],
@@ -59,4 +63,42 @@ test("manual planning edits and legacy unsourced levels cannot become published 
     known: 1,
     leaders: ["Alice"],
   });
+});
+
+test("widest gaps rank published spreads, skip single-member and level skills and ignore unknown members", () => {
+  const three = {
+    members: [{ name: "Alice" }, { name: "Bob" }, { name: "Cara" }],
+  };
+  const rows = groupPlayers(three, [
+    player("Alice", { Mining: 40, Smithing: 50, Cooking: 20, Fishing: 9 }),
+    player("Bob", { Mining: 12, Smithing: 50, Cooking: 20 }),
+    player("Cara", { Smithing: 50, Cooking: 8 }, "sample"),
+  ]);
+  const skills = ["Mining", "Smithing", "Cooking", "Fishing"];
+  assert.deepEqual(widestGaps(rows, skills), [
+    {
+      skill: "Mining",
+      highest: 40,
+      lowest: 12,
+      gap: 28,
+      leaders: ["Alice"],
+      trailing: ["Bob"],
+    },
+  ]);
+});
+
+test("widest gaps break ties by skill order and honour the limit", () => {
+  const rows = groupPlayers(group, [
+    player("Alice", { Mining: 30, Smithing: 30, Cooking: 50 }),
+    player("Bob", { Mining: 10, Smithing: 10, Cooking: 10 }),
+  ]);
+  const order = ["Smithing", "Mining", "Cooking"];
+  assert.deepEqual(
+    widestGaps(rows, order).map((g) => g.skill),
+    ["Cooking", "Smithing", "Mining"],
+  );
+  assert.deepEqual(
+    widestGaps(rows, order, 1).map((g) => g.skill),
+    ["Cooking"],
+  );
 });
