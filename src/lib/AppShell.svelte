@@ -6,24 +6,39 @@
   import {
     ArrowDownToLine,
     ArrowUpRight,
-    ChevronRight,
+    Check,
+    ChevronsUpDown,
     CircleHelp,
     Compass,
+    ExternalLink,
     Info,
-    Menu,
     Search,
+    TriangleAlert,
     X,
   } from "@lucide/svelte";
-  import { QUESTS, SKILLS, type Profile } from "../data";
+  import {
+    QUESTS,
+    SKILLS,
+    progressionQuests,
+    type Profile,
+  } from "../data";
+  import { wikiHref } from "../wiki";
   import { getCompass, setPlayerActions } from "./compassContext";
   import { fetchPlayer } from "./playerClient";
   import { normalizePlayerName } from "./playerName";
   import { readRememberedPlayer } from "./rememberedPlayer";
+  import {
+    NAV_GROUPS,
+    PHONE_TABS,
+    routeFor,
+    type RouteId,
+  } from "./navigation";
   import GameArt from "./components/GameArt.svelte";
-  import NavigationCard from "./components/NavigationCard.svelte";
+  import PlayerPortrait from "./components/PlayerPortrait.svelte";
   import SearchField from "./components/SearchField.svelte";
   import Button from "./components/Button.svelte";
   import SourceBanner from "./components/SourceBanner.svelte";
+  import LevelEditor from "./components/LevelEditor.svelte";
   import { profileSourceNotice } from "./sourceStatus";
   import IconButton from "./components/IconButton.svelte";
   import "./shell.css";
@@ -36,64 +51,38 @@
     compact = controller.compact,
     notice = controller.notice,
     sync = controller.syncState;
+  const TITLES: Record<RouteId, string> = {
+    home: "Your route",
+    quests: "Quests",
+    skills: "Skills",
+    players: "Players",
+    groups: "Group Ironman",
+    activity: "Activity",
+    levels: "Update levels",
+  };
   let profile = $derived($saved.profiles.find((p) => p.id === $saved.activeId));
-  let route = $derived(
-    page.url.pathname.startsWith("/players")
-      ? "players"
-      : page.url.pathname.startsWith("/groups")
-        ? "groups"
-        : page.url.pathname.startsWith("/activity")
-          ? "activity"
-          : page.url.pathname.startsWith("/quests")
-            ? "quests"
-            : page.url.pathname.startsWith("/skills")
-              ? "skills"
-              : "journey",
-  );
-  const navigation = [
-    {
-      id: "journey",
-      label: "Progression",
-      image: "Quest_map_icon.png",
-      href: "/",
-    },
-    {
-      id: "quests",
-      label: "Quests",
-      image: "Quest.png",
-      href: "/quests",
-    },
-    {
-      id: "skills",
-      label: "Skills",
-      image: "Skills_icon.png",
-      href: "/skills",
-    },
-    {
-      id: "players",
-      label: "Players",
-      image: "Ironman_badge.png",
-      href: "/players",
-    },
-    {
-      id: "groups",
-      label: "Group Ironman",
-      image: "Group_Ironman_badge.png",
-      href: "/groups",
-    },
-    {
-      id: "activity",
-      label: "Activity",
-      image: "Quest_map_icon.png",
-      href: "/activity",
-    },
-  ];
-  let mobileNav = $state(false),
-    search = $state(""),
+  let route = $derived(routeFor(page.url.pathname));
+  let questCount = $derived.by(() => {
+    if (!profile) return "";
+    const quests = progressionQuests(profile);
+    const done = quests.filter((q) =>
+      profile!.completedQuests.includes(q.id),
+    ).length;
+    return `${done} / ${quests.length}`;
+  });
+  let search = $state(""),
     lookupName = $state(""),
     lookupError = $state(""),
     lookupLoading = $state(false),
+    editingLevels = $state(false),
     shortcut = $state("Ctrl K");
+  let query = $derived(search.toLowerCase());
+  let questMatches = $derived(
+    QUESTS.filter((q) => q.name.toLowerCase().includes(query)),
+  );
+  let skillMatches = $derived(
+    SKILLS.filter((s) => s.name.toLowerCase().includes(query)),
+  );
   let lookupKind = $state<Profile["kind"]>("Solo Ironman");
   let searchDialog: HTMLDialogElement,
     aboutDialog: HTMLDialogElement,
@@ -102,13 +91,13 @@
   let rememberedStarted = false;
   let main: HTMLElement, topbar: HTMLElement;
   setPlayerActions({ lookup: (name) => openLookup(name ?? "") });
-  let selectedView = $derived(["journey", "quests", "skills"].includes(route));
+  let selectedView = $derived(["home", "quests", "skills"].includes(route));
   let sourceNotice = $derived(
     $ready && selectedView && profile
       ? profileSourceNotice(
           profile,
           $sync[profile.id],
-          route === "journey" ? "home" : (route as "quests" | "skills"),
+          route as "home" | "quests" | "skills",
         )
       : null,
   );
@@ -183,18 +172,14 @@
           : "Player lookup is unavailable. Try again later.";
     }
   }
-  function select(id: string) {
-    abortLookup();
-    if (lookupDialog.open) lookupDialog.close();
-    controller.selectProfile(id);
-    controller.notify(
-      "Switched character. Each profile keeps its own progress.",
-    );
-  }
   function navigate(href: string) {
-    mobileNav = false;
     compact.set(false);
     void goto(href);
+  }
+  function openLevels() {
+    // shortcut: interim until the /levels route lands in Task 9
+    navigate("/");
+    editingLevels = true;
   }
   onMount(() => {
     shortcut = /Mac|iPhone|iPad/.test(navigator.platform) ? "⌘ K" : "Ctrl K";
@@ -233,7 +218,6 @@
     const refreshTimer = window.setInterval(refreshSelected, 60_000);
     document.addEventListener("visibilitychange", refreshSelected);
     const keydown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") mobileNav = false;
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
         if (!document.querySelector("dialog[open]") || searchDialog.open)
@@ -260,8 +244,31 @@
   });
 </script>
 
+{#snippet portrait(p: Profile, size: number)}
+  {#if p.source === "hiscores"}<PlayerPortrait
+      name={p.name}
+      {size}
+    />{:else}<span
+      class="player-badge"
+      style:width={size + "px"}
+      style:height={size + "px"}
+      ><GameArt
+        file={p.kind === "Group Ironman"
+          ? "Group_Ironman_badge.png"
+          : "Ironman_badge.png"}
+        size={size - 12}
+      /></span
+    >{/if}
+{/snippet}
+
+{#snippet highlighted(text: string)}
+  {@const at = query ? text.toLowerCase().indexOf(query) : -1}
+  {#if at < 0}{text}{:else}{text.slice(0, at)}<mark
+      >{text.slice(at, at + query.length)}</mark
+    >{text.slice(at + query.length)}{/if}
+{/snippet}
+
 <div
-  class:nav-open={mobileNav}
   class:is-compact={$compact &&
     !!profile &&
     (route === "skills" || route === "quests")}
@@ -275,116 +282,117 @@
       main.focus();
     }}>Skip to content</a
   >
-  {#if mobileNav}<button
-      class="nav-scrim"
-      aria-label="Close navigation"
-      onclick={() => (mobileNav = false)}
-    ></button>{/if}
   <aside class="sidebar">
     <a class="brand" href="/" aria-label="RS3 Compass home"
-      ><span class="brand-mark"><Compass size={29} strokeWidth={1.4} /></span
+      ><span class="brand-mark"><Compass size={26} strokeWidth={1.5} /></span
       ><span><strong>RS3 COMPASS</strong><small>IRONMAN PLANNER</small></span
       ></a
     >
-    <div class="sidebar-rule"></div>
-    <span class="nav-heading">WORKSPACE</span>
-    <nav aria-label="Main navigation">
-      {#each navigation as item}
-        <button
-          class:active={route === item.id}
-          class="nav-item"
-          aria-current={route === item.id ? "page" : undefined}
-          onclick={() => navigate(item.href)}
-          ><GameArt file={item.image} size={24} /><span>{item.label}</span
-          >{#if route === item.id}<span class="nav-active-dot"
-            ></span>{/if}</button
+    {#if profile}
+      <div class="rail-player tool-window">
+        <div class="rail-player-row">
+          {@render portrait(profile, 44)}<span class="rail-player-text"
+            ><strong>{profile.name}</strong><small
+              >{profile.kind} · {profile.source === "hiscores"
+                ? "Public data"
+                : "Sample"}</small
+            ></span
+          ><a
+            class="rail-switch"
+            href="/players"
+            aria-label="Switch player"
+            title="Switch player"><ChevronsUpDown size={18} /></a
+          >
+        </div>
+        <div
+          class="access-segments"
+          role="group"
+          aria-label="Planning view"
         >
+          <button
+            aria-pressed={profile.mode === "f2p"}
+            onclick={() =>
+              controller.updateProfile((p) => ({ ...p, mode: "f2p" }))}
+            >F2P</button
+          ><button
+            aria-pressed={profile.mode === "members"}
+            onclick={() =>
+              controller.updateProfile((p) => ({ ...p, mode: "members" }))}
+            >Members</button
+          >
+        </div>
+      </div>
+    {:else if $ready}
+      <Button className="rail-lookup" onclick={() => openLookup("")}
+        >Look up a player</Button
+      >
+    {/if}
+    <nav class="rail-nav" aria-label="Main navigation">
+      {#each NAV_GROUPS as group}
+        <span class="rail-eyebrow">{group.label}</span>
+        {#each group.items as item}
+          <a
+            class="nav-item"
+            href={item.href}
+            aria-current={route === item.id ? "page" : undefined}
+            onclick={() => compact.set(false)}
+            ><GameArt file={item.image} size={22} /><span>{item.label}</span
+            >{#if item.id === "quests" && questCount}<span class="nav-count"
+                >{questCount}</span
+              >{:else if item.id === "players" && $ready}<span
+                class="nav-count">{$saved.profiles.length}</span
+              >{/if}</a
+          >
+        {/each}
       {/each}
     </nav>
     <div class="sidebar-bottom">
-      <div class="save-status">
-        <span class:warning={$storageError} class="status-dot"
-        ></span>{$storageError
+      <span class="save-status" class:warning={$storageError}
+        >{#if $storageError}<TriangleAlert size={16} />{:else}<Check
+            size={16}
+          />{/if}{$storageError
           ? "Not saved · export your preview"
           : $ready
-            ? "Preview saved on this device"
-            : "Loading local progress"}
-      </div>
-      <button class="nav-item subtle" onclick={() => aboutDialog.showModal()}
-        ><CircleHelp size={18} /> About this prototype</button
-      ><span class="version-label">DESIGN PREVIEW · 01</span>
+            ? "Saved on this device"
+            : "Loading local progress"}</span
+      >
+      <button class="rail-link" onclick={controller.exportProgress}
+        >Export progress</button
+      >
+      <button class="rail-link" onclick={() => aboutDialog.showModal()}
+        ><CircleHelp size={14} /> About Compass</button
+      >
     </div>
   </aside>
   <div class="workspace">
     <header class="topbar" bind:this={topbar}>
-      <div class="breadcrumb">
-        <IconButton
-          framed={false}
-          className="mobile-menu"
-          label="Open navigation"
-          aria-expanded={mobileNav}
-          onclick={() => (mobileNav = !mobileNav)}
-          ><Menu size={21} /></IconButton
-        ><Compass size={15} /><span>Workspace</span><ChevronRight
-          size={13}
-        /><strong>{navigation.find((item) => item.id === route)?.label}</strong>
-      </div>
-      <div class="topbar-tools">
-        <button
-          class="search-trigger"
-          aria-label="Search quests and skills"
-          title="Search quests and skills"
-          onclick={openSearch}
-          ><Search size={17} /><span>Search guides</span><kbd>{shortcut}</kbd
-          ></button
+      <a class="topbar-mark" href="/" aria-label="RS3 Compass home"
+        ><span class="brand-mark"><Compass size={20} strokeWidth={1.5} /></span
+        ></a
+      >
+      <span class="topbar-title">{TITLES[route]}</span>
+      <button
+        class="search-trigger"
+        aria-label="Search quests and skills"
+        title="Search quests and skills"
+        onclick={openSearch}
+        ><Search size={17} /><span>Search quests and skills</span><kbd
+          >{shortcut}</kbd
+        ></button
+      >
+      {#if profile}
+        <Button className="update-levels" onclick={openLevels}
+          >Update levels</Button
         >
-        {#if profile}
-          <div
-            class="access-toggle"
-            role="group"
-            aria-label="Character membership planning"
-          >
-            <button
-              class:selected={profile.mode === "f2p"}
-              aria-pressed={profile.mode === "f2p"}
-              onclick={() =>
-                controller.updateProfile((p) => ({ ...p, mode: "f2p" }))}
-              >F2P</button
-            ><button
-              class:selected={profile.mode === "members"}
-              aria-pressed={profile.mode === "members"}
-              onclick={() =>
-                controller.updateProfile((p) => ({ ...p, mode: "members" }))}
-              >Members</button
-            >
-          </div>
-          <label class="character-select"
-            ><GameArt
-              file={profile.kind === "Group Ironman"
-                ? "Group_Ironman_badge.png"
-                : "Ironman_badge.png"}
-              size={28}
-            /><span class="character-details"
-              ><small
-                >{profile.source === "hiscores"
-                  ? "Public data"
-                  : "Sample / manual"} · {profile.kind}</small
-              ><span class="character-name" aria-hidden="true"
-                >{profile.name} <span>▾</span></span
-              ><select
-                aria-label="Select character"
-                value={profile.id}
-                onchange={(event) => select(event.currentTarget.value)}
-                >{#each $saved.profiles as p}<option value={p.id}
-                    >{p.name} ({p.source === "hiscores"
-                      ? "Public data"
-                      : "Sample / manual"})</option
-                  >{/each}</select
-              ></span
-            ></label
-          >
-        {/if}
-      </div>
+        <a
+          class="player-chip"
+          href="/players"
+          aria-label={`${profile.name}, ${profile.mode === "f2p" ? "F2P" : "Members"} planning. Switch player`}
+          >{@render portrait(profile, 28)}<span class="player-chip-name"
+            >{profile.name}</span
+          ><small>{profile.mode === "f2p" ? "F2P" : "Members"}</small></a
+        >
+      {/if}
     </header>
     <main id="main-content" class="main-content" bind:this={main} tabindex="-1">
       {#if $storageError}<div class="notice storage-alert" role="alert">
@@ -424,66 +432,120 @@
         >
       </footer>
     </main>
+    <nav class="phone-tabs" aria-label="Sections">
+      {#each PHONE_TABS as tab}
+        <a
+          href={tab.href}
+          aria-current={tab.matches.includes(route) ? "page" : undefined}
+          onclick={() => compact.set(false)}
+          ><GameArt file={tab.image} size={22} />{tab.label}</a
+        >
+      {/each}
+    </nav>
   </div>
   {#if $notice}<div class="toast" role="status">
       <Info size={17} />{$notice}
     </div>{/if}
+  {#if editingLevels && profile}{#key profile.id}<LevelEditor
+        {profile}
+        initialSkill="Mining"
+        onSave={(levels) => {
+          controller.updateProfile((p) => ({
+            ...p,
+            levels: { ...p.levels, ...levels },
+          }));
+          editingLevels = false;
+        }}
+        onDismiss={() => (editingLevels = false)}
+      />{/key}{/if}
   <dialog
-    class="app-dialog"
+    class="app-dialog search-dialog"
     bind:this={searchDialog}
     aria-labelledby="search-title"
   >
-    <div class="dialog-heading">
-      <h2 id="search-title">Search quests and skills</h2>
-      <IconButton
+    <h2 id="search-title" class="sr-only">Search quests and skills</h2>
+    <div class="search-dialog-bar">
+      <SearchField
+        className="search-dialog-field"
+        label="Search quests and skills"
+        placeholder="Search quests and skills…"
+        value={search}
+        onChange={(value) => (search = value)}
+      /><kbd class="search-esc">Esc</kbd><IconButton
         framed={false}
+        className="search-close"
         label="Close search"
         onclick={() => searchDialog.close()}><X size={20} /></IconButton
       >
     </div>
-    <SearchField
-      className="large"
-      label="Search quests and skills"
-      placeholder="Search quests and skills…"
-      value={search}
-      onChange={(value) => (search = value)}
-    />
     <div class="search-results">
-      {#each QUESTS.filter((q) => q.name
-          .toLowerCase()
-          .includes(search.toLowerCase())) as q}<NavigationCard
-          title={q.name}
-          label={"Open preparation for " + q.name}
-          image={q.icon}
-          detail={q.members ? "Members quest" : "Free-to-play quest"}
-          wiki={q.wiki}
-          onOpen={() => {
-            searchDialog.close();
-            navigate("/quests/" + encodeURIComponent(q.id));
-          }}
-        />{/each}
-      {#each SKILLS.filter((s) => s.name
-          .toLowerCase()
-          .includes(search.toLowerCase())) as s}<NavigationCard
-          title={s.name}
-          label={"Open training for " + s.name}
-          image={s.icon}
-          detail={s.freeToPlayCap === 0
-            ? "Members skill"
-            : s.freeToPlayCap
-              ? `F2P trial to ${s.freeToPlayCap}`
-              : s.category}
-          wiki={s.wiki}
-          onOpen={() => {
-            searchDialog.close();
-            navigate("/skills/" + encodeURIComponent(s.name));
-          }}
-        />{/each}
-      {#if ![...QUESTS.map((q) => q.name), ...SKILLS.map((s) => s.name)].some( (n) => n
-            .toLowerCase()
-            .includes(search.toLowerCase()) )}<p class="empty-state">
+      {#if questMatches.length}<span class="rail-eyebrow">Quests</span>{/if}
+      {#each questMatches as q (q.id)}
+        <div class="search-row">
+          <button
+            class="search-result"
+            aria-label={"Open preparation for " + q.name}
+            onclick={() => {
+              searchDialog.close();
+              navigate("/quests/" + encodeURIComponent(q.id));
+            }}
+            ><GameArt file={q.icon} size={32} /><span
+              ><strong>{@render highlighted(q.name)}</strong><small
+                >{q.members ? "Members" : "Free-to-play"}
+                {q.kind ?? "quest"} · {q.difficulty}</small
+              ></span
+            ></button
+          ><a
+            class="search-wiki"
+            href={wikiHref(q.wiki)}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={q.name + " on RuneScape Wiki"}
+            title={q.name + " on RuneScape Wiki (opens a new tab)"}
+            ><ExternalLink size={16} /></a
+          >
+        </div>
+      {/each}
+      {#if skillMatches.length}<span class="rail-eyebrow">Skills</span>{/if}
+      {#each skillMatches as s (s.name)}
+        <div class="search-row">
+          <button
+            class="search-result"
+            aria-label={"Open training for " + s.name}
+            onclick={() => {
+              searchDialog.close();
+              navigate("/skills/" + encodeURIComponent(s.name));
+            }}
+            ><GameArt file={s.icon} size={32} /><span
+              ><strong>{@render highlighted(s.name)}</strong><small
+                >{s.category} · {profile?.levels[s.name] != null
+                  ? "level " + profile.levels[s.name]
+                  : "not recorded"}</small
+              ></span
+            ></button
+          ><a
+            class="search-wiki"
+            href={wikiHref(s.wiki)}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={s.name + " on RuneScape Wiki"}
+            title={s.name + " on RuneScape Wiki (opens a new tab)"}
+            ><ExternalLink size={16} /></a
+          >
+        </div>
+      {/each}
+      {#if !questMatches.length && !skillMatches.length}<p
+          class="search-empty"
+        >
           No guides match that search.
         </p>{/if}
+    </div>
+    <div class="search-foot">
+      <span><kbd>Enter</kbd> open in Compass</span><span
+        ><kbd>Esc</kbd> close</span
+      ><span class="search-count"
+        >{questMatches.length + skillMatches.length} results</span
+      >
     </div>
   </dialog>
   <dialog
@@ -585,8 +647,8 @@
         ></label
       >
       <p>
-        Access: {(profile?.mode ?? "f2p") === "f2p" ? "F2P" : "Members"} (change using
-        the header after import).
+        Access: {(profile?.mode ?? "f2p") === "f2p" ? "F2P" : "Members"} (change it
+        in the player card or on Players after import).
       </p>
       <p>
         Public data is cached for up to ten minutes; Jagex caching can add
