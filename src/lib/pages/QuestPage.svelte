@@ -190,7 +190,7 @@
             <h1 id="quest-title">{quest.name}</h1>
             <p class="quest-why"><GameText text={quest.why} /></p>
             <div class="quest-guides" aria-label="Guides on the RuneScape Wiki">
-              {#if QUICK_GUIDES.has(quest.wiki)}<a
+              {#if QUICK_GUIDES.has(quest.wiki.replaceAll(" ", "_"))}<a
                   class="guide-link guide-primary"
                   href={wikiHref(quest.wiki + "/Quick_guide")}
                   target="_blank"
