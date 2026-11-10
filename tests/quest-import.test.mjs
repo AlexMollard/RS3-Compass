@@ -46,3 +46,18 @@ test("quest requirement data keeps quest lists and skips Follows and Full keys",
   assert.deepEqual(map.get("Family Crest"), []);
   assert.equal(map.has("Follows:Nature Spirit"), false);
 });
+
+test("NPC infobox map pins are read with spaced parameters", () => {
+  assert.deepEqual(
+    mapPin("|map = {{NPC map|npcname = Ambassador Spanfipple|npcid = 4581|x = 2984|y = 3341}}"),
+    { x: 2984, y: 3341, plane: 0 },
+  );
+});
+
+test("area outlines pin their centre and colon NPC pins read their first spawn", () => {
+  assert.deepEqual(mapPin("|map = {{Area map|3200,3230|3220,3230|3220,3210|3200,3210}}"), { x: 3210, y: 3220, plane: 0 });
+  assert.deepEqual(
+    mapPin("{{NPC map|npcname=Legends' guard|npcid:398,x:2726,y:3349|npcid:399,x:2731,y:3348}}"),
+    { x: 2726, y: 3349, plane: 0 },
+  );
+});

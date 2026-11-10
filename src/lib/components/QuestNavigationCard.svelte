@@ -51,7 +51,14 @@
         ).padStart(2, "0")}{/if}</span
     ><GameArt className="queue-quest-icon" file={quest.icon} /><span
       class="queue-quest-name"
-      ><strong>{quest.name}</strong><small
+      ><strong
+        >{quest.name}{#if quest.members}<GameArt
+            className="members-mark"
+            file="P2P_icon.png"
+            size={14}
+            alt="Members"
+          />{/if}</strong
+      ><small
         >{completed
           ? "Recorded complete"
           : recommended
@@ -75,7 +82,14 @@
           size={12}
         />{/if}</span
     ><span
-      ><strong>{quest.name}</strong><small
+      ><strong
+        >{quest.name}{#if quest.members}<GameArt
+            className="members-mark"
+            file="P2P_icon.png"
+            size={14}
+            alt="Members"
+          />{/if}</strong
+      ><small
         >{quest.members ? "Members" : "Free-to-play"} · {availability ||
           activityType} · {quest.difficulty}</small
       ></span
@@ -85,3 +99,11 @@
       ><ChevronRight size={15} /></span
     ></button
   >{/if}
+
+<style>
+  :global(.members-mark) {
+    display: inline-block;
+    margin-left: 6px;
+    vertical-align: -2px;
+  }
+</style>

@@ -6,12 +6,18 @@ import { writeFileSync } from "node:fs";
 import { QUESTS } from "../src/data.ts";
 import { IMPORTED_QUESTS } from "../src/questsImported.ts";
 import { RS3_SKILL_NAMES } from "../src/skillNames.ts";
-import { bullets, firstLink, mapPin, parseQuestreq, plain, templateParams } from "./questWikitext.mjs";
+import { bullets, firstLink, links, mapPin, parseQuestreq, plain, templateParams } from "./questWikitext.mjs";
 
 const API = "https://runescape.wiki/api.php";
 const USER_AGENT = "RS3 Compass quest import (https://github.com/AlexMollard/RS3-Compass)";
 const OUT = new URL("../src/questsImported.ts", import.meta.url);
 const BATCH = 50;
+// Quests whose start text links nowhere with a pin: the Wiki page that has one.
+const START_PAGES = {
+  "Legends' Quest": ["Legends' guard"],
+  // Starts at any house portal; Rimmington is the first one players get.
+  "A Clockwork Syringe": ["Rimmington"],
+};
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 async function api(params) {
@@ -136,8 +142,11 @@ function parseQuest(title, content, questreq, npcPins) {
   if (!details) return { skip: "no Quest details" };
   const members = /^yes/i.test(details.members ?? "");
   const npcWiki = firstLink(details.start) ?? title;
-  const map = mapPin(details.start_path) ?? npcPins.get(npcWiki);
-  if (!map) return { skip: "no start map pin", npcWiki };
+  const startLinks = [...links(details.start), ...(START_PAGES[title] ?? [])];
+  const map =
+    mapPin(details.start_path) ??
+    startLinks.map((link) => npcPins.get(link)).find(Boolean);
+  if (!map) return { skip: "no start map pin", startLinks };
   const npc = npcWiki.replace(/\s*\(.*\)$/, "");
   const skills = new Map();
   for (const m of (details.requirements ?? "").matchAll(/\{\{\s*Skillreq\s*\|([^|}]+)\|(\d+)/gi)) {
@@ -212,36 +221,43 @@ for (const q of handWritten) {
 
 const guide = (await api({ action: "parse", page: "Quests/Progression guide", prop: "wikitext" })).parse.wikitext;
 const order = [...new Set([...guide.matchAll(/data-rowid="([^"]+)"/g)].map((m) => m[1].trim()).filter(Boolean))];
-const category = [];
-let cmcontinue;
-do {
-  const json = await api({
-    action: "query",
-    list: "categorymembers",
-    cmtitle: "Category:Quests",
-    cmnamespace: "0",
-    cmlimit: "500",
-    ...(cmcontinue ? { cmcontinue } : {}),
-  });
-  category.push(...json.query.categorymembers.map((m) => m.title));
-  cmcontinue = json.continue?.cmcontinue;
-} while (cmcontinue);
+async function categoryMembers(name) {
+  const members = [];
+  let cmcontinue;
+  do {
+    const json = await api({
+      action: "query",
+      list: "categorymembers",
+      cmtitle: "Category:" + name,
+      cmnamespace: "0",
+      cmlimit: "500",
+      ...(cmcontinue ? { cmcontinue } : {}),
+    });
+    members.push(...json.query.categorymembers.map((m) => m.title));
+    cmcontinue = json.continue?.cmcontinue;
+  } while (cmcontinue);
+  return members;
+}
+const category = await categoryMembers("Quests");
+const miniquests = new Set(await categoryMembers("Miniquests"));
 const inCategory = new Set(category);
 const titles = [
   ...order.filter((t) => inCategory.has(t)),
   ...category.filter((t) => !order.includes(t)).sort((a, b) => a.localeCompare(b)),
+  ...[...miniquests].filter((t) => !inCategory.has(t)).sort((a, b) => a.localeCompare(b)),
 ].filter((t) => !known.has(nameKey(t)) && !known.has(slug(t)));
 
 const questreqContent = (await pageContents(["Module:Questreq/data"])).get("Module:Questreq/data");
 const questreq = parseQuestreq(questreqContent);
 const contents = await pageContents(titles);
 
-// Pages without a start pin fall back to the pin on the starting NPC's own page.
+// Pages without a start pin fall back to the first pin found on a page linked from
+// the start text: the NPC first, then the place (e.g. Lumbridge Castle).
 const npcPins = new Map();
 const unpinned = titles
   .map((title) => contents.get(title) && parseQuest(title, contents.get(title), questreq, npcPins))
   .filter((result) => result?.skip === "no start map pin")
-  .map((result) => result.npcWiki);
+  .flatMap((result) => result.startLinks);
 const npcPages = await pageContents([...new Set(unpinned)]);
 for (const [npc, content] of npcPages) {
   const pin = mapPin(content);
@@ -257,6 +273,8 @@ for (const title of titles) {
   const { record, combat, skip } = parseQuest(title, content, questreq, npcPins);
   if (skip) { skipped.push(`${title}: ${skip}`); continue; }
   if (!record.members) { skipped.push(`${title}: free-to-play, add by hand`); continue; }
+  if (miniquests.has(title))
+    record.kind = /\(saga\)$/i.test(title) ? "saga" : "miniquest";
   records.push(record);
   combatPlans[record.id] = combat;
 }
@@ -284,9 +302,14 @@ for (const r of records) {
       r.preparationNotes.push(plain(name.replace(/^Misc:/i, "")));
       continue;
     }
+    // "Partial:X" needs only part of X, so it is a note rather than a blocking requirement.
+    if (/^Partial:/i.test(name)) {
+      r.preparationNotes.push(`Get partway through ${name.replace(/^Partial:/i, "")} first; check the Wiki for the point needed.`);
+      continue;
+    }
     const id = finalIds.get(nameKey(name)) ?? finalIds.get(slug(name));
     if (id && id !== r.id) r.questRequirements.push(id);
-    else r.preparationNotes.push(`Complete ${name} first; it isn't in Compass yet.`);
+    else r.preparationNotes.push(`Complete ${name} first; Compass doesn't track it.`);
   }
   delete r.questRequirementNames;
   if (!r.preparationNotes.length) delete r.preparationNotes;
@@ -299,6 +322,24 @@ for (const r of records) {
     summary: `Start of ${r.name}.`,
   };
 }
+
+// Keep the guide order, but pull each imported prerequisite in just before the first
+// quest that needs it, so miniquests and late-listed quests appear in a playable order.
+const byId = new Map(records.map((r) => [r.id, r]));
+const ordered = [];
+const placed = new Set();
+const place = (record, path = new Set()) => {
+  if (placed.has(record.id) || path.has(record.id)) return;
+  path.add(record.id);
+  for (const id of record.questRequirements) {
+    const dependency = byId.get(id);
+    if (dependency) place(dependency, path);
+  }
+  placed.add(record.id);
+  ordered.push(record);
+};
+for (const record of records) place(record);
+records.splice(0, records.length, ...ordered);
 
 const today = new Date().toISOString().slice(0, 10);
 const source = `// Generated by scripts/import-quests.mjs on ${today}. Do not edit by hand: rerun the script.

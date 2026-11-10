@@ -494,6 +494,43 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "questRequirements": []
   },
   {
+    "id": "merlins-crystal",
+    "name": "Merlin's Crystal",
+    "icon": "Merlin's_Crystal_icon.png",
+    "artwork": "Merlin's_Crystal.png",
+    "members": true,
+    "difficulty": "Intermediate",
+    "length": "Medium",
+    "start": {
+      "npc": "King Arthur",
+      "npcWiki": "King Arthur",
+      "image": "King_Arthur_chathead.png",
+      "location": "Seers' Village",
+      "meetingPoint": "Talk to King Arthur in Camelot.",
+      "map": {
+        "x": 2764,
+        "y": 3515,
+        "plane": 0
+      }
+    },
+    "why": "Merlin's Crystal is the first quest in the Camelot quest series, involving the player rescuing the wizard Merlin from a crystal.",
+    "requirements": [],
+    "supplies": [
+      "Bread (can be obtained during the quest with 24 coins)",
+      "Bat bones (can be obtained during the quest)",
+      "Black candle",
+      "Bucket (can be obtained during the quest)",
+      "Insect repellent (can be obtained during the quest)"
+    ],
+    "rewards": [
+      "6 quest points",
+      "Excalibur",
+      "A replica of Excalibur will be placed in the Varrock Museum as a Varrock Museum display by talking to Historian Minas. This will give you 5 Kudos and an antique lamp that gives 1,000 experience in a skill of level 20 or above."
+    ],
+    "wiki": "Merlin's_Crystal",
+    "questRequirements": []
+  },
+  {
     "id": "murder-mystery",
     "name": "Murder Mystery",
     "icon": "Murder_Mystery_icon.png",
@@ -772,7 +809,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "why": "Raksha, the Shadow Colossus is a quest that unlocks access to Orthen Oubliette, where Raksha, the Shadow Colossus may be fought.",
     "requirements": [],
     "preparationNotes": [
-      "Complete Anachronia base camp tutorial first; it isn't in Compass yet."
+      "Complete Anachronia base camp tutorial first; Compass doesn't track it."
     ],
     "supplies": [],
     "rewards": [
@@ -1226,6 +1263,44 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ]
   },
   {
+    "id": "enter-the-abyss-miniquest",
+    "name": "Enter the Abyss (miniquest)",
+    "icon": "Enter_the_Abyss_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Intermediate",
+    "length": "Short",
+    "start": {
+      "npc": "Mage of Zamorak",
+      "npcWiki": "Mage of Zamorak",
+      "image": "Mage_of_Zamorak_chathead.png",
+      "location": "Enter the Abyss (miniquest)",
+      "meetingPoint": "The Mage of Zamorak at the beginning of the above-ground River Lum in the Wilderness (roams levels 4-7).",
+      "map": {
+        "x": 3106,
+        "y": 3558,
+        "plane": 0
+      }
+    },
+    "why": "Enter the Abyss (miniquest) is a miniquest during which the player helps the Zamorakians access the Rune Essence mine so that they can craft their own runes.",
+    "requirements": [
+      {
+        "skill": "Runecrafting",
+        "level": 5
+      }
+    ],
+    "supplies": [],
+    "rewards": [
+      "Ability to enter the Abyss",
+      "A small pouch (able to carry 3 pure essence or rune essence)",
+      "Abyssal book",
+      "Increased stock in the Battle Runes shop"
+    ],
+    "wiki": "Enter_the_Abyss_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": []
+  },
+  {
     "id": "wanted",
     "name": "Wanted!",
     "icon": "Wanted!_icon.png",
@@ -1248,7 +1323,6 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "why": "Wanted! is a quest that focuses on the completion of your application to become a Temple Knight. Due to an oversight during your recruitment, you are now to hunt down an extremely dangerous wizard and mass murderer named Solus Dellagar.",
     "requirements": [],
     "preparationNotes": [
-      "Complete Enter the Abyss (miniquest) first; it isn't in Compass yet.",
       "Ability to enter Morytania"
     ],
     "supplies": [
@@ -1262,7 +1336,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "wiki": "Wanted!",
     "questRequirements": [
-      "recruitment-drive"
+      "recruitment-drive",
+      "enter-the-abyss-miniquest"
     ]
   },
   {
@@ -1349,6 +1424,47 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ]
   },
   {
+    "id": "recipe-for-disaster-freeing-the-goblin-generals",
+    "name": "Recipe for Disaster: Freeing the Goblin Generals",
+    "icon": "Goblin_Generals_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Novice",
+    "length": "Short",
+    "start": {
+      "npc": "General Wartface",
+      "npcWiki": "General Wartface",
+      "image": "General_Wartface_chathead.png",
+      "location": "Recipe for Disaster: Freeing the Goblin Generals",
+      "meetingPoint": "Inspect General Wartface or General Bentnoze in the banquet hall in Lumbridge Castle.",
+      "map": {
+        "x": 2957,
+        "y": 3513,
+        "plane": 0
+      }
+    },
+    "why": "Recipe for Disaster: Freeing the Goblin Generals is a subquest of Recipe for Disaster.",
+    "requirements": [],
+    "supplies": [
+      "Charcoal",
+      "Spice or gnome spice",
+      "Fishing bait",
+      "Bucket of water or bowl of water or jug of water",
+      "Bread",
+      "Orange",
+      "Green, blue, or purple dye"
+    ],
+    "rewards": [
+      "1 quest point",
+      "Further access to the Culinaromancer's chest."
+    ],
+    "wiki": "Recipe_for_Disaster:_Freeing_the_Goblin_Generals",
+    "questRequirements": [
+      "recipe-for-disaster-another-cooks-quest",
+      "goblin-diplomacy"
+    ]
+  },
+  {
     "id": "fishing-contest",
     "name": "Fishing Contest",
     "icon": "Fishing_Contest_icon.png",
@@ -1387,6 +1503,48 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "wiki": "Fishing_Contest",
     "questRequirements": []
+  },
+  {
+    "id": "recipe-for-disaster-freeing-the-mountain-dwarf",
+    "name": "Recipe for Disaster: Freeing the Mountain Dwarf",
+    "icon": "Mountain_Dwarf_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Novice",
+    "length": "Short",
+    "start": {
+      "npc": "Mountain Dwarf",
+      "npcWiki": "Mountain Dwarf",
+      "image": "Mountain_Dwarf_chathead.png",
+      "location": "Recipe for Disaster: Freeing the Mountain Dwarf",
+      "meetingPoint": "Inspect the mountain dwarf in the banquet hall in Lumbridge Castle.",
+      "map": {
+        "x": 1862,
+        "y": 5345,
+        "plane": 0,
+        "mapId": 394
+      }
+    },
+    "why": "Recipe for Disaster: Freeing the Mountain Dwarf is a subquest of Recipe for Disaster.",
+    "requirements": [],
+    "supplies": [
+      "304 coins (plus up to 30 more to buy the ales)",
+      "Pot of flour (buy from chest)",
+      "Egg (buy from chest)",
+      "Bucket of milk (buy from chest)",
+      "Bowl of water (take bowl on table next to the Cook and fill it up in the sink)",
+      "Gloves (Ice gloves are the best, but other gloves will work fine too)",
+      "4 Asgarnian ale (2 more recommended in case he sobers up, can be bought during the quest)"
+    ],
+    "rewards": [
+      "1 quest point",
+      "(Further) access to the Culinaromancer's chest"
+    ],
+    "wiki": "Recipe_for_Disaster:_Freeing_the_Mountain_Dwarf",
+    "questRequirements": [
+      "recipe-for-disaster-another-cooks-quest",
+      "fishing-contest"
+    ]
   },
   {
     "id": "tower-of-life",
@@ -2877,9 +3035,6 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
         "level": 30
       }
     ],
-    "preparationNotes": [
-      "Complete Merlin's Crystal first; it isn't in Compass yet."
-    ],
     "supplies": [
       "Excalibur"
     ],
@@ -2889,7 +3044,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Ability to use the King Arthur picture in your player-owned house"
     ],
     "wiki": "Holy_Grail",
-    "questRequirements": []
+    "questRequirements": [
+      "merlins-crystal"
+    ]
   },
   {
     "id": "sea-slug",
@@ -3030,6 +3187,46 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "questRequirements": [
       "demon-slayer",
       "the-golem"
+    ]
+  },
+  {
+    "id": "recipe-for-disaster-freeing-evil-dave",
+    "name": "Recipe for Disaster: Freeing Evil Dave",
+    "icon": "Evil_Dave_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Intermediate",
+    "length": "Medium to Long",
+    "start": {
+      "npc": "Evil Dave",
+      "npcWiki": "Evil Dave",
+      "image": "Evil_Dave_chathead.png",
+      "location": "Recipe for Disaster: Freeing Evil Dave",
+      "meetingPoint": "Inspect Evil Dave in the banquet hall in Lumbridge Castle.",
+      "map": {
+        "x": 3077,
+        "y": 3493,
+        "plane": 0
+      }
+    },
+    "why": "Recipe for Disaster: Freeing Evil Dave is a subquest of Recipe for Disaster.",
+    "requirements": [],
+    "supplies": [
+      "Wily cat, cat, kitten, or lazy cat",
+      "Up to 10 bowls of stew (If you make no mistakes, you will not need more than 10 bowls. The Forester's Arms sells stew for 20 coins)."
+    ],
+    "rewards": [
+      "1 quest point",
+      "7,000 Cooking XP",
+      "The ability to catch hellrats to get a hellcat",
+      "The ability to add coloured spices to stew by catching Hellrats (spicy stews can boost or lower certain stats)",
+      "(Further) access to the Culinaromancer's chest"
+    ],
+    "wiki": "Recipe_for_Disaster:_Freeing_Evil_Dave",
+    "questRequirements": [
+      "recipe-for-disaster-another-cooks-quest",
+      "gertrudes-cat",
+      "shadow-of-the-storm"
     ]
   },
   {
@@ -3301,9 +3498,6 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
         "level": 30
       }
     ],
-    "preparationNotes": [
-      "Complete Recipe for Disaster: Freeing Evil Dave first; it isn't in Compass yet."
-    ],
     "supplies": [
       "An empty backpack.",
       "No familiar or pet summoned."
@@ -3320,7 +3514,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Dave's spellbook that holds up to 1000 charges of chipped teleports. Talk to Dave after the quest to receive it."
     ],
     "wiki": "Evil_Dave's_Big_Day_Out",
-    "questRequirements": []
+    "questRequirements": [
+      "recipe-for-disaster-freeing-evil-dave"
+    ]
   },
   {
     "id": "the-slug-menace",
@@ -3378,6 +3574,38 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ]
   },
   {
+    "id": "bar-crawl-miniquest",
+    "name": "Bar Crawl (miniquest)",
+    "icon": "Bar_Crawl_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Intermediate",
+    "length": "Short to Medium",
+    "start": {
+      "npc": "barbarian guard",
+      "npcWiki": "barbarian guard",
+      "image": "Bar_Crawl_(miniquest)_icon.png",
+      "location": "Bar Crawl (miniquest)",
+      "meetingPoint": "Talk to one of the barbarian guards at the outer entrance of the Barbarian Outpost Agility Course.",
+      "map": {
+        "x": 2544,
+        "y": 3569,
+        "plane": 0
+      }
+    },
+    "why": "Alfred Grimhand's Bar Crawl is a miniquest that must be completed to gain full access to the Barbarian Outpost, where it's considered a \"rite of passage\".",
+    "requirements": [],
+    "supplies": [
+      "208 coins to buy all the required liquor"
+    ],
+    "rewards": [
+      "Access to the Barbarian Outpost Agility Course."
+    ],
+    "wiki": "Bar_Crawl_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": []
+  },
+  {
     "id": "scorpion-catcher",
     "name": "Scorpion Catcher",
     "icon": "Scorpion_Catcher_icon.png",
@@ -3404,9 +3632,6 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
         "level": 31
       }
     ],
-    "preparationNotes": [
-      "Complete Bar Crawl (miniquest) first; it isn't in Compass yet."
-    ],
     "supplies": [
       "Dusty key (can be obtained during the quest, unnecessary with 70 Agility)"
     ],
@@ -3415,7 +3640,55 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Ability to have Thormac make an elemental battlestaff into a corresponding mystic battlestaff for 40,000 coins."
     ],
     "wiki": "Scorpion_Catcher",
-    "questRequirements": []
+    "questRequirements": [
+      "bar-crawl-miniquest"
+    ]
+  },
+  {
+    "id": "recipe-for-disaster-freeing-pirate-pete",
+    "name": "Recipe for Disaster: Freeing Pirate Pete",
+    "icon": "Pirate_Pete_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Intermediate",
+    "length": "Short",
+    "start": {
+      "npc": "Pirate Pete",
+      "npcWiki": "Pirate Pete",
+      "image": "Pirate_Pete_chathead.png",
+      "location": "Recipe for Disaster: Freeing Pirate Pete",
+      "meetingPoint": "Inspect Pirate Pete in the banquet hall in Lumbridge Castle.",
+      "map": {
+        "x": 3680,
+        "y": 3537,
+        "plane": 0
+      }
+    },
+    "why": "Recipe for Disaster: Freeing Pirate Pete is a subquest of Recipe for Disaster.",
+    "requirements": [
+      {
+        "skill": "Cooking",
+        "level": 31
+      }
+    ],
+    "supplies": [
+      "Raw cod",
+      "Bread",
+      "An empty fishbowl",
+      "Needle (Only a normal needle will work. Tool belt will not work.)",
+      "3 bronze wires"
+    ],
+    "rewards": [
+      "1 quest point",
+      "The ability to go diving and fight crabs (you need your diving apparatus) at Mogre Camp",
+      "The ability to cook crab meat (heals 100 life points in five bites)",
+      "Ability to dive underwater and trade crunchy claw tokens for giant crab pets",
+      "(Further) access to the Culinaromancer's chest"
+    ],
+    "wiki": "Recipe_for_Disaster:_Freeing_Pirate_Pete",
+    "questRequirements": [
+      "recipe-for-disaster-another-cooks-quest"
+    ]
   },
   {
     "id": "eadgars-ruse",
@@ -3836,6 +4109,72 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ]
   },
   {
+    "id": "cold-war",
+    "name": "Cold War",
+    "icon": "Cold_War_icon.png",
+    "artwork": "Cold_War.png",
+    "members": true,
+    "difficulty": "Intermediate",
+    "length": "Long",
+    "start": {
+      "npc": "Larry",
+      "npcWiki": "Larry",
+      "image": "Larry_chathead.png",
+      "location": "Ardougne Zoo",
+      "meetingPoint": "Speak to Larry at Ardougne Zoo.",
+      "map": {
+        "x": 2592,
+        "y": 3264,
+        "plane": 0
+      }
+    },
+    "why": "Cold War is the first quest in the penguin quest series. It involves two agents finding out about the plans of the penguins.",
+    "requirements": [
+      {
+        "skill": "Agility",
+        "level": 30
+      },
+      {
+        "skill": "Construction",
+        "level": 34
+      },
+      {
+        "skill": "Crafting",
+        "level": 30
+      },
+      {
+        "skill": "Hunter",
+        "level": 10
+      },
+      {
+        "skill": "Thieving",
+        "level": 15
+      }
+    ],
+    "supplies": [
+      "Access to a clockmaker's bench 3 or clockmaker's bench 4 (you can use a friend's house if you're not an ironman)",
+      "10 oak planks (protean planks and plank box will not work)",
+      "10 steel nails",
+      "Plank (protean and other types of planks do not work)",
+      "Mahogany plank (protean does not work)",
+      "Silk",
+      "Clockwork (or a steel bar to craft one)",
+      "Swamp tar",
+      "5 feathers (coloured ones won't work)",
+      "Leather",
+      "Raw cod or a ring of charos (inactivated works)"
+    ],
+    "rewards": [
+      "1 quest point",
+      "Ability to make the penguin suit. To enter the suit, you must talk to Larry at the zoo, pier, farm or Iceberg.",
+      "Ability to train at the Penguin Agility Course.",
+      "Players can also steal more cowbells and make more bongos to play while in a penguin suit.",
+      "Ability to contact Larry through the NPC Contact spell."
+    ],
+    "wiki": "Cold_War",
+    "questRequirements": []
+  },
+  {
     "id": "horror-from-the-deep",
     "name": "Horror from the Deep",
     "icon": "Horror_from_the_Deep_icon.png",
@@ -3862,9 +4201,6 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
         "level": 35
       }
     ],
-    "preparationNotes": [
-      "Complete Bar Crawl (miniquest) first; it isn't in Compass yet."
-    ],
     "supplies": [
       "60 steel nails",
       "2 normal planks (can be obtained during the quest, just north of the fenced-in area of the Barbarian Outpost)",
@@ -3885,7 +4221,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "The ability to request dagannoth as a Slayer assignment if the Mask of the Dagannoth is owned"
     ],
     "wiki": "Horror_from_the_Deep",
-    "questRequirements": []
+    "questRequirements": [
+      "bar-crawl-miniquest"
+    ]
   },
   {
     "id": "what-lies-below",
@@ -4626,6 +4964,48 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "questRequirements": []
   },
   {
+    "id": "recipe-for-disaster-freeing-the-lumbridge-sage",
+    "name": "Recipe for Disaster: Freeing the Lumbridge Sage",
+    "icon": "Lumbridge_Sage_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Intermediate",
+    "length": "Short",
+    "start": {
+      "npc": "Lumbridge Sage",
+      "npcWiki": "Lumbridge Sage",
+      "image": "Lumbridge_Sage_chathead.png",
+      "location": "Recipe for Disaster: Freeing the Lumbridge Sage",
+      "meetingPoint": "Inspect the Lumbridge Sage in the banquet hall in Lumbridge Castle.",
+      "map": {
+        "x": 3238,
+        "y": 3219,
+        "plane": 0
+      }
+    },
+    "why": "Recipe for Disaster: Freeing the Lumbridge Sage is a subquest of Recipe for Disaster.",
+    "requirements": [
+      {
+        "skill": "Cooking",
+        "level": 40
+      }
+    ],
+    "supplies": [
+      "Bucket of milk",
+      "Egg",
+      "Pot of flour",
+      "Cake tin"
+    ],
+    "rewards": [
+      "1 quest point",
+      "(Further) access to the Culinaromancer's chest"
+    ],
+    "wiki": "Recipe_for_Disaster:_Freeing_the_Lumbridge_Sage",
+    "questRequirements": [
+      "recipe-for-disaster-another-cooks-quest"
+    ]
+  },
+  {
     "id": "the-fremennik-trials",
     "name": "The Fremennik Trials",
     "icon": "The_Fremennik_Trials_icon.png",
@@ -5211,9 +5591,6 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
         "level": 38
       }
     ],
-    "preparationNotes": [
-      "Complete Cold War first; it isn't in Compass yet."
-    ],
     "supplies": [
       "Clockwork suit",
       "8 silk",
@@ -5231,6 +5608,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "wiki": "Hunt_for_Red_Raktuber",
     "questRequirements": [
+      "cold-war",
       "sea-slug"
     ]
   },
@@ -5530,6 +5908,85 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "wiki": "Tears_of_Guthix_(quest)",
     "questRequirements": []
+  },
+  {
+    "id": "legacy-of-seergaze",
+    "name": "Legacy of Seergaze",
+    "icon": "Legacy_of_Seergaze_icon.png",
+    "artwork": "Legacy_of_Seergaze.png",
+    "members": true,
+    "difficulty": "Experienced",
+    "length": "Long to Very Long",
+    "start": {
+      "npc": "mercenary adventurer",
+      "npcWiki": "mercenary adventurer",
+      "image": "Legacy_of_Seergaze_icon.png",
+      "location": "Paterdomus",
+      "meetingPoint": "Talk to the mercenary adventurer east of Paterdomus in Morytania.",
+      "map": {
+        "x": 3411,
+        "y": 3492,
+        "plane": 0
+      }
+    },
+    "why": "Legacy of Seergaze is the sixth quest in the Myreque quest series, where you must further aid the Myreque in their rebellion against the Vampyres.",
+    "requirements": [
+      {
+        "skill": "Agility",
+        "level": 29
+      },
+      {
+        "skill": "Construction",
+        "level": 20
+      },
+      {
+        "skill": "Crafting",
+        "level": 47
+      },
+      {
+        "skill": "Firemaking",
+        "level": 40
+      },
+      {
+        "skill": "Magic",
+        "level": 49
+      },
+      {
+        "skill": "Mining",
+        "level": 35
+      },
+      {
+        "skill": "Slayer",
+        "level": 31
+      }
+    ],
+    "supplies": [
+      "Teak or higher-level pyre logs",
+      "Combat gear (Necromancy or two different combat styles recommended for lower-level players)",
+      "10 nails (obtained during quest from Flaygian)",
+      "1 coal (can be obtained during the quest)",
+      "Items to use Lvl-2 Enchant:",
+      "1 mithril bar (can be obtained during the quest, metal bank works)",
+      "1 silver bar (can be obtained during the quest, metal bank works)",
+      "1 silver sickle (b) (can be obtained during the quest)",
+      "1 emerald (can be obtained during the quest)",
+      "1 saw (cannot use the default one on the tool belt, one can be obtained during the quest)"
+    ],
+    "rewards": [
+      "2 quest points",
+      "Tome of xp 2nd ed, giving 2,500 experience each in any skill that's at least level 35, up to 3 times in total, or 1,250 experience when used on an elite skill.",
+      "Ivandis flail",
+      "Blood talisman",
+      "Ability to craft blood runes at the blood altar with level 77 Runecrafting.",
+      "Access to Meiyerditch tunnels including skeletal hands, zombie hands, bloodvelds and mutated bloodvelds, as well as a jutting wall shortcut (requires level 65 Agility) between Canifis and Meiyerditch.",
+      "Access to a furnace in Meiyerditch.",
+      "Access to the columbarium beneath Paterdomus and the ability to cremate the vyre corpse for rewards.",
+      "Access to vyrewatch event in Temple Trekking."
+    ],
+    "wiki": "Legacy_of_Seergaze",
+    "questRequirements": [
+      "the-darkness-of-hallowvale"
+    ]
   },
   {
     "id": "between-a-rock",
@@ -6067,7 +6524,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       }
     ],
     "preparationNotes": [
-      "Complete Anachronia base camp tutorial first; it isn't in Compass yet."
+      "Complete Anachronia base camp tutorial first; Compass doesn't track it."
     ],
     "supplies": [
       "100 orthenglass (Can be stored in material storage container. Can also be obtained during quest from Anachronia north excavation site.)",
@@ -6153,9 +6610,6 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
         "level": 50
       }
     ],
-    "preparationNotes": [
-      "Complete Recipe for Disaster: Freeing Pirate Pete first; it isn't in Compass yet."
-    ],
     "supplies": [
       "Fishbowl helmet and diving apparatus",
       "A holy symbol",
@@ -6176,7 +6630,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "wiki": "The_Great_Brain_Robbery",
     "questRequirements": [
       "creature-of-fenkenstrain",
-      "cabin-fever"
+      "cabin-fever",
+      "recipe-for-disaster-freeing-pirate-pete"
     ]
   },
   {
@@ -6425,7 +6880,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       }
     ],
     "preparationNotes": [
-      "Complete Partial:Necromancy! first; it isn't in Compass yet."
+      "Get partway through Necromancy! first; check the Wiki for the point needed."
     ],
     "supplies": [
       "2 buckets of water",
@@ -6563,6 +7018,53 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ]
   },
   {
+    "id": "regicide",
+    "name": "Regicide",
+    "icon": "Regicide_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Master",
+    "length": "Long",
+    "start": {
+      "npc": "King's messenger",
+      "npcWiki": "King's messenger",
+      "image": "King's_messenger_chathead.png",
+      "location": "Ardougne",
+      "meetingPoint": "Receive a message from King Lathas's messenger (typically, this happens about 15 minutes after completing Underground Pass).",
+      "map": {
+        "x": 2575,
+        "y": 3297,
+        "plane": 1
+      }
+    },
+    "why": "Regicide is the fourth quest in the Elf (Prifddinas) quest series, where King Lathas sends the player to Tirannwn to kill his brother, King Tyras, and end his tyranny.",
+    "requirements": [
+      {
+        "skill": "Agility",
+        "level": 56
+      }
+    ],
+    "supplies": [
+      "Items to get through the Underground Pass (other items can be banked until the lodestone is active):",
+      "Limestone (limestone bricks will not work)",
+      "6-30 pieces of coal (coal in an orebox will not work)",
+      "An empty pot (can be obtained in the elf camp)",
+      "A strip of cloth (made by using 2 balls of wool on a loom)",
+      "A cooked rabbit (can be obtained from charter traders or in Tirannwn after killing a rabbit and cooking the meat)"
+    ],
+    "rewards": [
+      "3 quest points",
+      "Access to Isafdar and the overpass of Arandar",
+      "Access to Port Tyras by using charter ships",
+      "Ability to wield and use a dragon halberd (bought for from the quartermaster in Tyras Camp)",
+      "Ability to have elves assigned as a slayer task by Chaeldar, Sumona, Morvran, and Laniakea."
+    ],
+    "wiki": "Regicide",
+    "questRequirements": [
+      "underground-pass"
+    ]
+  },
+  {
     "id": "roving-elves",
     "name": "Roving Elves",
     "icon": "Roving_Elves_icon.png",
@@ -6584,9 +7086,6 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     },
     "why": "Roving Elves is a sequel to the Waterfall Quest and Regicide. It revolves around consecrating the tomb of King Baxtorian on behalf of his and Glarial's grandson Islwyn.",
     "requirements": [],
-    "preparationNotes": [
-      "Complete Regicide first; it isn't in Compass yet."
-    ],
     "supplies": [
       "A rope (not necessary if you have built a rope rack)",
       "A key to the Waterfall Dungeon (can be acquired during the quest)",
@@ -6599,6 +7098,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "wiki": "Roving_Elves",
     "questRequirements": [
+      "regicide",
       "waterfall-quest"
     ]
   },
@@ -6633,9 +7133,6 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
         "level": 42
       }
     ],
-    "preparationNotes": [
-      "Complete Regicide first; it isn't in Compass yet."
-    ],
     "supplies": [
       "90 mithril nails (or better)",
       "10 mahogany planks (protean planks will not work)"
@@ -6648,7 +7145,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Sailor's hat"
     ],
     "wiki": "Catapult_Construction",
-    "questRequirements": []
+    "questRequirements": [
+      "regicide"
+    ]
   },
   {
     "id": "the-fremennik-isles",
@@ -6712,6 +7211,147 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "wiki": "The_Fremennik_Isles",
     "questRequirements": [
       "the-fremennik-trials"
+    ]
+  },
+  {
+    "id": "legends-quest",
+    "name": "Legends' Quest",
+    "icon": "Legends'_Quest_icon.png",
+    "artwork": "Legends'_Quest.png",
+    "members": true,
+    "difficulty": "Master",
+    "length": "Long to Very Long",
+    "start": {
+      "npc": "Legends' Guild",
+      "npcWiki": "Legends' Guild",
+      "image": "Legends'_Quest_icon.png",
+      "location": "Kandarin North",
+      "meetingPoint": "Talk to the guards just outside of the Legends' Guild.",
+      "map": {
+        "x": 2729,
+        "y": 3368,
+        "plane": 0
+      }
+    },
+    "why": "Legends' Quest is the 50th quest released in RuneScape, in which the player is sent by Guildmaster Radimus Erkle to explore and map the Kharazi Jungle on the southern part of Karamja.",
+    "requirements": [
+      {
+        "skill": "Agility",
+        "level": 50
+      },
+      {
+        "skill": "Crafting",
+        "level": 50
+      },
+      {
+        "skill": "Herblore",
+        "level": 45
+      },
+      {
+        "skill": "Magic",
+        "level": 56
+      },
+      {
+        "skill": "Mining",
+        "level": 52
+      },
+      {
+        "skill": "Prayer",
+        "level": 42
+      },
+      {
+        "skill": "Smithing",
+        "level": 50
+      },
+      {
+        "skill": "Strength",
+        "level": 50
+      },
+      {
+        "skill": "Thieving",
+        "level": 50
+      },
+      {
+        "skill": "Woodcutting",
+        "level": 50
+      }
+    ],
+    "supplies": [
+      "A rope",
+      "An empty vial",
+      "A vial of water",
+      "3 papyrus (can be obtained during the quest)",
+      "1 charcoal",
+      "An unpowered orb (two if taking the easy way)",
+      "2 gold bars (more recommended in case of smithing failure, metal bank does not work)",
+      "Clean ardrigal and clean snake weed (can be obtained during the quest)",
+      "A cut opal, jade, red topaz, sapphire, emerald, ruby, and diamond",
+      "Runes for two casts of any Charge Orb spell (bring more to be safe)",
+      "Lockpick, hair clip or a master thief's lockpick (tool belt works)",
+      "Unaugmented rune hatchet or better (tool belt works; the hatchet might have to be used on the item)",
+      "Runes, depending on your version of RuneScape:"
+    ],
+    "rewards": [
+      "4 quest points",
+      "Access to the Legends' Guild (including a shop to buy the cape of legends)",
+      "7,650 experience each in four skills of your choice amongst the following - Attack, Defence, Strength, Constitution, Prayer, Magic, Woodcutting, Crafting, Smithing, Herblore, Agility, and Thieving (You can choose the same skill multiple times if you wish)",
+      "Binding book",
+      "Bull roarer, used to summon Gujuo to bless more golden bowls",
+      "Ability to wield a dragon square shield",
+      "Ability to make holy water",
+      "Access to the Kharazi Jungle and red gecko pets",
+      "Chronicle, Book of legends pet (if not already unlocked)"
+    ],
+    "wiki": "Legends'_Quest",
+    "questRequirements": [
+      "heroes-quest",
+      "jungle-potion"
+    ]
+  },
+  {
+    "id": "recipe-for-disaster-freeing-sir-amik-varze",
+    "name": "Recipe for Disaster: Freeing Sir Amik Varze",
+    "icon": "Sir_Amik_Varze_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Experienced",
+    "length": "Short to Medium",
+    "start": {
+      "npc": "Sir Amik Varze",
+      "npcWiki": "Sir Amik Varze",
+      "image": "Sir_Amik_Varze_chathead.png",
+      "location": "Recipe for Disaster: Freeing Sir Amik Varze",
+      "meetingPoint": "Inspect Sir Amik Varze in the banquet hall in Lumbridge Castle.",
+      "map": {
+        "x": 2960,
+        "y": 3336,
+        "plane": 2
+      }
+    },
+    "why": "Recipe for Disaster: Freeing Sir Amik Varze is a subquest of Recipe for Disaster.",
+    "requirements": [],
+    "preparationNotes": [
+      "Get partway through Legends' Quest first; check the Wiki for the point needed."
+    ],
+    "supplies": [
+      "Bucket of milk (buy from chest)",
+      "Pot of cream (buy from chest)",
+      "Sweetcorn",
+      "Empty pot (can be obtained during quest, bought from chest or picked from the table in the kitchen)",
+      "Radimus notes if you haven't completed Legends' Quest",
+      "Dramen staff or Lunar staff if you haven't completed A Fairy Tale III - Battle at Ork's Rift",
+      "Raw chicken (can be obtained during the quest at the Chicken Shrine)",
+      "Dramen branch (or cinnamon, made from a Dramen branch)"
+    ],
+    "rewards": [
+      "1 quest point",
+      "Access to the Evil Chicken's Lair, where you can fight black dragons",
+      "Further access to the Culinaromancer's chest"
+    ],
+    "wiki": "Recipe_for_Disaster:_Freeing_Sir_Amik_Varze",
+    "questRequirements": [
+      "recipe-for-disaster-another-cooks-quest",
+      "lost-city"
     ]
   },
   {
@@ -6823,6 +7463,69 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ]
   },
   {
+    "id": "glorious-memories",
+    "name": "Glorious Memories",
+    "icon": "Glorious_Memories_icon.png",
+    "artwork": "Glorious_Memories.png",
+    "members": true,
+    "difficulty": "Master",
+    "length": "Medium",
+    "start": {
+      "npc": "Manni the Reveller",
+      "npcWiki": "Manni the Reveller",
+      "image": "Manni_the_Reveller_chathead.png",
+      "location": "Rellekka",
+      "meetingPoint": "Speak to Manni the Reveller inside the longhall in Rellekka.",
+      "map": {
+        "x": 2659,
+        "y": 3675,
+        "plane": 0
+      }
+    },
+    "why": "Glorious Memories is a quest about the common histories of several Fremennik leaders: Chieftain Brundt, Burgher Mawnis Burrowgar and King Vargas. It sets up the plot for the series finale, introducing the Fremennik prophecy.",
+    "requirements": [
+      {
+        "skill": "Agility",
+        "level": 50
+      },
+      {
+        "skill": "Herblore",
+        "level": 43
+      },
+      {
+        "skill": "Hunter",
+        "level": 41
+      },
+      {
+        "skill": "Magic",
+        "level": 57
+      }
+    ],
+    "preparationNotes": [
+      "Standard spells equipped or the ability to cast Spellbook Swap"
+    ],
+    "supplies": [
+      "Clean irit",
+      "A vial",
+      "10 earth runes or a magic weapon which provides earth runes, such as a staff of earth",
+      "Cosmic rune",
+      "Plank (can be obtained during quest)",
+      "Staff or pole (can be obtained during quest)",
+      "At least 4 backpack spaces"
+    ],
+    "rewards": [
+      "1 quest point",
+      "tome (3x) in either,,,, or (Skill must be level 40 or higher)",
+      "An unfinished astral rune that can be traded with Baba Yaga for extra rewards"
+    ],
+    "wiki": "Glorious_Memories",
+    "questRequirements": [
+      "mountain-daughter",
+      "the-fremennik-isles",
+      "royal-trouble"
+    ]
+  },
+  {
     "id": "as-a-first-resort",
     "name": "As a First Resort",
     "icon": "As_a_First_Resort_icon.png",
@@ -6885,6 +7588,62 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Access to decanting five and six dose flasks into other flasks or vials (talk to Teplin Macagan)"
     ],
     "wiki": "As_a_First_Resort",
+    "questRequirements": []
+  },
+  {
+    "id": "family-crest",
+    "name": "Family Crest",
+    "icon": "Family_Crest_icon.png",
+    "artwork": "Family_Crest.png",
+    "members": true,
+    "difficulty": "Experienced",
+    "length": "Medium",
+    "start": {
+      "npc": "Dimintheis",
+      "npcWiki": "Dimintheis",
+      "image": "Dimintheis_chathead.png",
+      "location": "Varrock",
+      "meetingPoint": "Talk to Dimintheis in south-east Varrock, next to the Fancy Clothes Store.",
+      "map": {
+        "x": 3280,
+        "y": 3404,
+        "plane": 0
+      }
+    },
+    "why": "Family Crest is a quest during which the player retrieves the Fitzharmon family crest pieces from the three brothers to return it to their father.",
+    "requirements": [
+      {
+        "skill": "Crafting",
+        "level": 40
+      },
+      {
+        "skill": "Mining",
+        "level": 40
+      },
+      {
+        "skill": "Smithing",
+        "level": 40
+      },
+      {
+        "skill": "Magic",
+        "level": 59
+      }
+    ],
+    "supplies": [
+      "Cooked shrimps",
+      "Cooked salmon",
+      "Cooked tuna",
+      "Cooked bass",
+      "Cooked swordfish",
+      "2 cut rubies",
+      "Antipoison or super antipoison, any number of doses",
+      "Either one to defeat Chronozon:"
+    ],
+    "rewards": [
+      "1 quest point",
+      "Family gauntlets, which can then be enchanted into chaos, cooking, or smelting gauntlets."
+    ],
+    "wiki": "Family_Crest",
     "questRequirements": []
   },
   {
@@ -7244,6 +8003,110 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ]
   },
   {
+    "id": "civil-war-i-miniquest",
+    "name": "Civil War I (miniquest)",
+    "icon": "Civil_War_I_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Novice",
+    "length": "Short",
+    "start": {
+      "npc": "Adrasteia",
+      "npcWiki": "Adrasteia",
+      "image": "Adrasteia_chathead.png",
+      "location": "Civil War I (miniquest)",
+      "meetingPoint": "Speak to Adrasteia in the Falador Castle throne room.",
+      "map": {
+        "x": 2984,
+        "y": 3336,
+        "plane": 1
+      }
+    },
+    "why": "Civil War I (miniquest) is the first miniquest in the Legacy of Zamorak quest series concerning the Zamorakian Civil War. It follows the events of the Daughter of Chaos quest.",
+    "requirements": [],
+    "supplies": [],
+    "rewards": [
+      "Small XP lamp",
+      "Infernal Puzzle Box tier 3 upgrade"
+    ],
+    "wiki": "Civil_War_I_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "daughter-of-chaos"
+    ]
+  },
+  {
+    "id": "civil-war-ii-miniquest",
+    "name": "Civil War II (miniquest)",
+    "icon": "Civil_War_II_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Novice",
+    "length": "Short",
+    "start": {
+      "npc": "Trindine",
+      "npcWiki": "Trindine",
+      "image": "Trindine_chathead.png",
+      "location": "Civil War II (miniquest)",
+      "meetingPoint": "Speak to Anne Dimitri in the Wilderness.",
+      "map": {
+        "x": 3137,
+        "y": 3534,
+        "plane": 0
+      }
+    },
+    "why": "Civil War II (miniquest) is the second miniquest in the Legacy of Zamorak quest series concerning the Zamorakian Civil War.",
+    "requirements": [],
+    "supplies": [],
+    "rewards": [
+      "Small XP lamp",
+      "Infernal Puzzle Box tier 4 upgrade"
+    ],
+    "wiki": "Civil_War_II_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "civil-war-i-miniquest"
+    ]
+  },
+  {
+    "id": "civil-war-iii-miniquest",
+    "name": "Civil War III (miniquest)",
+    "icon": "Civil_War_III_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Novice",
+    "length": "Short",
+    "start": {
+      "npc": "Trindine",
+      "npcWiki": "Trindine",
+      "image": "Trindine_chathead.png",
+      "location": "Civil War III (miniquest)",
+      "meetingPoint": "Speak to Anne Dimitri in the Wilderness.",
+      "map": {
+        "x": 3137,
+        "y": 3534,
+        "plane": 0
+      }
+    },
+    "why": "Civil War III (miniquest) is the third miniquest in the Legacy of Zamorak quest series concerning the Zamorakian Civil War. It is a requirement for the tier 5 upgrade of the Infernal Puzzle Box.",
+    "requirements": [
+      {
+        "skill": "Farming",
+        "level": 50
+      }
+    ],
+    "supplies": [],
+    "rewards": [
+      "Small XP lamp",
+      "Infernal Puzzle Box tier 5 upgrade"
+    ],
+    "wiki": "Civil_War_III_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "civil-war-ii-miniquest"
+    ]
+  },
+  {
     "id": "succession",
     "name": "Succession",
     "icon": "Succession_icon.png",
@@ -7275,7 +8138,6 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       }
     ],
     "preparationNotes": [
-      "Complete Civil War III (miniquest) first; it isn't in Compass yet.",
       "Unlock Infernal Puzzle Box Tier 5"
     ],
     "supplies": [],
@@ -7286,7 +8148,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Tier 6 of the Infernal Puzzle Box becomes available, granting the ability to add Infernal Puzzle Box to the tool belt"
     ],
     "wiki": "Succession",
-    "questRequirements": []
+    "questRequirements": [
+      "civil-war-iii-miniquest"
+    ]
   },
   {
     "id": "dealing-with-scabaras",
@@ -7733,62 +8597,6 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ]
   },
   {
-    "id": "family-crest",
-    "name": "Family Crest",
-    "icon": "Family_Crest_icon.png",
-    "artwork": "Family_Crest.png",
-    "members": true,
-    "difficulty": "Experienced",
-    "length": "Medium",
-    "start": {
-      "npc": "Dimintheis",
-      "npcWiki": "Dimintheis",
-      "image": "Dimintheis_chathead.png",
-      "location": "Varrock",
-      "meetingPoint": "Talk to Dimintheis in south-east Varrock, next to the Fancy Clothes Store.",
-      "map": {
-        "x": 3280,
-        "y": 3404,
-        "plane": 0
-      }
-    },
-    "why": "Family Crest is a quest during which the player retrieves the Fitzharmon family crest pieces from the three brothers to return it to their father.",
-    "requirements": [
-      {
-        "skill": "Crafting",
-        "level": 40
-      },
-      {
-        "skill": "Mining",
-        "level": 40
-      },
-      {
-        "skill": "Smithing",
-        "level": 40
-      },
-      {
-        "skill": "Magic",
-        "level": 59
-      }
-    ],
-    "supplies": [
-      "Cooked shrimps",
-      "Cooked salmon",
-      "Cooked tuna",
-      "Cooked bass",
-      "Cooked swordfish",
-      "2 cut rubies",
-      "Antipoison or super antipoison, any number of doses",
-      "Either one to defeat Chronozon:"
-    ],
-    "rewards": [
-      "1 quest point",
-      "Family gauntlets, which can then be enchanted into chaos, cooking, or smelting gauntlets."
-    ],
-    "wiki": "Family_Crest",
-    "questRequirements": []
-  },
-  {
     "id": "lunar-diplomacy",
     "name": "Lunar Diplomacy",
     "icon": "Lunar_Diplomacy_icon.png",
@@ -7865,6 +8673,44 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "questRequirements": [
       "the-fremennik-trials",
       "lost-city"
+    ]
+  },
+  {
+    "id": "dream-mentor",
+    "name": "Dream Mentor",
+    "icon": "Dream_Mentor_icon.png",
+    "artwork": "Dream_Mentor.png",
+    "members": true,
+    "difficulty": "Master",
+    "length": "Short to Medium",
+    "start": {
+      "npc": "Cyrisus",
+      "npcWiki": "Cyrisus",
+      "image": "Dream_Mentor_icon.png",
+      "location": "Fremennik Isles",
+      "meetingPoint": "Talk to the fallen man inside the small cave in the Lunar Isle Mine.",
+      "map": {
+        "x": 2156,
+        "y": 10362,
+        "plane": 0,
+        "mapId": 14
+      }
+    },
+    "why": "Dream Mentor is a quest in the Fremennik quest series that takes place on Lunar Isle. It involves helping the adventurer Cyrisus literally overcome his fears and doubts of combat using oneiromancy.",
+    "requirements": [],
+    "supplies": [
+      "3 different kinds of food: 6 of 1 type and 7 of 2 others for a total of 20 pieces.",
+      "1 astral rune"
+    ],
+    "rewards": [
+      "2 quest points",
+      "lamp in one of: Strength, Ranged, Magic, Constitution, or Defence",
+      "9 new spells added to the Lunar spellbook:",
+      "Access to the 'Random' option on NPC Contact"
+    ],
+    "wiki": "Dream_Mentor",
+    "questRequirements": [
+      "lunar-diplomacy"
     ]
   },
   {
@@ -7985,7 +8831,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "preparationNotes": [
       "Ability to access Trollheim",
-      "Complete Partial:Troll Stronghold first; it isn't in Compass yet.",
+      "Get partway through Troll Stronghold first; check the Wiki for the point needed.",
       "Fully restore Senliten from the 'Missing My Mummy' quest"
     ],
     "supplies": [
@@ -8282,6 +9128,165 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ]
   },
   {
+    "id": "recipe-for-disaster-freeing-king-awowogei",
+    "name": "Recipe for Disaster: Freeing King Awowogei",
+    "icon": "Monkey_Ambassador_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Experienced",
+    "length": "Medium to Long",
+    "start": {
+      "npc": "Awowogei",
+      "npcWiki": "Awowogei",
+      "image": "Awowogei_chathead.png",
+      "location": "Recipe for Disaster: Freeing King Awowogei",
+      "meetingPoint": "Inspect Awowogei in the banquet hall in Lumbridge Castle.",
+      "map": {
+        "x": 2678,
+        "y": 4579,
+        "plane": 1
+      }
+    },
+    "why": "Recipe for Disaster: Freeing King Awowogei is a subquest of Recipe for Disaster.",
+    "requirements": [
+      {
+        "skill": "Agility",
+        "level": 48
+      },
+      {
+        "skill": "Cooking",
+        "level": 70
+      }
+    ],
+    "supplies": [
+      "Monkeyspeak amulet (if you've lost your amulet, all the materials to remake it, except for the gold bar, can be bought from shops in Ape Atoll)",
+      "Gorilla greegree or gorilla greegree (bearded) or gorilla greegree (ancient)",
+      "Ninja monkey greegree or small variant",
+      "Zombie monkey greegree",
+      "Banana (can be picked or bought in Ape Atoll)",
+      "Monkey nuts (can be bought in Ape Atoll)",
+      "Rope (can be bought in Ape Atoll)",
+      "Few coins (10 coins should be enough)"
+    ],
+    "rewards": [
+      "1 quest point",
+      "10,000 Cooking XP experience",
+      "10,000 Agility XP experience",
+      "Ape Atoll Teleport spell",
+      "Further access to the Culinaromancer's Chest"
+    ],
+    "wiki": "Recipe_for_Disaster:_Freeing_King_Awowogei",
+    "questRequirements": [
+      "recipe-for-disaster-another-cooks-quest",
+      "monkey-madness"
+    ]
+  },
+  {
+    "id": "recipe-for-disaster-freeing-skrach-uglogwee",
+    "name": "Recipe for Disaster: Freeing Skrach Uglogwee",
+    "icon": "Skrach_Uglogwee_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Intermediate",
+    "length": "Medium",
+    "start": {
+      "npc": "Skrach Uglogwee",
+      "npcWiki": "Skrach Uglogwee",
+      "image": "Skrach_Uglogwee_chathead.png",
+      "location": "Recipe for Disaster: Freeing Skrach Uglogwee",
+      "meetingPoint": "Inspect Skrach Uglogwee in the banquet hall in Lumbridge Castle.",
+      "map": {
+        "x": 1863,
+        "y": 5352,
+        "plane": 0,
+        "mapId": 394
+      }
+    },
+    "why": "Recipe for Disaster: Freeing Skrach Uglogwee is a subquest of Recipe for Disaster.",
+    "requirements": [
+      {
+        "skill": "Cooking",
+        "level": 41
+      },
+      {
+        "skill": "Firemaking",
+        "level": 20
+      }
+    ],
+    "supplies": [
+      "1 Raw chompy (if you don't burn the food, only one is needed)",
+      "Ball of wool",
+      "Iron spit",
+      "Logs",
+      "Ogre bellows",
+      "Ogre bow or Comp ogre bow",
+      "Ogre arrows or brutal arrows (bring extras or make more just in case you lose some)"
+    ],
+    "rewards": [
+      "1 quest point",
+      "Able to use the boat trip to travel between Karamja and Feldip Hills (you must pay a fee of chompies or exotic herbs that can be found on Karamja, such as rogue's purse)",
+      "(Further) access to the Culinaromancer's chest",
+      "The ability to hunt jubblies (counts for 1 point when hunting chompies, though provides more range experience when killed, and big bones as a drop when killed, and the raw jubbly gives more experience when cooked than a raw chompy)"
+    ],
+    "wiki": "Recipe_for_Disaster:_Freeing_Skrach_Uglogwee",
+    "questRequirements": [
+      "recipe-for-disaster-another-cooks-quest",
+      "big-chompy-bird-hunting"
+    ]
+  },
+  {
+    "id": "recipe-for-disaster-defeating-the-culinaromancer",
+    "name": "Recipe for Disaster: Defeating the Culinaromancer",
+    "icon": "Defeating_the_Culinaromancer_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Experienced",
+    "length": "Short",
+    "start": {
+      "npc": "Lumbridge Castle",
+      "npcWiki": "Lumbridge Castle",
+      "image": "Defeating_the_Culinaromancer_icon.png",
+      "location": "Recipe for Disaster: Defeating the Culinaromancer",
+      "meetingPoint": "Enter the white portal in the banquet hall in Lumbridge Castle.",
+      "map": {
+        "x": 3217,
+        "y": 3219,
+        "plane": 0
+      }
+    },
+    "why": "Recipe for Disaster: Defeating the Culinaromancer is the final subquest of Recipe for Disaster.",
+    "requirements": [
+      {
+        "skill": "Cooking",
+        "level": 10
+      }
+    ],
+    "supplies": [
+      "Ice gloves for defeating Flambeed, or expect to fight unarmed",
+      "Certain armour and weapons for each boss",
+      "Good healing food, such as sharks"
+    ],
+    "rewards": [
+      "1 quest point",
+      "An antique lamp, which gives 20,000 experience to any skill above 50 (Note: If your backpack is full upon defeating the Culinaromancer, the lamp can be found in your bank. If both your backpack and bank are full, it will be dropped to the floor.)",
+      "Full access to the Culinaromancer's Chest"
+    ],
+    "wiki": "Recipe_for_Disaster:_Defeating_the_Culinaromancer",
+    "questRequirements": [
+      "recipe-for-disaster-another-cooks-quest",
+      "recipe-for-disaster-freeing-the-mountain-dwarf",
+      "recipe-for-disaster-freeing-the-goblin-generals",
+      "recipe-for-disaster-freeing-pirate-pete",
+      "recipe-for-disaster-freeing-the-lumbridge-sage",
+      "recipe-for-disaster-freeing-evil-dave",
+      "recipe-for-disaster-freeing-skrach-uglogwee",
+      "recipe-for-disaster-freeing-sir-amik-varze",
+      "recipe-for-disaster-freeing-king-awowogei",
+      "desert-treasure",
+      "horror-from-the-deep"
+    ]
+  },
+  {
     "id": "deadliest-catch",
     "name": "Deadliest Catch",
     "icon": "Deadliest_Catch_icon.png",
@@ -8514,7 +9519,6 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       }
     ],
     "preparationNotes": [
-      "Complete Recipe for Disaster: Freeing King Awowogei first; it isn't in Compass yet.",
       "Fully restore Senliten from the 'Missing My Mummy' quest",
       "Bring Leela to Senliten's tomb"
     ],
@@ -8561,6 +9565,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "smoking-kills",
       "missing-my-mummy",
       "dealing-with-scabaras",
+      "recipe-for-disaster-freeing-king-awowogei",
       "missing-my-mummy"
     ]
   },
@@ -8596,7 +9601,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       }
     ],
     "preparationNotes": [
-      "Complete Anachronia base camp tutorial first; it isn't in Compass yet."
+      "Complete Anachronia base camp tutorial first; Compass doesn't track it."
     ],
     "supplies": [
       "20 orthenglass (some obtainable during the quest, can be in material storage; players with low Archaeology levels will likely obtain all during the quest)"
@@ -9108,6 +10113,51 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ]
   },
   {
+    "id": "the-hunt-for-surok-miniquest",
+    "name": "The Hunt for Surok (miniquest)",
+    "icon": "The_Hunt_for_Surok_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Experienced",
+    "length": "Short to Medium",
+    "start": {
+      "npc": "Surok Magis",
+      "npcWiki": "Surok Magis",
+      "image": "Surok_Magis_chathead.png",
+      "location": "The Hunt for Surok (miniquest)",
+      "meetingPoint": "Speak to Surok by the statue of Saradomin, east of Varrock.",
+      "map": {
+        "x": 3282,
+        "y": 3466,
+        "plane": 0
+      }
+    },
+    "why": "The Hunt for Surok (miniquest) is a miniquest sequel to What Lies Below involving hunting Surok Magis in the Chaos Tunnels.",
+    "requirements": [
+      {
+        "skill": "Mining",
+        "level": 42
+      },
+      {
+        "skill": "Prayer",
+        "level": 43
+      }
+    ],
+    "supplies": [],
+    "rewards": [
+      "30,000 Slayer XP (the text on the quest reward scroll is outdated)",
+      "Ability to slay Bork (for Summoning charms, big bones and gems) in the Chaos Tunnels",
+      "Ability to wear Dagon'hai robes.",
+      "Bork will drop a femur bone from the Odd Old Man's Fur 'n Seek wish list, if you have not already looted one from General Graardor.",
+      "Ability to use 6 new portals within the Chaos Tunnels that were previously locked by Surok."
+    ],
+    "wiki": "The_Hunt_for_Surok_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "what-lies-below"
+    ]
+  },
+  {
     "id": "while-guthix-sleeps",
     "name": "While Guthix Sleeps",
     "icon": "While_Guthix_Sleeps_icon.png",
@@ -9172,9 +10222,6 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "preparationNotes": [
       "Be eligible for entry to the Warriors' Guild (the sum of your Attack and Strength must be at or above 130, level 99 Attack or level 99 Strength)",
-      "Complete Dream Mentor first; it isn't in Compass yet.",
-      "Complete Legends' Quest first; it isn't in Compass yet.",
-      "Complete The Hunt for Surok (miniquest) first; it isn't in Compass yet.",
       "Ability to enter the Warriors' Guild"
     ],
     "supplies": [
@@ -9209,11 +10256,14 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "wiki": "While_Guthix_Sleeps",
     "questRequirements": [
       "defender-of-varrock",
+      "dream-mentor",
       "shilo-village",
       "temple-of-ikov",
+      "legends-quest",
       "the-path-of-glouphrie",
       "tears-of-guthix-quest",
-      "wanted"
+      "wanted",
+      "the-hunt-for-surok-miniquest"
     ]
   },
   {
@@ -9288,10 +10338,6 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
         "level": 75
       }
     ],
-    "preparationNotes": [
-      "Complete Dream Mentor first; it isn't in Compass yet.",
-      "Complete Glorious Memories first; it isn't in Compass yet."
-    ],
     "supplies": [
       "Rope (obtained during the quest)",
       "Weapons for the Melee, Ranged and Magic combat styles",
@@ -9306,7 +10352,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "wiki": "Blood_Runs_Deep",
     "questRequirements": [
-      "horror-from-the-deep"
+      "horror-from-the-deep",
+      "dream-mentor",
+      "glorious-memories"
     ]
   },
   {
@@ -9460,6 +10508,73 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "questRequirements": []
   },
   {
+    "id": "a-clockwork-syringe",
+    "name": "A Clockwork Syringe",
+    "icon": "A_Clockwork_Syringe_icon.png",
+    "artwork": "A_Clockwork_Syringe.png",
+    "members": true,
+    "difficulty": "Master",
+    "length": "Long",
+    "start": {
+      "npc": "Portal",
+      "npcWiki": "Portal (player-owned house)",
+      "image": "A_Clockwork_Syringe_icon.png",
+      "location": "Player owned house",
+      "meetingPoint": "Enter the portal to your player-owned house.",
+      "map": {
+        "x": 2950,
+        "y": 3222,
+        "plane": 0
+      }
+    },
+    "why": "A Clockwork Syringe is a master quest, as well as the sixth and penultimate quest of the pirate quest series. It is also the first quest to include Dungeoneering as a feature and a requirement.",
+    "requirements": [
+      {
+        "skill": "Construction",
+        "level": 62
+      },
+      {
+        "skill": "Defence",
+        "level": 76
+      },
+      {
+        "skill": "Dungeoneering",
+        "level": 50
+      },
+      {
+        "skill": "Slayer",
+        "level": 61
+      },
+      {
+        "skill": "Smithing",
+        "level": 74
+      },
+      {
+        "skill": "Summoning",
+        "level": 65
+      },
+      {
+        "skill": "Thieving",
+        "level": 74
+      }
+    ],
+    "supplies": [
+      "Diving apparatus (obtainable during quest)",
+      "Fishbowl helmet (obtainable during quest)",
+      "At least six free backpack spaces"
+    ],
+    "rewards": [
+      "1 quest point",
+      "Ability to enter the Braindeath Island 'Rum'-geon and kill the 'Rum'-pumped crabs for the brackish blade.",
+      "A scroll allowing quick transport between Mos Le'Harmless and Braindeath Island."
+    ],
+    "wiki": "A_Clockwork_Syringe",
+    "questRequirements": [
+      "rocking-out",
+      "theres-no-place-like-home"
+    ]
+  },
+  {
     "id": "the-branches-of-darkmeyer",
     "name": "The Branches of Darkmeyer",
     "icon": "The_Branches_of_Darkmeyer_icon.png",
@@ -9510,9 +10625,6 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
         "level": 76
       }
     ],
-    "preparationNotes": [
-      "Complete Legacy of Seergaze first; it isn't in Compass yet."
-    ],
     "supplies": [],
     "rewards": [
       "2 quest points",
@@ -9526,7 +10638,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Access to a Bloodwood tree outside the Arboretum."
     ],
     "wiki": "The_Branches_of_Darkmeyer",
-    "questRequirements": []
+    "questRequirements": [
+      "legacy-of-seergaze"
+    ]
   },
   {
     "id": "love-story",
@@ -10739,9 +11853,6 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
         "level": 85
       }
     ],
-    "preparationNotes": [
-      "Complete A Clockwork Syringe first; it isn't in Compass yet."
-    ],
     "supplies": [
       "The following items are required, but will need to be retrieved from your bank once you escape prison as you will be forced to deposit all of your worn/inventory items before the Customs Sergeant will send you to jail:"
     ],
@@ -10760,6 +11871,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "wiki": "Pieces_of_Hate",
     "questRequirements": [
+      "a-clockwork-syringe",
       "gertrudes-cat"
     ]
   },
@@ -10946,6 +12058,42 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ]
   },
   {
+    "id": "pharaohs-folly",
+    "name": "Pharaoh's Folly",
+    "icon": "Pharaoh's_Folly_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Experienced",
+    "length": "Medium",
+    "start": {
+      "npc": "Leela",
+      "npcWiki": "Leela",
+      "image": "Leela_chathead.png",
+      "location": "Menaphos & Sophanem",
+      "meetingPoint": "Speak to Leela outside the gates of Menaphos.",
+      "map": {
+        "x": 3200,
+        "y": 2823,
+        "plane": 0
+      }
+    },
+    "why": "Pharaoh's Folly is the penultimate quest in the Desert quest series, following Beneath Scabaras' Sands. It was released on 7 April 2025.",
+    "requirements": [],
+    "supplies": [],
+    "rewards": [
+      "2 quest points",
+      "Leela's favour",
+      "Agility XP lamp (60,000 Agility XP; requires level 50)",
+      "Thieving XP lamp (60,000 Thieving XP; requires level 70)",
+      "title",
+      "The following passive effects:"
+    ],
+    "wiki": "Pharaoh's_Folly",
+    "questRequirements": [
+      "beneath-scabaras-sands"
+    ]
+  },
+  {
     "id": "eclipse-of-the-heart",
     "name": "Eclipse of the Heart",
     "icon": "Eclipse_of_the_Heart_icon.png",
@@ -11001,6 +12149,140 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ]
   },
   {
+    "id": "vengeance-saga",
+    "name": "Vengeance (saga)",
+    "icon": "Vengeance_(saga)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Intermediate",
+    "length": "Medium",
+    "start": {
+      "npc": "collection of swords",
+      "npcWiki": "collection of swords",
+      "image": "Vengeance_(saga)_icon.png",
+      "location": "Vengeance (saga)",
+      "meetingPoint": "Find a collection of swords while raiding the 12-17 abandoned floors of Daemonheim, then ask Skaldrun south-west of the Daemonheim entrance to share their story.",
+      "map": {
+        "x": 3430,
+        "y": 3700,
+        "plane": 0
+      }
+    },
+    "why": "Vengeance (saga) is the second Fremennik Saga. It may be started after completing the Three's Company saga and finding a collection of swords on the abandoned floors of Daemonheim.",
+    "requirements": [
+      {
+        "skill": "Dungeoneering",
+        "level": 23
+      }
+    ],
+    "preparationNotes": [
+      "Find and free Skaldrun from the frozen floors in Daemonheim"
+    ],
+    "supplies": [
+      "Ring of kinship to find the collection of swords"
+    ],
+    "rewards": [
+      "241 Dungeoneering tokens",
+      "or (having bonus experience in either skill will be used)"
+    ],
+    "wiki": "Vengeance_(saga)",
+    "kind": "saga",
+    "questRequirements": []
+  },
+  {
+    "id": "nadir-saga",
+    "name": "Nadir (saga)",
+    "icon": "Nadir_(saga)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Experienced",
+    "length": "Medium",
+    "start": {
+      "npc": "damaged device",
+      "npcWiki": "damaged device",
+      "image": "Nadir_(saga)_icon.png",
+      "location": "Nadir (saga)",
+      "meetingPoint": "Find the damaged device while raiding the 18-22 furnished floors of Daemonheim, then ask Skaldrun south-west of the Daemonheim entrance to share their story.",
+      "map": {
+        "x": 3429,
+        "y": 3699,
+        "plane": 0
+      }
+    },
+    "why": "Nadir (saga) is the third Fremennik Saga. It is started by finding a damaged device on Daemonheim floors 18-22.",
+    "requirements": [
+      {
+        "skill": "Dungeoneering",
+        "level": 35
+      }
+    ],
+    "preparationNotes": [
+      "Find and free Skaldrun from the frozen floors in Daemonheim"
+    ],
+    "supplies": [
+      "Ring of kinship to find the damaged device",
+      "Standard spells must be used for completing this saga"
+    ],
+    "rewards": [
+      "375 Dungeoneering tokens",
+      "Ability to purchase Furniture plans: Tied ritual marker from the Daemonheim Rewards shop for 50,000 tokens (requires having purchased Furniture plans: Ritual marker at level 75 Construction)",
+      "2,167 Dungeoneering tokens",
+      "or",
+      "Ability to purchase Furniture plans: Warped ritual marker from the Daemonheim Rewards shop for 100,000 tokens (requires having purchased Furniture plans: Ritual marker at level 75 Construction)"
+    ],
+    "wiki": "Nadir_(saga)",
+    "kind": "saga",
+    "questRequirements": []
+  },
+  {
+    "id": "remains-of-the-necrolord",
+    "name": "Remains of the Necrolord",
+    "icon": "Remains_of_the_Necrolord_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Master",
+    "length": "Medium",
+    "start": {
+      "npc": "Death",
+      "npcWiki": "Death",
+      "image": "Death_chathead.png",
+      "location": "Underworld",
+      "meetingPoint": "Speak to Death in the City of Um.",
+      "map": {
+        "x": 1103,
+        "y": 1776,
+        "plane": 1
+      }
+    },
+    "why": "Remains of the Necrolord is the sixth and penultimate quest in The First Necromancer quest series.",
+    "requirements": [
+      {
+        "skill": "Dungeoneering",
+        "level": 77
+      },
+      {
+        "skill": "Necromancy",
+        "level": 85
+      }
+    ],
+    "supplies": [
+      "Ghostspeak amulet or cramulet (unless hard Morytania achievements are complete)",
+      "Combat equipment"
+    ],
+    "rewards": [
+      "1 quest point",
+      "100,000 Necromancy XP lamp",
+      "50,000 Dungeoneering XP lamp",
+      "title"
+    ],
+    "wiki": "Remains_of_the_Necrolord",
+    "questRequirements": [
+      "tomes-of-the-warlock",
+      "vengeance-saga",
+      "nadir-saga"
+    ]
+  },
+  {
     "id": "alpha-vs-omega",
     "name": "Alpha vs Omega",
     "icon": "Alpha_vs_Omega_icon.png",
@@ -11044,6 +12326,46 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ]
   },
   {
+    "id": "death-plateau-historical",
+    "name": "Death Plateau (historical)",
+    "icon": "Death_Plateau_icon.png",
+    "artwork": "Death_Plateau_(historical).jpg",
+    "members": true,
+    "difficulty": "Novice",
+    "length": "Medium",
+    "start": {
+      "npc": "Denulth",
+      "npcWiki": "Denulth",
+      "image": "Death_Plateau_icon.png",
+      "location": "Death Plateau (historical)",
+      "meetingPoint": "Talk to Denulth in his tent in Burthorpe",
+      "map": {
+        "x": 2918,
+        "y": 3561,
+        "plane": 0
+      }
+    },
+    "why": "Death Plateau (historical) on the RuneScape Wiki.",
+    "requirements": [],
+    "supplies": [
+      "10 loaves of bread (un-noted)",
+      "10 Cooked trout (also un-noted)",
+      "An iron bar",
+      "More than 121-1000 coins",
+      "Blurberry Special (optional, but highly recommended)",
+      "An Asgarnian ale (can be obtained during the quest)"
+    ],
+    "rewards": [
+      "1 quest point",
+      "Steel claws",
+      "The ability to make claws",
+      "Ability to wear Climbing boots",
+      "Ability to purchase climbing boots from Tenzing, allowing you to cross the secret path for some troll killing (and cross into Rellekka as well). They do not need to be spiked, although it does say that you would need a good reason to go that way when you try to climb over the rocks. This message will disappear and you will be able to climb over the rocks once you have started the Troll Stronghold Quest."
+    ],
+    "wiki": "Death_Plateau_(historical)",
+    "questRequirements": []
+  },
+  {
     "id": "dimension-of-disaster",
     "name": "Dimension of Disaster",
     "icon": "Dimension_of_Disaster_icon.png",
@@ -11079,6 +12401,139 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "wiki": "Dimension_of_Disaster",
     "questRequirements": []
+  },
+  {
+    "id": "druidic-ritual-historical",
+    "name": "Druidic Ritual (historical)",
+    "icon": "Druidic_Ritual_icon.png",
+    "artwork": "Druidic_Ritual.jpg",
+    "members": true,
+    "difficulty": "Novice",
+    "length": "Short",
+    "start": {
+      "npc": "Kaqemeex",
+      "npcWiki": "Kaqemeex",
+      "image": "Kaqemeex_chathead.png",
+      "location": "Druidic Ritual (historical)",
+      "meetingPoint": "Speak to Kaqemeex in the stone circle north of Taverley",
+      "map": {
+        "x": 2924,
+        "y": 3484,
+        "plane": 0
+      }
+    },
+    "why": "Druidic Ritual was the introduction to the Herblore skill. Until the completion of the quest, players could not gain Herblore experience in any way. You must aid the druids in gathering supplies for a ritual in exchange for knowledge in Herblore.",
+    "requirements": [],
+    "supplies": [
+      "Raw bear meat",
+      "Raw rat meat",
+      "Raw beef",
+      "Raw chicken"
+    ],
+    "rewards": [
+      "4 quest points",
+      "Ability to use the Herblore skill"
+    ],
+    "wiki": "Druidic_Ritual_(historical)",
+    "questRequirements": []
+  },
+  {
+    "id": "hawthorn-holiday-event",
+    "name": "Hawthorn (holiday event)",
+    "icon": "Hawthorn_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Novice",
+    "length": "None",
+    "start": {
+      "npc": "Queen of Snow",
+      "npcWiki": "Queen of Snow",
+      "image": "Queen_of_Snow_chathead.png",
+      "location": "Hawthorn (holiday event)",
+      "meetingPoint": "Speak to the Queen of Snow in the Land of Holly and Hawthorn.",
+      "map": {
+        "x": 1605,
+        "y": 4512,
+        "plane": 0
+      }
+    },
+    "why": "The Hawthorn was a temporary holiday quest which was part of the 2011 Easter event. In the Land of Holly and Hawthorn, the Queen of Sunrise and the Queen of Snow required assistance in transitioning the season from winter to spring.",
+    "requirements": [],
+    "supplies": [
+      "Hatchet",
+      "Tinderbox"
+    ],
+    "rewards": [
+      "Icicle crown, which can be charged in a similar way to the sunbeam crown by chopping down evil hawthorn trees."
+    ],
+    "wiki": "Hawthorn_(holiday_event)",
+    "questRequirements": []
+  },
+  {
+    "id": "secrets-of-amberfell",
+    "name": "Secrets of Amberfell",
+    "icon": "Secrets_of_Amberfell_icon.png",
+    "artwork": "Secrets_of_Amberfell.png",
+    "members": true,
+    "difficulty": "Intermediate",
+    "length": "Medium",
+    "start": {
+      "npc": "ranger",
+      "npcWiki": "ranger (Amberfell bridge)",
+      "image": "Secrets_of_Amberfell_icon.png",
+      "location": "Wendlewick",
+      "meetingPoint": "Speak to the ranger guarding the ruined bridge to Amberfell.",
+      "map": {
+        "x": 4348,
+        "y": 3381,
+        "plane": 0
+      }
+    },
+    "why": "Secrets of Amberfell is a quest in the Sanguine quest series.",
+    "requirements": [
+      {
+        "skill": "Construction",
+        "level": 30
+      },
+      {
+        "skill": "Herblore",
+        "level": 35
+      },
+      {
+        "skill": "Hunter",
+        "level": 32
+      },
+      {
+        "skill": "Slayer",
+        "level": 28
+      }
+    ],
+    "supplies": [
+      "2 ropes",
+      "10 logs (of same kind, core logs only)",
+      "20 nails (of same kind)",
+      "A butterfly net (including magic butterfly net and Tellervo's net)",
+      "A teasing stick or ferret",
+      "An empty vial",
+      "5 cooked fish (not for combat use)",
+      "Food (for combat use)",
+      "3- or 4-dose antisanguine potion (optionally more for combat use)",
+      "Combat gear, recommended to include a havensilver weapon"
+    ],
+    "rewards": [
+      "3 quest points",
+      "Combat XP lamp (requires level 30 in the chosen skill; grants 2,500 experience in one of: Attack, Strength, Defence, Constitution, Ranged, Magic, Prayer or Necromancy)",
+      "Construction XP lamp (requires level 30 Construction; grants 2,500 Construction XP)",
+      "Herblore XP (requires level 35 Herblore; grants 2,500 Herblore XP)",
+      "Hunter XP lamp (requires level 32 Hunter; grants 2,500 Hunter XP)",
+      "Summoning XP lamp (requires level 30 Summoning; grants 2,500 Summoning XP)",
+      "Inanna's gift",
+      "Access to Amberfell, the Moonrise Temple, and the Moonrise Dig Site"
+    ],
+    "wiki": "Secrets_of_Amberfell",
+    "questRequirements": [
+      "hearts-of-sanguine"
+    ]
   },
   {
     "id": "heralds-of-crimson",
@@ -11194,37 +12649,34 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ]
   },
   {
-    "id": "once-upon-a-time-in-gielinor-finale",
-    "name": "Once Upon a Time in Gielinor: Finale",
-    "icon": "Once_Upon_a_Time_in_Gielinor_Finale_icon.png",
+    "id": "once-upon-a-time-in-gielinor-foreshadowing",
+    "name": "Once Upon a Time in Gielinor: Foreshadowing",
+    "icon": "Once_Upon_a_Time_in_Gielinor_Foreshadowing_icon.png",
     "artwork": "Quest.png",
     "members": true,
     "difficulty": "Novice",
     "length": "Short",
     "start": {
-      "npc": "Closure",
-      "npcWiki": "Closure",
-      "image": "Closure_chathead.png",
-      "location": "Once Upon a Time in Gielinor: Finale",
-      "meetingPoint": "Talk to Closure in his office to find out more. It can be accessed via Death's realm.",
+      "npc": "Relomia",
+      "npcWiki": "Relomia",
+      "image": "Once_Upon_a_Time_in_Gielinor_Foreshadowing_icon.png",
+      "location": "Once Upon a Time in Gielinor: Foreshadowing",
+      "meetingPoint": "Speak to Relomia in the Blue Moon Inn in Varrock.",
       "map": {
-        "x": 3108,
-        "y": 3308,
+        "x": 3222,
+        "y": 3402,
         "plane": 0
       }
     },
-    "why": "Once Upon a Time in Gielinor: Finale is the final subquest of the special quest, Once Upon a Time in Gielinor.",
+    "why": "Once Upon a Time in Gielinor: Foreshadowing is the first subquest of the special quest, Once Upon a Time in Gielinor. It was originally released as a miniquest and turned into a subquest on 22 November 2021.",
     "requirements": [],
     "supplies": [],
     "rewards": [
       "Medium XP lamp",
-      "Shadow Rip Teleport cosmetic override",
-      "Golden partyhat shard (only during the Golden Partyhat Hunt event)"
+      "Relomia's party hat cosmetic override"
     ],
-    "wiki": "Once_Upon_a_Time_in_Gielinor:_Finale",
-    "questRequirements": [
-      "once-upon-a-time-in-gielinor-fortunes"
-    ]
+    "wiki": "Once_Upon_a_Time_in_Gielinor:_Foreshadowing",
+    "questRequirements": []
   },
   {
     "id": "once-upon-a-time-in-gielinor-flashback",
@@ -11259,36 +12711,6 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ]
   },
   {
-    "id": "once-upon-a-time-in-gielinor-foreshadowing",
-    "name": "Once Upon a Time in Gielinor: Foreshadowing",
-    "icon": "Once_Upon_a_Time_in_Gielinor_Foreshadowing_icon.png",
-    "artwork": "Quest.png",
-    "members": true,
-    "difficulty": "Novice",
-    "length": "Short",
-    "start": {
-      "npc": "Relomia",
-      "npcWiki": "Relomia",
-      "image": "Once_Upon_a_Time_in_Gielinor_Foreshadowing_icon.png",
-      "location": "Once Upon a Time in Gielinor: Foreshadowing",
-      "meetingPoint": "Speak to Relomia in the Blue Moon Inn in Varrock.",
-      "map": {
-        "x": 3222,
-        "y": 3402,
-        "plane": 0
-      }
-    },
-    "why": "Once Upon a Time in Gielinor: Foreshadowing is the first subquest of the special quest, Once Upon a Time in Gielinor. It was originally released as a miniquest and turned into a subquest on 22 November 2021.",
-    "requirements": [],
-    "supplies": [],
-    "rewards": [
-      "Medium XP lamp",
-      "Relomia's party hat cosmetic override"
-    ],
-    "wiki": "Once_Upon_a_Time_in_Gielinor:_Foreshadowing",
-    "questRequirements": []
-  },
-  {
     "id": "once-upon-a-time-in-gielinor-fortunes",
     "name": "Once Upon a Time in Gielinor: Fortunes",
     "icon": "Once_Upon_a_Time_in_Gielinor_Fortunes_icon.png",
@@ -11321,155 +12743,104 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ]
   },
   {
-    "id": "pharaohs-folly",
-    "name": "Pharaoh's Folly",
-    "icon": "Pharaoh's_Folly_icon.png",
+    "id": "once-upon-a-time-in-gielinor-finale",
+    "name": "Once Upon a Time in Gielinor: Finale",
+    "icon": "Once_Upon_a_Time_in_Gielinor_Finale_icon.png",
     "artwork": "Quest.png",
     "members": true,
-    "difficulty": "Experienced",
-    "length": "Medium",
+    "difficulty": "Novice",
+    "length": "Short",
     "start": {
-      "npc": "Leela",
-      "npcWiki": "Leela",
-      "image": "Leela_chathead.png",
-      "location": "Menaphos & Sophanem",
-      "meetingPoint": "Speak to Leela outside the gates of Menaphos.",
+      "npc": "Closure",
+      "npcWiki": "Closure",
+      "image": "Closure_chathead.png",
+      "location": "Once Upon a Time in Gielinor: Finale",
+      "meetingPoint": "Talk to Closure in his office to find out more. It can be accessed via Death's realm.",
       "map": {
-        "x": 3200,
-        "y": 2823,
+        "x": 3108,
+        "y": 3308,
         "plane": 0
       }
     },
-    "why": "Pharaoh's Folly is the penultimate quest in the Desert quest series, following Beneath Scabaras' Sands. It was released on 7 April 2025.",
+    "why": "Once Upon a Time in Gielinor: Finale is the final subquest of the special quest, Once Upon a Time in Gielinor.",
     "requirements": [],
     "supplies": [],
     "rewards": [
-      "2 quest points",
-      "Leela's favour",
-      "Agility XP lamp (60,000 Agility XP; requires level 50)",
-      "Thieving XP lamp (60,000 Thieving XP; requires level 70)",
-      "title",
-      "The following passive effects:"
+      "Medium XP lamp",
+      "Shadow Rip Teleport cosmetic override",
+      "Golden partyhat shard (only during the Golden Partyhat Hunt event)"
     ],
-    "wiki": "Pharaoh's_Folly",
+    "wiki": "Once_Upon_a_Time_in_Gielinor:_Finale",
     "questRequirements": [
-      "beneath-scabaras-sands"
+      "once-upon-a-time-in-gielinor-fortunes"
     ]
   },
   {
-    "id": "remains-of-the-necrolord",
-    "name": "Remains of the Necrolord",
-    "icon": "Remains_of_the_Necrolord_icon.png",
-    "artwork": "Quest.png",
+    "id": "recipe-for-disaster",
+    "name": "Recipe for Disaster",
+    "icon": "Recipe_for_Disaster_icon.png",
+    "artwork": "Recipe_for_Disaster.png",
     "members": true,
-    "difficulty": "Master",
-    "length": "Medium",
+    "difficulty": "Special",
+    "length": "Very, Very Long",
     "start": {
-      "npc": "Death",
-      "npcWiki": "Death",
-      "image": "Death_chathead.png",
-      "location": "Underworld",
-      "meetingPoint": "Speak to Death in the City of Um.",
+      "npc": "cook",
+      "npcWiki": "cook",
+      "image": "Recipe_for_Disaster_icon.png",
+      "location": "Lumbridge",
+      "meetingPoint": "Speak to the cook in Lumbridge Castle.",
       "map": {
-        "x": 1103,
-        "y": 1776,
-        "plane": 1
-      }
-    },
-    "why": "Remains of the Necrolord is the sixth and penultimate quest in The First Necromancer quest series.",
-    "requirements": [
-      {
-        "skill": "Dungeoneering",
-        "level": 77
-      },
-      {
-        "skill": "Necromancy",
-        "level": 85
-      }
-    ],
-    "preparationNotes": [
-      "Complete Vengeance (saga) first; it isn't in Compass yet.",
-      "Complete Nadir (saga) first; it isn't in Compass yet."
-    ],
-    "supplies": [
-      "Ghostspeak amulet or cramulet (unless hard Morytania achievements are complete)",
-      "Combat equipment"
-    ],
-    "rewards": [
-      "1 quest point",
-      "100,000 Necromancy XP lamp",
-      "50,000 Dungeoneering XP lamp",
-      "title"
-    ],
-    "wiki": "Remains_of_the_Necrolord",
-    "questRequirements": [
-      "tomes-of-the-warlock"
-    ]
-  },
-  {
-    "id": "secrets-of-amberfell",
-    "name": "Secrets of Amberfell",
-    "icon": "Secrets_of_Amberfell_icon.png",
-    "artwork": "Secrets_of_Amberfell.png",
-    "members": true,
-    "difficulty": "Intermediate",
-    "length": "Medium",
-    "start": {
-      "npc": "ranger",
-      "npcWiki": "ranger (Amberfell bridge)",
-      "image": "Secrets_of_Amberfell_icon.png",
-      "location": "Wendlewick",
-      "meetingPoint": "Speak to the ranger guarding the ruined bridge to Amberfell.",
-      "map": {
-        "x": 4348,
-        "y": 3381,
+        "x": 3217,
+        "y": 3219,
         "plane": 0
       }
     },
-    "why": "Secrets of Amberfell is a quest in the Sanguine quest series.",
+    "why": "Recipe for Disaster is the 100th quest released by Jagex and is a sequel to the first quest, Cook's Assistant. It is composed of ten subquests, ranging in difficulty from easy to very hard.",
     "requirements": [
       {
-        "skill": "Construction",
-        "level": 30
-      },
-      {
-        "skill": "Herblore",
-        "level": 35
-      },
-      {
-        "skill": "Hunter",
-        "level": 32
-      },
-      {
-        "skill": "Slayer",
-        "level": 28
+        "skill": "Cooking",
+        "level": 10
       }
     ],
+    "preparationNotes": [
+      "Get partway through Legends' Quest first; check the Wiki for the point needed."
+    ],
     "supplies": [
-      "2 ropes",
-      "10 logs (of same kind, core logs only)",
-      "20 nails (of same kind)",
-      "A butterfly net (including magic butterfly net and Tellervo's net)",
-      "A teasing stick or ferret",
-      "An empty vial",
-      "5 cooked fish (not for combat use)",
-      "Food (for combat use)",
-      "3- or 4-dose antisanguine potion (optionally more for combat use)",
-      "Combat gear, recommended to include a havensilver weapon"
+      "1 Eye of newt",
+      "1 Greenman's ale",
+      "1 Rotten tomato",
+      "1 Ashes",
+      "1 Fruit blast (premade does not work)",
+      "1 Cocktail shaker",
+      "1 Cocktail glass",
+      "2 Lemons, 1 Pineapple, 1 Orange"
     ],
     "rewards": [
-      "3 quest points",
-      "Combat XP lamp (requires level 30 in the chosen skill; grants 2,500 experience in one of: Attack, Strength, Defence, Constitution, Ranged, Magic, Prayer or Necromancy)",
-      "Construction XP lamp (requires level 30 Construction; grants 2,500 Construction XP)",
-      "Herblore XP (requires level 35 Herblore; grants 2,500 Herblore XP)",
-      "Hunter XP lamp (requires level 32 Hunter; grants 2,500 Hunter XP)",
-      "Summoning XP lamp (requires level 30 Summoning; grants 2,500 Summoning XP)",
-      "Inanna's gift",
-      "Access to Amberfell, the Moonrise Temple, and the Moonrise Dig Site"
+      "10 quest points",
+      "Experience",
+      "Access to the following areas:",
+      "Ability to dive for crabs",
+      "Ability to own a crab",
+      "Ability to cook crab meat",
+      "Ability to catch Hell-Rats",
+      "Ability to own a hellcat",
+      "Ability to add coloured spices to stews of any sort",
+      "Ability to use the boat trip to travel between Karamja and Feldip Hills",
+      "Ape Atoll Teleport spell",
+      "Full access to Culinaromancer's Chest"
     ],
-    "wiki": "Secrets_of_Amberfell",
+    "wiki": "Recipe_for_Disaster",
     "questRequirements": [
-      "hearts-of-sanguine"
+      "cooks-assistant",
+      "big-chompy-bird-hunting",
+      "desert-treasure",
+      "fishing-contest",
+      "gertrudes-cat",
+      "goblin-diplomacy",
+      "horror-from-the-deep",
+      "lost-city",
+      "monkey-madness",
+      "shadow-of-the-storm"
     ]
   },
   {
@@ -11513,6 +12884,43 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "wiki": "That_Old_Black_Magic",
     "questRequirements": [
       "necromancy"
+    ]
+  },
+  {
+    "id": "that-old-black-magic-my-one-and-only-lute",
+    "name": "That Old Black Magic: My One and Only Lute",
+    "icon": "That_Old_Black_Magic_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Novice",
+    "length": "Short",
+    "start": {
+      "npc": "Lady Grey",
+      "npcWiki": "Lady Grey",
+      "image": "Lady_Grey_chathead.png",
+      "location": "That Old Black Magic: My One and Only Lute",
+      "meetingPoint": "Speak to Lady Grey in the City of Um's bandstand.",
+      "map": {
+        "x": 1113,
+        "y": 1775,
+        "plane": 1
+      }
+    },
+    "why": "That Old Black Magic: My One and Only Lute is a subquest of the special quest That Old Black Magic. It was originally directly a part of the quest until it officially became a subquest on 30 October 2023.",
+    "requirements": [
+      {
+        "skill": "Necromancy",
+        "level": 32
+      }
+    ],
+    "supplies": [],
+    "rewards": [
+      "5,000 Necromancy XP lamp",
+      "10 vessel souls"
+    ],
+    "wiki": "That_Old_Black_Magic:_My_One_and_Only_Lute",
+    "questRequirements": [
+      "the-blood-pact"
     ]
   },
   {
@@ -11593,43 +13001,6 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "questRequirements": [
       "that-old-black-magic-my-one-and-only-lute",
       "the-spirit-of-war"
-    ]
-  },
-  {
-    "id": "that-old-black-magic-my-one-and-only-lute",
-    "name": "That Old Black Magic: My One and Only Lute",
-    "icon": "That_Old_Black_Magic_icon.png",
-    "artwork": "Quest.png",
-    "members": true,
-    "difficulty": "Novice",
-    "length": "Short",
-    "start": {
-      "npc": "Lady Grey",
-      "npcWiki": "Lady Grey",
-      "image": "Lady_Grey_chathead.png",
-      "location": "That Old Black Magic: My One and Only Lute",
-      "meetingPoint": "Speak to Lady Grey in the City of Um's bandstand.",
-      "map": {
-        "x": 1113,
-        "y": 1775,
-        "plane": 1
-      }
-    },
-    "why": "That Old Black Magic: My One and Only Lute is a subquest of the special quest That Old Black Magic. It was originally directly a part of the quest until it officially became a subquest on 30 October 2023.",
-    "requirements": [
-      {
-        "skill": "Necromancy",
-        "level": 32
-      }
-    ],
-    "supplies": [],
-    "rewards": [
-      "5,000 Necromancy XP lamp",
-      "10 vessel souls"
-    ],
-    "wiki": "That_Old_Black_Magic:_My_One_and_Only_Lute",
-    "questRequirements": [
-      "the-blood-pact"
     ]
   },
   {
@@ -11722,6 +13093,1685 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "questRequirements": [
       "visions-of-havenhythe"
     ]
+  },
+  {
+    "id": "wolf-whistle-historical",
+    "name": "Wolf Whistle (historical)",
+    "icon": "Wolf_Whistle_icon.png",
+    "artwork": "Wolf_Whistle.jpg",
+    "members": true,
+    "difficulty": "Novice",
+    "length": "Short",
+    "start": {
+      "npc": "Pikkupstix",
+      "npcWiki": "Pikkupstix",
+      "image": "Pikkupstix_chathead.png",
+      "location": "Wolf Whistle (historical)",
+      "meetingPoint": "Pikkupstix's house, Taverley",
+      "map": {
+        "x": 2929,
+        "y": 3448,
+        "plane": 0
+      }
+    },
+    "why": "Wolf Whistle is a quest that was released to introduce the Summoning skill. In it, the player helps the druid Pikkupstix with a Summoning experiment that has gone wrong.",
+    "requirements": [],
+    "supplies": [],
+    "rewards": [
+      "1 quest point",
+      "Access to the Summoning skill",
+      "275 gold charms"
+    ],
+    "wiki": "Wolf_Whistle_(historical)",
+    "questRequirements": []
+  },
+  {
+    "id": "from-tiny-acorns-miniquest",
+    "name": "From Tiny Acorns (miniquest)",
+    "icon": "From_Tiny_Acorns_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Novice",
+    "length": "Short",
+    "start": {
+      "npc": "Guildmaster Darren Lightfinger",
+      "npcWiki": "Guildmaster Darren Lightfinger",
+      "image": "From_Tiny_Acorns_(miniquest)_icon.png",
+      "location": "From Tiny Acorns (miniquest)",
+      "meetingPoint": "Speak to Darren Lightfinger in his cellar accessed through a trapdoor north of Lumbridge furnace.",
+      "map": {
+        "x": 4662,
+        "y": 5903,
+        "plane": 0,
+        "mapId": 181
+      }
+    },
+    "why": "From Tiny Acorns (miniquest) is the first caper Guildmaster Darren Lightfinger will assign a player who has completed the Buyers and Cellars quest. Capers are tasks set by the guildmaster in order to slowly build and fund the Thieves' Guild.",
+    "requirements": [
+      {
+        "skill": "Thieving",
+        "level": 24
+      }
+    ],
+    "supplies": [],
+    "rewards": [
+      "Ability to steal a craftsman's monocle",
+      "Ability to purchase crafting equipment from Urist Loric",
+      "Access to the pickpocketing volunteers, advanced pickpocketing trainer and coshing volunteers in the Thieves' Guild",
+      "Access to the practice chest area in the Thieves' Guild"
+    ],
+    "wiki": "From_Tiny_Acorns_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "buyers-and-cellars"
+    ]
+  },
+  {
+    "id": "lost-her-marbles-miniquest",
+    "name": "Lost Her Marbles (miniquest)",
+    "icon": "Lost_Her_Marbles_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Intermediate",
+    "length": "Medium",
+    "start": {
+      "npc": "Darren Lightfinger",
+      "npcWiki": "Darren Lightfinger",
+      "image": "Darren_Lightfinger_chathead.png",
+      "location": "Lost Her Marbles (miniquest)",
+      "meetingPoint": "Speak to Darren Lightfinger in his cellar accessed through a trapdoor north of Lumbridge furnace.",
+      "map": {
+        "x": 4662,
+        "y": 5903,
+        "plane": 0
+      }
+    },
+    "why": "Lost Her Marbles (miniquest) is the second caper involving the Lumbridge Thieves' Guild. It can only be assigned to players who have completed the Buyers and Cellars quest and the first caper, From Tiny Acorns (miniquest).",
+    "requirements": [
+      {
+        "skill": "Thieving",
+        "level": 41
+      }
+    ],
+    "supplies": [],
+    "rewards": [
+      "A total of (5,000 + 4800 for turning in the flame fragments)",
+      "Improved loot from pickpocketing NPCs up to level 40 Thieving",
+      "Access to Dodgy Derek's Dirty Deals store run by Dodgy Derek",
+      "Access to wall safes",
+      "Guild expands with several more rooms and NPCs"
+    ],
+    "wiki": "Lost_Her_Marbles_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "from-tiny-acorns-miniquest"
+    ]
+  },
+  {
+    "id": "a-guild-of-our-own-miniquest",
+    "name": "A Guild of Our Own (miniquest)",
+    "icon": "A_Guild_of_Our_Own_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Master",
+    "length": "Short to Medium",
+    "start": {
+      "npc": "Guildmaster Darren Lightfinger",
+      "npcWiki": "Guildmaster Darren Lightfinger",
+      "image": "A_Guild_of_Our_Own_(miniquest)_icon.png",
+      "location": "A Guild of Our Own (miniquest)",
+      "meetingPoint": "Speak to Darren Lightfinger in his cellar accessed through a trapdoor north of Lumbridge furnace.",
+      "map": {
+        "x": 4662,
+        "y": 5903,
+        "plane": 0
+      }
+    },
+    "why": "A Guild of Our Own (miniquest) is the third and final caper Guildmaster Darren Lightfinger will assign a player who has completed the Buyers and Cellars quest and the previous two capers, From Tiny Acorns (miniquest) and Lost Her Marbles (miniquest).",
+    "requirements": [
+      {
+        "skill": "Agility",
+        "level": 40
+      },
+      {
+        "skill": "Herblore",
+        "level": 46
+      },
+      {
+        "skill": "Thieving",
+        "level": 62
+      }
+    ],
+    "preparationNotes": [
+      "Get partway through The Feud first; check the Wiki for the point needed."
+    ],
+    "supplies": [
+      "Any blackjack (not including the rubber blackjack)",
+      "Lockpick (or hair clip)",
+      "Irit potion (unfinished) (or clean irit and a vial of water)",
+      "Chopped onion (or bowl, onion)"
+    ],
+    "rewards": [
+      "Ability to mix vials of stench",
+      "Full access to the Thieves' Guild, including a bank",
+      "Ability to obtain special items from cracking safes"
+    ],
+    "wiki": "A_Guild_of_Our_Own_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "lost-her-marbles-miniquest"
+    ]
+  },
+  {
+    "id": "borics-task-i-miniquest",
+    "name": "Boric's Task I (miniquest)",
+    "icon": "Boric's_Task_I_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Intermediate",
+    "length": "Very Short",
+    "start": {
+      "npc": "Boric",
+      "npcWiki": "Boric",
+      "image": "Boric_chathead.png",
+      "location": "Boric's Task I (miniquest)",
+      "meetingPoint": "Speak to Boric in the workshop accessed from the stairs in Doric's hut, just outside the gates of Taverley north of Falador.",
+      "map": {
+        "x": 1560,
+        "y": 5987,
+        "plane": 0
+      }
+    },
+    "why": "Boric's Task I (miniquest) is Boric's first task as part of the Boric's Tasks quest series.",
+    "requirements": [
+      {
+        "skill": "Mining",
+        "level": 30
+      }
+    ],
+    "supplies": [
+      "30 coal"
+    ],
+    "rewards": [
+      "1,500 Mining XP",
+      "4,500 charges for the Gofannon amulet"
+    ],
+    "wiki": "Boric's_Task_I_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "whats-mine-is-yours"
+    ]
+  },
+  {
+    "id": "borics-task-ii-miniquest",
+    "name": "Boric's Task II (miniquest)",
+    "icon": "Boric's_Task_II_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Intermediate",
+    "length": "Very Short",
+    "start": {
+      "npc": "Boric",
+      "npcWiki": "Boric",
+      "image": "Boric_chathead.png",
+      "location": "Boric's Task II (miniquest)",
+      "meetingPoint": "Speak to Boric in the workshop accessed from the stairs in Doric's hut, just outside the gates of Taverley north of Falador.",
+      "map": {
+        "x": 1560,
+        "y": 5987,
+        "plane": 0
+      }
+    },
+    "why": "Boric's Task II (miniquest) is Boric's second task as part of the Boric's Tasks quest series.",
+    "requirements": [
+      {
+        "skill": "Mining",
+        "level": 40
+      }
+    ],
+    "supplies": [],
+    "rewards": [
+      "3,500 Mining XP",
+      "10,500 charges for the Gofannon amulet"
+    ],
+    "wiki": "Boric's_Task_II_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "borics-task-i-miniquest"
+    ]
+  },
+  {
+    "id": "borics-task-iii-miniquest",
+    "name": "Boric's Task III (miniquest)",
+    "icon": "Boric's_Task_III_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Experienced",
+    "length": "Short",
+    "start": {
+      "npc": "Boric",
+      "npcWiki": "Boric",
+      "image": "Boric_chathead.png",
+      "location": "Boric's Task III (miniquest)",
+      "meetingPoint": "Speak to Boric in the workshop accessed from the stairs in Doric's hut, just outside the gates of Taverley north of Falador.",
+      "map": {
+        "x": 1560,
+        "y": 5987,
+        "plane": 0
+      }
+    },
+    "why": "Boric's Task III (miniquest) is Boric's third task as part of the Boric's Tasks quest series.",
+    "requirements": [
+      {
+        "skill": "Mining",
+        "level": 60
+      }
+    ],
+    "supplies": [],
+    "rewards": [
+      "8,000 Mining XP",
+      "24,000 charges for the Gofannon amulet"
+    ],
+    "wiki": "Boric's_Task_III_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "borics-task-ii-miniquest"
+    ]
+  },
+  {
+    "id": "curse-of-the-empty-lord-miniquest",
+    "name": "Curse of the Empty Lord (miniquest)",
+    "icon": "Curse_of_the_Empty_Lord_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Intermediate",
+    "length": "Medium to Long",
+    "start": {
+      "npc": "mysterious ghost",
+      "npcWiki": "mysterious ghost (Valdez)",
+      "image": "Curse_of_the_Empty_Lord_(miniquest)_icon.png",
+      "location": "Curse of the Empty Lord (miniquest)",
+      "meetingPoint": "Talk to the mysterious ghost (Valdez) near Glarial's tombstone (north-west of the Fishing Guild), while wearing a ring of visibility and a way to speak with ghosts.",
+      "map": {
+        "x": 2555,
+        "y": 3444,
+        "plane": 0
+      }
+    },
+    "why": "Curse of the Empty Lord (miniquest) is a miniquest following the events of Desert Treasure, allowing the player to obtain a set of ghostly robes.",
+    "requirements": [],
+    "preparationNotes": [
+      "Get partway through Desert Treasure first; check the Wiki for the point needed."
+    ],
+    "supplies": [
+      "Ring of visibility",
+      "Ghostspeak amulet or cramulet or hard Morytania achievements completed"
+    ],
+    "rewards": [
+      "Ghostly hood",
+      "Ghostly robe top",
+      "Ghostly robe bottom",
+      "Ghostly gloves",
+      "Ghostly boots",
+      "Ghostly cloak"
+    ],
+    "wiki": "Curse_of_the_Empty_Lord_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "temple-of-ikov",
+      "the-restless-ghost"
+    ]
+  },
+  {
+    "id": "flag-fall-miniquest",
+    "name": "Flag Fall (miniquest)",
+    "icon": "Flag_Fall_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Intermediate",
+    "length": "Short to Medium",
+    "start": {
+      "npc": "Boni",
+      "npcWiki": "Boni (rewards)",
+      "image": "Flag_Fall_(miniquest)_icon.png",
+      "location": "Flag Fall (miniquest)",
+      "meetingPoint": "Speak with Boni at the Waiko market. (Quartermaster Gully, south-east of the Port Sarim pub, can sail you to Waiko in the Arc region of the Wushanko Isles.)",
+      "map": {
+        "x": 1827,
+        "y": 11616,
+        "plane": 0
+      }
+    },
+    "why": "Flag Fall (miniquest) is a part of the Tales of the Arc miniquest series.",
+    "requirements": [],
+    "supplies": [
+      "0-1,000+ chimes (for supplies)",
+      "5 driftwood (obtained during the miniquest)"
+    ],
+    "rewards": [
+      "500 chimes",
+      "2 Taijitu",
+      "Ability to claim an uncharted isle",
+      "Claim island flag in Waiko reward shop"
+    ],
+    "wiki": "Flag_Fall_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "impressing-the-locals"
+    ]
+  },
+  {
+    "id": "head-of-the-family-miniquest",
+    "name": "Head of the Family (miniquest)",
+    "icon": "Head_of_the_Family_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Grandmaster",
+    "length": "Medium",
+    "start": {
+      "npc": "Waiko moai",
+      "npcWiki": "Waiko moai",
+      "image": "Waiko_moai_chathead.png",
+      "location": "Head of the Family (miniquest)",
+      "meetingPoint": "Talk to the Waiko moai on the hill north-east of Waiko market.",
+      "map": {
+        "x": 1870,
+        "y": 11642,
+        "plane": 0
+      }
+    },
+    "why": "Head of the Family (miniquest) is a part of the Tales of the Arc quest series.",
+    "requirements": [
+      {
+        "skill": "Cooking",
+        "level": 91
+      },
+      {
+        "skill": "Fishing",
+        "level": 90
+      },
+      {
+        "skill": "Woodcutting",
+        "level": 90
+      }
+    ],
+    "supplies": [
+      "450 chimes",
+      "5 bamboo",
+      "15 fish oil"
+    ],
+    "rewards": [
+      "1,000 chimes (+ 300 of your original investment)",
+      "30 fish oil",
+      "4 bundles of bamboo",
+      "5 taijitu",
+      "lamp",
+      "Moai decoration available in Waiko Reward Shop",
+      "An additional crew member, Cap'n Ekahi"
+    ],
+    "wiki": "Head_of_the_Family_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "impressing-the-locals"
+    ]
+  },
+  {
+    "id": "spiritual-enlightenment-miniquest",
+    "name": "Spiritual Enlightenment (miniquest)",
+    "icon": "Spiritual_Enlightenment_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Grandmaster",
+    "length": "Medium",
+    "start": {
+      "npc": "The Assassin",
+      "npcWiki": "The Assassin",
+      "image": "The_Assassin_chathead.png",
+      "location": "Spiritual Enlightenment (miniquest)",
+      "meetingPoint": "Talk with Ling on the south beach of Aminishi.",
+      "map": {
+        "x": 2089,
+        "y": 11276,
+        "plane": 0
+      }
+    },
+    "why": "Spiritual Enlightenment (miniquest) is a part of the Tales of the Arc quest series.",
+    "requirements": [
+      {
+        "skill": "Slayer",
+        "level": 90
+      }
+    ],
+    "preparationNotes": [
+      "Complete the 'Meet the Assassin' voyage in player-owned port"
+    ],
+    "supplies": [],
+    "rewards": [
+      "250 chimes",
+      "3 taijitu",
+      "lamp",
+      "Access to Aminishi's Spirit Realm and arhat dragons"
+    ],
+    "wiki": "Spiritual_Enlightenment_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "impressing-the-locals"
+    ]
+  },
+  {
+    "id": "jed-hunter-miniquest",
+    "name": "Jed Hunter (miniquest)",
+    "icon": "Jed_Hunter_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Grandmaster",
+    "length": "Short",
+    "start": {
+      "npc": "Lookout Ekahi",
+      "npcWiki": "Lookout Ekahi",
+      "image": "Jed_Hunter_(miniquest)_icon.png",
+      "location": "Jed Hunter (miniquest)",
+      "meetingPoint": "Talk to Lookout Ekahi who is on the northern dock on Waiko near Sarim's Revenge.",
+      "map": {
+        "x": 1804,
+        "y": 11651,
+        "plane": 0
+      }
+    },
+    "why": "Jed Hunter (miniquest) is a part of the Tales of the Arc miniquest series.",
+    "requirements": [
+      {
+        "skill": "Crafting",
+        "level": 91
+      },
+      {
+        "skill": "Hunter",
+        "level": 90
+      }
+    ],
+    "supplies": [
+      "10 driftwood",
+      "5 sea shells",
+      "2 tortle shell bowls",
+      "1 taijitu",
+      "200+ chimes (for supplies)",
+      "Uncharted island map (to kill 3 Gu ronin)"
+    ],
+    "rewards": [
+      "2,000 chimes",
+      "10 taijitu",
+      "lamp"
+    ],
+    "wiki": "Jed_Hunter_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "impressing-the-locals",
+      "flag-fall-miniquest",
+      "head-of-the-family-miniquest",
+      "spiritual-enlightenment-miniquest"
+    ]
+  },
+  {
+    "id": "eye-for-an-eye-miniquest",
+    "name": "Eye for an Eye (miniquest)",
+    "icon": "Eye_for_an_Eye_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Grandmaster",
+    "length": "Short",
+    "start": {
+      "npc": "Ichi",
+      "npcWiki": "Ichi",
+      "image": "Ichi_chathead.png",
+      "location": "Eye for an Eye (miniquest)",
+      "meetingPoint": "Talk to Ichi on the eastern side of Cyclosis. (Quartermaster Gully, south-east of the Port Sarim pub, can sail you to Cyclosis in the Arc region of the Wushanko Isles.)",
+      "map": {
+        "x": 2337,
+        "y": 11199,
+        "plane": 0
+      }
+    },
+    "why": "Eye for an Eye (miniquest) is part of the Tales of the Arc miniquest series. The miniquest requires completion of the Jed Hunter miniquest and having Cyclosis discovered in the Player-owned port minigame.",
+    "requirements": [
+      {
+        "skill": "Mining",
+        "level": 90
+      }
+    ],
+    "preparationNotes": [
+      "Discover the island of Cyclosis in player-owned port"
+    ],
+    "supplies": [
+      "30 sea salt or alaea sea salt (untradeable)"
+    ],
+    "rewards": [
+      "250 chimes",
+      "1 taijitu",
+      "25 alaea sea salt",
+      "lamp",
+      "Banky crablet and Cyclosis teleport tablet unlocked in the Waiko Reward Shop"
+    ],
+    "wiki": "Eye_for_an_Eye_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "impressing-the-locals",
+      "jed-hunter-miniquest"
+    ]
+  },
+  {
+    "id": "harbinger-miniquest",
+    "name": "Harbinger (miniquest)",
+    "icon": "Harbinger_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Grandmaster",
+    "length": "Short",
+    "start": {
+      "npc": "Navigator Jemi",
+      "npcWiki": "Navigator Jemi",
+      "image": "Harbinger_(miniquest)_icon.png",
+      "location": "Harbinger (miniquest)",
+      "meetingPoint": "Talk to Navigator Jemi on the docks of Cyclosis.",
+      "map": {
+        "x": 2252,
+        "y": 11182,
+        "plane": 0
+      }
+    },
+    "why": "Harbinger (miniquest) is a part of the Tales of the Arc miniquest series.",
+    "requirements": [],
+    "supplies": [],
+    "rewards": [
+      "250 Chimes",
+      "2 Taijitu",
+      "lamp"
+    ],
+    "wiki": "Harbinger_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "impressing-the-locals",
+      "eye-for-an-eye-miniquest"
+    ]
+  },
+  {
+    "id": "damage-control-miniquest",
+    "name": "Damage Control (miniquest)",
+    "icon": "Damage_Control_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Grandmaster",
+    "length": "Short",
+    "start": {
+      "npc": "Bosun Higgs",
+      "npcWiki": "Bosun Higgs",
+      "image": "Bosun_Higgs_chathead.png",
+      "location": "Damage Control (miniquest)",
+      "meetingPoint": "Speak to Bosun Higgs on the docks near the Sarim's Revenge.",
+      "map": {
+        "x": 1760,
+        "y": 12013,
+        "plane": 0
+      }
+    },
+    "why": "Damage Control (miniquest) is a part of the Tales of the Arc miniquest series.",
+    "requirements": [],
+    "supplies": [
+      "2,500 chimes"
+    ],
+    "rewards": [
+      "3,000 chimes",
+      "2 taijitu",
+      "lamp",
+      "Fully armed and prepared ship",
+      "Whereabouts of Stan's stolen property and Jacob"
+    ],
+    "wiki": "Damage_Control_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "impressing-the-locals",
+      "harbinger-miniquest"
+    ]
+  },
+  {
+    "id": "desert-slayer-dungeon-miniquest",
+    "name": "Desert Slayer Dungeon (miniquest)",
+    "icon": "Desert_Slayer_Dungeon_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Master",
+    "length": "Short to Medium",
+    "start": {
+      "npc": "Pollnivneach Slayer Dungeon",
+      "npcWiki": "Pollnivneach Slayer Dungeon",
+      "image": "Desert_Slayer_Dungeon_(miniquest)_icon.png",
+      "location": "Desert Slayer Dungeon (miniquest)",
+      "meetingPoint": "Enter a barrier on the lowest level of Pollnivneach Slayer Dungeon.",
+      "map": {
+        "x": 3277,
+        "y": 4371,
+        "plane": 0
+      }
+    },
+    "why": "Desert Slayer Dungeon (miniquest) is a miniquest that takes place in the Pollnivneach Slayer Dungeon after completing the Smoking Kills quest.",
+    "requirements": [
+      {
+        "skill": "Slayer",
+        "level": 70
+      }
+    ],
+    "supplies": [
+      "Full slayer helmet, slayer helmet, masked earmuffs or face mask. Having a slayer helmet stored on the slayer helmet stand also works.",
+      "Leaf-bladed sword, spear or slayer staff with runes for slayer dart spell",
+      "Mirror shield"
+    ],
+    "rewards": [
+      "4,000 Slayer XP (1,000 experience after every boss kill, with four boss monsters to kill)",
+      "Ability to enter four rooms, each room filled a certain creature:"
+    ],
+    "wiki": "Desert_Slayer_Dungeon_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "smoking-kills"
+    ]
+  },
+  {
+    "id": "dorics-task-v-miniquest",
+    "name": "Doric's Task V (miniquest)",
+    "icon": "Doric's_Task_V_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Experienced",
+    "length": "Short",
+    "start": {
+      "npc": "Doric",
+      "npcWiki": "Doric",
+      "image": "Doric_chathead.png",
+      "location": "Doric's Task V (miniquest)",
+      "meetingPoint": "Speak to Doric in his hut just outside the gates of Taverley north of Falador.",
+      "map": {
+        "x": 2959,
+        "y": 3439,
+        "plane": 0
+      }
+    },
+    "why": "Doric's Task V (miniquest) is Doric's fifth task as part of the Doric's Tasks quest series.",
+    "requirements": [
+      {
+        "skill": "Smithing",
+        "level": 50
+      }
+    ],
+    "supplies": [
+      "12 rune bars or",
+      "20 steel bars or 4 steel platebodies"
+    ],
+    "rewards": [
+      "5,000 Smithing XP",
+      "15,000 charges for the Gofannon amulet"
+    ],
+    "wiki": "Doric's_Task_V_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "dorics-task-iv"
+    ]
+  },
+  {
+    "id": "dorics-task-vi-miniquest",
+    "name": "Doric's Task VI (miniquest)",
+    "icon": "Doric's_Task_VI_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Experienced",
+    "length": "Short",
+    "start": {
+      "npc": "Doric",
+      "npcWiki": "Doric",
+      "image": "Doric_chathead.png",
+      "location": "Doric's Task VI (miniquest)",
+      "meetingPoint": "Speak to Doric in his hut just outside the gates of Taverley north of Falador.",
+      "map": {
+        "x": 2959,
+        "y": 3439,
+        "plane": 0
+      }
+    },
+    "why": "Doric's Task VI (miniquest) is Doric's sixth task as part of the Doric's Tasks quest series.",
+    "requirements": [
+      {
+        "skill": "Smithing",
+        "level": 60
+      }
+    ],
+    "supplies": [
+      "16 orikalkum bars or"
+    ],
+    "rewards": [
+      "8,000 Smithing XP",
+      "24,000 charges for the Gofannon amulet"
+    ],
+    "wiki": "Doric's_Task_VI_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "dorics-task-v-miniquest"
+    ]
+  },
+  {
+    "id": "dorics-task-vii-miniquest",
+    "name": "Doric's Task VII (miniquest)",
+    "icon": "Doric's_Task_VII_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Master",
+    "length": "Short",
+    "start": {
+      "npc": "Doric",
+      "npcWiki": "Doric",
+      "image": "Doric_chathead.png",
+      "location": "Doric's Task VII (miniquest)",
+      "meetingPoint": "Speak to Doric in his hut just outside the gates of Taverley north of Falador.",
+      "map": {
+        "x": 2959,
+        "y": 3439,
+        "plane": 0
+      }
+    },
+    "why": "Doric's Task VII (miniquest) is Doric's seventh task as part of the Doric's Tasks quest series.",
+    "requirements": [
+      {
+        "skill": "Smithing",
+        "level": 65
+      }
+    ],
+    "supplies": [],
+    "rewards": [
+      "12,000 Smithing XP",
+      "36,000 charges for the Gofannon amulet"
+    ],
+    "wiki": "Doric's_Task_VII_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "dorics-task-vi-miniquest"
+    ]
+  },
+  {
+    "id": "dorics-task-viii-miniquest",
+    "name": "Doric's Task VIII (miniquest)",
+    "icon": "Doric's_Task_VIII_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Master",
+    "length": "Short",
+    "start": {
+      "npc": "Doric",
+      "npcWiki": "Doric",
+      "image": "Doric_chathead.png",
+      "location": "Doric's Task VIII (miniquest)",
+      "meetingPoint": "Speak to Doric in his hut just outside the gates of Taverley north of Falador.",
+      "map": {
+        "x": 2959,
+        "y": 3439,
+        "plane": 0
+      }
+    },
+    "why": "Doric's Task VIII (miniquest) is Doric's eighth task as part of the Doric's Tasks quest series.",
+    "requirements": [
+      {
+        "skill": "Smithing",
+        "level": 70
+      }
+    ],
+    "supplies": [
+      "Two backpack spaces",
+      "20 necronium bars"
+    ],
+    "rewards": [
+      "20,000 Smithing XP",
+      "60,000 charges for the Gofannon amulet"
+    ],
+    "wiki": "Doric's_Task_VIII_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "dorics-task-vii-miniquest"
+    ]
+  },
+  {
+    "id": "father-and-son-miniquest",
+    "name": "Father and Son (miniquest)",
+    "icon": "Father_and_Son_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Novice",
+    "length": "Short",
+    "start": {
+      "npc": "Irwinsson",
+      "npcWiki": "Irwinsson",
+      "image": "Irwinsson_chathead.png",
+      "location": "Father and Son (miniquest)",
+      "meetingPoint": "Talk to Irwinsson, located on Anachronia, found south of the Anachronia lodestone.",
+      "map": {
+        "x": 5429,
+        "y": 2330,
+        "plane": 0
+      }
+    },
+    "why": "Father and Son (miniquest) is a miniquest involving Irwinsson and Sigli the Huntsman.",
+    "requirements": [],
+    "preparationNotes": [
+      "Complete Anachronia base camp tutorial first; Compass doesn't track it."
+    ],
+    "supplies": [],
+    "rewards": [
+      "lamp"
+    ],
+    "wiki": "Father_and_Son_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": []
+  },
+  {
+    "id": "tuai-leits-own-miniquest",
+    "name": "Tuai Leit's Own (miniquest)",
+    "icon": "Tuai_Leit's_Own_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Grandmaster",
+    "length": "Short to Medium",
+    "start": {
+      "npc": "Seasinger Jemi",
+      "npcWiki": "Seasinger Jemi",
+      "image": "Seasinger_Jemi_chathead.png",
+      "location": "Tuai Leit's Own (miniquest)",
+      "meetingPoint": "Speak to Seasinger Jemi on Tuai Leit.",
+      "map": {
+        "x": 1760,
+        "y": 12011,
+        "plane": 0
+      }
+    },
+    "why": "Tuai Leit's Own (miniquest) is a part of the Tales of the Arc miniquest series.",
+    "requirements": [
+      {
+        "skill": "Divination",
+        "level": 90
+      },
+      {
+        "skill": "Farming",
+        "level": 86
+      },
+      {
+        "skill": "Woodcutting",
+        "level": 90
+      }
+    ],
+    "supplies": [
+      "30 rumberries",
+      "30 positive energies",
+      "At least 1 spirit dragon charm"
+    ],
+    "rewards": [
+      "500 chimes",
+      "2 taijitu",
+      "50 rumberry",
+      "50 ancestral energy",
+      "Tuai Leit teleport tablet unlocked in the Waiko Reward Shop"
+    ],
+    "wiki": "Tuai_Leit's_Own_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "impressing-the-locals",
+      "harbinger-miniquest"
+    ]
+  },
+  {
+    "id": "ghosts-from-the-past-miniquest",
+    "name": "Ghosts from the Past (miniquest)",
+    "icon": "Ghosts_from_the_Past_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Grandmaster",
+    "length": "Short",
+    "start": {
+      "npc": "Quartermaster Gully",
+      "npcWiki": "Quartermaster Gully",
+      "image": "Ghosts_from_the_Past_(miniquest)_icon.png",
+      "location": "Ghosts from the Past (miniquest)",
+      "meetingPoint": "Speak to Quartermaster Gully on the docks near the Sarim's Revenge.",
+      "map": {
+        "x": 1760,
+        "y": 12010,
+        "plane": 0
+      }
+    },
+    "why": "Ghosts from the Past (miniquest) is a part of the Tales of the Arc miniquest series.",
+    "requirements": [],
+    "supplies": [],
+    "rewards": [
+      "500 Chimes",
+      "2 Taijitu",
+      "1 Medium XP lamp in one of the following skills:,,,,,,,,,,, or",
+      "Islands That Once Were Turtles teleport tablet unlocked in the Waiko Reward Shop"
+    ],
+    "wiki": "Ghosts_from_the_Past_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "impressing-the-locals",
+      "harbinger-miniquest"
+    ]
+  },
+  {
+    "id": "final-destination-miniquest",
+    "name": "Final Destination (miniquest)",
+    "icon": "Final_Destination_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Grandmaster",
+    "length": "Short",
+    "start": {
+      "npc": "Lookout Ekahi",
+      "npcWiki": "Lookout Ekahi",
+      "image": "Final_Destination_(miniquest)_icon.png",
+      "location": "Final Destination (miniquest)",
+      "meetingPoint": "Talk to Lookout Ekahi on the docks near the Sarim's Revenge.",
+      "map": {
+        "x": 2452,
+        "y": 11592,
+        "plane": 0
+      }
+    },
+    "why": "Final Destination (miniquest) is a miniquest that serves as the conclusion of the Tales of the Arc quest series.",
+    "requirements": [],
+    "supplies": [],
+    "rewards": [
+      "2,000 chimes",
+      "10 taijitu",
+      "1 large combat XP lamp in one of the following skills:,,,,,,,, or",
+      "Goshima teleport tablet unlocked in the Waiko Reward Shop",
+      "Unlocked title"
+    ],
+    "wiki": "Final_Destination_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "impressing-the-locals",
+      "tuai-leits-own-miniquest",
+      "ghosts-from-the-past-miniquest",
+      "damage-control-miniquest"
+    ]
+  },
+  {
+    "id": "helping-laniakea-miniquest",
+    "name": "Helping Laniakea (miniquest)",
+    "icon": "Helping_Laniakea_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Novice",
+    "length": "Medium",
+    "start": {
+      "npc": "Laniakea",
+      "npcWiki": "Laniakea",
+      "image": "Laniakea_chathead.png",
+      "location": "Helping Laniakea (miniquest)",
+      "meetingPoint": "Talk to Laniakea at the base camp on Anachronia.",
+      "map": {
+        "x": 5461,
+        "y": 2356,
+        "plane": 0
+      }
+    },
+    "why": "Helping Laniakea (miniquest) is a miniquest on Anachronia during which the player aids Laniakea to catch an elusive fish.",
+    "requirements": [],
+    "preparationNotes": [
+      "Complete Anachronia base camp tutorial first; Compass doesn't track it."
+    ],
+    "supplies": [
+      "Raw arcane apoterrasaur meat (can be bought from the Grand Exchange or another player)"
+    ],
+    "rewards": [
+      "Totem of Intimidation middle"
+    ],
+    "wiki": "Helping_Laniakea_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": []
+  },
+  {
+    "id": "hopespears-will-miniquest",
+    "name": "Hopespear's Will (miniquest)",
+    "icon": "Hopespear's_Will_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Experienced",
+    "length": "Short",
+    "start": {
+      "npc": "Ghost",
+      "npcWiki": "Ghost (Hopespear)",
+      "image": "Hopespear's_Will_(miniquest)_icon.png",
+      "location": "Hopespear's Will (miniquest)",
+      "meetingPoint": "Speak to Hopespear in the Crypt in the Goblin Temple.",
+      "map": {
+        "x": 2582,
+        "y": 9850,
+        "plane": 0
+      }
+    },
+    "why": "Hopespear's Will (miniquest) is a miniquest available after completing the Land of the Goblins quest.",
+    "requirements": [
+      {
+        "skill": "Prayer",
+        "level": 40
+      }
+    ],
+    "preparationNotes": [
+      "Ability to defeat five foes up to level 36 without any armour or weapons; you may not use magic attacks or summon familiars, either.",
+      "Get partway through A Fairy Tale II - Cure a Queen first; check the Wiki for the point needed.",
+      "Get partway through Desert Treasure first; check the Wiki for the point needed."
+    ],
+    "supplies": [
+      "Goblin potion",
+      "Dramen staff or Lunar staff (unless A Fairy Tale III - Battle at Ork's Rift has been completed)",
+      "Ring of visibility or Sliske's gift",
+      "Ghostspeak amulet or cramulet or hard Morytania achievements"
+    ],
+    "rewards": [
+      "total from burying all 5 sets of bones (unaffected by any bonus experience)."
+    ],
+    "wiki": "Hopespear's_Will_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "land-of-the-goblins",
+      "a-fairy-tale-i-growing-pains"
+    ]
+  },
+  {
+    "id": "in-memory-of-the-myreque-miniquest",
+    "name": "In Memory of the Myreque (miniquest)",
+    "icon": "In_Memory_of_the_Myreque_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Grandmaster",
+    "length": "Long",
+    "start": {
+      "npc": "Veliaf Hurtz",
+      "npcWiki": "Veliaf Hurtz",
+      "image": "Veliaf_Hurtz_chathead.png",
+      "location": "In Memory of the Myreque (miniquest)",
+      "meetingPoint": "Talk to Veliaf Hurtz, north-west of the Canifis lodestone.",
+      "map": {
+        "x": 3512,
+        "y": 3538,
+        "plane": 0
+      }
+    },
+    "why": "In Memory of the Myreque (miniquest) is a miniquest which preceded the release of River of Blood. During the miniquest, the player builds monuments to honour allies lost in the Myreque quest series.",
+    "requirements": [],
+    "supplies": [
+      "10 blisterwood sickles",
+      "20 Granite (5kg)",
+      "Blamish blue shell (pointed) (not the snelm made from it)",
+      "Nail beast nails",
+      "Snakeskin body",
+      "Ivandis flail",
+      "Rune armoured boots",
+      "Mort myre pear",
+      "Moonlight mead (Moonlight mead (m) does not work)",
+      "Blisterwood stake-thrower crossbow",
+      "Histories of the Hallowland",
+      "Holy water"
+    ],
+    "rewards": [
+      "See the Wiki for rewards."
+    ],
+    "wiki": "In_Memory_of_the_Myreque_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "the-lord-of-vampyrium",
+      "legends-quest"
+    ]
+  },
+  {
+    "id": "koscheis-troubles-miniquest",
+    "name": "Koschei's Troubles (miniquest)",
+    "icon": "Koschei's_Troubles_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Grandmaster",
+    "length": "Short",
+    "start": {
+      "npc": "Thorvald the Warrior",
+      "npcWiki": "Thorvald the Warrior",
+      "image": "Thorvald_the_Warrior_chathead.png",
+      "location": "Koschei's Troubles (miniquest)",
+      "meetingPoint": "Talk to Thorvald the Warrior in Skulgrimen's Battle Gear in Rellekka.",
+      "map": {
+        "x": 2666,
+        "y": 3693,
+        "plane": 0
+      }
+    },
+    "why": "Koschei's Troubles (miniquest) is a short miniquest revolving around the mind-wiping and history of Fremennik champion Koschei the deathless.",
+    "requirements": [],
+    "supplies": [
+      "Balmung"
+    ],
+    "rewards": [
+      "Antique lamp giving 30,000 experience in any skill of level 75 or higher.",
+      "An enhanced Balmung axe, depending on the colour of gem made:"
+    ],
+    "wiki": "Koschei's_Troubles_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "blood-runs-deep",
+      "ritual-of-the-mahjarrat"
+    ]
+  },
+  {
+    "id": "lair-of-tarn-razorlor-miniquest",
+    "name": "Lair of Tarn Razorlor (miniquest)",
+    "icon": "Lair_of_Tarn_Razorlor_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Experienced",
+    "length": "Medium",
+    "start": {
+      "npc": "Tarn Razorlor",
+      "npcWiki": "Tarn Razorlor",
+      "image": "Tarn_Razorlor_chathead.png",
+      "location": "Lair of Tarn Razorlor (miniquest)",
+      "meetingPoint": "Recover the diary of Tarn Razorlor. The entrance to Tarn's lair is on the north wall of the ground floor of the Abandoned Mine, accessed via the surface cart tunnel.",
+      "map": {
+        "x": 3424,
+        "y": 9661,
+        "plane": 0
+      }
+    },
+    "why": "Lair of Tarn Razorlor (miniquest) is a miniquest in which the player's objective is to kill Tarn Razorlor and retrieve his diary, allowing them to enchant the salve amulet.",
+    "requirements": [
+      {
+        "skill": "Slayer",
+        "level": 40
+      }
+    ],
+    "supplies": [],
+    "rewards": [
+      "Tarn's diary",
+      "Ability to create enchanted salve amulets, by using Tarn's diary on salve amulets.",
+      "Access to terror dogs in Tarn's lair"
+    ],
+    "wiki": "Lair_of_Tarn_Razorlor_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "haunted-mine"
+    ]
+  },
+  {
+    "id": "mahjarrat-memories-miniquest",
+    "name": "Mahjarrat Memories (miniquest)",
+    "icon": "Mahjarrat_Memories_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Grandmaster",
+    "length": "Very, Very Long",
+    "start": {
+      "npc": "Kharshai",
+      "npcWiki": "Kharshai",
+      "image": "Kharshai_chathead.png",
+      "location": "Mahjarrat Memories (miniquest)",
+      "meetingPoint": "Talk to Kharshai via the trapdoor in Thorvald the Warrior's helmet shop in Rellekka.",
+      "map": {
+        "x": 2667,
+        "y": 3694,
+        "plane": 0
+      }
+    },
+    "why": "Mahjarrat Memories (miniquest) is a miniquest wherein players help Kharshai recover the memories of some of his kin - both dead and alive - so he can learn what they've been up to.",
+    "requirements": [
+      {
+        "skill": "Divination",
+        "level": 60
+      }
+    ],
+    "supplies": [
+      "7,500 vibrant memories (or memories of a higher tier); enriched memories count for double (collected during miniquest)",
+      "Invitation box (for Sliske's memory)",
+      "Insulated boots (for Zemouregal's memory)",
+      "Macaw pouch or Ravenous locust pouch (for Zemouregal's memory)"
+    ],
+    "rewards": [
+      "(given during the miniquest; is awarded each time a memory is turned in)",
+      "150,000 bonus experience in Divination.",
+      "An engrammeter that Kharshai states could be useful in Freneskae when charged",
+      "15 lore books",
+      "Tiny Lucien pet",
+      "Dr Nabanik's Old Trilby cosmetic override",
+      "title",
+      "title"
+    ],
+    "wiki": "Mahjarrat_Memories_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "koscheis-troubles-miniquest",
+      "missing-presumed-death"
+    ]
+  },
+  {
+    "id": "one-foot-in-the-grave-miniquest",
+    "name": "One Foot in the Grave (miniquest)",
+    "icon": "One_Foot_in_the_Grave_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Master",
+    "length": "Short to Medium",
+    "start": {
+      "npc": "Zavistic Rarve",
+      "npcWiki": "Zavistic Rarve",
+      "image": "Zavistic_Rarve_chathead.png",
+      "location": "One Foot in the Grave (miniquest)",
+      "meetingPoint": "Talk to Zavistic Rarve at the Wizards' Guild with Clarence's hand in your backpack.",
+      "map": {
+        "x": 2598,
+        "y": 3085,
+        "plane": 0
+      }
+    },
+    "why": "One Foot in the Grave (miniquest) (formerly Returning Clarence) is a miniquest that becomes available after reaching a certain point in Back to my Roots.",
+    "requirements": [],
+    "preparationNotes": [
+      "Get partway through Back to my Roots first; check the Wiki for the point needed."
+    ],
+    "supplies": [
+      "Hand (from the Back to my Roots quest)"
+    ],
+    "rewards": [
+      "10,000 Magic experience",
+      "200 blood runes",
+      "100 law runes"
+    ],
+    "wiki": "One_Foot_in_the_Grave_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "the-hand-in-the-sand"
+    ]
+  },
+  {
+    "id": "rebuilding-edgeville-miniquest",
+    "name": "Rebuilding Edgeville (miniquest)",
+    "icon": "Rebuilding_Edgeville_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Grandmaster",
+    "length": "Short",
+    "start": {
+      "npc": "Vannaka",
+      "npcWiki": "Vannaka",
+      "image": "Vannaka_chathead.png",
+      "location": "Rebuilding Edgeville (miniquest)",
+      "meetingPoint": "Talk to Vannaka in Edgeville.",
+      "map": {
+        "x": 3091,
+        "y": 3478,
+        "plane": 0
+      }
+    },
+    "why": "Rebuilding Edgeville (miniquest) is a miniquest that features the player assisting Vannaka in cleaning up Edgeville after it was attacked by the dragonkin during Ritual of the Mahjarrat, released six and a half years prior.",
+    "requirements": [],
+    "supplies": [
+      "5 bittercap mushrooms",
+      "20 planks (protean planks don't work)",
+      "10 oak planks (protean planks don't work)",
+      "10 mahogany planks (protean planks don't work)",
+      "Molten glass",
+      "Marble block",
+      "100 water runes",
+      "Magic watering can (tool belt works)"
+    ],
+    "rewards": [
+      "(during the miniquest)",
+      "(during the miniquest)",
+      "(during the miniquest)",
+      "(during the miniquest)",
+      "(during the miniquest)",
+      "A dragonkin lamp",
+      "Chance to receive Effy after rubbing dragonkin lamps and using dragonkin stars"
+    ],
+    "wiki": "Rebuilding_Edgeville_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "ritual-of-the-mahjarrat",
+      "a-fairy-tale-iii-battle-at-orks-rift"
+    ]
+  },
+  {
+    "id": "tales-of-nomad-miniquest",
+    "name": "Tales of Nomad (miniquest)",
+    "icon": "Tales_of_Nomad_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Master",
+    "length": "Short",
+    "start": {
+      "npc": "Death's office",
+      "npcWiki": "Death's office",
+      "image": "Tales_of_Nomad_(miniquest)_icon.png",
+      "location": "Tales of Nomad (miniquest)",
+      "meetingPoint": "Sift through Nomad's memory on the western side of the lower level of the Underworld. (Return to the Underworld by passing through Death's door in Death's office.)",
+      "map": {
+        "x": 3106,
+        "y": 3310,
+        "plane": 0
+      }
+    },
+    "why": "Tales of Nomad (miniquest) is a miniquest chronicling Nomad's life. It takes place after Nomad's Elegy and tells his story via static scenes from his life found at various locations indicated by cryptic hints.",
+    "requirements": [],
+    "supplies": [],
+    "rewards": [
+      "Three experience lamps of 1,500 experience each."
+    ],
+    "wiki": "Tales_of_Nomad_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "nomads-elegy"
+    ]
+  },
+  {
+    "id": "tales-of-the-god-wars-miniquest",
+    "name": "Tales of the God Wars (miniquest)",
+    "icon": "Tales_of_the_God_Wars_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Experienced",
+    "length": "Medium",
+    "start": {
+      "npc": "the Curator",
+      "npcWiki": "the Curator",
+      "image": "Tales_of_the_God_Wars_(miniquest)_icon.png",
+      "location": "Tales of the God Wars (miniquest)",
+      "meetingPoint": "Talk to the Curator at the Heart of Gielinor, north of the Agility Pyramid in the Kharidian Desert.",
+      "map": {
+        "x": 3381,
+        "y": 2881,
+        "plane": 0
+      }
+    },
+    "why": "Tales of the God Wars (miniquest) is a miniquest that serves as an introduction to the Heart of Gielinor.",
+    "requirements": [
+      {
+        "skill": "Constitution",
+        "level": 70
+      },
+      {
+        "skill": "Strength",
+        "level": 60
+      },
+      {
+        "skill": "Agility",
+        "level": 60
+      }
+    ],
+    "preparationNotes": [
+      "Ability to enter Morytania",
+      "Access to the God Wars Dungeon",
+      "Get partway through Troll Stronghold first; check the Wiki for the point needed."
+    ],
+    "supplies": [],
+    "rewards": [
+      "Magic lamp which awards 30,000 experience",
+      "25 The Heart teleport tablets that will teleport the player to the Heart of Gielinor",
+      "An anima crystal, which increases the player's reputation with one of the factions by 500",
+      "5,000 Strength XP (obtained during the miniquest)",
+      "5,000 Summoning XP (obtained during the miniquest)",
+      "5,000 Divination XP (obtained during the miniquest)",
+      "5,000 Slayer XP (obtained during the miniquest)"
+    ],
+    "wiki": "Tales_of_the_God_Wars_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": []
+  },
+  {
+    "id": "the-generals-shadow-miniquest",
+    "name": "The General's Shadow (miniquest)",
+    "icon": "The_General's_Shadow_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Experienced",
+    "length": "Short",
+    "start": {
+      "npc": "General Khazard",
+      "npcWiki": "General Khazard",
+      "image": "General_Khazard_chathead.png",
+      "location": "The General's Shadow (miniquest)",
+      "meetingPoint": "Speak to the ghost of General Khazard wandering near the road south-east of Rellekka, while wearing a ring of visibility, ghostly robes and a way to speak with ghosts.",
+      "map": {
+        "x": 2723,
+        "y": 3622,
+        "plane": 0
+      }
+    },
+    "why": "The General's Shadow (miniquest) is a short miniquest that features General Khazard preparing for the Ritual of Rejuvenation by informing his scouts in the Shadow Realm.",
+    "requirements": [],
+    "supplies": [
+      "40 coins (70 coins if using boat to Karamja)",
+      "Ghostspeak amulet or cramulet (not necessary with hard Morytania achievements completed)",
+      "The full ghostly robe outfit",
+      "A ring of visibility"
+    ],
+    "rewards": [
+      "The Shadow sword, which can be reclaimed from the ghost that will appear after Bouncer's defeat for free.",
+      "After completion of Fate of the Gods, The World Wakes, and Ritual of the Mahjarrat, if you visit the Empyrean Citadel throne room and attempt to leave, Sliske will appear and answer one question, before giving you a gift: the ability to see into the Shadow Realm without the ring of visibility. This still happens after Sliske's Endgame."
+    ],
+    "wiki": "The_General's_Shadow_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "curse-of-the-empty-lord-miniquest",
+      "fight-arena"
+    ]
+  },
+  {
+    "id": "the-lost-toys-miniquest",
+    "name": "The Lost Toys (miniquest)",
+    "icon": "The_Lost_Toys_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Grandmaster",
+    "length": "Medium",
+    "start": {
+      "npc": "Lex",
+      "npcWiki": "Lex",
+      "image": "Lex_chathead.png",
+      "location": "The Lost Toys (miniquest)",
+      "meetingPoint": "Talk to Lex in the Hair of the Dog tavern, south of the Canifis lodestone.",
+      "map": {
+        "x": 3488,
+        "y": 3476,
+        "plane": 0
+      }
+    },
+    "why": "The Lost Toys (miniquest) is a miniquest that was released ahead of the launch of River of Blood. Players must have completed The Branches of Darkmeyer to begin the miniquest by speaking to Lex who is located in the Hair of the Dog inn in Canifis.",
+    "requirements": [],
+    "supplies": [],
+    "rewards": [
+      "13 shiny columbarium keys",
+      "Draccles plushie and override"
+    ],
+    "wiki": "The_Lost_Toys_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "the-branches-of-darkmeyer"
+    ]
+  },
+  {
+    "id": "thok-it-to-em-saga",
+    "name": "Thok It To 'Em (saga)",
+    "icon": "Thok_It_To_'Em_(saga)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Experienced",
+    "length": "Medium",
+    "start": {
+      "npc": "scribbled note",
+      "npcWiki": "scribbled note",
+      "image": "Thok_It_To_'Em_(saga)_icon.png",
+      "location": "Thok It To 'Em (saga)",
+      "meetingPoint": "Find scribbled notes while raiding the 30-35 abandoned floors of Daemonheim, then ask Skaldrun south-west of the Daemonheim entrance to share their story.",
+      "map": {
+        "x": 3431,
+        "y": 3700,
+        "plane": 0
+      }
+    },
+    "why": "Thok It To 'Em (saga) is a Fremennik Saga during which the player experiences an adventure through Thok's eyes.",
+    "requirements": [
+      {
+        "skill": "Dungeoneering",
+        "level": 59
+      }
+    ],
+    "preparationNotes": [
+      "Find and free Skaldrun from the frozen floors in Daemonheim"
+    ],
+    "supplies": [
+      "Ring of kinship to find scribbled notes"
+    ],
+    "rewards": [
+      "3,708 Dungeoneering tokens"
+    ],
+    "wiki": "Thok_It_To_'Em_(saga)",
+    "kind": "saga",
+    "questRequirements": []
+  },
+  {
+    "id": "thok-your-block-off-saga",
+    "name": "Thok Your Block Off (saga)",
+    "icon": "Thok_Your_Block_Off_(saga)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Master",
+    "length": "Medium",
+    "start": {
+      "npc": "rock and twine bundle",
+      "npcWiki": "rock and twine bundle",
+      "image": "Thok_Your_Block_Off_(saga)_icon.png",
+      "location": "Thok Your Block Off (saga)",
+      "meetingPoint": "Find the rock and twine bundle while raiding the 36-40 occult floors of Daemonheim, then ask Skaldrun south-west of the Daemonheim entrance to share their story.",
+      "map": {
+        "x": 3430,
+        "y": 3699,
+        "plane": 0
+      }
+    },
+    "why": "Thok Your Block Off (saga) is a Fremennik Saga. Players are able to take control of Thok, again, as he attempts to defeat his brother in a battle of brawn.",
+    "requirements": [
+      {
+        "skill": "Dungeoneering",
+        "level": 71
+      }
+    ],
+    "preparationNotes": [
+      "Find and free Skaldrun from the frozen floors in Daemonheim"
+    ],
+    "supplies": [
+      "Ring of kinship to find the rock and twine bundle. Players cannot bring it into the saga itself."
+    ],
+    "rewards": [
+      "53,440 Dungeoneering XP (bonus experience will be used)",
+      "5,344 Dungeoneering tokens",
+      "105,010 Strength XP"
+    ],
+    "wiki": "Thok_Your_Block_Off_(saga)",
+    "kind": "saga",
+    "questRequirements": []
+  },
+  {
+    "id": "tortle-combat-miniquest",
+    "name": "Tortle Combat (miniquest)",
+    "icon": "Tortle_Combat_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Unknown",
+    "length": "Medium",
+    "start": {
+      "npc": "Postie Pete-za",
+      "npcWiki": "Postie Pete-za",
+      "image": "Postie_Pete-za_chathead.png",
+      "location": "Tortle Combat (miniquest)",
+      "meetingPoint": "Talk to Postie Pete-za by the entrance to the Varrock Sewers.",
+      "map": {
+        "x": 3238,
+        "y": 3461,
+        "plane": 0
+      }
+    },
+    "why": "Tortle Combat (miniquest) is a miniquest made by the Ninja Team to celebrate the team's 1 year anniversary of existing again. A year later the team was disbanded again.",
+    "requirements": [
+      {
+        "skill": "Construction",
+        "level": 40
+      },
+      {
+        "skill": "Farming",
+        "level": 17
+      }
+    ],
+    "preparationNotes": [
+      "Complete Player-owned farm tutorial first; Compass doesn't track it."
+    ],
+    "supplies": [
+      "16 planks (other types of planks will not work; can be inside a plank box)",
+      "60 iron nails (higher level nails will not work)",
+      "Empty sack",
+      "2 buckets of sand",
+      "3 ropes",
+      "Adult or elder common brown rabbit",
+      "Dense honeycomb",
+      "Kebab",
+      "2 law runes",
+      "Soft clay",
+      "1 empty inventory space"
+    ],
+    "rewards": [
+      "Tortle lamp of construction, which gives 10,000 Construction XP",
+      "Tortle lamp of farming, which gives 1,000 Farming XP",
+      "Tortle lamp of magic, which gives 1,000 Magic XP",
+      "Ninja Tortle Hood cosmetic override"
+    ],
+    "wiki": "Tortle_Combat_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": []
+  },
+  {
+    "id": "wandering-gaal-miniquest",
+    "name": "Wandering Ga'al (miniquest)",
+    "icon": "Wandering_Ga'al_(miniquest)_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Unknown",
+    "length": "Very Short",
+    "start": {
+      "npc": "TzHaar-Ga'al-Kot",
+      "npcWiki": "TzHaar-Ga'al-Kot",
+      "image": "TzHaar-Ga'al-Kot_chathead.png",
+      "location": "Wandering Ga'al (miniquest)",
+      "meetingPoint": "Talk to TzHaar-Ga'al-Kot (after using a ring of visibility on a ring of stone) somewhere outside the TzHaar City.",
+      "map": {
+        "x": 4672,
+        "y": 5120,
+        "plane": 0,
+        "mapId": 12
+      }
+    },
+    "why": "Wandering Ga'al (miniquest) is a miniquest that was released in January 2013 as a response to an ongoing hunt to translate the final bookcase in Brink of Extinction, after a Jagex Moderator mistakenly told the players there was a way to read it.",
+    "requirements": [],
+    "preparationNotes": [
+      "Get partway through Desert Treasure first; check the Wiki for the point needed."
+    ],
+    "supplies": [
+      "Ring of stone",
+      "Ring of visibility (Sliske's gift will not work)"
+    ],
+    "rewards": [
+      "Ability to read the mysterious bookcase in the Fight Cauldron."
+    ],
+    "wiki": "Wandering_Ga'al_(miniquest)",
+    "kind": "miniquest",
+    "questRequirements": [
+      "the-brink-of-extinction"
+    ]
   }
 ];
 
@@ -11787,7 +14837,7 @@ export const IMPORTED_LOCATIONS: Record<string, LocationRecord> = {
     "wiki": "Seers' Village",
     "image": "Seers'_Village.png",
     "members": true,
-    "summary": "Start of Murder Mystery."
+    "summary": "Start of Merlin's Crystal."
   },
   "Kandarin North": {
     "name": "Kandarin North",
@@ -11901,12 +14951,26 @@ export const IMPORTED_LOCATIONS: Record<string, LocationRecord> = {
     "members": true,
     "summary": "Start of Recipe for Disaster: Another Cook's Quest."
   },
+  "Recipe for Disaster: Freeing the Goblin Generals": {
+    "name": "Recipe for Disaster: Freeing the Goblin Generals",
+    "wiki": "Recipe for Disaster: Freeing the Goblin Generals",
+    "image": "Quest.png",
+    "members": true,
+    "summary": "Start of Recipe for Disaster: Freeing the Goblin Generals."
+  },
   "Taverley Outskirts": {
     "name": "Taverley Outskirts",
     "wiki": "Taverley Outskirts",
     "image": "Fishing_Contest.png",
     "members": true,
     "summary": "Start of Fishing Contest."
+  },
+  "Recipe for Disaster: Freeing the Mountain Dwarf": {
+    "name": "Recipe for Disaster: Freeing the Mountain Dwarf",
+    "wiki": "Recipe for Disaster: Freeing the Mountain Dwarf",
+    "image": "Quest.png",
+    "members": true,
+    "summary": "Start of Recipe for Disaster: Freeing the Mountain Dwarf."
   },
   "Fremennik Province": {
     "name": "Fremennik Province",
@@ -11985,6 +15049,13 @@ export const IMPORTED_LOCATIONS: Record<string, LocationRecord> = {
     "members": true,
     "summary": "Start of Sea Slug."
   },
+  "Recipe for Disaster: Freeing Evil Dave": {
+    "name": "Recipe for Disaster: Freeing Evil Dave",
+    "wiki": "Recipe for Disaster: Freeing Evil Dave",
+    "image": "Quest.png",
+    "members": true,
+    "summary": "Start of Recipe for Disaster: Freeing Evil Dave."
+  },
   "Dimension of Disaster: Demon Slayer": {
     "name": "Dimension of Disaster: Demon Slayer",
     "wiki": "Dimension of Disaster: Demon Slayer",
@@ -12005,6 +15076,13 @@ export const IMPORTED_LOCATIONS: Record<string, LocationRecord> = {
     "image": "Edgeville.png",
     "members": true,
     "summary": "Start of Evil Dave's Big Day Out."
+  },
+  "Recipe for Disaster: Freeing Pirate Pete": {
+    "name": "Recipe for Disaster: Freeing Pirate Pete",
+    "wiki": "Recipe for Disaster: Freeing Pirate Pete",
+    "image": "Quest.png",
+    "members": true,
+    "summary": "Start of Recipe for Disaster: Freeing Pirate Pete."
   },
   "Taverley": {
     "name": "Taverley",
@@ -12040,6 +15118,13 @@ export const IMPORTED_LOCATIONS: Record<string, LocationRecord> = {
     "image": "Entrana.png",
     "members": true,
     "summary": "Start of Enlightened Journey."
+  },
+  "Recipe for Disaster: Freeing the Lumbridge Sage": {
+    "name": "Recipe for Disaster: Freeing the Lumbridge Sage",
+    "wiki": "Recipe for Disaster: Freeing the Lumbridge Sage",
+    "image": "Quest.png",
+    "members": true,
+    "summary": "Start of Recipe for Disaster: Freeing the Lumbridge Sage."
   },
   "Rellekka": {
     "name": "Rellekka",
@@ -12083,6 +15168,13 @@ export const IMPORTED_LOCATIONS: Record<string, LocationRecord> = {
     "members": true,
     "summary": "Start of Roving Elves."
   },
+  "Recipe for Disaster: Freeing Sir Amik Varze": {
+    "name": "Recipe for Disaster: Freeing Sir Amik Varze",
+    "wiki": "Recipe for Disaster: Freeing Sir Amik Varze",
+    "image": "Quest.png",
+    "members": true,
+    "summary": "Start of Recipe for Disaster: Freeing Sir Amik Varze."
+  },
   "Dimension of Disaster: Defender of Varrock": {
     "name": "Dimension of Disaster: Defender of Varrock",
     "wiki": "Dimension of Disaster: Defender of Varrock",
@@ -12111,12 +15203,47 @@ export const IMPORTED_LOCATIONS: Record<string, LocationRecord> = {
     "members": true,
     "summary": "Start of Dimension of Disaster: Curse of Arrav."
   },
+  "Recipe for Disaster: Freeing King Awowogei": {
+    "name": "Recipe for Disaster: Freeing King Awowogei",
+    "wiki": "Recipe for Disaster: Freeing King Awowogei",
+    "image": "Quest.png",
+    "members": true,
+    "summary": "Start of Recipe for Disaster: Freeing King Awowogei."
+  },
+  "Recipe for Disaster: Defeating the Culinaromancer": {
+    "name": "Recipe for Disaster: Defeating the Culinaromancer",
+    "wiki": "Recipe for Disaster: Defeating the Culinaromancer",
+    "image": "Quest.png",
+    "members": true,
+    "summary": "Start of Recipe for Disaster: Defeating the Culinaromancer."
+  },
   "Player owned house": {
     "name": "Player owned house",
     "wiki": "Player owned house",
     "image": "Player-owned_house_(initial).png",
     "members": true,
-    "summary": "Start of Pieces of Hate."
+    "summary": "Start of A Clockwork Syringe."
+  },
+  "Death Plateau (historical)": {
+    "name": "Death Plateau (historical)",
+    "wiki": "Death Plateau (historical)",
+    "image": "Death_Plateau_(historical).jpg",
+    "members": true,
+    "summary": "Start of Death Plateau (historical)."
+  },
+  "Druidic Ritual (historical)": {
+    "name": "Druidic Ritual (historical)",
+    "wiki": "Druidic Ritual (historical)",
+    "image": "Druidic_Ritual.jpg",
+    "members": true,
+    "summary": "Start of Druidic Ritual (historical)."
+  },
+  "Hawthorn (holiday event)": {
+    "name": "Hawthorn (holiday event)",
+    "wiki": "Hawthorn (holiday event)",
+    "image": "Hawthorn_(2011_Easter_event).jpg",
+    "members": true,
+    "summary": "Start of Hawthorn (holiday event)."
   },
   "Wendlewick": {
     "name": "Wendlewick",
@@ -12153,6 +15280,13 @@ export const IMPORTED_LOCATIONS: Record<string, LocationRecord> = {
     "members": true,
     "summary": "Start of Once Upon a Time in Gielinor: Fortunes."
   },
+  "Recipe for Disaster: Freeing Skrach Uglogwee": {
+    "name": "Recipe for Disaster: Freeing Skrach Uglogwee",
+    "wiki": "Recipe for Disaster: Freeing Skrach Uglogwee",
+    "image": "Quest.png",
+    "members": true,
+    "summary": "Start of Recipe for Disaster: Freeing Skrach Uglogwee."
+  },
   "That Old Black Magic: Flesh and Bone": {
     "name": "That Old Black Magic: Flesh and Bone",
     "wiki": "That Old Black Magic: Flesh and Bone",
@@ -12180,6 +15314,342 @@ export const IMPORTED_LOCATIONS: Record<string, LocationRecord> = {
     "image": "That_Old_Black_Magic-_Skelly_By_Everlight.png",
     "members": true,
     "summary": "Start of That Old Black Magic: Skelly By Everlight."
+  },
+  "Wolf Whistle (historical)": {
+    "name": "Wolf Whistle (historical)",
+    "wiki": "Wolf Whistle (historical)",
+    "image": "Wolf_Whistle.jpg",
+    "members": true,
+    "summary": "Start of Wolf Whistle (historical)."
+  },
+  "A Guild of Our Own (miniquest)": {
+    "name": "A Guild of Our Own (miniquest)",
+    "wiki": "A Guild of Our Own (miniquest)",
+    "image": "A_Guild_of_Our_Own_(miniquest).png",
+    "members": true,
+    "summary": "Start of A Guild of Our Own (miniquest)."
+  },
+  "Bar Crawl (miniquest)": {
+    "name": "Bar Crawl (miniquest)",
+    "wiki": "Bar Crawl (miniquest)",
+    "image": "Bar_Crawl_(miniquest).png",
+    "members": true,
+    "summary": "Start of Bar Crawl (miniquest)."
+  },
+  "Boric's Task I (miniquest)": {
+    "name": "Boric's Task I (miniquest)",
+    "wiki": "Boric's Task I (miniquest)",
+    "image": "Doric_and_Boric_tasks.png",
+    "members": true,
+    "summary": "Start of Boric's Task I (miniquest)."
+  },
+  "Boric's Task II (miniquest)": {
+    "name": "Boric's Task II (miniquest)",
+    "wiki": "Boric's Task II (miniquest)",
+    "image": "Doric_and_Boric_tasks.png",
+    "members": true,
+    "summary": "Start of Boric's Task II (miniquest)."
+  },
+  "Boric's Task III (miniquest)": {
+    "name": "Boric's Task III (miniquest)",
+    "wiki": "Boric's Task III (miniquest)",
+    "image": "Doric_and_Boric_tasks.png",
+    "members": true,
+    "summary": "Start of Boric's Task III (miniquest)."
+  },
+  "Civil War I (miniquest)": {
+    "name": "Civil War I (miniquest)",
+    "wiki": "Civil War I (miniquest)",
+    "image": "Civil_War_I_(miniquest).png",
+    "members": true,
+    "summary": "Start of Civil War I (miniquest)."
+  },
+  "Civil War II (miniquest)": {
+    "name": "Civil War II (miniquest)",
+    "wiki": "Civil War II (miniquest)",
+    "image": "Civil_War_II_(miniquest).png",
+    "members": true,
+    "summary": "Start of Civil War II (miniquest)."
+  },
+  "Civil War III (miniquest)": {
+    "name": "Civil War III (miniquest)",
+    "wiki": "Civil War III (miniquest)",
+    "image": "Quest.png",
+    "members": true,
+    "summary": "Start of Civil War III (miniquest)."
+  },
+  "Curse of the Empty Lord (miniquest)": {
+    "name": "Curse of the Empty Lord (miniquest)",
+    "wiki": "Curse of the Empty Lord (miniquest)",
+    "image": "Curse_of_the_Empty_Lord_(miniquest).png",
+    "members": true,
+    "summary": "Start of Curse of the Empty Lord (miniquest)."
+  },
+  "Damage Control (miniquest)": {
+    "name": "Damage Control (miniquest)",
+    "wiki": "Damage Control (miniquest)",
+    "image": "Malignant_entity_on_Goshima.png",
+    "members": true,
+    "summary": "Start of Damage Control (miniquest)."
+  },
+  "Desert Slayer Dungeon (miniquest)": {
+    "name": "Desert Slayer Dungeon (miniquest)",
+    "wiki": "Desert Slayer Dungeon (miniquest)",
+    "image": "Desert_Slayer_Dungeon_miniquest.png",
+    "members": true,
+    "summary": "Start of Desert Slayer Dungeon (miniquest)."
+  },
+  "Doric's Task V (miniquest)": {
+    "name": "Doric's Task V (miniquest)",
+    "wiki": "Doric's Task V (miniquest)",
+    "image": "Doric_and_Boric_tasks.png",
+    "members": true,
+    "summary": "Start of Doric's Task V (miniquest)."
+  },
+  "Doric's Task VI (miniquest)": {
+    "name": "Doric's Task VI (miniquest)",
+    "wiki": "Doric's Task VI (miniquest)",
+    "image": "Doric_and_Boric_tasks.png",
+    "members": true,
+    "summary": "Start of Doric's Task VI (miniquest)."
+  },
+  "Doric's Task VII (miniquest)": {
+    "name": "Doric's Task VII (miniquest)",
+    "wiki": "Doric's Task VII (miniquest)",
+    "image": "Doric_and_Boric_tasks.png",
+    "members": true,
+    "summary": "Start of Doric's Task VII (miniquest)."
+  },
+  "Doric's Task VIII (miniquest)": {
+    "name": "Doric's Task VIII (miniquest)",
+    "wiki": "Doric's Task VIII (miniquest)",
+    "image": "Doric_and_Boric_tasks.png",
+    "members": true,
+    "summary": "Start of Doric's Task VIII (miniquest)."
+  },
+  "Enter the Abyss (miniquest)": {
+    "name": "Enter the Abyss (miniquest)",
+    "wiki": "Enter the Abyss (miniquest)",
+    "image": "Enter_the_Abyss_(miniquest).png",
+    "members": true,
+    "summary": "Start of Enter the Abyss (miniquest)."
+  },
+  "Eye for an Eye (miniquest)": {
+    "name": "Eye for an Eye (miniquest)",
+    "wiki": "Eye for an Eye (miniquest)",
+    "image": "Jed_steals_energy_from_Ekahi.png",
+    "members": true,
+    "summary": "Start of Eye for an Eye (miniquest)."
+  },
+  "Father and Son (miniquest)": {
+    "name": "Father and Son (miniquest)",
+    "wiki": "Father and Son (miniquest)",
+    "image": "Father_and_Son_(miniquest).png",
+    "members": true,
+    "summary": "Start of Father and Son (miniquest)."
+  },
+  "Final Destination (miniquest)": {
+    "name": "Final Destination (miniquest)",
+    "wiki": "Final Destination (miniquest)",
+    "image": "Final_Destination_(miniquest).png",
+    "members": true,
+    "summary": "Start of Final Destination (miniquest)."
+  },
+  "Flag Fall (miniquest)": {
+    "name": "Flag Fall (miniquest)",
+    "wiki": "Flag Fall (miniquest)",
+    "image": "Flag_Fall_(miniquest).png",
+    "members": true,
+    "summary": "Start of Flag Fall (miniquest)."
+  },
+  "From Tiny Acorns (miniquest)": {
+    "name": "From Tiny Acorns (miniquest)",
+    "wiki": "From Tiny Acorns (miniquest)",
+    "image": "From_Tiny_Acorns.png",
+    "members": true,
+    "summary": "Start of From Tiny Acorns (miniquest)."
+  },
+  "Ghosts from the Past (miniquest)": {
+    "name": "Ghosts from the Past (miniquest)",
+    "wiki": "Ghosts from the Past (miniquest)",
+    "image": "Ghosts_from_the_Past_(miniquest).png",
+    "members": true,
+    "summary": "Start of Ghosts from the Past (miniquest)."
+  },
+  "Harbinger (miniquest)": {
+    "name": "Harbinger (miniquest)",
+    "wiki": "Harbinger (miniquest)",
+    "image": "The_Harbinger.png",
+    "members": true,
+    "summary": "Start of Harbinger (miniquest)."
+  },
+  "Head of the Family (miniquest)": {
+    "name": "Head of the Family (miniquest)",
+    "wiki": "Head of the Family (miniquest)",
+    "image": "Head_of_the_Family_(miniquest).png",
+    "members": true,
+    "summary": "Start of Head of the Family (miniquest)."
+  },
+  "Helping Laniakea (miniquest)": {
+    "name": "Helping Laniakea (miniquest)",
+    "wiki": "Helping Laniakea (miniquest)",
+    "image": "Helping_Laniakea_(miniquest).png",
+    "members": true,
+    "summary": "Start of Helping Laniakea (miniquest)."
+  },
+  "Hopespear's Will (miniquest)": {
+    "name": "Hopespear's Will (miniquest)",
+    "wiki": "Hopespear's Will (miniquest)",
+    "image": "Hopespear's_Will.png",
+    "members": true,
+    "summary": "Start of Hopespear's Will (miniquest)."
+  },
+  "In Memory of the Myreque (miniquest)": {
+    "name": "In Memory of the Myreque (miniquest)",
+    "wiki": "In Memory of the Myreque (miniquest)",
+    "image": "Memorial_to_the_Myreque_(empty).png",
+    "members": true,
+    "summary": "Start of In Memory of the Myreque (miniquest)."
+  },
+  "Jed Hunter (miniquest)": {
+    "name": "Jed Hunter (miniquest)",
+    "wiki": "Jed Hunter (miniquest)",
+    "image": "Jed_Hunter_(miniquest).png",
+    "members": true,
+    "summary": "Start of Jed Hunter (miniquest)."
+  },
+  "Koschei's Troubles (miniquest)": {
+    "name": "Koschei's Troubles (miniquest)",
+    "wiki": "Koschei's Troubles (miniquest)",
+    "image": "Kharshai_declines.png",
+    "members": true,
+    "summary": "Start of Koschei's Troubles (miniquest)."
+  },
+  "Lair of Tarn Razorlor (miniquest)": {
+    "name": "Lair of Tarn Razorlor (miniquest)",
+    "wiki": "Lair of Tarn Razorlor (miniquest)",
+    "image": "Lair_of_Tarn_Razorlor_(miniquest).png",
+    "members": true,
+    "summary": "Start of Lair of Tarn Razorlor (miniquest)."
+  },
+  "Lost Her Marbles (miniquest)": {
+    "name": "Lost Her Marbles (miniquest)",
+    "wiki": "Lost Her Marbles (miniquest)",
+    "image": "Lost_Her_Marbles_(miniquest).png",
+    "members": true,
+    "summary": "Start of Lost Her Marbles (miniquest)."
+  },
+  "Mahjarrat Memories (miniquest)": {
+    "name": "Mahjarrat Memories (miniquest)",
+    "wiki": "Mahjarrat Memories (miniquest)",
+    "image": "Mahjarrat_Memories_(miniquest).png",
+    "members": true,
+    "summary": "Start of Mahjarrat Memories (miniquest)."
+  },
+  "Nadir (saga)": {
+    "name": "Nadir (saga)",
+    "wiki": "Nadir (saga)",
+    "image": "Nadir_(saga).png",
+    "members": true,
+    "summary": "Start of Nadir (saga)."
+  },
+  "One Foot in the Grave (miniquest)": {
+    "name": "One Foot in the Grave (miniquest)",
+    "wiki": "One Foot in the Grave (miniquest)",
+    "image": "One_Foot_in_the_Grave_(miniquest).png",
+    "members": true,
+    "summary": "Start of One Foot in the Grave (miniquest)."
+  },
+  "Rebuilding Edgeville (miniquest)": {
+    "name": "Rebuilding Edgeville (miniquest)",
+    "wiki": "Rebuilding Edgeville (miniquest)",
+    "image": "Rebuilding_Edgeville_(miniquest).png",
+    "members": true,
+    "summary": "Start of Rebuilding Edgeville (miniquest)."
+  },
+  "Spiritual Enlightenment (miniquest)": {
+    "name": "Spiritual Enlightenment (miniquest)",
+    "wiki": "Spiritual Enlightenment (miniquest)",
+    "image": "Spiritual_Enlightenment_(miniquest).png",
+    "members": true,
+    "summary": "Start of Spiritual Enlightenment (miniquest)."
+  },
+  "Tales of Nomad (miniquest)": {
+    "name": "Tales of Nomad (miniquest)",
+    "wiki": "Tales of Nomad (miniquest)",
+    "image": "Tales_of_Nomad_(miniquest).png",
+    "members": true,
+    "summary": "Start of Tales of Nomad (miniquest)."
+  },
+  "Tales of the God Wars (miniquest)": {
+    "name": "Tales of the God Wars (miniquest)",
+    "wiki": "Tales of the God Wars (miniquest)",
+    "image": "Tales_of_the_God_Wars_(miniquest)_overview.png",
+    "members": true,
+    "summary": "Start of Tales of the God Wars (miniquest)."
+  },
+  "The General's Shadow (miniquest)": {
+    "name": "The General's Shadow (miniquest)",
+    "wiki": "The General's Shadow (miniquest)",
+    "image": "The_General's_Shadow_(miniquest).png",
+    "members": true,
+    "summary": "Start of The General's Shadow (miniquest)."
+  },
+  "The Hunt for Surok (miniquest)": {
+    "name": "The Hunt for Surok (miniquest)",
+    "wiki": "The Hunt for Surok (miniquest)",
+    "image": "Surok_start_point.png",
+    "members": true,
+    "summary": "Start of The Hunt for Surok (miniquest)."
+  },
+  "The Lost Toys (miniquest)": {
+    "name": "The Lost Toys (miniquest)",
+    "wiki": "The Lost Toys (miniquest)",
+    "image": "The_Lost_Toys.png",
+    "members": true,
+    "summary": "Start of The Lost Toys (miniquest)."
+  },
+  "Thok It To 'Em (saga)": {
+    "name": "Thok It To 'Em (saga)",
+    "wiki": "Thok It To 'Em (saga)",
+    "image": "Thok_It_To_'Em_(saga).png",
+    "members": true,
+    "summary": "Start of Thok It To 'Em (saga)."
+  },
+  "Thok Your Block Off (saga)": {
+    "name": "Thok Your Block Off (saga)",
+    "wiki": "Thok Your Block Off (saga)",
+    "image": "Thok_Your_Block_Off_(saga).png",
+    "members": true,
+    "summary": "Start of Thok Your Block Off (saga)."
+  },
+  "Tortle Combat (miniquest)": {
+    "name": "Tortle Combat (miniquest)",
+    "wiki": "Tortle Combat (miniquest)",
+    "image": "Tortle_Combat_(miniquest).png",
+    "members": true,
+    "summary": "Start of Tortle Combat (miniquest)."
+  },
+  "Tuai Leit's Own (miniquest)": {
+    "name": "Tuai Leit's Own (miniquest)",
+    "wiki": "Tuai Leit's Own (miniquest)",
+    "image": "Tuai_Leit's_Own_(miniquest).png",
+    "members": true,
+    "summary": "Start of Tuai Leit's Own (miniquest)."
+  },
+  "Vengeance (saga)": {
+    "name": "Vengeance (saga)",
+    "wiki": "Vengeance (saga)",
+    "image": "Vengeance_(saga).png",
+    "members": true,
+    "summary": "Start of Vengeance (saga)."
+  },
+  "Wandering Ga'al (miniquest)": {
+    "name": "Wandering Ga'al (miniquest)",
+    "wiki": "Wandering Ga'al (miniquest)",
+    "image": "Meeting_TzHaar-Ga'al-Kot.png",
+    "members": true,
+    "summary": "Start of Wandering Ga'al (miniquest)."
   }
 };
 
@@ -12293,6 +15763,24 @@ export const IMPORTED_COMBAT: Record<string, CombatPlan> = {
         "name": "Goblin guard",
         "wiki": "Goblin guard (Observatory)",
         "level": 28
+      }
+    ],
+    "hazards": [],
+    "notes": []
+  },
+  "merlins-crystal": {
+    "required": [
+      {
+        "name": "Sir Mordred",
+        "wiki": "Sir Mordred",
+        "image": "Sir_Mordred.png",
+        "level": 23
+      },
+      {
+        "name": "Thrantax the Mighty",
+        "wiki": "Thrantax the Mighty",
+        "image": "Thrantax_the_Mighty.png",
+        "level": 70
       }
     ],
     "hazards": [],
@@ -12498,8 +15986,25 @@ export const IMPORTED_COMBAT: Record<string, CombatPlan> = {
     "hazards": [],
     "notes": []
   },
+  "recipe-for-disaster-freeing-the-goblin-generals": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
   "fishing-contest": {
     "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "recipe-for-disaster-freeing-the-mountain-dwarf": {
+    "required": [
+      {
+        "name": "Icefiend",
+        "wiki": "Icefiend",
+        "image": "Icefiend.png",
+        "level": 35
+      }
+    ],
     "hazards": [],
     "notes": []
   },
@@ -12943,6 +16448,11 @@ export const IMPORTED_COMBAT: Record<string, CombatPlan> = {
     "hazards": [],
     "notes": []
   },
+  "recipe-for-disaster-freeing-evil-dave": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
   "dimension-of-disaster-demon-slayer": {
     "required": [
       {
@@ -13112,6 +16622,24 @@ export const IMPORTED_COMBAT: Record<string, CombatPlan> = {
     "hazards": [],
     "notes": []
   },
+  "recipe-for-disaster-freeing-pirate-pete": {
+    "required": [
+      {
+        "name": "Mudskipper",
+        "wiki": "Mudskipper",
+        "image": "Mudskipper.png",
+        "level": 33
+      },
+      {
+        "name": "Crab",
+        "wiki": "Crab",
+        "image": "Crab.png",
+        "level": 29
+      }
+    ],
+    "hazards": [],
+    "notes": []
+  },
   "eadgars-ruse": {
     "required": [],
     "hazards": [],
@@ -13202,6 +16730,17 @@ export const IMPORTED_COMBAT: Record<string, CombatPlan> = {
   },
   "forgettable-tale-of-a-drunken-dwarf": {
     "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "cold-war": {
+    "required": [
+      {
+        "name": "icelord",
+        "wiki": "icelord",
+        "level": 42
+      }
+    ],
     "hazards": [],
     "notes": []
   },
@@ -13446,6 +16985,11 @@ export const IMPORTED_COMBAT: Record<string, CombatPlan> = {
     "hazards": [],
     "notes": []
   },
+  "recipe-for-disaster-freeing-the-lumbridge-sage": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
   "the-fremennik-trials": {
     "required": [
       {
@@ -13643,6 +17187,30 @@ export const IMPORTED_COMBAT: Record<string, CombatPlan> = {
   },
   "tears-of-guthix-quest": {
     "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "legacy-of-seergaze": {
+    "required": [
+      {
+        "name": "Fistandantilus",
+        "wiki": "Fistandantilus",
+        "image": "Fistandantilus.png",
+        "level": 77
+      },
+      {
+        "name": "Zaromark Sliver",
+        "wiki": "Zaromark Sliver",
+        "image": "Zaromark_Sliver.png",
+        "level": 77
+      },
+      {
+        "name": "Vyrewatch",
+        "wiki": "Vyrewatch (Legacy of Seergaze)",
+        "image": "Vyrewatch.png",
+        "level": 72
+      }
+    ],
     "hazards": [],
     "notes": []
   },
@@ -13916,6 +17484,18 @@ export const IMPORTED_COMBAT: Record<string, CombatPlan> = {
     "hazards": [],
     "notes": []
   },
+  "regicide": {
+    "required": [
+      {
+        "name": "Tyras guard",
+        "wiki": "Tyras guard",
+        "image": "Tyras_guard.png",
+        "level": 58
+      }
+    ],
+    "hazards": [],
+    "notes": []
+  },
   "roving-elves": {
     "required": [
       {
@@ -13944,6 +17524,54 @@ export const IMPORTED_COMBAT: Record<string, CombatPlan> = {
         "name": "Ice Troll King",
         "wiki": "Ice Troll King",
         "level": 91
+      }
+    ],
+    "hazards": [],
+    "notes": []
+  },
+  "legends-quest": {
+    "required": [
+      {
+        "name": "Nezikchened",
+        "wiki": "Nezikchened",
+        "image": "Nezikchened.png",
+        "level": 84
+      },
+      {
+        "name": "Ranalph Devere",
+        "wiki": "Ranalph Devere",
+        "image": "Ranalph_Devere.png",
+        "level": 63
+      },
+      {
+        "name": "Irvig Senay",
+        "wiki": "Irvig Senay",
+        "image": "Irvig_Senay.png",
+        "level": 70
+      },
+      {
+        "name": "San Tojalon",
+        "wiki": "San Tojalon",
+        "image": "San_Tojalon.png",
+        "level": 70
+      }
+    ],
+    "hazards": [],
+    "notes": []
+  },
+  "recipe-for-disaster-freeing-sir-amik-varze": {
+    "required": [
+      {
+        "name": "Evil Chicken",
+        "wiki": "Evil Chicken (Recipe for Disaster)",
+        "image": "Evil_Chicken.png",
+        "level": "?"
+      },
+      {
+        "name": "Black dragon",
+        "wiki": "Black dragon",
+        "image": "Black_dragon.png",
+        "level": 100
       }
     ],
     "hazards": [],
@@ -13980,6 +17608,24 @@ export const IMPORTED_COMBAT: Record<string, CombatPlan> = {
         "wiki": "Fairy Godfather",
         "image": "Fairy_Godfather.png",
         "level": 84
+      }
+    ],
+    "hazards": [],
+    "notes": []
+  },
+  "glorious-memories": {
+    "required": [
+      {
+        "name": "Nial Swiftfling",
+        "wiki": "Nial Swiftfling",
+        "image": "Nial_Swiftfling.png",
+        "level": 81
+      },
+      {
+        "name": "Yeti",
+        "wiki": "Yeti",
+        "image": "Yeti.png",
+        "level": 63
       }
     ],
     "hazards": [],
@@ -14207,6 +17853,42 @@ export const IMPORTED_COMBAT: Record<string, CombatPlan> = {
     "hazards": [],
     "notes": []
   },
+  "dream-mentor": {
+    "required": [
+      {
+        "name": "The Inadequacy",
+        "wiki": "The Inadequacy",
+        "image": "The_Inadequacy.png",
+        "level": 98
+      },
+      {
+        "name": "The Everlasting",
+        "wiki": "The Everlasting",
+        "image": "The_Everlasting.png",
+        "level": 93
+      },
+      {
+        "name": "The Untouchable",
+        "wiki": "The Untouchable",
+        "image": "The_Untouchable.png",
+        "level": 98
+      },
+      {
+        "name": "The Illusive",
+        "wiki": "The Illusive",
+        "image": "The_Illusive.png",
+        "level": 88
+      },
+      {
+        "name": "A Doubt",
+        "wiki": "A Doubt",
+        "image": "A_Doubt.png",
+        "level": 77
+      }
+    ],
+    "hazards": [],
+    "notes": []
+  },
   "swan-song": {
     "required": [
       {
@@ -14316,6 +17998,59 @@ export const IMPORTED_COMBAT: Record<string, CombatPlan> = {
         "name": "Customs Officer",
         "wiki": "Customs Officer (Rocking Out)",
         "level": 37
+      }
+    ],
+    "hazards": [],
+    "notes": []
+  },
+  "recipe-for-disaster-freeing-king-awowogei": {
+    "required": [
+      {
+        "name": "Big Snake",
+        "wiki": "Big Snake",
+        "image": "Big_Snake.png",
+        "level": 64
+      }
+    ],
+    "hazards": [],
+    "notes": []
+  },
+  "recipe-for-disaster-defeating-the-culinaromancer": {
+    "required": [
+      {
+        "name": "Agrith-Na-Na",
+        "wiki": "Agrith-Na-Na",
+        "image": "Agrith-Na-Na.png",
+        "level": 89
+      },
+      {
+        "name": "Flambeed",
+        "wiki": "Flambeed",
+        "image": "Flambeed.png",
+        "level": 89
+      },
+      {
+        "name": "Karamel",
+        "wiki": "Karamel",
+        "image": "Karamel.png",
+        "level": 89
+      },
+      {
+        "name": "Dessourt",
+        "wiki": "Dessourt",
+        "image": "Dessourt.png",
+        "level": 92
+      },
+      {
+        "name": "Gelatinnoth Mother",
+        "wiki": "Gelatinnoth Mother",
+        "level": 91
+      },
+      {
+        "name": "Culinaromancer",
+        "wiki": "Culinaromancer",
+        "image": "Culinaromancer.png",
+        "level": 98
       }
     ],
     "hazards": [],
@@ -14764,6 +18499,29 @@ export const IMPORTED_COMBAT: Record<string, CombatPlan> = {
         "wiki": "Char",
         "image": "Char.png",
         "level": 160
+      }
+    ],
+    "hazards": [],
+    "notes": []
+  },
+  "a-clockwork-syringe": {
+    "required": [
+      {
+        "name": "Grimtern",
+        "wiki": "Grimtern",
+        "image": "Grimtern.png",
+        "level": 70
+      },
+      {
+        "name": "Barrelchest Mk II",
+        "wiki": "Barrelchest Mk II",
+        "image": "Barrelchest_Mk_II.png",
+        "level": 98
+      },
+      {
+        "name": "General malpractitioner",
+        "wiki": "General malpractitioner",
+        "level": "?"
       }
     ],
     "hazards": [],
@@ -15556,6 +19314,11 @@ export const IMPORTED_COMBAT: Record<string, CombatPlan> = {
     "hazards": [],
     "notes": []
   },
+  "death-plateau-historical": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
   "dimension-of-disaster": {
     "required": [
       {
@@ -15594,6 +19357,16 @@ export const IMPORTED_COMBAT: Record<string, CombatPlan> = {
         "level": 98
       }
     ],
+    "hazards": [],
+    "notes": []
+  },
+  "druidic-ritual-historical": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "hawthorn-holiday-event": {
+    "required": [],
     "hazards": [],
     "notes": []
   },
@@ -15655,6 +19428,66 @@ export const IMPORTED_COMBAT: Record<string, CombatPlan> = {
   },
   "pharaohs-folly": {
     "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "recipe-for-disaster": {
+    "required": [
+      {
+        "name": "Icefiend",
+        "wiki": "Icefiend",
+        "image": "Icefiend.png",
+        "level": 35
+      },
+      {
+        "name": "Mudskipper",
+        "wiki": "Mudskipper",
+        "image": "Mudskipper.png",
+        "level": 33
+      },
+      {
+        "name": "Crab",
+        "wiki": "Crab",
+        "image": "Crab.png",
+        "level": 29
+      },
+      {
+        "name": "Jubbly bird",
+        "wiki": "Jubbly bird",
+        "image": "Jubbly_bird.png",
+        "level": 16
+      },
+      {
+        "name": "Evil Chicken",
+        "wiki": "Evil Chicken",
+        "image": "Evil_Chicken.png",
+        "level": "?"
+      },
+      {
+        "name": "Black dragon",
+        "wiki": "Black dragon",
+        "image": "Black_dragon.png",
+        "level": 100
+      },
+      {
+        "name": "Big Snake",
+        "wiki": "Big Snake",
+        "image": "Big_Snake.png",
+        "level": 64
+      }
+    ],
+    "hazards": [],
+    "notes": []
+  },
+  "recipe-for-disaster-freeing-skrach-uglogwee": {
+    "required": [
+      {
+        "name": "Jubbly bird",
+        "wiki": "Jubbly bird",
+        "image": "Jubbly_bird.png",
+        "level": 11
+      }
+    ],
     "hazards": [],
     "notes": []
   },
@@ -15747,6 +19580,700 @@ export const IMPORTED_COMBAT: Record<string, CombatPlan> = {
     "notes": []
   },
   "wiz-kid": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "wolf-whistle-historical": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "a-guild-of-our-own-miniquest": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "bar-crawl-miniquest": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "borics-task-i-miniquest": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "borics-task-ii-miniquest": {
+    "required": [
+      {
+        "name": "living rock brawler",
+        "wiki": "living rock brawler",
+        "level": 1
+      }
+    ],
+    "hazards": [],
+    "notes": []
+  },
+  "borics-task-iii-miniquest": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "civil-war-i-miniquest": {
+    "required": [
+      {
+        "name": "demon",
+        "wiki": "demon",
+        "level": "?"
+      }
+    ],
+    "hazards": [],
+    "notes": []
+  },
+  "civil-war-ii-miniquest": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "civil-war-iii-miniquest": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "curse-of-the-empty-lord-miniquest": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "damage-control-miniquest": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "desert-slayer-dungeon-miniquest": {
+    "required": [
+      {
+        "name": "Monstrous cave crawler",
+        "wiki": "Monstrous cave crawler",
+        "image": "Monstrous_cave_crawler.png",
+        "level": 76
+      },
+      {
+        "name": "Basilisk boss",
+        "wiki": "Basilisk boss",
+        "image": "Basilisk_boss.png",
+        "level": 79
+      },
+      {
+        "name": "Mightiest turoth",
+        "wiki": "Mightiest turoth",
+        "image": "Mightiest_turoth.png",
+        "level": 83
+      },
+      {
+        "name": "Kurask overlord",
+        "wiki": "Kurask overlord",
+        "image": "Kurask_overlord.png",
+        "level": 90
+      }
+    ],
+    "hazards": [],
+    "notes": []
+  },
+  "dorics-task-v-miniquest": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "dorics-task-vi-miniquest": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "dorics-task-vii-miniquest": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "dorics-task-viii-miniquest": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "enter-the-abyss-miniquest": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "eye-for-an-eye-miniquest": {
+    "required": [
+      {
+        "name": "Zyclops",
+        "wiki": "Zyclops",
+        "image": "Zyclops.png",
+        "level": 93
+      },
+      {
+        "name": "Undead Jed",
+        "wiki": "Undead Jed",
+        "image": "Undead_Jed.png",
+        "level": "?"
+      }
+    ],
+    "hazards": [],
+    "notes": []
+  },
+  "father-and-son-miniquest": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "final-destination-miniquest": {
+    "required": [
+      {
+        "name": "zyclops cannoneer",
+        "wiki": "zyclops cannoneer",
+        "level": 93
+      },
+      {
+        "name": "Zombie",
+        "wiki": "Zombie (Uncharted Isles)",
+        "image": "Zombie.png",
+        "level": 93
+      },
+      {
+        "name": "Skeleton",
+        "wiki": "Skeleton (Uncharted Isles)",
+        "image": "Skeleton.png",
+        "level": 93
+      },
+      {
+        "name": "Zyclops",
+        "wiki": "Zyclops",
+        "image": "Zyclops.png",
+        "level": 93
+      },
+      {
+        "name": "Captain Cora",
+        "wiki": "Captain Cora",
+        "image": "Captain_Cora.png",
+        "level": "?"
+      }
+    ],
+    "hazards": [],
+    "notes": []
+  },
+  "flag-fall-miniquest": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "from-tiny-acorns-miniquest": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "ghosts-from-the-past-miniquest": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "harbinger-miniquest": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "head-of-the-family-miniquest": {
+    "required": [
+      {
+        "name": "Cap'n Ekahi",
+        "wiki": "Cap'n Ekahi",
+        "image": "Cap'n_Ekahi.png",
+        "level": "?"
+      },
+      {
+        "name": "Cyclops labourer",
+        "wiki": "Cyclops labourer",
+        "level": "?"
+      }
+    ],
+    "hazards": [],
+    "notes": []
+  },
+  "helping-laniakea-miniquest": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "hopespears-will-miniquest": {
+    "required": [
+      {
+        "name": "Snothead",
+        "wiki": "Snothead",
+        "image": "Snothead.png",
+        "level": 19
+      },
+      {
+        "name": "Snailfeet",
+        "wiki": "Snailfeet",
+        "image": "Snailfeet.png",
+        "level": 25
+      },
+      {
+        "name": "Mosschin",
+        "wiki": "Mosschin",
+        "image": "Mosschin.png",
+        "level": 30
+      },
+      {
+        "name": "Redeyes",
+        "wiki": "Redeyes",
+        "image": "Redeyes.png",
+        "level": 36
+      },
+      {
+        "name": "Strongbones",
+        "wiki": "Strongbones",
+        "image": "Strongbones.png",
+        "level": 36
+      }
+    ],
+    "hazards": [],
+    "notes": []
+  },
+  "in-memory-of-the-myreque-miniquest": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "jed-hunter-miniquest": {
+    "required": [
+      {
+        "name": "Gu ronin",
+        "wiki": "Gu ronin",
+        "image": "Gu_ronin.png",
+        "level": 119
+      }
+    ],
+    "hazards": [],
+    "notes": []
+  },
+  "koscheis-troubles-miniquest": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "lair-of-tarn-razorlor-miniquest": {
+    "required": [
+      {
+        "name": "Tarn Razorlor",
+        "wiki": "Tarn Razorlor",
+        "level": 79
+      }
+    ],
+    "hazards": [],
+    "notes": []
+  },
+  "lost-her-marbles-miniquest": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "mahjarrat-memories-miniquest": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "nadir-saga": {
+    "required": [
+      {
+        "name": "Soldier",
+        "wiki": "Soldier (Nadir)",
+        "level": 21
+      },
+      {
+        "name": "Ranger",
+        "wiki": "Ranger (Nadir)",
+        "level": 21
+      },
+      {
+        "name": "Mage",
+        "wiki": "Mage (Nadir)",
+        "image": "Mage.png",
+        "level": 21
+      },
+      {
+        "name": "Necrolord",
+        "wiki": "Necrolord (Yudura)",
+        "image": "Necrolord.png",
+        "level": 62
+      },
+      {
+        "name": "Necromancer",
+        "wiki": "Necromancer (Nadir)",
+        "image": "Necromancer.png",
+        "level": 105
+      },
+      {
+        "name": "Hooved mage",
+        "wiki": "Hooved mage",
+        "image": "Hooved_mage.png",
+        "level": 103
+      },
+      {
+        "name": "Hellhound",
+        "wiki": "Hellhound (Nadir)",
+        "image": "Hellhound.png",
+        "level": 21
+      }
+    ],
+    "hazards": [],
+    "notes": []
+  },
+  "one-foot-in-the-grave-miniquest": {
+    "required": [
+      {
+        "name": "jade vine maze",
+        "wiki": "jade vine maze",
+        "level": 42
+      }
+    ],
+    "hazards": [],
+    "notes": []
+  },
+  "rebuilding-edgeville-miniquest": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "spiritual-enlightenment-miniquest": {
+    "required": [
+      {
+        "name": "Sotapanna",
+        "wiki": "Sotapanna",
+        "image": "Sotapanna.png",
+        "level": "111,118"
+      }
+    ],
+    "hazards": [],
+    "notes": []
+  },
+  "tales-of-nomad-miniquest": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "tales-of-the-god-wars-miniquest": {
+    "required": [
+      {
+        "name": "Barrows Brothers",
+        "wiki": "Barrows Brothers",
+        "level": 150
+      },
+      {
+        "name": "God Wars Dungeon",
+        "wiki": "God Wars Dungeon",
+        "image": "God_Wars_Dungeon.png",
+        "level": "?"
+      },
+      {
+        "name": "K'ril Tsutsaroth",
+        "wiki": "K'ril Tsutsaroth",
+        "image": "K'ril_Tsutsaroth.png",
+        "level": 650
+      },
+      {
+        "name": "Young grotworm",
+        "wiki": "Young grotworm",
+        "image": "Young_grotworm.png",
+        "level": 28
+      },
+      {
+        "name": "Grotworm",
+        "wiki": "Grotworm",
+        "image": "Grotworm.png",
+        "level": 63
+      },
+      {
+        "name": "Mature grotworm",
+        "wiki": "Mature grotworm",
+        "level": 98
+      }
+    ],
+    "hazards": [],
+    "notes": []
+  },
+  "the-generals-shadow-miniquest": {
+    "required": [
+      {
+        "name": "Bouncer",
+        "wiki": "Bouncer",
+        "image": "Bouncer.png",
+        "level": 91
+      }
+    ],
+    "hazards": [],
+    "notes": []
+  },
+  "the-hunt-for-surok-miniquest": {
+    "required": [
+      {
+        "name": "Bork",
+        "wiki": "Bork",
+        "image": "Bork.png",
+        "level": 107
+      }
+    ],
+    "hazards": [],
+    "notes": []
+  },
+  "the-lost-toys-miniquest": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "thok-it-to-em-saga": {
+    "required": [
+      {
+        "name": "Coward in armour",
+        "wiki": "Coward in armour",
+        "image": "Coward_in_armour.png",
+        "level": 82
+      },
+      {
+        "name": "Girly warrior",
+        "wiki": "Girly warrior",
+        "image": "Girly_warrior.png",
+        "level": 82
+      },
+      {
+        "name": "Weaker than Thok",
+        "wiki": "Weaker than Thok",
+        "image": "Weaker_than_Thok.png",
+        "level": 82
+      },
+      {
+        "name": "Namby-pamby",
+        "wiki": "Namby-pamby",
+        "image": "Namby-pamby.png",
+        "level": 82
+      },
+      {
+        "name": "Splinter-lobber",
+        "wiki": "Splinter-lobber",
+        "image": "Splinter-lobber.png",
+        "level": 82
+      },
+      {
+        "name": "Weakling",
+        "wiki": "Weakling",
+        "level": 82
+      },
+      {
+        "name": "Ramokee bloodrager",
+        "wiki": "Ramokee bloodrager (Thok It To 'Em)",
+        "image": "Ramokee_bloodrager.png",
+        "level": 103
+      },
+      {
+        "name": "Ramokee skinweaver",
+        "wiki": "Ramokee skinweaver (Thok It To 'Em)",
+        "image": "Ramokee_skinweaver.png",
+        "level": 103
+      },
+      {
+        "name": "Ramokee stormbringer",
+        "wiki": "Ramokee stormbringer (Thok It To 'Em)",
+        "image": "Ramokee_stormbringer.png",
+        "level": 103
+      },
+      {
+        "name": "Ramokee deathslinger",
+        "wiki": "Ramokee deathslinger (Thok It To 'Em)",
+        "image": "Ramokee_deathslinger.png",
+        "level": 103
+      },
+      {
+        "name": "squishy ghost",
+        "wiki": "squishy ghost",
+        "level": "?"
+      },
+      {
+        "name": "Stomp",
+        "wiki": "Stomp (Thok It To 'Em)",
+        "image": "Stomp.png",
+        "level": 77
+      },
+      {
+        "name": "Thing with eyes",
+        "wiki": "Thing with eyes",
+        "level": 69
+      },
+      {
+        "name": "Walking icecube",
+        "wiki": "Walking icecube",
+        "image": "Walking_icecube.png",
+        "level": 81
+      },
+      {
+        "name": "Warped gulega",
+        "wiki": "Warped gulega (Thok It To 'Em)",
+        "level": 99
+      },
+      {
+        "name": "ugly",
+        "wiki": "ugly",
+        "level": 104
+      },
+      {
+        "name": "Armoured cow thing",
+        "wiki": "Armoured cow thing",
+        "level": 62
+      },
+      {
+        "name": "Bulky warrior",
+        "wiki": "Bulky warrior",
+        "level": 114
+      },
+      {
+        "name": "Coward with bow",
+        "wiki": "Coward with bow",
+        "image": "Coward_with_bow.png",
+        "level": 105
+      },
+      {
+        "name": "Gobby demon",
+        "wiki": "Gobby demon",
+        "image": "Gobby_demon.png",
+        "level": 119
+      }
+    ],
+    "hazards": [],
+    "notes": []
+  },
+  "thok-your-block-off-saga": {
+    "required": [
+      {
+        "name": "Huge troll",
+        "wiki": "Huge troll",
+        "image": "Huge_troll.png",
+        "level": 42
+      },
+      {
+        "name": "Brute",
+        "wiki": "Brute (Thok Your Block Off)",
+        "level": 70
+      },
+      {
+        "name": "Skeleton",
+        "wiki": "Skeleton (Thok Your Block Off)",
+        "image": "Skeleton.png",
+        "level": 56
+      },
+      {
+        "name": "Crawly monster",
+        "wiki": "Crawly monster",
+        "level": 42
+      },
+      {
+        "name": "Forgotten mage",
+        "wiki": "Forgotten mage (Thok Your Block Off)",
+        "level": 42
+      },
+      {
+        "name": "Forgotten ranger",
+        "wiki": "Forgotten ranger (Thok Your Block Off)",
+        "level": 42
+      },
+      {
+        "name": "Forgotten warrior",
+        "wiki": "Forgotten warrior (Thok Your Block Off)",
+        "level": 42
+      },
+      {
+        "name": "Pitiful zombie",
+        "wiki": "Pitiful zombie",
+        "image": "Pitiful_zombie.png",
+        "level": 56
+      },
+      {
+        "name": "Hellhound",
+        "wiki": "Hellhound (Thok Your Block Off)",
+        "image": "Hellhound.png",
+        "level": 42
+      },
+      {
+        "name": "A face only his mum loves",
+        "wiki": "A face only his mum loves",
+        "level": 98
+      },
+      {
+        "name": "Ate all the pies",
+        "wiki": "Ate all the pies",
+        "level": 147
+      },
+      {
+        "name": "Bone Face",
+        "wiki": "Bone Face",
+        "image": "Bone_Face.png",
+        "level": "?"
+      },
+      {
+        "name": "Derek",
+        "wiki": "Derek",
+        "level": 98
+      }
+    ],
+    "hazards": [],
+    "notes": []
+  },
+  "tortle-combat-miniquest": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "tuai-leits-own-miniquest": {
+    "required": [],
+    "hazards": [],
+    "notes": []
+  },
+  "vengeance-saga": {
+    "required": [
+      {
+        "name": "Forgotten warrior",
+        "wiki": "Forgotten warrior",
+        "level": 105
+      },
+      {
+        "name": "Lotheria Seldorina",
+        "wiki": "Lotheria Seldorina",
+        "image": "Lotheria_Seldorina.png",
+        "level": 105
+      },
+      {
+        "name": "Ican Haz",
+        "wiki": "Ican Haz",
+        "image": "Ican_Haz.png",
+        "level": 105
+      },
+      {
+        "name": "Lola Wut",
+        "wiki": "Lola Wut",
+        "image": "Lola_Wut.png",
+        "level": 98
+      },
+      {
+        "name": "Kay Thanxby",
+        "wiki": "Kay Thanxby",
+        "image": "Kay_Thanxby.png",
+        "level": 112
+      }
+    ],
+    "hazards": [],
+    "notes": []
+  },
+  "wandering-gaal-miniquest": {
     "required": [],
     "hazards": [],
     "notes": []

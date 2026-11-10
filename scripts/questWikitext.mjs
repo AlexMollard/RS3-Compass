@@ -66,6 +66,13 @@ export const bullets = (text = "") =>
     .map((line) => plain(line.trim().slice(1)))
     .filter((line) => line && !/^(none|n\/a)\.?$/i.test(line));
 
+/** Every [[link]] target in order, without anchors or labels. */
+export function links(text = "") {
+  return [...text.matchAll(/\[\[([^\]|#]+)(?:#[^\]|]*)?(?:\|[^\]]*)?\]\]/g)]
+    .map((m) => m[1].trim())
+    .filter((t) => !/^(File|Image|Category):/i.test(t));
+}
+
 export function firstLink(text = "") {
   const match = text.match(/\[\[([^\]|#]+)(?:#[^\]|]*)?(?:\|[^\]]*)?\]\]/);
   return match?.[1].trim();
@@ -82,8 +89,16 @@ export function parseQuestreq(lua) {
 
 /** The first {{Map}}/{{Maplink}} pin: x=/y= params, a bare "x, y" or "x:N,y:N". */
 export function mapPin(text = "") {
-  const pin = text.match(/\{\{\s*Map(?:link)?\s*\|([^}]*)\}\}/i);
-  if (!pin) return undefined;
+  // Quest pages use {{Map}}/{{Maplink}}; NPC infoboxes use {{NPC map|x=..|y=..}}.
+  const pin = text.match(/\{\{\s*(?:NPC map|Map(?:link)?)\s*\|([^}]*)\}\}/i);
+  if (!pin) {
+    // Location pages outline an area: {{Area map|x,y|x,y|...}}; pin its centre.
+    const area = text.match(/\{\{\s*Area map\s*\|([^}]*)\}\}/i);
+    const points = [...(area?.[1] ?? "").matchAll(/(\d+)\s*,\s*(\d+)/g)].map((m) => [Number(m[1]), Number(m[2])]);
+    if (!points.length) return undefined;
+    const mean = (i) => Math.round(points.reduce((sum, p) => sum + p[i], 0) / points.length);
+    return { x: mean(0), y: mean(1), plane: 0 };
+  }
   const parts = pin[1].split("|").map((p) => p.trim());
   const named = Object.fromEntries(
     parts.map((p) => p.split("=").map((s) => s.trim())).filter((p) => p.length === 2),
