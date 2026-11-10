@@ -23,6 +23,9 @@
   import ActivityNotes from "../components/ActivityNotes.svelte";
   import QuestPlayerStatus from "../components/QuestPlayerStatus.svelte";
   import QuestRewards from "../components/QuestRewards.svelte";
+  import ChoiceStrip from "../components/ChoiceStrip.svelte";
+  import { BookOpen, ExternalLink, Globe } from "@lucide/svelte";
+  import { QUICK_GUIDES } from "../../questsImported";
   import { rewardHighlights } from "../questRewards";
   import { SKILLS } from "../../data";
   let { selectedId = "" }: { selectedId?: string } = $props();
@@ -35,6 +38,8 @@
   );
   let query = $state("");
   let hideCompleted = $state(false);
+  let access = $state<"all" | "free" | "members">("all");
+  let activity = $state<"all" | "quests" | "mini">("all");
   let quest = $derived(QUESTS.find((q) => q.id === selectedId) ?? QUESTS[1]);
   let locked = $derived(quest.members && profile.mode === "f2p");
   let complete = $derived(profile.completedQuests.includes(quest.id));
@@ -74,6 +79,9 @@
     QUESTS.filter(
       (q) =>
         (profile.mode === "members" || !q.members || q.id === quest.id) &&
+        (access === "all" || q.members === (access === "members")) &&
+        (activity === "all" ||
+          (activity === "mini") === (q.kind === "miniquest" || q.kind === "saga")) &&
         q.name.toLowerCase().includes(query.toLowerCase()) &&
         (!hideCompleted || !profile.completedQuests.includes(q.id)),
     ),
@@ -113,13 +121,38 @@
             value={query}
             onChange={(v) => (query = v)}
           />
+          <div class="quest-filters">
+            {#if profile.mode === "members"}<ChoiceStrip
+                variant="joined"
+                label="Access"
+                name="quest-access"
+                value={access}
+                choices={[
+                  { value: "all", label: "All" },
+                  { value: "free", label: "Free" },
+                  { value: "members", label: "Members", image: "P2P_icon.png" },
+                ]}
+                onChange={(v) => (access = v as typeof access)}
+              />{/if}
+            <ChoiceStrip
+              variant="joined"
+              label="Type"
+              name="quest-type"
+              value={activity}
+              choices={[
+                { value: "all", label: "All" },
+                { value: "quests", label: "Quests" },
+                { value: "mini", label: "Miniquests" },
+              ]}
+              onChange={(v) => (activity = v as typeof activity)}
+            />
+          </div>
           <label class="small-checkbox"
             ><input type="checkbox" bind:checked={hideCompleted} /> Hide completed</label
           >
           <p class="list-kicker">
-            {profile.mode === "members"
-              ? "FREE & MEMBERS QUESTS"
-              : "FREE WORLD QUESTS"}
+            {visible.length}
+            {visible.length === 1 ? "ACTIVITY" : "ACTIVITIES"} · ROUTE ORDER
           </p>
           {#each visible as q (q.id)}<QuestNavigationCard
               quest={q}
@@ -156,6 +189,23 @@
             >
             <h1 id="quest-title">{quest.name}</h1>
             <p class="quest-why"><GameText text={quest.why} /></p>
+            <div class="quest-guides" aria-label="Guides on the RuneScape Wiki">
+              {#if QUICK_GUIDES.has(quest.wiki)}<a
+                  class="guide-link guide-primary"
+                  href={wikiHref(quest.wiki + "/Quick_guide")}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  ><BookOpen size={15} />Quick guide<ExternalLink size={12} /></a
+                >{/if}<a
+                class="guide-link"
+                href={wikiHref(quest.wiki)}
+                target="_blank"
+                rel="noopener noreferrer"
+                ><Globe size={15} />Wiki page<ExternalLink
+                  size={12}
+                /></a
+              >
+            </div>
             <div class="quest-chips">
               <span class="badge">{quest.difficulty}</span>
               <span class="badge">{quest.length}</span>
@@ -393,10 +443,53 @@
     margin-right: 6px;
   }
   .quest-log :global(.journal-row) {
-    min-height: 44px;
+    min-height: 48px;
     margin: 2px 0;
-    padding: 4px 10px;
+    padding: 6px 10px;
     border-radius: 3px;
+  }
+  .quest-guides {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 10px 0 4px;
+  }
+  .guide-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 34px;
+    padding: 0 12px;
+    border: 1px solid #4a5560;
+    border-radius: 3px;
+    background: #1a2329;
+    color: var(--text, #e8e0cc);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .guide-link:hover,
+  .guide-link:focus-visible {
+    border-color: #c9a85a;
+    color: #f2d891;
+  }
+  .guide-primary {
+    border-color: #7a6233;
+    background: #2a2416;
+    color: #f2d891;
+  }
+  .quest-filters {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 12px 6px 0;
+  }
+  .quest-filters :global(legend) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
   }
   .quest-log :global(.journal-row.selected) {
     background: var(--panel-raised);
