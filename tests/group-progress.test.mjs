@@ -102,3 +102,38 @@ test("widest gaps break ties by skill order and honour the limit", () => {
     ["Cooking"],
   );
 });
+
+test("quest difference lists completions only one player has, and needs both players' quest data", async () => {
+  const { questDifference } = await import("../src/lib/groupProgress.ts");
+  const quests = (...done) => ({
+    questProgress: {
+      records: [
+        ...done.map((title) => ({ title, status: "COMPLETED" })),
+        { title: "Started Quest", status: "STARTED" },
+      ],
+    },
+  });
+  assert.deepEqual(
+    questDifference(
+      quests("Cook's Assistant", "Dragon Slayer", "Druidic Ritual"),
+      quests("cook's assistant", "Blood Pact"),
+    ),
+    { onlyA: ["Dragon Slayer", "Druidic Ritual"], onlyB: ["Blood Pact"] },
+  );
+  assert.equal(questDifference(quests("Dragon Slayer"), {}), undefined);
+});
+
+test("head to head counts only skills both players publish", async () => {
+  const { headToHead } = await import("../src/lib/groupProgress.ts");
+  const a = player("A", { Mining: 50, Smithing: 40, Cooking: 10, Fishing: 5 });
+  const b = player("B", { Mining: 60, Smithing: 40, Cooking: 1 });
+  assert.deepEqual(
+    headToHead(a, b, ["Mining", "Smithing", "Cooking", "Fishing", "Crafting"]),
+    { aAhead: 1, bAhead: 1, level: 1 },
+  );
+  assert.deepEqual(headToHead(a, undefined, ["Mining"]), {
+    aAhead: 0,
+    bAhead: 0,
+    level: 0,
+  });
+});

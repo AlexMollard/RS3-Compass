@@ -8,6 +8,7 @@ export type RouteId =
   | "skills"
   | "players"
   | "groups"
+  | "compare"
   | "activity"
   | "levels";
 
@@ -16,6 +17,7 @@ const SECTIONS: RouteId[] = [
   "skills",
   "players",
   "groups",
+  "compare",
   "activity",
   "levels",
 ];
@@ -57,6 +59,12 @@ export const NAV_GROUPS: {
         label: "Group Ironman",
         href: "/groups",
         image: "Group_Ironman_badge.png",
+      },
+      {
+        id: "compare",
+        label: "Compare",
+        href: "/compare",
+        image: "Scales.png",
       },
       {
         id: "activity",
@@ -101,6 +109,6 @@ export const PHONE_TABS: {
     label: "People",
     href: "/players",
     image: "Friends_List_icon.png",
-    matches: ["players", "groups", "activity"],
+    matches: ["players", "groups", "compare", "activity"],
   },
 ];

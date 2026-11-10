@@ -51,6 +51,7 @@
   >
     {#snippet trailing()}<div class="head-actions">
         <a class="btn btn-quiet" href="/groups">Group Ironman</a>
+        <a class="btn btn-quiet" href="/compare">Compare players</a>
         <a class="btn btn-quiet" href="/activity">Activity feeds</a>
         <Button variant="quiet" onclick={controller.exportProgress}
           ><Download size={16} aria-hidden="true" />Export progress</Button

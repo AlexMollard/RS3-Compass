@@ -2,9 +2,52 @@ import type { Profile } from "../data.ts";
 import type { GroupLookup, GroupMember } from "./groupTypes.ts";
 import { normalizePlayerName } from "./playerName.ts";
 
-export interface GroupPlayer {
-  member: GroupMember;
+/** Any player being compared: a group member or a saved player, by name. */
+export interface ComparedPlayer {
+  member: { name: string };
   profile?: Profile;
+}
+
+export interface GroupPlayer extends ComparedPlayer {
+  member: GroupMember;
+}
+
+/** Skills where each player's published level is higher; skills either lacks are left out. */
+export function headToHead(
+  a: Profile | undefined,
+  b: Profile | undefined,
+  skills: readonly string[],
+): { aAhead: number; bAhead: number; level: number } {
+  const result = { aAhead: 0, bAhead: 0, level: 0 };
+  for (const skill of skills) {
+    const x = a?.hiscoresLevels?.[skill],
+      y = b?.hiscoresLevels?.[skill];
+    if (x === undefined || y === undefined) continue;
+    if (x > y) result.aAhead++;
+    else if (y > x) result.bAhead++;
+    else result.level++;
+  }
+  return result;
+}
+
+/** Quest titles one player completed and the other did not, from public quest data. */
+export function questDifference(
+  a: Profile | undefined,
+  b: Profile | undefined,
+): { onlyA: string[]; onlyB: string[] } | undefined {
+  const done = (p: Profile | undefined) =>
+    p?.questProgress &&
+    new Map(
+      p.questProgress.records
+        .filter((r) => r.status === "COMPLETED")
+        .map((r) => [r.title.toLocaleLowerCase("en"), r.title]),
+    );
+  const left = done(a),
+    right = done(b);
+  if (!left || !right) return undefined;
+  const only = (x: Map<string, string>, y: Map<string, string>) =>
+    [...x].filter(([key]) => !y.has(key)).map(([, title]) => title).sort();
+  return { onlyA: only(left, right), onlyB: only(right, left) };
 }
 
 export function groupPlayers(
@@ -24,7 +67,7 @@ export function groupPlayers(
 }
 
 export function groupSkillSummary(
-  players: readonly GroupPlayer[],
+  players: readonly ComparedPlayer[],
   skill: string,
 ) {
   let highest: number | undefined;
@@ -54,7 +97,7 @@ export interface SkillGap {
 
 /** Largest published-level spreads. `skills` order is the in-game tie-break. */
 export function widestGaps(
-  players: readonly GroupPlayer[],
+  players: readonly ComparedPlayer[],
   skills: readonly string[],
   limit = 5,
 ): SkillGap[] {

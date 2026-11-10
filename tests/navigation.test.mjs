@@ -7,6 +7,7 @@ test("routeFor maps paths to shell routes", () => {
   assert.equal(routeFor("/quests/cooks-assistant"), "quests");
   assert.equal(routeFor("/levels"), "levels");
   assert.equal(routeFor("/groups"), "groups");
+  assert.equal(routeFor("/compare"), "compare");
   assert.equal(routeFor("/players/"), "players");
   assert.equal(routeFor("/play"), "home");
 });
@@ -16,6 +17,7 @@ test("the People phone tab covers players, groups and activity", () => {
   assert.ok(people);
   assert.ok(people.matches.includes("activity"));
   assert.ok(people.matches.includes("groups"));
+  assert.ok(people.matches.includes("compare"));
   assert.ok(people.matches.includes("players"));
 });
 

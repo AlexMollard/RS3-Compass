@@ -1,19 +1,15 @@
 <script lang="ts">
   import { onMount, untrack } from "svelte";
-  import { goto } from "$app/navigation";
   import { SKILLS } from "../../data";
   import { getCompass } from "../compassContext";
   import { fetchGroup } from "../groupClient";
   import type { GroupLookup, GroupSize } from "../groupTypes";
-  import {
-    groupPlayers,
-    groupSkillSummary,
-    widestGaps,
-  } from "../groupProgress";
+  import { groupPlayers, groupSkillSummary } from "../groupProgress";
   import { normalizePlayerName } from "../playerName";
   import { relativeTime } from "../relativeTime";
-  import { skillPath } from "../navigation";
   import { isSnapshotStale, rateLimitNotice } from "../sourceStatus";
+  import SkillComparison from "../components/SkillComparison.svelte";
+  import SkillGaps from "../components/SkillGaps.svelte";
   import { RefreshCw } from "@lucide/svelte";
   import PageHeading from "../components/PageHeading.svelte";
   import ChoiceStrip from "../components/ChoiceStrip.svelte";
@@ -40,20 +36,9 @@
   let messages = $state<Record<number, string>>({});
   let failures = $state<Record<number, string>>({});
   let removing = $state<number | null>(null);
-  let comparison = $state("prep");
   let mounted = $state(false);
   let request: AbortController | undefined;
   const attempted = new Map<number, number>();
-  const prepSkills = new Set([
-    "Mining",
-    "Smithing",
-    "Crafting",
-    "Fletching",
-    "Herblore",
-    "Cooking",
-    "Fishing",
-    "Runecrafting",
-  ]);
   let groups = $derived($saved.groups ?? []);
   let group = $derived(
     groups.find((g) => String(g.id) === selectedId) ?? groups[0],
@@ -72,17 +57,6 @@
         $sync[id]?.state === "queued" || $sync[id]?.state === "refreshing",
     ),
   );
-  let skills = $derived(
-    comparison === "all"
-      ? SKILLS
-      : SKILLS.filter((s) => prepSkills.has(s.name)),
-  );
-  let gaps = $derived(
-    widestGaps(
-      members,
-      SKILLS.map((s) => s.name),
-    ),
-  );
   // Skills where a member is among the leaders; unknown without published levels.
   let highestCounts = $derived(
     members.map((m) =>
@@ -93,10 +67,6 @@
         : undefined,
     ),
   );
-  let withoutLevels = $derived(
-    members.filter((m) => !m.profile?.hiscoresLevels).map((m) => m.member.name),
-  );
-  const shortName = (value: string) => value.slice(0, 4).toUpperCase();
   const number = (value: number) => value.toLocaleString();
   const date = (value: number) => new Date(value).toLocaleString();
   const sourceUrl = (g: GroupLookup) =>
@@ -504,134 +474,14 @@
       {/each}
     </div>
     <div class="two">
-      <GameWindow
-        title="Skill comparison"
-        icon="Mining.png"
-        trailing="Gold marks the group's highest"
-      >
-        <div class="comparisons">
-          <div class="comparison-toolbar">
-            <ChoiceStrip
-              label="Compare skills"
-              name="group-skills"
-              value={comparison}
-              choices={[
-                { value: "prep", label: "Gathering and crafting" },
-                { value: "all", label: "All 29 skills" },
-              ]}
-              onChange={(value) => (comparison = value)}
-            />
-            <p class="caption">
-              Each level opens that skill's guide as that player.
-            </p>
-          </div>
-          <div
-            class="skill-comparisons"
-            style:--cols={Math.min(members.length, 4)}
-          >
-            {#each skills as skill (skill.name)}
-              {@const summary = groupSkillSummary(members, skill.name)}
-              <section
-                class="comparison-card"
-                aria-label={skill.name + " comparison"}
-              >
-                <a
-                  class="skill-title"
-                  href={wikiHref(skill.wiki)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <GameArt file={skill.icon} size={22} />
-                  <span>{skill.name}</span><span
-                    class="wiki-arrow"
-                    aria-hidden="true">↗</span
-                  >
-                </a>
-                <div class="member-levels">
-                  {#each members as member (member.member.name)}
-                    {@const level =
-                      member.profile?.hiscoresLevels?.[skill.name]}
-                    {@const highest =
-                      level !== undefined && level === summary.highest}
-                    {#if level !== undefined}
-                      <button
-                        class="lv"
-                        class:top={highest}
-                        aria-label={`${member.member.name}: ${skill.name} ${level}. ${highest ? "Highest published in the group. " : ""}Open training as this player`}
-                        onclick={() => {
-                          controller.selectProfile(member.profile!.id);
-                          void goto(skillPath(skill.name));
-                        }}
-                      >
-                        <strong>{level}</strong><small aria-hidden="true"
-                          >{shortName(member.member.name)}</small
-                        >
-                      </button>
-                    {:else}
-                      <div
-                        class="lv unk"
-                        role="img"
-                        aria-label={member.member.name +
-                          ": " +
-                          skill.name +
-                          " unrecorded"}
-                      >
-                        <strong>?</strong><small aria-hidden="true"
-                          >{shortName(member.member.name)}</small
-                        >
-                      </div>
-                    {/if}
-                  {/each}
-                </div>
-              </section>
-            {/each}
-          </div>
-          <details class="comparison-help source">
-            <summary>About these levels</summary>
-            <p>
-              Published Hiscores levels only; manual Compass edits are
-              excluded. Gold marks the highest published level, not item
-              ownership or every required unlock. Each character still needs
-              their own use levels and quest requirements. Individual source
-              times are shown under each member.
-            </p>
-          </details>
-        </div>
-      </GameWindow>
+      <SkillComparison
+        players={members}
+        id="group"
+        highestLabel="Highest published in the group"
+        sourceNote="Individual source times are shown under each member."
+      />
       <aside class="side-panels">
-        <GameWindow title="Widest gaps">
-          {#if gaps.length}
-            <ul class="gap-list">
-              {#each gaps as gap (gap.skill)}
-                {@const skill = SKILLS.find((s) => s.name === gap.skill)}
-                <li>
-                  {#if skill}<GameArt file={skill.icon} size={28} />{/if}
-                  <span class="gap-text"
-                    ><a href={skillPath(gap.skill)}>{gap.skill}</a><br /><span
-                      class="caption"
-                      >{gap.leaders.join(", ")} {gap.highest} · {gap.trailing.join(
-                        ", ",
-                      )}
-                      {gap.lowest}</span
-                    ></span
-                  >
-                  <StatusChip tone="warn" label={String(gap.gap)} />
-                </li>
-              {/each}
-            </ul>
-          {:else}
-            <p class="side-copy">
-              No gaps to show yet. A skill needs published levels from at least
-              two members that differ.
-            </p>
-          {/if}
-          {#if withoutLevels.length}<p class="caption side-copy">
-              {withoutLevels.join(", ")}
-              {withoutLevels.length === 1 ? "has" : "have"} no published levels,
-              so {withoutLevels.length === 1 ? "they are" : "they are all"} left
-              out of gaps.
-            </p>{/if}
-        </GameWindow>
+        <SkillGaps players={members} />
         <GameWindow title="Latest from the group">
           <p class="side-copy">
             Recent levels and quest completions for each member are on the
@@ -873,8 +723,7 @@
   .source-times {
     margin-top: auto;
   }
-  .source-times summary,
-  .comparison-help summary {
+  .source-times summary {
     cursor: pointer;
     min-height: 32px;
   }
@@ -892,141 +741,17 @@
     font-size: var(--font-ui);
     margin: 0;
   }
-  .caption {
-    color: var(--muted);
-    font-size: var(--font-caption);
-    margin: 0;
-  }
   .two {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 300px;
     gap: 24px;
     align-items: start;
   }
-  .comparisons {
-    padding: 12px 16px 16px;
-  }
-  .comparison-toolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: end;
-    flex-wrap: wrap;
-    gap: 8px 16px;
-    margin-bottom: 14px;
-  }
-  .skill-comparisons {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-    gap: 8px;
-  }
-  .comparison-card {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    padding: 8px;
-    min-width: 0;
-    background: var(--well);
-    border: 1px solid #2f3e48;
-    border-radius: 3px;
-  }
-  .skill-title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    min-width: 0;
-    font-size: 0.8125rem;
-    font-weight: 600;
-    color: var(--text);
-    text-decoration: none;
-  }
-  .groups-page .skill-title {
-    color: var(--text);
-  }
-  .skill-title:hover {
-    color: var(--gold-bright);
-  }
-  .wiki-arrow {
-    font-weight: 400;
-    color: var(--muted);
-  }
-  .member-levels {
-    display: grid;
-    grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr));
-    gap: 4px;
-  }
-  .lv {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 44px;
-    min-width: 0;
-    padding: 2px;
-    color: var(--text);
-    background: #0b1318;
-    border: 1px solid #33434d;
-    border-radius: 3px;
-    line-height: 1.1;
-    text-align: center;
-  }
-  .lv strong {
-    font-size: 0.9375rem;
-    font-weight: 600;
-  }
-  .lv small {
-    font-size: 0.625rem;
-    font-weight: 500;
-    color: var(--muted);
-    letter-spacing: 0.5px;
-  }
-  button.lv:hover {
-    border-color: #8fa3b1;
-  }
-  .lv.top {
-    color: #f0e2c2;
-    border-color: var(--gold);
-    background: #2a2418;
-  }
-  .lv.unk {
-    color: var(--muted);
-    border-style: dashed;
-  }
-  .comparison-help {
-    margin-top: 16px;
-  }
-  .comparison-help p {
-    max-width: 90ch;
-    margin: 8px 0 0;
-  }
   .side-panels {
     display: flex;
     flex-direction: column;
     gap: 20px;
     min-width: 0;
-  }
-  .gap-list {
-    list-style: none;
-    margin: 0;
-    padding: 6px 16px 8px;
-  }
-  .gap-list li {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid #24323b;
-  }
-  .gap-list li:last-child {
-    border-bottom: 0;
-  }
-  .gap-text {
-    flex: 1 1 auto;
-    min-width: 0;
-    overflow-wrap: anywhere;
-  }
-  .gap-text a {
-    font-weight: 600;
-    min-height: 24px;
   }
   .side-copy {
     margin: 0;
@@ -1070,9 +795,6 @@
       padding: 0 16px;
     }
     .member-card {
-      padding: 12px;
-    }
-    .comparisons {
       padding: 12px;
     }
   }

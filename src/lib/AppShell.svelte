@@ -61,6 +61,7 @@
     skills: "Skills",
     players: "Players",
     groups: "Group Ironman",
+    compare: "Compare players",
     activity: "Activity",
     levels: "Update levels",
   };
