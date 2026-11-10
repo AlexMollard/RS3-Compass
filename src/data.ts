@@ -9,6 +9,7 @@ import { TALE_QUESTS } from "./questsTales.ts";
 import { ADVENTURE_QUESTS } from "./questsAdventures.ts";
 import { SIDE_QUESTS } from "./questsSideActivities.ts";
 import { SEASONAL_QUESTS } from "./questsSeasonal.ts";
+import { IMPORTED_QUESTS } from "./questsImported.ts";
 import type {
   HiscoresImportStatus,
   PlayerEvent,
@@ -393,9 +394,11 @@ for (const group of [
 ]) {
   for (const quest of group) questsById.set(quest.id, quest);
 }
-export const QUESTS: QuestRecord[] = QUEST_ORDER.map((id) =>
-  questsById.get(id)!,
-);
+// Hand-written quests keep their curated order; Wiki imports follow in progression-guide order.
+export const QUESTS: QuestRecord[] = [
+  ...QUEST_ORDER.map((id) => questsById.get(id)!),
+  ...IMPORTED_QUESTS.filter((quest) => !questsById.has(quest.id)),
+];
 
 export const SKILLS: SkillRecord[] = [
   ...CORE_SKILLS,

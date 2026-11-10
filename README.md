@@ -25,7 +25,7 @@ _Quest preparation with fictional sample-player data. Game artwork and maps: Jag
 | **[Compare](https://rs3-compass.mollard.deno.net/compare)**      | Put any two public players side by side: totals, quest points, the same skill grid and widest gaps as Group Ironman, and quests only one of them has completed. |
 | **[Activity](https://rs3-compass.mollard.deno.net/activity)**    | Read individual or combined-group feeds, newest first. Filter by player and event type, follow Wiki references and see availability separately for each player.                                                                  |
 
-Switch between **F2P and Members** planning. The catalogue includes all 54 F2P quests and 9 miniquests/sagas, checked against November 2026 sources; Members quest coverage is selective. Seasonal quests and the tutorial remain available outside the regular progression route.
+Switch between **F2P and Members** planning. The catalogue includes all 54 F2P quests and 9 miniquests/sagas, checked against November 2026 sources, plus about 235 Members quests imported from the RuneScape Wiki in its progression-guide order. Seasonal quests and the tutorial remain available outside the regular progression route.
 
 Compass prepares you to start an activity; it does **not** replace quest walkthroughs, the in-game journal or the [RuneScape Wiki](https://runescape.wiki/). Named items, skills, quests and locations link to their references, with Wiki artwork throughout the app.
 
@@ -89,10 +89,12 @@ npm test
 npm run build
 ```
 
+To refresh the imported Members quests from the Wiki, run `node --experimental-strip-types scripts/import-quests.mjs`. It rewrites `src/questsImported.ts` and never overrides the hand-written quests in `src/quests*.ts`.
+
 The production build includes Svelte checks. Deno serves `build/index.js`; the stable deployment is **[rs3-compass.mollard.deno.net](https://rs3-compass.mollard.deno.net/)**. The player lookup requires a server and cannot run on GitHub Pages alone.
 
 ## Credits
 
-Initial research drew on the [Ironbound guide](https://ironbound-rs3-alex.alexmollard93.chatgpt.site/guide/). Game artwork and map tiles come from the [RuneScape Wiki](https://runescape.wiki/) and belong to Jagex. Interface icons use [Lucide](https://lucide.dev/) (ISC).
+Initial research drew on the [Ironbound guide](https://ironbound-rs3-alex.alexmollard93.chatgpt.site/guide/). Game artwork and map tiles come from the [RuneScape Wiki](https://runescape.wiki/) and belong to Jagex. Imported quest text is adapted from the RuneScape Wiki under [CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/). Interface icons use [Lucide](https://lucide.dev/) (ISC).
 
 RS3 Compass is an unofficial fan project, not affiliated with or endorsed by Jagex.

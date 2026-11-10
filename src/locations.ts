@@ -8,6 +8,7 @@ import { TALE_LOCATIONS } from "./questsTales.ts";
 import { ADVENTURE_LOCATIONS } from "./questsAdventures.ts";
 import { SIDE_LOCATIONS } from "./questsSideActivities.ts";
 import { SEASONAL_LOCATIONS } from "./questsSeasonal.ts";
+import { IMPORTED_LOCATIONS } from "./questsImported.ts";
 
 export interface LocationRecord {
   name: string;
@@ -20,6 +21,7 @@ export interface LocationRecord {
 
 // Images and access details are drawn from each linked RuneScape Wiki location article.
 export const LOCATIONS: Record<string, LocationRecord> = {
+  ...IMPORTED_LOCATIONS,
   ...FOUNDATION_LOCATIONS,
   ...UNLOCK_LOCATIONS,
   ...TALE_LOCATIONS,

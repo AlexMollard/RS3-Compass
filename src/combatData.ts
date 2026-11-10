@@ -4,6 +4,7 @@ import { TALE_COMBAT } from "./questsTales.ts";
 import { ADVENTURE_COMBAT } from "./questsAdventures.ts";
 import { SIDE_COMBAT } from "./questsSideActivities.ts";
 import { SEASONAL_COMBAT } from "./questsSeasonal.ts";
+import { IMPORTED_COMBAT } from "./questsImported.ts";
 
 export interface QuestEnemy {
   name: string;
@@ -19,6 +20,7 @@ export interface CombatPlan {
 
 // Combat fields and enemy images are sourced from each quest and NPC Wiki article.
 export const QUEST_COMBAT: Record<string, CombatPlan> = {
+  ...IMPORTED_COMBAT,
   ...FOUNDATION_COMBAT,
   ...UNLOCK_COMBAT,
   ...TALE_COMBAT,
