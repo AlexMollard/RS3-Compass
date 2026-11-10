@@ -1,5 +1,11 @@
 import { get, writable } from "svelte/store";
-import { QUESTS, SAMPLE_PROFILES, nextQuest, type Profile } from "../data.ts";
+import {
+  QUESTS,
+  SAMPLE_PROFILES,
+  isAccountKind,
+  nextQuest,
+  type Profile,
+} from "../data.ts";
 import type { CompassController, SavedState } from "./compassContext";
 import { normalizePlayerName } from "./playerName.ts";
 import { clearRememberedPlayer, rememberPlayer } from "./rememberedPlayer.ts";
@@ -24,7 +30,7 @@ function validProfile(value: unknown): value is Profile {
   return (
     typeof p.id === "string" &&
     typeof p.name === "string" &&
-    (p.kind === "Solo Ironman" || p.kind === "Group Ironman") &&
+    isAccountKind(p.kind) &&
     (p.mode === "f2p" || p.mode === "members") &&
     typeof p.activeTask === "string" &&
     (p.source === undefined ||

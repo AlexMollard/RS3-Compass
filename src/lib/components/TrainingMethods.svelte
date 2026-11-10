@@ -81,7 +81,7 @@
         <p class="method-benefit">
           <GameArt file={selected.image} size={28} />
           <span
-            ><strong>Why it helps an Ironman:</strong>
+            ><strong>Why it helps:</strong>
             <GameText text={selected.benefit} /></span
           >
         </p>

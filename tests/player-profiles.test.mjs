@@ -380,3 +380,42 @@ test("a cached training choice survives reload and a temporary free-play view wi
   assert.equal(trainingMethod(mining, current(restored)).id, chosen.id);
   assert.deepEqual(get(restored.state).profiles.slice(1), otherPlayers);
 });
+
+test("A regular account is saved and restored; an unknown account type is not", (t) => {
+  const descriptor = Object.getOwnPropertyDescriptor(
+    globalThis,
+    "localStorage",
+  );
+  const storage = new Map();
+  Object.defineProperty(globalThis, "localStorage", {
+    configurable: true,
+    value: {
+      getItem: (key) => storage.get(key) ?? null,
+      setItem: (key, value) => storage.set(key, value),
+    },
+  });
+  const controllers = [];
+  const load = () => {
+    const controller = createCompassController();
+    controllers.push(controller);
+    controller.initialize();
+    return controller;
+  };
+  t.after(() => {
+    controllers.forEach((c) => c.destroy());
+    if (descriptor)
+      Object.defineProperty(globalThis, "localStorage", descriptor);
+    else delete globalThis.localStorage;
+  });
+  const first = load();
+  first.addPlayer(player, "Regular account", "members");
+  const saved = JSON.parse(storage.get(KEY));
+  const regular = saved.profiles.find((p) => p.kind === "Regular account");
+  assert.ok(regular);
+  assert.deepEqual(get(load().state), saved);
+  regular.kind = "Pure";
+  storage.set(KEY, JSON.stringify(saved));
+  assert.ok(
+    !get(load().state).profiles.some((p) => p.id === regular.id),
+  );
+});

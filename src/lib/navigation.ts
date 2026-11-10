@@ -50,7 +50,7 @@ export const NAV_GROUPS: {
         id: "players",
         label: "Players",
         href: "/players",
-        image: "Ironman_badge.png",
+        image: "Friends_List_icon.png",
       },
       {
         id: "groups",
@@ -100,7 +100,7 @@ export const PHONE_TABS: {
     id: "players",
     label: "People",
     href: "/players",
-    image: "Ironman_badge.png",
+    image: "Friends_List_icon.png",
     matches: ["players", "groups", "activity"],
   },
 ];

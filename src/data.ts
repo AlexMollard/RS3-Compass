@@ -19,10 +19,21 @@ import type {
 
 export type AccessMode = "f2p" | "members";
 export type Page = "journey" | "play" | "quests" | "skills";
+export type AccountKind = "Regular account" | "Solo Ironman" | "Group Ironman";
+/** Every account type, each with its RuneScape Wiki badge. */
+export const ACCOUNT_KINDS: readonly { kind: AccountKind; image: string }[] = [
+  { kind: "Regular account", image: "Friends_List_icon.png" },
+  { kind: "Solo Ironman", image: "Ironman_badge.png" },
+  { kind: "Group Ironman", image: "Group_Ironman_badge.png" },
+];
+export const isAccountKind = (value: unknown): value is AccountKind =>
+  ACCOUNT_KINDS.some((k) => k.kind === value);
+export const accountBadge = (kind: AccountKind): string =>
+  ACCOUNT_KINDS.find((k) => k.kind === kind)?.image ?? "Friends_List_icon.png";
 export interface Profile {
   id: string;
   name: string;
-  kind: "Solo Ironman" | "Group Ironman";
+  kind: AccountKind;
   mode: AccessMode;
   levels: Record<string, number>;
   completedQuests: string[];

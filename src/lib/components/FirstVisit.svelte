@@ -1,6 +1,6 @@
 <script lang="ts">
   import { ChevronRight, Search, Users } from "@lucide/svelte";
-  import type { Profile } from "../../data";
+  import { accountBadge, type Profile } from "../../data";
   import GameArt from "./GameArt.svelte";
 
   let {
@@ -38,7 +38,7 @@
     <span class="first-visit-brand">RS3 COMPASS</span>
     <h1>Who are you planning for?</h1>
     <p>
-      Compass gets an Ironman ready for the next quest or training session,
+      Compass gets your account ready for the next quest or training session,
       then hands you to the RuneScape Wiki.
     </p>
   </div>
@@ -109,9 +109,7 @@
               onclick={() => onSample(sample.id)}
               ><span class="first-visit-badge"
                 ><GameArt
-                  file={sample.kind === "Group Ironman"
-                    ? "Group_Ironman_badge.png"
-                    : "Ironman_badge.png"}
+                  file={accountBadge(sample.kind)}
                   size={36}
                 /></span
               ><span class="first-visit-sample-text"

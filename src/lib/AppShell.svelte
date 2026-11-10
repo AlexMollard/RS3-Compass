@@ -17,8 +17,10 @@
     X,
   } from "@lucide/svelte";
   import {
+    ACCOUNT_KINDS,
     QUESTS,
     SAMPLE_PROFILES,
+    accountBadge,
     SKILLS,
     progressionQuests,
     type Profile,
@@ -95,7 +97,7 @@
   let skillMatches = $derived(
     SKILLS.filter((s) => s.name.toLowerCase().includes(query)),
   );
-  let lookupKind = $state<Profile["kind"]>("Solo Ironman");
+  let lookupKind = $state<Profile["kind"]>("Regular account");
   let lookupMode = $state<Profile["mode"]>("f2p");
   let searchDialog: HTMLDialogElement,
     aboutDialog: HTMLDialogElement,
@@ -147,7 +149,7 @@
   ) {
     abortLookup();
     lookupName = name;
-    lookupKind = profile?.kind ?? "Solo Ironman";
+    lookupKind = profile?.kind ?? "Regular account";
     lookupMode = profile?.mode ?? "f2p";
     lookupError = "";
     if (!lookupDialog.open) lookupDialog.showModal();
@@ -194,7 +196,7 @@
   }
   function firstVisitLookup(name: string, mode: Profile["mode"]) {
     openLookup(name);
-    lookupKind = "Solo Ironman";
+    lookupKind = "Regular account";
     lookupMode = mode;
     void lookup(name);
   }
@@ -270,9 +272,7 @@
       style:width={size + "px"}
       style:height={size + "px"}
       ><GameArt
-        file={p.kind === "Group Ironman"
-          ? "Group_Ironman_badge.png"
-          : "Ironman_badge.png"}
+        file={accountBadge(p.kind)}
         size={size - 12}
       /></span
     >{/if}
@@ -302,7 +302,7 @@
   <aside class="sidebar">
     <a class="brand" href="/" aria-label="RS3 Compass home"
       ><span class="brand-mark"><Compass size={26} strokeWidth={1.5} /></span
-      ><span><strong>RS3 COMPASS</strong><small>IRONMAN PLANNER</small></span
+      ><span><strong>RS3 COMPASS</strong><small>QUEST PLANNER</small></span
       ></a
     >
     {#if showFirstVisit}{:else if profile}
@@ -628,7 +628,7 @@
     <p>
       Hiscores supplies public levels and statistics. Jagex's Adventurer's Log
       supplies available quest status and recent events; unavailable data never
-      clears existing checks. Membership and Ironman kind are planning choices,
+      clears existing checks. Membership and account type are planning choices,
       not account membership. Sample profiles are fictional.
     </p>
     <p>
@@ -676,7 +676,7 @@
     <p>
       Import public Hiscores and available Adventurer's Log quest and event
       data. Unavailable data will not erase your manual checks or last
-      successful snapshot. Membership and Ironman type remain planning settings.
+      successful snapshot. Membership and account type remain planning settings.
     </p>
     <form
       onsubmit={(event) => {
@@ -694,10 +694,11 @@
         /></label
       >
       <label class="lookup-field"
-        >Kind for new profiles<select
+        >Account type for new profiles<select
           bind:value={lookupKind}
           disabled={lookupLoading}
-          ><option>Solo Ironman</option><option>Group Ironman</option></select
+          >{#each ACCOUNT_KINDS as { kind } (kind)}<option>{kind}</option
+            >{/each}</select
         ></label
       >
       <p>

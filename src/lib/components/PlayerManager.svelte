@@ -1,6 +1,12 @@
 <script lang="ts">
   import { getCompass, getPlayerActions } from "../compassContext";
-  import { progressionQuests, SKILLS } from "../../data";
+  import {
+    ACCOUNT_KINDS,
+    accountBadge,
+    progressionQuests,
+    SKILLS,
+    type AccountKind,
+  } from "../../data";
   import { isSnapshotStale, rateLimitNotice } from "../sourceStatus";
   import SourceBanner from "./SourceBanner.svelte";
   import { relativeTime } from "../relativeTime";
@@ -99,9 +105,7 @@
     >
       <div class="player-heading">
         {#if isPublic}<PlayerPortrait name={player.name} size={64} />{:else}<GameArt
-            file={player.kind === "Group Ironman"
-              ? "Group_Ironman_badge.png"
-              : "Ironman_badge.png"}
+            file={accountBadge(player.kind)}
             size={64}
           />{/if}
         <div>
@@ -242,21 +246,14 @@
           label={"Planning type for " + player.name}
           name={"kind-" + player.id}
           value={player.kind}
-          choices={[
-            {
-              value: "Solo Ironman",
-              label: "Solo Ironman",
-              image: "Ironman_badge.png",
-            },
-            {
-              value: "Group Ironman",
-              label: "Group Ironman",
-              image: "Group_Ironman_badge.png",
-            },
-          ]}
+          choices={ACCOUNT_KINDS.map(({ kind, image }) => ({
+            value: kind,
+            label: kind,
+            image,
+          }))}
           onChange={(value) =>
             controller.updatePlayer(player.id, {
-              kind: value as "Solo Ironman" | "Group Ironman",
+              kind: value as AccountKind,
               mode: player.mode,
             })}
         />

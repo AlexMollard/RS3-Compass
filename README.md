@@ -3,7 +3,7 @@
 
 # RS3 Compass
 
-**RuneScape 3 quest preparation and skill planning for Ironman accounts.**
+**RuneScape 3 quest preparation and skill planning for regular and Ironman accounts.**
 
 [Open the app](https://rs3-compass.mollard.deno.net/) · [Browse quests](https://rs3-compass.mollard.deno.net/quests) · [Explore skills](https://rs3-compass.mollard.deno.net/skills)
 
