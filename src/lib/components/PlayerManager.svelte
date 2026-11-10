@@ -272,8 +272,8 @@
             })}
         />
         <p class="note">
-          Planning settings do not verify account type, membership or group
-          membership.
+          For public players, each refresh sets regular or Solo Ironman from
+          the Ironman Hiscores. Group Ironman and membership are not checked.
         </p>
       </details>
       {#if isPublic}<details

@@ -234,8 +234,31 @@ export function createPlayerLookupService(
           return { status: "service-unavailable" };
         }
       };
-      const [scores, quests, events] = await Promise.all([
-        hiscores(),
+      // Ironmen, hardcore included, are ranked on the Ironman Hiscores; a player
+      // ranked on the main table but missing there is not an Ironman. Group
+      // Ironmen are not listed there either, so callers keep a group setting.
+      const ironman = async (): Promise<boolean | undefined> => {
+        try {
+          const url = new URL(
+            "https://secure.runescape.com/m=hiscore_ironman/index_lite.json",
+          );
+          url.searchParams.set("player", name);
+          const response = await sourceFetch(url, {
+            signal: AbortSignal.timeout(8000),
+            headers: {
+              accept: "application/json",
+              "user-agent": "RS3 Compass public Hiscores lookup",
+            },
+          });
+          return response.ok ? true : response.status === 404 ? false : undefined;
+        } catch {
+          return undefined;
+        }
+      };
+      const [[scores, isIronman], quests, events] = await Promise.all([
+        hiscores().then(
+          async (s) => [s, s.data ? await ironman() : undefined] as const,
+        ),
         lookupQuests(name, sourceFetch),
         lookupEvents(name, sourceFetch),
       ]);
@@ -285,6 +308,7 @@ export function createPlayerLookupService(
               : scores.data!.name,
         fetchedAt,
         hiscoresImportStatus: scores.status,
+        ...(isIronman === undefined ? {} : { ironman: isIronman }),
         quests,
         events,
       };

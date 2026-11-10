@@ -151,6 +151,7 @@ export function isPlayerLookup(value: unknown): value is PlayerLookup {
     !playerName(value.name) ||
     !isFetchedAt(value.fetchedAt) ||
     !isHiscoresImportStatus(value.hiscoresImportStatus) ||
+    (value.ironman !== undefined && typeof value.ironman !== "boolean") ||
     !record(value.levels) ||
     !Object.entries(value.levels).every(
       ([name, level]) => isSkillName(name) && positive(level) && level <= 120,

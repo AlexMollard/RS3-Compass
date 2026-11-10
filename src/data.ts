@@ -28,6 +28,16 @@ export const ACCOUNT_KINDS: readonly { kind: AccountKind; image: string }[] = [
 ];
 export const isAccountKind = (value: unknown): value is AccountKind =>
   ACCOUNT_KINDS.some((k) => k.kind === value);
+/** Applies what the Ironman Hiscores report; Group Ironman can't be detected, so it is kept. */
+export const detectedAccountKind = (
+  kind: AccountKind,
+  ironman: boolean | undefined,
+): AccountKind =>
+  ironman === undefined || kind === "Group Ironman"
+    ? kind
+    : ironman
+      ? "Solo Ironman"
+      : "Regular account";
 export const accountBadge = (kind: AccountKind): string =>
   ACCOUNT_KINDS.find((k) => k.kind === kind)?.image ?? "Friends_List_icon.png";
 export interface Profile {

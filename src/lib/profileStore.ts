@@ -2,6 +2,7 @@ import { get, writable } from "svelte/store";
 import {
   QUESTS,
   SAMPLE_PROFILES,
+  detectedAccountKind,
   isAccountKind,
   nextQuest,
   type Profile,
@@ -387,6 +388,7 @@ export function createCompassController(): CompassController {
           profile = {
             ...existing,
             name: player.name,
+            kind: detectedAccountKind(existing.kind, player.ironman),
             levels: { ...existing.levels, ...player.levels },
             completedQuests: [
               ...new Set([...existing.completedQuests, ...imported]),
@@ -398,7 +400,7 @@ export function createCompassController(): CompassController {
           profile = {
             id,
             name: player.name,
-            kind,
+            kind: detectedAccountKind(kind, player.ironman),
             mode,
             levels: { ...player.levels },
             completedQuests: imported,

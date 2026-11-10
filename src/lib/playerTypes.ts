@@ -70,6 +70,8 @@ export type PlayerEventsImport =
 
 export interface PlayerLookup extends PlayerLevels {
   hiscoresImportStatus: HiscoresImportStatus;
+  /** From the Ironman Hiscores; omitted when they could not tell. */
+  ironman?: boolean;
   quests: QuestImport;
   events: PlayerEventsImport;
 }

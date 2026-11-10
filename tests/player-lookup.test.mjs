@@ -110,7 +110,7 @@ test("missing, duplicate, invalid and malformed skill responses fail closed", ()
   assert.throws(() => parseHiscores("<html>", "Example", 1));
 });
 
-test("concurrent aliases share all three requests and ten minute cache", async () => {
+test("concurrent aliases share every request and ten minute cache", async () => {
   let time = 1000;
   const calls = [];
   const service = createPlayerLookupService(fetchAll(calls), () => time);
@@ -119,13 +119,13 @@ test("concurrent aliases share all three requests and ten minute cache", async (
     service.lookup("example name"),
   ]);
   assert.strictEqual(a, b);
-  assert.equal(calls.length, 3);
+  assert.equal(calls.length, 4);
   time += PLAYER_CACHE_MS - 1;
   await service.lookup("example name");
-  assert.equal(calls.length, 3);
+  assert.equal(calls.length, 4);
   time++;
   await service.lookup("example name");
-  assert.equal(calls.length, 6);
+  assert.equal(calls.length, 8);
 });
 
 test("all-source not-found caching recovers when public data becomes available", async () => {
@@ -148,7 +148,7 @@ test("all-source not-found caching recovers when public data becomes available",
   assert.equal(calls.length, 3);
   time = 30_000;
   assert.equal((await service.lookup("Example")).levels.Mining, 50);
-  assert.equal(calls.length, 6);
+  assert.equal(calls.length, 7);
 });
 
 test("unranked Hiscores retain matching public quests and events for the normal cache", async () => {
@@ -224,7 +224,7 @@ test("transient Hiscores failure keeps auxiliary data and retries after 30 secon
   const full = await service.lookup("Example");
   assert.equal(full.hiscoresImportStatus, "available");
   assert.equal(full.levels.Mining, 50);
-  assert.equal(calls, 6);
+  assert.equal(calls, 7);
 });
 
 test("failed auxiliary sources retain Hiscores and mismatched identities cannot supply a profile", async () => {
@@ -258,15 +258,15 @@ test("budget counts actual calls, allows hits, and avoids reserving unsent reque
   let time = 0;
   const calls = [];
   const service = createPlayerLookupService(fetchAll(calls), () => time);
-  for (let i = 0; i < 20; i++) await service.lookup("Player " + i);
+  for (let i = 0; i < 15; i++) await service.lookup("Player " + i);
   assert.equal(calls.length, 60);
   await service.lookup("Player 0");
   assert.equal(calls.length, 60);
-  await assert.rejects(service.lookup("Player 20"), { status: 429 });
+  await assert.rejects(service.lookup("Player 15"), { status: 429 });
   assert.equal(calls.length, 60);
   time = 60000;
-  await service.lookup("Player 20");
-  assert.equal(calls.length, 63);
+  await service.lookup("Player 15");
+  assert.equal(calls.length, 64);
 });
 
 test("partial response at budget boundary keeps available data and retries after short cache", async () => {
@@ -282,7 +282,7 @@ test("partial response at budget boundary keeps available data and retries after
     },
     () => time,
   );
-  for (let i = 0; i < 20; i++) await service.lookup("Player " + i);
+  for (let i = 0; i < 15; i++) await service.lookup("Player " + i);
   time = 60_000;
   const result = await service.lookup("Example");
   assert.equal(calls, 62);
@@ -295,7 +295,7 @@ test("partial response at budget boundary keeps available data and retries after
   time = 90_000;
   const refreshed = await service.lookup("Example");
   assert.equal(refreshed.events.status, "available");
-  assert.equal(calls, 65);
+  assert.equal(calls, 66);
 });
 
 test("bounded concurrency joins pending aliases and releases after failure", async () => {
@@ -324,7 +324,7 @@ test("bounded concurrency joins pending aliases and releases after failure", asy
   assert.equal(calls, 24);
   fail = false;
   assert.equal((await service.lookup("Player 0")).levels.Mining, 50);
-  assert.equal(calls, 27);
+  assert.equal(calls, 28);
 });
 
 test("LRU eviction preserves recently used entries", async () => {
@@ -333,7 +333,7 @@ test("LRU eviction preserves recently used entries", async () => {
   const service = createPlayerLookupService(fetchAll(calls), () => time);
   // Move time so rate window resets without expiring the positive cache.
   for (let i = 0; i < 128; i++) {
-    if (i % 20 === 0) time += 60000;
+    if (i % 15 === 0) time += 60000;
     await service.lookup("Player " + i);
   }
   await service.lookup("Player 0");
@@ -343,7 +343,7 @@ test("LRU eviction preserves recently used entries", async () => {
   await service.lookup("Player 0");
   assert.equal(calls.length, before);
   await service.lookup("Player 1");
-  assert.equal(calls.length, before + 3);
+  assert.equal(calls.length, before + 4);
 });
 
 test("known nonmember events use the normal cache without hiding a later membership change", async () => {
@@ -365,10 +365,10 @@ test("known nonmember events use the normal cache without hiding a later members
   member = true;
   time = PLAYER_CACHE_MS - 1;
   assert.equal((await service.lookup("example")).events.reason, "not-member");
-  assert.equal(calls.length, 3);
+  assert.equal(calls.length, 4);
   time++;
   assert.equal((await service.lookup("Example")).events.status, "available");
-  assert.equal(calls.length, 6);
+  assert.equal(calls.length, 8);
 });
 
 test("the rolling request budget expires old calls without forgetting more recent traffic", async () => {
@@ -422,4 +422,32 @@ test("Jagex wire names import Constitution and Runecrafting without relying on r
     xp: 200000000,
     rank: 147,
   });
+});
+
+test("the Ironman Hiscores decide whether a ranked player is an Ironman", async () => {
+  const lookup = async (ironmanStatus, mainRanked = true) => {
+    const calls = [];
+    const service = createPlayerLookupService(async (url) => {
+      calls.push(url.pathname);
+      if (url.pathname.startsWith("/m=hiscore_ironman/"))
+        return ironmanStatus === 200
+          ? json(payload("Example"))
+          : new Response(null, { status: ironmanStatus });
+      if (url.pathname.includes("index_lite"))
+        return mainRanked
+          ? json(payload("Example"))
+          : new Response(null, { status: 404 });
+      return auxiliary(url);
+    });
+    const result = await service.lookup("Example");
+    return { ironman: result.ironman, calls };
+  };
+  assert.equal((await lookup(200)).ironman, true);
+  assert.equal((await lookup(404)).ironman, false);
+  const failed = await lookup(503);
+  assert.equal(failed.ironman, undefined);
+  assert.equal(failed.calls.length, 4);
+  const unranked = await lookup(200, false);
+  assert.equal(unranked.ironman, undefined);
+  assert.ok(!unranked.calls.some((path) => path.startsWith("/m=hiscore_ironman/")));
 });

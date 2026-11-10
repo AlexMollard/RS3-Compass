@@ -17,7 +17,6 @@
     X,
   } from "@lucide/svelte";
   import {
-    ACCOUNT_KINDS,
     QUESTS,
     SAMPLE_PROFILES,
     accountBadge,
@@ -149,7 +148,8 @@
   ) {
     abortLookup();
     lookupName = name;
-    lookupKind = profile?.kind ?? "Regular account";
+    lookupKind =
+      profile?.kind === "Group Ironman" ? "Group Ironman" : "Regular account";
     lookupMode = profile?.mode ?? "f2p";
     lookupError = "";
     if (!lookupDialog.open) lookupDialog.showModal();
@@ -628,8 +628,9 @@
     <p>
       Hiscores supplies public levels and statistics. Jagex's Adventurer's Log
       supplies available quest status and recent events; unavailable data never
-      clears existing checks. Membership and account type are planning choices,
-      not account membership. Sample profiles are fictional.
+      clears existing checks. Regular and Ironman accounts are detected from the
+      Ironman Hiscores on each refresh; membership and Group Ironman are
+      planning choices. Sample profiles are fictional.
     </p>
     <p>
       Progress stays in this browser. A functional cookie remembers the selected
@@ -676,7 +677,8 @@
     <p>
       Import public Hiscores and available Adventurer's Log quest and event
       data. Unavailable data will not erase your manual checks or last
-      successful snapshot. Membership and account type remain planning settings.
+      successful snapshot. The Ironman Hiscores show whether a player is an
+      Ironman; Group Ironman membership can't be detected, so choose it here.
     </p>
     <form
       onsubmit={(event) => {
@@ -694,11 +696,10 @@
         /></label
       >
       <label class="lookup-field"
-        >Account type for new profiles<select
-          bind:value={lookupKind}
-          disabled={lookupLoading}
-          >{#each ACCOUNT_KINDS as { kind } (kind)}<option>{kind}</option
-            >{/each}</select
+        >Account type<select bind:value={lookupKind} disabled={lookupLoading}
+          ><option value="Regular account"
+            >Detect regular or Ironman from Hiscores</option
+          ><option value="Group Ironman">Group Ironman</option></select
         ></label
       >
       <p>

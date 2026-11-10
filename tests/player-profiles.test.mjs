@@ -419,3 +419,21 @@ test("A regular account is saved and restored; an unknown account type is not", 
     !get(load().state).profiles.some((p) => p.id === regular.id),
   );
 });
+
+test("Hiscores detection sets regular or Solo Ironman on lookup and refresh, and keeps Group Ironman", () => {
+  const controller = createCompassController();
+  const kindOf = () =>
+    get(controller.state).profiles.find((p) => p.source === "hiscores").kind;
+  const at = (fetchedAt, ironman) => ({ ...player, fetchedAt, ironman });
+  controller.addPlayer(at(1, true), "Regular account", "f2p");
+  assert.equal(kindOf(), "Solo Ironman");
+  controller.addPlayer(at(2, false), "Solo Ironman", "f2p");
+  assert.equal(kindOf(), "Regular account");
+  controller.addPlayer(at(3, undefined), "Solo Ironman", "f2p");
+  assert.equal(kindOf(), "Regular account");
+  const id = get(controller.state).profiles.find((p) => p.source === "hiscores").id;
+  controller.updatePlayer(id, { kind: "Group Ironman", mode: "f2p" });
+  controller.addPlayer(at(4, false), "Regular account", "f2p");
+  assert.equal(kindOf(), "Group Ironman");
+  controller.destroy();
+});
