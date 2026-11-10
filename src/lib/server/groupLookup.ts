@@ -244,7 +244,7 @@ export function parseGroupRoster(
     const key = parsedName.toLocaleLowerCase("en");
     if (names.has(key)) throw unavailable();
     names.add(key);
-    return { name: title };
+    return { name: normalizePlayerName(title) };
   });
 }
 

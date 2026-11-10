@@ -451,3 +451,8 @@ test("the Ironman Hiscores decide whether a ranked player is an Ironman", async 
   assert.equal(unranked.ironman, undefined);
   assert.ok(!unranked.calls.some((path) => path.startsWith("/m=hiscore_ironman/")));
 });
+
+test("non-breaking spaces in names normalize to ordinary spaces", () => {
+  assert.equal(normalizePlayerName("GIM Invoker"), "GIM Invoker");
+  assert.equal(normalizePlayerName(" Iron  Name "), "Iron Name");
+});

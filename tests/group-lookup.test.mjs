@@ -150,3 +150,10 @@ test("reads the public roster header without confusing repeated member-detail av
     { name: "sunakyu" },
   ]);
 });
+
+test("member names written with non-breaking spaces read as ordinary names", () => {
+  assert.deepEqual(
+    parseGroupRoster(detail(["GIM Invoker", "Ariatsa", "Iron Name"]), "ironmanies", 3),
+    [{ name: "GIM Invoker" }, { name: "Ariatsa" }, { name: "Iron Name" }],
+  );
+});
