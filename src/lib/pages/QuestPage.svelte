@@ -22,6 +22,9 @@
   import QuestStart from "../components/QuestStart.svelte";
   import ActivityNotes from "../components/ActivityNotes.svelte";
   import QuestPlayerStatus from "../components/QuestPlayerStatus.svelte";
+  import QuestRewards from "../components/QuestRewards.svelte";
+  import { rewardHighlights } from "../questRewards";
+  import { SKILLS } from "../../data";
   let { selectedId = "" }: { selectedId?: string } = $props();
   const controller = getCompass();
   const saved = controller.state;
@@ -43,6 +46,9 @@
   let inventory = $derived(inventorySlots(quest, profile.packed));
   let readiness = $derived(questReadiness(quest, profile));
   let next = $derived(nextQuest(profile));
+  let highlights = $derived(rewardHighlights(quest.rewards));
+  const skillIcon = (name: string) =>
+    SKILLS.find((s) => s.name === name)?.icon ?? "Skills_icon.png";
   let catalogueCounts = $derived.by(() => {
     let total = 0;
     let completed = 0;
@@ -165,6 +171,29 @@
                   class="badge">Members to finish</span
                 >{/if}
             </div>
+            {#if highlights.length}<a
+                class="reward-strip"
+                href="#quest-rewards"
+                aria-label="Rewards summary; jump to all rewards"
+                ><span class="reward-strip-label">Rewards</span
+                >{#each highlights as chip}<span class="reward-chip"
+                    >{#if chip.kind === "quest-points"}<GameArt
+                        file="Quest.png"
+                        size={18}
+                      />{chip.points}
+                      {chip.points === 1 ? "quest point" : "quest points"}{:else if chip.kind === "skill-xp"}<GameArt
+                        file={skillIcon(chip.skill)}
+                        size={18}
+                      />{chip.xp.toLocaleString("en")}
+                      {chip.skill} XP{:else if chip.kind === "lamp"}<GameArt
+                        file="Antique_lamp.png"
+                        size={18}
+                      />XP lamps{:else}<GameArt
+                        file="Quest_map_icon.png"
+                        size={18}
+                      /><span class="reward-chip-text">{chip.text}</span>{/if}</span
+                  >{/each}</a
+              >{/if}
             <QuestPlayerStatus {profile} {quest} />
           </div>
         </div>
@@ -248,6 +277,10 @@
         </GameWindow>
       </div>
 
+      <div id="quest-rewards" class="quest-rewards">
+        <QuestRewards rewards={quest.rewards} />
+      </div>
+
       <div class="quest-checks">
         <div id="quest-levels" class="quest-levels">
           <GameWindow title="Level checks">
@@ -322,14 +355,6 @@
       <div id="quest-start" class="quest-start-window">
         <GameWindow title="Start here">
           <QuestStart {quest} />
-        </GameWindow>
-      </div>
-      <div class="quest-rewards">
-        <GameWindow title="Rewards">
-          <ul class="reward-list">
-            {#each quest.rewards as reward}<li><GameText text={reward} /></li>{/each}
-          </ul>
-          <p class="cap rewards-note">Record reward levels after claiming them.</p>
         </GameWindow>
       </div>
     </div>
@@ -594,17 +619,45 @@
     width: 64px;
     height: 64px;
   }
-  .reward-list {
-    list-style: none;
-    margin: 0;
-    padding: 14px 16px;
+  .reward-strip {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    color: var(--text);
+    text-decoration: none;
   }
-  .rewards-note {
-    margin: 0;
-    padding: 0 16px 16px;
+  .reward-strip-label {
+    margin-right: 2px;
+    font-size: var(--font-caption);
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .reward-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 30px;
+    max-width: 100%;
+    padding: 2px 10px 2px 6px;
+    font-size: var(--font-caption);
+    font-weight: 600;
+    color: #f0e2c2;
+    background: #2a2418;
+    border: 1px solid #5a4b37;
+    border-radius: 3px;
+  }
+  .reward-chip-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 260px;
+  }
+  .reward-strip:hover .reward-chip {
+    border-color: var(--gold);
   }
 
   @media (min-width: 1001px) {
@@ -642,6 +695,9 @@
     .quest-pack {
       order: 3;
     }
+    .quest-rewards {
+      order: 3;
+    }
     .quest-start-window {
       order: 4;
     }
@@ -669,9 +725,6 @@
     }
     .quest-notes {
       order: 9;
-    }
-    .quest-rewards {
-      order: 10;
     }
     .quest-hero-art {
       flex: 1 1 100%;
