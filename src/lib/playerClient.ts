@@ -1,4 +1,4 @@
-import { normalizePlayerName } from "./playerName.ts";
+import { normalizePlayerName, playerKey } from "./playerName.ts";
 import { isPlayerLookup } from "./playerData.ts";
 import type { PlayerLookup } from "./playerTypes";
 
@@ -42,8 +42,7 @@ export async function fetchPlayer(
   }
   if (
     !isPlayerLookup(data) ||
-    normalizePlayerName(data.name).toLocaleLowerCase("en") !==
-      normalized.toLocaleLowerCase("en")
+    playerKey(data.name) !== playerKey(normalized)
   ) {
     throw new Error(
       "The player service returned invalid player data. Existing progress has not been changed.",

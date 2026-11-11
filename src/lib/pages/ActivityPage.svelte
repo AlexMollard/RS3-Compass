@@ -2,7 +2,7 @@
   import { onMount, untrack } from "svelte";
   import { page } from "$app/state";
   import { getCompass, getPlayerActions } from "../compassContext";
-  import { normalizePlayerName } from "../playerName";
+  import { playerKey } from "../playerName";
   import type { ActivitySource } from "../activityFeed";
   import ActivityFeed from "../components/ActivityFeed.svelte";
   import PageHeading from "../components/PageHeading.svelte";
@@ -27,14 +27,14 @@
   let selectedGroup = $derived(
     groups.find((g) => String(g.id) === groupFilter),
   );
-  const key = (name: string) => normalizePlayerName(name).toLowerCase();
   let roster = $derived(
-    new Set((selectedGroup?.members ?? []).map((m) => key(m.name))),
+    new Set((selectedGroup?.members ?? []).map((m) => playerKey(m.name))),
   );
   let profiles = $derived(
     $saved.profiles.filter(
       (p) =>
-        p.source === "hiscores" && (!selectedGroup || roster.has(key(p.name))),
+        p.source === "hiscores" &&
+        (!selectedGroup || roster.has(playerKey(p.name))),
     ),
   );
   let selectedPlayer = $derived(

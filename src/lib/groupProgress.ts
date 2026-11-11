@@ -1,6 +1,6 @@
 import type { Profile } from "../data.ts";
 import type { GroupLookup, GroupMember } from "./groupTypes.ts";
-import { normalizePlayerName } from "./playerName.ts";
+import { playerKey } from "./playerName.ts";
 
 /** Any player being compared: a group member or a saved player, by name. */
 export interface ComparedPlayer {
@@ -54,15 +54,14 @@ export function groupPlayers(
   group: GroupLookup,
   profiles: readonly Profile[],
 ): GroupPlayer[] {
-  const key = (name: string) => normalizePlayerName(name).toLowerCase();
   const byName = new Map(
     profiles
       .filter((p) => p.source === "hiscores")
-      .map((p) => [key(p.name), p]),
+      .map((p) => [playerKey(p.name), p]),
   );
   return group.members.map((member) => ({
     member,
-    profile: byName.get(key(member.name)),
+    profile: byName.get(playerKey(member.name)),
   }));
 }
 

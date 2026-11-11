@@ -1,9 +1,6 @@
 import type { PlayerEvent, PlayerEventsImport } from "../playerTypes.ts";
-import {
-  adventurerError,
-  fetchAdventurer,
-  samePlayerName,
-} from "./adventurerLookup.ts";
+import { samePlayerName } from "../playerName.ts";
+import { adventurerError, fetchAdventurer } from "./adventurerLookup.ts";
 
 export function parseEventResponse(value: unknown): PlayerEventsImport {
   const unavailable = (): PlayerEventsImport => ({

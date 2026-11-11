@@ -1,16 +1,4 @@
 import type { PlayerImportStatus } from "../playerTypes.ts";
-import { normalizePlayerName } from "../playerName.ts";
-
-export function samePlayerName(a: string, b: string): boolean {
-  try {
-    return (
-      normalizePlayerName(a).toLocaleLowerCase("en") ===
-      normalizePlayerName(b).toLocaleLowerCase("en")
-    );
-  } catch {
-    return false;
-  }
-}
 
 export function adventurerError(
   value: unknown,

@@ -1,7 +1,7 @@
 import { parse } from "parse5";
 import { isGroupLookup, normalizeGroupQuery } from "../groupData.ts";
 import type { GroupLookup, GroupQuery } from "../groupTypes.ts";
-import { normalizePlayerName } from "../playerName.ts";
+import { normalizePlayerName, playerKey } from "../playerName.ts";
 import {
   createClientLimiter,
   IN_FLIGHT_RETRY_SECONDS,
@@ -247,15 +247,11 @@ export function parseGroupRoster(
           url.pathname.slice("/m=avatar-rs/".length, -"/chat.png".length),
         ),
       );
-      if (
-        normalizePlayerName(title).toLocaleLowerCase("en") !==
-        parsedName.toLocaleLowerCase("en")
-      )
-        throw unavailable();
+      if (playerKey(title) !== playerKey(parsedName)) throw unavailable();
     } catch {
       throw unavailable();
     }
-    const key = parsedName.toLocaleLowerCase("en");
+    const key = playerKey(parsedName);
     if (names.has(key)) throw unavailable();
     names.add(key);
     return { name: normalizePlayerName(title) };

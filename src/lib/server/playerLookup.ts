@@ -3,14 +3,17 @@ import {
   RS3_SKILL_NAMES,
   type SkillName,
 } from "../../skillNames.ts";
-import { normalizePlayerName } from "../playerName.ts";
+import {
+  normalizePlayerName,
+  playerKey,
+  samePlayerName,
+} from "../playerName.ts";
 import type {
   PlayerLevels,
   PlayerLookup,
   PlayerSkillStatistics,
 } from "../playerTypes.ts";
 import { lookupQuests } from "./questLookup.ts";
-import { samePlayerName } from "./adventurerLookup.ts";
 import { lookupEvents } from "./eventLookup.ts";
 import {
   createClientLimiter,
@@ -189,7 +192,7 @@ export function createPlayerLookupService(
         400,
       );
     }
-    const key = name.toLocaleLowerCase("en");
+    const key = playerKey(name);
     const cached = cache.get(key);
     if (cached && cached.expiresAt > now()) {
       cache.delete(key);

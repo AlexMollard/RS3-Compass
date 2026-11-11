@@ -5,7 +5,7 @@
   import { fetchGroup } from "../groupClient";
   import type { GroupLookup, GroupSize } from "../groupTypes";
   import { groupPlayers, groupSkillSummary } from "../groupProgress";
-  import { normalizePlayerName } from "../playerName";
+  import { publicProfileId } from "../playerName";
   import { relativeTime } from "../relativeTime";
   import { isSnapshotStale, rateLimitNotice } from "../sourceStatus";
   import SkillComparison from "../components/SkillComparison.svelte";
@@ -47,9 +47,7 @@
   let ids = $derived(members.flatMap((m) => (m.profile ? [m.profile.id] : [])));
   let syncKey = $derived(JSON.stringify([group?.id, ids]));
   let memberIds = $derived(
-    group?.members.map(
-      (m) => "rs3:" + normalizePlayerName(m.name).toLowerCase(),
-    ) ?? [],
+    group?.members.map((m) => publicProfileId(m.name)) ?? [],
   );
   let memberBusy = $derived(
     memberIds.some(
@@ -368,8 +366,7 @@
         .length} of {members.length} loaded"
     >
       {#each members as member, index (member.member.name)}
-        {@const id =
-          "rs3:" + normalizePlayerName(member.member.name).toLowerCase()}
+        {@const id = publicProfileId(member.member.name)}
         {@const memberSync = $sync[id]}
         {@const profile = member.profile}
         {@const active = profile?.id === $saved.activeId}

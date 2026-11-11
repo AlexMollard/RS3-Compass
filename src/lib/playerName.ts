@@ -10,3 +10,22 @@ export function normalizePlayerName(value: unknown): string {
   }
   return name;
 }
+
+/** Case-insensitive identity of a player name; throws like normalizePlayerName. */
+export function playerKey(name: unknown): string {
+  return normalizePlayerName(name).toLowerCase();
+}
+
+/** Persisted id of a public profile. Stored in localStorage: never change the format. */
+export function publicProfileId(name: unknown): string {
+  return "rs3:" + playerKey(name);
+}
+
+/** Whether two names are the same player; an invalid name never matches. */
+export function samePlayerName(a: string, b: string): boolean {
+  try {
+    return playerKey(a) === playerKey(b);
+  } catch {
+    return false;
+  }
+}

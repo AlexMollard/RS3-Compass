@@ -8,7 +8,7 @@ import {
   type Profile,
 } from "../data.ts";
 import type { CompassController, SavedState } from "./compassContext";
-import { normalizePlayerName } from "./playerName.ts";
+import { playerKey, publicProfileId } from "./playerName.ts";
 import { clearRememberedPlayer, rememberPlayer } from "./rememberedPlayer.ts";
 import {
   isFetchedAt,
@@ -172,9 +172,7 @@ export function createCompassController(): CompassController {
             (group) =>
               group.id === target.groupId &&
               group.members.some(
-                (member) =>
-                  normalizePlayerName(member.name).toLowerCase() ===
-                  normalizePlayerName(target.name).toLowerCase(),
+                (member) => playerKey(member.name) === playerKey(target.name),
               ),
           ) ?? false
         );
@@ -228,7 +226,7 @@ export function createCompassController(): CompassController {
       await Promise.all(
         group.members.map((member) => {
           const target: SyncTarget = {
-            id: "rs3:" + normalizePlayerName(member.name).toLowerCase(),
+            id: publicProfileId(member.name),
             name: member.name,
             groupId: group.id,
             kind: "Group Ironman",
@@ -336,7 +334,7 @@ export function createCompassController(): CompassController {
       rememberSelection(profile);
     },
     addPlayer(player, kind, mode, options) {
-      const id = "rs3:" + normalizePlayerName(player.name).toLowerCase();
+      const id = publicProfileId(player.name);
       const previousActiveId = get(state).activeId;
       const completed = new Set<string>();
       if (player.quests.status === "available") {

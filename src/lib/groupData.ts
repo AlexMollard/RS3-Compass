@@ -1,5 +1,5 @@
 import { RS3_SKILL_NAMES } from "../skillNames.ts";
-import { normalizePlayerName } from "./playerName.ts";
+import { playerKey } from "./playerName.ts";
 import type { GroupLookup, GroupQuery, GroupSize } from "./groupTypes.ts";
 
 function record(value: unknown): value is Record<string, unknown> {
@@ -64,7 +64,7 @@ export function isGroupLookup(value: unknown): value is GroupLookup {
     if (!record(member) || typeof member.name !== "string") return false;
     let name: string;
     try {
-      name = normalizePlayerName(member.name).toLocaleLowerCase("en");
+      name = playerKey(member.name);
     } catch {
       return false;
     }

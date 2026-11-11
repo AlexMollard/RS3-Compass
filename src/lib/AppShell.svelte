@@ -28,7 +28,7 @@
   import { wikiHref } from "../wiki";
   import { getCompass, setPlayerActions } from "./compassContext";
   import { fetchPlayer } from "./playerClient";
-  import { normalizePlayerName } from "./playerName";
+  import { publicProfileId } from "./playerName";
   import { readRememberedPlayer } from "./rememberedPlayer";
   import {
     NAV_GROUPS,
@@ -215,7 +215,7 @@
       if (!name) return;
       let id: string;
       try {
-        id = "rs3:" + normalizePlayerName(name).toLowerCase();
+        id = publicProfileId(name);
       } catch {
         return;
       }

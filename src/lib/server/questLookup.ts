@@ -1,9 +1,6 @@
 import type { PlayerQuest, QuestImport } from "../playerTypes.ts";
-import {
-  adventurerError,
-  fetchAdventurer,
-  samePlayerName,
-} from "./adventurerLookup.ts";
+import { samePlayerName } from "../playerName.ts";
+import { adventurerError, fetchAdventurer } from "./adventurerLookup.ts";
 
 export function parseQuestResponse(value: unknown): QuestImport {
   const unavailable = (): QuestImport => ({

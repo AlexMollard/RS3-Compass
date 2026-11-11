@@ -1,5 +1,5 @@
 import { isSkillName } from "../skillNames.ts";
-import { normalizePlayerName } from "./playerName.ts";
+import { normalizePlayerName, playerKey } from "./playerName.ts";
 import type {
   HiscoresImportStatus,
   PlayerEvent,
@@ -178,18 +178,16 @@ export function isPlayerLookup(value: unknown): value is PlayerLookup {
     value.events.status !== "available"
   )
     return false;
-  const key = normalizePlayerName(value.name).toLocaleLowerCase("en");
+  const key = playerKey(value.name);
   return (
     (value.quests.status === "available"
       ? playerName(value.quests.name) &&
-        normalizePlayerName(value.quests.name).toLocaleLowerCase("en") ===
-          key &&
+        playerKey(value.quests.name) === key &&
         isQuestProgress(value.quests)
       : unavailable(value.quests)) &&
     (value.events.status === "available"
       ? playerName(value.events.name) &&
-        normalizePlayerName(value.events.name).toLocaleLowerCase("en") ===
-          key &&
+        playerKey(value.events.name) === key &&
         isPlayerEvents(value.events.events)
       : unavailable(value.events))
   );

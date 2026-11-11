@@ -10,7 +10,7 @@
     questDifference,
     type ComparedPlayer,
   } from "../groupProgress";
-  import { normalizePlayerName } from "../playerName";
+  import { publicProfileId } from "../playerName";
   import { relativeTime } from "../relativeTime";
   import { isSnapshotStale } from "../sourceStatus";
   import { wikiHref } from "../../wiki";
@@ -93,7 +93,7 @@
       const mode =
         $saved.profiles.find((p) => p.id === $saved.activeId)?.mode ?? "f2p";
       controller.addPlayer(player, "Regular account", mode, { select: false });
-      const id = "rs3:" + normalizePlayerName(player.name).toLowerCase();
+      const id = publicProfileId(player.name);
       name = "";
       // The newcomer replaces the second player unless it is already the first.
       if (a && a.id !== id) choose("b", id);
