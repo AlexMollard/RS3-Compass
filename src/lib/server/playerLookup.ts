@@ -12,6 +12,11 @@ import type {
 import { lookupQuests } from "./questLookup.ts";
 import { samePlayerName } from "./adventurerLookup.ts";
 import { lookupEvents } from "./eventLookup.ts";
+import {
+  createClientLimiter,
+  IN_FLIGHT_RETRY_SECONDS,
+  retryAfterSeconds,
+} from "./rateLimit.ts";
 
 export const PLAYER_CACHE_MS = 10 * 60 * 1000;
 export const PLAYER_PARTIAL_CACHE_MS = 30 * 1000;
@@ -38,10 +43,13 @@ export function playerCacheMs(player: PlayerLookup): number {
 
 export class PlayerLookupError extends Error {
   readonly status: number;
-  constructor(message: string, status: number) {
+  /** Seconds a 429 asks the caller to wait, when known. */
+  readonly retryAfter?: number;
+  constructor(message: string, status: number, retryAfter?: number) {
     super(message);
     this.name = "PlayerLookupError";
     this.status = status;
+    this.retryAfter = retryAfter;
   }
 }
 
@@ -144,6 +152,7 @@ export function createPlayerLookupService(
   const requestTimes = new Float64Array(MAX_UPSTREAM_PER_MINUTE);
   let requestHead = 0;
   let requestCount = 0;
+  const takeClient = createClientLimiter();
   function cacheEntry(key: string, entry: CacheEntry) {
     cache.delete(key);
     cache.set(key, entry);
@@ -160,12 +169,17 @@ export function createPlayerLookupService(
       throw new PlayerLookupError(
         "Player lookup is busy. Wait a moment before trying again.",
         429,
+        retryAfterSeconds(requestTimes[requestHead], time),
       );
     requestTimes[(requestHead + requestCount) % MAX_UPSTREAM_PER_MINUTE] = time;
     requestCount++;
     return fetcher(input, init);
   };
-  async function lookup(rawName: unknown): Promise<PlayerLookup> {
+  /** `client` identifies the caller for its per-client share; omit it to use only the shared budget. */
+  async function lookup(
+    rawName: unknown,
+    client?: string,
+  ): Promise<PlayerLookup> {
     let name: string;
     try {
       name = normalizePlayerName(rawName);
@@ -190,9 +204,19 @@ export function createPlayerLookupService(
       throw new PlayerLookupError(
         "Player lookup is busy. Wait a moment before trying again.",
         429,
+        IN_FLIGHT_RETRY_SECONDS,
+      );
+    const clientWait =
+      client === undefined ? undefined : takeClient(client, now());
+    if (clientWait !== undefined)
+      throw new PlayerLookupError(
+        "Too many player lookups from this connection. Wait a moment before trying again.",
+        429,
+        clientWait,
       );
     const request = (async () => {
       let rateLimited = false;
+      let retryAfter: number | undefined;
       const notFound = new Set<string>();
       const sourceFetch: typeof fetch = async (input, init) => {
         try {
@@ -202,8 +226,10 @@ export function createPlayerLookupService(
             notFound.add(new URL(String(input)).pathname);
           return response;
         } catch (error) {
-          if (error instanceof PlayerLookupError && error.status === 429)
+          if (error instanceof PlayerLookupError && error.status === 429) {
             rateLimited = true;
+            retryAfter = error.retryAfter;
+          }
           throw error;
         }
       };
@@ -278,6 +304,7 @@ export function createPlayerLookupService(
           ? new PlayerLookupError(
               "Player lookup is busy. Wait a moment before trying again.",
               429,
+              retryAfter,
             )
           : allMissing
             ? new PlayerLookupError(

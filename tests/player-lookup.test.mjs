@@ -5,6 +5,7 @@ import {
   parseHiscores,
   PLAYER_CACHE_MS,
 } from "../src/lib/server/playerLookup.ts";
+import { createClientLimiter } from "../src/lib/server/rateLimit.ts";
 import { normalizePlayerName } from "../src/lib/playerName.ts";
 import { RS3_SKILL_NAMES } from "../src/skillNames.ts";
 
@@ -267,6 +268,36 @@ test("budget counts actual calls, allows hits, and avoids reserving unsent reque
   time = 60000;
   await service.lookup("Player 15");
   assert.equal(calls.length, 64);
+});
+
+test("one client's share cannot drain the shared budget, and 429s carry the real wait", async () => {
+  let time = 0;
+  const calls = [];
+  const service = createPlayerLookupService(fetchAll(calls), () => time);
+  for (let i = 0; i < 6; i++) await service.lookup("Player " + i, "1.1.1.1");
+  await service.lookup("Player 0", "1.1.1.1");
+  assert.equal(calls.length, 24);
+  time = 10_000;
+  await assert.rejects(service.lookup("Player 6", "1.1.1.1"), {
+    status: 429,
+    retryAfter: 50,
+  });
+  assert.equal(calls.length, 24);
+  await service.lookup("Player 6", "2.2.2.2");
+  for (let i = 7; i < 15; i++) await service.lookup("Player " + i);
+  assert.equal(calls.length, 60);
+  await assert.rejects(service.lookup("Player 15"), {
+    status: 429,
+    retryAfter: 50,
+  });
+});
+
+test("the per-client limiter forgets the least recently seen clients past its cap", () => {
+  const take = createClientLimiter(1);
+  assert.equal(take("a", 0), undefined);
+  assert.equal(take("a", 1000), 59);
+  for (let i = 0; i < 1024; i++) take("client " + i, 1000);
+  assert.equal(take("a", 1000), undefined);
 });
 
 test("partial response at budget boundary keeps available data and retries after short cache", async () => {

@@ -119,6 +119,41 @@ test("coalesces aliases, caches successes and does not cache failed source data"
   assert.equal(calls, 5);
 });
 
+test("an upstream 429 is reported as busy, not as invalid data", async () => {
+  const service = createGroupLookupService(async () =>
+    response("Too many requests", 429),
+  );
+  await assert.rejects(
+    service.lookup(query),
+    (error) => error instanceof GroupLookupError && error.status === 429,
+  );
+});
+
+test("one client's share leaves the group budget for others", async () => {
+  let time = 0;
+  let calls = 0;
+  const service = createGroupLookupService(
+    async () => {
+      calls++;
+      return response(listing([]));
+    },
+    () => time,
+  );
+  for (let i = 0; i < 6; i++)
+    await assert.rejects(service.lookup({ ...query, name: "g" + i }, "a"), {
+      status: 404,
+    });
+  time = 15_000;
+  await assert.rejects(service.lookup({ ...query, name: "g6" }, "a"), {
+    status: 429,
+    retryAfter: 45,
+  });
+  assert.equal(calls, 6);
+  await assert.rejects(service.lookup({ ...query, name: "g6" }, "b"), {
+    status: 404,
+  });
+});
+
 test("rejects oversized streaming responses before reading further", async () => {
   let cancelled = false;
   let reads = 0;

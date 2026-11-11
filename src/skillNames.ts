@@ -33,6 +33,12 @@ export const RS3_SKILL_NAMES = [
 
 export type SkillName = (typeof RS3_SKILL_NAMES)[number];
 
+/** The skill named `name` in any letter case, if there is one. */
+export function canonicalSkillName(name: string): SkillName | undefined {
+  const key = name.toLowerCase();
+  return RS3_SKILL_NAMES.find((skill) => skill.toLowerCase() === key);
+}
+
 // Row-major order from the RuneScape Skills interface:
 // https://runescape.wiki/images/Skill_screen.png
 export const SKILL_GAME_ORDER: readonly SkillName[] = [

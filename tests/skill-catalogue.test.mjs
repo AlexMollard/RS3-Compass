@@ -25,6 +25,13 @@ test("Every public RS3 skill identity has one reachable Compass guide", () => {
   );
 });
 
+test("Training Wiki links name articles, not missing subpages", () => {
+  // The Wiki has no "Skill/Training" subpages; those links 404.
+  for (const skill of SKILLS)
+    if (skill.trainingWiki)
+      assert.ok(!skill.trainingWiki.includes("/"), skill.name);
+});
+
 export function assertTrainingRanges(skills) {
   for (const skill of skills) {
     assert.ok(skill.stages.length > 0, skill.name + " has no training method");

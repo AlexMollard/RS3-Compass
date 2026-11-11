@@ -703,7 +703,11 @@ const magicWeapons: EquipmentRecommendation[] = [
     1,
     "magic weapon",
     "Two-handed staff supplies air runes; bring any other runes needed for your spell.",
-    { methods: nonDragonCombat, levels: [{ skill: "Magic", level: 1 }] },
+    {
+      twoHanded: true,
+      methods: nonDragonCombat,
+      levels: [{ skill: "Magic", level: 1 }],
+    },
   ),
   ...(
     [

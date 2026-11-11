@@ -16,6 +16,8 @@ export interface EquipmentRecommendation extends ItemReference {
   planningSkill?: SkillName;
   members?: boolean;
   optional?: boolean;
+  // Leaves no hand free, so no off-hand item is recommended alongside it.
+  twoHanded?: boolean;
   condition?: string;
   levels?: { skill: SkillName; level: number }[];
   unlocks?: string[];

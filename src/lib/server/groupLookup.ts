@@ -2,6 +2,11 @@ import { parse } from "parse5";
 import { isGroupLookup, normalizeGroupQuery } from "../groupData.ts";
 import type { GroupLookup, GroupQuery } from "../groupTypes.ts";
 import { normalizePlayerName } from "../playerName.ts";
+import {
+  createClientLimiter,
+  IN_FLIGHT_RETRY_SECONDS,
+  retryAfterSeconds,
+} from "./rateLimit.ts";
 
 export const GROUP_CACHE_MS = 10 * 60 * 1000;
 const MAX_CACHED = 128;
@@ -29,11 +34,20 @@ const sameName = (a: string, b: string) =>
 
 export class GroupLookupError extends Error {
   readonly status: number;
-  constructor(message: string, status: number) {
+  /** Seconds a 429 asks the caller to wait, when known. */
+  readonly retryAfter?: number;
+  constructor(message: string, status: number, retryAfter?: number) {
     super(message);
     this.status = status;
+    this.retryAfter = retryAfter;
   }
 }
+const busy = (retryAfter?: number) =>
+  new GroupLookupError(
+    "Group lookup is busy. Wait a moment before trying again.",
+    429,
+    retryAfter,
+  );
 const unavailable = () =>
   new GroupLookupError(
     "RuneScape's group service returned unavailable or invalid data. Existing progress has not changed.",
@@ -255,14 +269,12 @@ export function createGroupLookupService(
   const cache = new Map<string, GroupLookup>();
   const pending = new Map<string, Promise<GroupLookup>>();
   const times: number[] = [];
+  const takeClient = createClientLimiter();
   async function request(url: URL): Promise<string> {
     const time = now();
     while (times.length && time - times[0] >= 60_000) times.shift();
     if (times.length >= MAX_PER_MINUTE)
-      throw new GroupLookupError(
-        "Group lookup is busy. Wait a moment before trying again.",
-        429,
-      );
+      throw busy(retryAfterSeconds(times[0], time));
     times.push(time);
     const response = await fetcher(url, {
       signal: AbortSignal.timeout(8000),
@@ -271,12 +283,18 @@ export function createGroupLookupService(
         "user-agent": "RS3 Compass public Group Ironman lookup",
       },
     });
+    if (response.status === 429) {
+      await response.body?.cancel();
+      throw busy();
+    }
     if (
       !response.ok ||
       Number(response.headers.get("content-length")) > MAX_HTML ||
       !response.body
-    )
+    ) {
+      await response.body?.cancel();
       throw unavailable();
+    }
     const reader = response.body.getReader();
     const decoder = new TextDecoder("utf-8", { fatal: true });
     const parts: string[] = [];
@@ -298,7 +316,8 @@ export function createGroupLookupService(
       reader.releaseLock();
     }
   }
-  async function lookup(input: unknown): Promise<GroupLookup> {
+  /** `client` identifies the caller for its per-client share; omit it to use only the shared budget. */
+  async function lookup(input: unknown, client?: string): Promise<GroupLookup> {
     let query: GroupQuery;
     try {
       query = normalizeGroupQuery(input);
@@ -318,10 +337,14 @@ export function createGroupLookupService(
     cache.delete(key);
     const existing = pending.get(key);
     if (existing) return existing;
-    if (pending.size >= MAX_IN_FLIGHT)
+    if (pending.size >= MAX_IN_FLIGHT) throw busy(IN_FLIGHT_RETRY_SECONDS);
+    const clientWait =
+      client === undefined ? undefined : takeClient(client, now());
+    if (clientWait !== undefined)
       throw new GroupLookupError(
-        "Group lookup is busy. Wait a moment before trying again.",
+        "Too many group lookups from this connection. Wait a moment before trying again.",
         429,
+        clientWait,
       );
     const task = (async () => {
       try {

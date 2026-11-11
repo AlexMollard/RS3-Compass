@@ -275,7 +275,7 @@ export const SUPPORT_ITEMS: ItemReference[] = [
 // Training sources: https://runescape.wiki/w/Skill_mastery
 // https://runescape.wiki/w/Agility_training https://runescape.wiki/w/Thieving_training
 // https://runescape.wiki/w/Free-to-play_Runecrafting_training https://runescape.wiki/w/Construction_training
-// https://runescape.wiki/w/Dungeoneering/Training https://runescape.wiki/w/Divination_training
+// https://runescape.wiki/w/Free-to-play_Dungeoneering_training https://runescape.wiki/w/Divination_training
 // https://runescape.wiki/w/Invention_training https://runescape.wiki/w/Archaeology_training
 type Option = SkillRecord["stages"][number]["options"][number];
 // Coordinates below are sourced from each linked article's Map, NPC map or Object map wikitext.
@@ -1422,7 +1422,7 @@ export const SUPPORT_SKILLS: SkillRecord[] = [
     maxLevel: 120,
     payoff: "Earn tokens and unlock deeper floors.",
     wiki: "Dungeoneering",
-    trainingWiki: "Dungeoneering/Training",
+    trainingWiki: "Free-to-play Dungeoneering training",
     membersNote:
       "Free players can reach 120, although some floors, rooms and rewards are members-only.",
     stages: [
