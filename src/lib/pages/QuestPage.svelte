@@ -543,7 +543,7 @@
   /* Art and title on top, reward chips beneath both, start card beside them. */
   .quest-hero {
     display: grid;
-    grid-template-columns: 240px minmax(0, 1fr) minmax(240px, 300px);
+    grid-template-columns: 300px minmax(0, 1fr) minmax(280px, 380px);
     grid-template-areas:
       "art copy start"
       "chips chips start";
@@ -557,7 +557,7 @@
   .quest-hero-art {
     grid-area: art;
     position: relative;
-    height: 160px;
+    height: 200px;
     overflow: hidden;
     background: #0d161c;
     border-radius: 2px;
@@ -709,7 +709,7 @@
     border-radius: 0;
   }
   .quest-start-card :global(.world-map-canvas) {
-    height: 132px;
+    height: 180px;
   }
   .quest-start-card :global(.leaflet-control-attribution) {
     font-size: 10px;
@@ -1140,7 +1140,7 @@
       grid-row: auto;
     }
     .quest-hero {
-      grid-template-columns: 200px minmax(0, 1fr);
+      grid-template-columns: 260px minmax(0, 1fr);
       grid-template-areas:
         "art copy"
         "chips chips"
