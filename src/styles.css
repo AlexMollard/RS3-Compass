@@ -384,6 +384,8 @@ textarea {
 }
 .workspace {
   min-width: 0;
+  /* Full-bleed bars (the quest action bar) stop here; clip keeps sticky working. */
+  overflow-x: clip;
 }
 .topbar {
   position: sticky;

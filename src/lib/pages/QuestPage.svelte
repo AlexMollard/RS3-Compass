@@ -1113,6 +1113,14 @@
     gap: 10px;
     margin: 0 -32px;
     padding: 12px 32px;
+  }
+  /* The background runs past the capped page column to the workspace edges;
+     .workspace clips it at the sidebar. */
+  .quest-actionbar::before {
+    content: "";
+    position: absolute;
+    inset: 0 -100vmax;
+    z-index: -1;
     background: #0d151bf2;
     border-top: 1px solid #34444f;
   }
@@ -1188,6 +1196,9 @@
       order: 2;
       width: min(100%, 240px);
       box-sizing: border-box;
+    }
+    .quest-actionbar::before {
+      display: none;
     }
     .quest-actionbar {
       position: static;
