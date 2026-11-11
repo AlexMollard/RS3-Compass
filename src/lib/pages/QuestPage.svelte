@@ -300,7 +300,15 @@
               manual; they do not read your bank or inventory.
             </p>
           {:else}
-            <p class="cap pack-note">Nothing to pack for this quest.</p>
+            <div class="pack-empty">
+              <div class="inv inv-empty" aria-hidden="true">
+                {#each { length: INVENTORY_SIZE } as _}<span class="slot empty"></span>{/each}
+              </div>
+              <div class="pack-empty-text">
+                <strong>Nothing to pack</strong>
+                <p class="cap">The Wiki lists no items for this quest, so you can set off with an empty inventory.</p>
+              </div>
+            </div>
           {/if}
         </section>
 
@@ -525,7 +533,9 @@
 </div>
 
 <style>
+  /* Layout switches on the page's own width (sidebar or not), not the window's. */
   .quest-page {
+    container: quest / inline-size;
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -716,6 +726,7 @@
     overflow: hidden;
   }
   .quest-start-card :global(.world-map) {
+    grid-column: auto;
     border: 0;
     border-radius: 0;
   }
@@ -858,6 +869,31 @@
   .pack-note {
     margin-top: auto;
     padding: 0 16px 16px;
+  }
+  /* No items: a faded empty inventory beside the message, centred in the card. */
+  .pack-empty {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    padding: 24px;
+  }
+  .inv-empty {
+    opacity: 0.55;
+  }
+  .pack-empty-text {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-width: 280px;
+  }
+  .pack-empty-text strong {
+    font:
+      600 18px/1.2 "Cinzel",
+      Georgia,
+      serif;
+    color: var(--heading);
   }
   .inv {
     flex: 0 0 176px;
@@ -1142,12 +1178,47 @@
     gap: 8px;
   }
 
-  @media (max-width: 1100px) {
+  /* Art, title and start card side by side need about 1080px. */
+  @container quest (max-width: 1080px) {
+    .quest-hero {
+      grid-template-columns: 260px minmax(0, 1fr);
+      grid-template-areas:
+        "art copy"
+        "chips chips"
+        "start start";
+    }
+    .reward-chips {
+      flex-wrap: wrap;
+    }
+    /* Full-width start card: map and NPC side by side rather than a long strip. */
+    .quest-start-card {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+    .start-who {
+      border-top: 0;
+      border-left: 1px solid var(--line);
+    }
+  }
+  @container quest (max-width: 860px) {
     .reward-cards {
       grid-template-columns: minmax(0, 1fr) !important;
     }
   }
-  @media (max-width: 900px) {
+  @container quest (max-width: 600px) {
+    .quest-hero {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas: "art" "copy" "chips" "start";
+    }
+    .quest-start-card {
+      display: flex;
+    }
+    .start-who {
+      border-left: 0;
+      border-top: 1px solid var(--line);
+    }
+  }
+  @container quest (max-width: 720px) {
     .prepare-grid,
     .detail-grid {
       grid-template-columns: minmax(0, 1fr);
@@ -1158,16 +1229,6 @@
     .wiki-card {
       grid-column: auto;
       grid-row: auto;
-    }
-    .quest-hero {
-      grid-template-columns: 260px minmax(0, 1fr);
-      grid-template-areas:
-        "art copy"
-        "chips chips"
-        "start start";
-    }
-    .reward-chips {
-      flex-wrap: wrap;
     }
   }
   @media (max-width: 760px) {
@@ -1206,6 +1267,13 @@
       order: 2;
       width: min(100%, 240px);
       box-sizing: border-box;
+    }
+    .pack-empty {
+      flex-direction: column;
+      text-align: center;
+    }
+    .pack-empty .inv {
+      width: 140px;
     }
     .quest-actionbar::before,
     .quest-hero::before {
