@@ -1,5 +1,6 @@
 import type { Profile, QuestRecord } from "../data.ts";
 import { QUEST_COMBAT } from "../combatData.ts";
+import { questStatus, type QuestStatus } from "./questMap.ts";
 
 export interface QuestReadiness {
   levels: { met: number; total: number; unknown: number };
@@ -40,6 +41,40 @@ export function questReadiness(
     pack: { packed, total: quest.supplies.length },
     danger,
   };
+}
+
+/**
+ * Whether the player can start a quest now: "ready" needs every earlier quest done and every
+ * required level met (an unrecorded level counts as met); "levels" is short only on levels.
+ */
+export function questStartStatus(
+  quest: Pick<QuestRecord, "id" | "requirements" | "supplies" | "questRequirements">,
+  profile: Pick<Profile, "levels" | "packed">,
+  completed: ReadonlySet<string>,
+): QuestStatus {
+  const status = questStatus(quest, completed);
+  if (status !== "ready") return status;
+  const { met, unknown, total } = questReadiness(quest, profile).levels;
+  return met + unknown === total ? "ready" : "levels";
+}
+
+/** The quest page's one-line status, most blocking first. */
+export function questStartMessage(s: {
+  complete: boolean;
+  membersOnly: boolean;
+  levelsShort: number;
+  earlierLeft: number;
+  packed: number;
+  supplies: number;
+}): string {
+  if (s.complete) return "Marked complete in Compass.";
+  if (s.membersOnly) return "Members quest. Switch to Members planning to play it.";
+  if (s.levelsShort > 0)
+    return `${s.levelsShort} level ${s.levelsShort === 1 ? "check is" : "checks are"} below target.`;
+  if (s.earlierLeft > 0)
+    return `${s.earlierLeft} earlier quest${s.earlierLeft === 1 ? "" : "s"} to finish first.`;
+  if (s.packed < s.supplies) return `${s.packed} of ${s.supplies} items packed.`;
+  return "Ready to start. Follow the walkthrough on the Wiki.";
 }
 
 export function closeToUnlocking(

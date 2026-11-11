@@ -2,7 +2,8 @@ import type { QuestRecord } from "../data.ts";
 
 type Node = Pick<QuestRecord, "id" | "questRequirements">;
 
-export type QuestStatus = "done" | "ready" | "locked";
+/** "levels": every earlier quest is done but a required skill level is not (see questStartStatus). */
+export type QuestStatus = "done" | "ready" | "levels" | "locked";
 
 /** Difficulty edge colours, matching the dots in the quest finder. */
 export const difficultyColor = (difficulty: string) =>

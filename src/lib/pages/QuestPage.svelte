@@ -18,7 +18,7 @@
   import { questPath, skillPath } from "../navigation";
   import { questLine } from "../questLine";
   import { earlierQuests } from "../questMap";
-  import { questReadiness } from "../questReadiness";
+  import { questReadiness, questStartMessage } from "../questReadiness";
   import { experienceRewards, groupRewards, lampLabel, rewardSummary } from "../questRewards";
   import { findPlayerQuest } from "../playerProgress";
   import { LOCATIONS } from "../../locations";
@@ -107,15 +107,14 @@
   let line = $derived(questLine(quest, QUESTS));
   let levelsShort = $derived(readiness.levels.total - readiness.levels.met - readiness.levels.unknown);
   let status = $derived(
-    complete
-      ? "Marked complete in Compass."
-      : locked
-        ? "Members quest. Switch to Members planning to play it."
-        : levelsShort > 0
-          ? `${levelsShort} level ${levelsShort === 1 ? "check is" : "checks are"} below target.`
-          : packedItems.length < quest.supplies.length
-            ? `${packedItems.length} of ${quest.supplies.length} items packed.`
-            : "Ready to start. Follow the walkthrough on the Wiki.",
+    questStartMessage({
+      complete,
+      membersOnly: locked,
+      levelsShort,
+      earlierLeft: prerequisites.length - prerequisitesDone,
+      packed: packedItems.length,
+      supplies: quest.supplies.length,
+    }),
   );
   const skillIcon = (name: string) =>
     SKILLS.find((s) => s.name === name)?.icon ?? "Skills_icon.png";

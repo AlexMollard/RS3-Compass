@@ -10,9 +10,9 @@
     earlierQuests,
     layoutQuestMap,
     pathColumns,
-    questStatus,
     type QuestStatus,
   } from "../questMap";
+  import { questStartStatus } from "../questReadiness";
   import Button from "../components/Button.svelte";
   import ChoiceStrip from "../components/ChoiceStrip.svelte";
   import GameArt from "../components/GameArt.svelte";
@@ -33,11 +33,15 @@
   let layout = $derived(layoutQuestMap(route));
   let completed = $derived(new Set(profile.completedQuests));
   let status = $derived(
-    new Map<string, QuestStatus>(route.map((q) => [q.id, questStatus(q, completed)])),
+    new Map<string, QuestStatus>(
+      route.map((q) => [q.id, questStartStatus(q, profile, completed)]),
+    ),
   );
   let counts = $derived({
     done: route.filter((q) => status.get(q.id) === "done").length,
     ready: route.filter((q) => status.get(q.id) === "ready").length,
+    levels: route.filter((q) => status.get(q.id) === "levels").length,
+    locked: route.filter((q) => status.get(q.id) === "locked").length,
   });
 
   // The goal comes from the link first, then the last goal picked on this device.
@@ -108,7 +112,8 @@
       <p>
         <strong>{counts.done} of {route.length}</strong> complete ·
         <strong class="ready-count">{counts.ready}</strong> you can start now ·
-        {route.length - counts.done - counts.ready} need earlier quests first
+        {counts.levels} need higher levels ·
+        {counts.locked} need earlier quests first
       </p>
     </div>
     <ChoiceStrip
@@ -145,8 +150,8 @@
         >{/each}{/if}
     <span class="legend" aria-hidden="true"
       ><span><i class="key done"></i>Completed</span><span><i class="key ready"></i>Can start</span><span
-        ><i class="key locked"></i>Needs earlier quests</span
-      ></span
+        ><i class="key levels"></i>Needs levels</span
+      ><span><i class="key locked"></i>Needs earlier quests</span></span
     >
   </div>
 
@@ -201,7 +206,9 @@
                   ? "Completed"
                   : status.get(selected.id) === "ready"
                     ? "Can start now"
-                    : "Needs earlier quests"}</small
+                    : status.get(selected.id) === "levels"
+                      ? "Needs higher levels"
+                      : "Needs earlier quests"}</small
               >
             </div>
           </div>
@@ -237,7 +244,9 @@
           </ul>
           {#if ready.length > 6}<p class="more">
               and {ready.length - 6} more, shown with a gold dot on the map
-            </p>{/if}{:else}<p class="empty">Nothing to start: every quest on your route is done or waiting on another.</p>{/if}
+            </p>{/if}{:else}<p class="empty">
+            Nothing to start: every quest on your route is done or waiting on earlier quests or levels.
+          </p>{/if}
       </GameWindow>
     </aside>
   </div>
@@ -375,6 +384,9 @@
   .key.ready {
     background: #d6b576;
   }
+  .key.levels {
+    background: #8a7650;
+  }
   .key.locked {
     background: #3a4c58;
     box-shadow: inset 0 0 0 1px var(--edge);
@@ -429,6 +441,9 @@
   }
   .state.ready {
     color: var(--gold-bright);
+  }
+  .state.levels {
+    color: #c9ad78;
   }
   .diff {
     display: inline-block;

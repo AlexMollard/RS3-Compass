@@ -78,7 +78,13 @@
               style:--difficulty={difficultyColor(q.difficulty)}
               ><GameArt file={q.icon} size={24} /><span class="text"
                 ><strong>{q.name}</strong><small
-                  >{s === "done" ? "Completed" : s === "ready" ? "Can start now" : q.difficulty + " · " + q.length}</small
+                  >{s === "done"
+                    ? "Completed"
+                    : s === "ready"
+                      ? "Can start now"
+                      : s === "levels"
+                        ? "Needs higher levels"
+                        : q.difficulty + " · " + q.length}</small
                 ></span
               >{#if s === "done"}<Check size={16} class="state" aria-label="Completed" />{:else if s === "locked"}<Lock
                   size={14}
@@ -196,6 +202,9 @@
   }
   .path-card.ready small {
     color: var(--gold-bright);
+  }
+  .path-card.levels small {
+    color: #c9ad78;
   }
   .path-card :global(.state) {
     flex: none;

@@ -310,7 +310,9 @@
               ? 'Completed'
               : s === 'ready'
                 ? 'Can start now'
-                : 'Needs earlier quests'}"
+                : s === 'levels'
+                  ? 'Needs higher levels'
+                  : 'Needs earlier quests'}"
             aria-label={q.name}
             aria-pressed={q.id === selected}
             onclick={() => onSelect(q.id)}
@@ -318,7 +320,7 @@
             >{#if !dots}<span class="mark" aria-hidden="true"
                 >{#if s === "done"}<svg viewBox="0 0 24 24" width="12" height="12"
                     ><path d="m5 12 5 5 9-10" /></svg
-                  >{:else if s === "ready"}<span class="ready-dot"></span>{:else}<Lock
+                  >{:else if s === "ready" || s === "levels"}<span class="ready-dot {s}"></span>{:else}<Lock
                     size={11}
                   />{/if}</span
               ><span class="name">{shortQuestName(q.name)}</span>{/if}</button
@@ -514,6 +516,9 @@
     border-radius: 50%;
     background: #d6b576;
   }
+  .ready-dot.levels {
+    background: #8a7650;
+  }
   .name {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -533,6 +538,9 @@
   }
   .map-quest.dot.ready {
     background: #d6b576;
+  }
+  .map-quest.dot.levels {
+    background: #8a7650;
   }
   .map-quest.dot.on-path {
     box-shadow: 0 0 0 calc(var(--dot) / 5) var(--gold-bright);
@@ -626,6 +634,9 @@
   }
   .mini.ready {
     fill: #d6b576;
+  }
+  .mini.levels {
+    fill: #8a7650;
   }
   .mini.on-path {
     fill: var(--gold-bright);

@@ -5,7 +5,34 @@ import { QUEST_COMBAT } from "../src/combatData.ts";
 import {
   questReadiness,
   closeToUnlocking,
+  questStartMessage,
+  questStartStatus,
 } from "../src/lib/questReadiness.ts";
+
+test("a quest is startable only when earlier quests and required levels are done", () => {
+  const q = {
+    id: "q",
+    requirements: [
+      { skill: "Mining", level: 10 },
+      { skill: "Cooking", level: 50, recommended: true },
+    ],
+    supplies: [],
+    questRequirements: ["a"],
+  };
+  const profile = (levels) => ({ levels, packed: [] });
+  assert.equal(questStartStatus(q, profile({ Mining: 10 }), new Set()), "locked");
+  assert.equal(questStartStatus(q, profile({ Mining: 9 }), new Set(["a"])), "levels");
+  assert.equal(questStartStatus(q, profile({ Mining: 10 }), new Set(["a"])), "ready");
+  assert.equal(questStartStatus(q, profile({}), new Set(["a"])), "ready", "unrecorded counts as met");
+  assert.equal(questStartStatus(q, profile({}), new Set(["a", "q"])), "done");
+});
+
+test("the quest page never says ready while earlier quests are unfinished", () => {
+  const base = { complete: false, membersOnly: false, levelsShort: 0, packed: 0, supplies: 0 };
+  assert.equal(questStartMessage({ ...base, earlierLeft: 1 }), "1 earlier quest to finish first.");
+  assert.equal(questStartMessage({ ...base, earlierLeft: 3 }), "3 earlier quests to finish first.");
+  assert.equal(questStartMessage({ ...base, earlierLeft: 0 }), "Ready to start. Follow the walkthrough on the Wiki.");
+});
 
 const quest = (over = {}) => ({
   id: "q",
