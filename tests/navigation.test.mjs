@@ -1,6 +1,13 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { NAV_GROUPS, PHONE_TABS, routeFor } from "../src/lib/navigation.ts";
+import { load as loadQuestRoute } from "../src/routes/quests/[[id]]/+page.ts";
+
+test("an unknown quest id is a 404, not a different quest", () => {
+  assert.throws(() => loadQuestRoute({ params: { id: "not-a-real-quest" } }), (e) => e.status === 404);
+  assert.doesNotThrow(() => loadQuestRoute({ params: { id: "cooks-assistant" } }));
+  assert.doesNotThrow(() => loadQuestRoute({ params: {} }));
+});
 
 test("routeFor maps paths to shell routes", () => {
   assert.equal(routeFor("/"), "home");
