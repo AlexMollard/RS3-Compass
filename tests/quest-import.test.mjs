@@ -5,8 +5,21 @@ import {
   mapPin,
   parseQuestreq,
   plain,
+  questSeries,
   templateParams,
 } from "../scripts/questWikitext.mjs";
+
+test("quest series reads the infobox name and position, and skips missing or odd ones", () => {
+  const page = (extra) => `{{Infobox Quest\n|name = X\n${extra}\n}}\nLead.`;
+  assert.deepEqual(
+    questSeries(page("|main_series = [[Elf (Prifddinas)|Elf]]\n|series_nth = 9")),
+    { name: "Elf", order: 9 },
+  );
+  assert.equal(questSeries(page("|difficulty = Easy")), undefined);
+  assert.equal(questSeries(page("|main_series = None\n|series_nth = 1")), undefined);
+  assert.equal(questSeries(page("|main_series = Pirate\n|series_nth = 3rd")), undefined);
+  assert.equal(questSeries("no infobox"), undefined);
+});
 
 test("template parameters split at top-level pipes only", () => {
   const params = templateParams(

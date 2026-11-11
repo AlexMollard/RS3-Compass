@@ -78,6 +78,17 @@ export function firstLink(text = "") {
   return match?.[1].trim();
 }
 
+/** The storyline series from {{Infobox Quest}}: main_series and a positive-integer series_nth. */
+export function questSeries(text) {
+  const infobox = templateParams(text, "Infobox Quest");
+  if (!infobox) return undefined;
+  const name = plain(infobox.main_series ?? "");
+  const nth = (infobox.series_nth ?? "").trim();
+  if (!name || /^(none|no)$/i.test(name) || !/^\d+$/.test(nth)) return undefined;
+  const order = Number(nth);
+  return order > 0 ? { name, order } : undefined;
+}
+
 export function parseQuestreq(lua) {
   const map = new Map();
   for (const match of lua.matchAll(/\["([^"]+)"\]\s*=\s*\{([^}]*)\}/g)) {
