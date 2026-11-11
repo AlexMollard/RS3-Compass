@@ -75,7 +75,10 @@
       (($saved.welcomed === false && !$storageError) ||
         (!profile && !peopleRoute)),
   );
-  let questBar = $derived(route === "quests" && !page.error && !showFirstVisit && !!profile);
+  // The quest bar belongs to a single quest; the quests home keeps the plain search.
+  let questBar = $derived(
+    route === "quests" && !!page.params.id && !page.error && !showFirstVisit && !!profile,
+  );
   let samples = $derived(
     $saved.profiles.filter((p) => SAMPLE_PROFILES.some((s) => s.id === p.id)),
   );

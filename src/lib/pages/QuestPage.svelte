@@ -7,8 +7,9 @@
     ExternalLink,
     Globe,
     Info,
+    Map as MapIcon,
   } from "@lucide/svelte";
-  import { QUESTS, SKILLS, toggleItem } from "../../data";
+  import { QUESTS, SKILLS, progressionQuests, toggleItem } from "../../data";
   import { QUEST_COMBAT } from "../../combatData";
   import { QUICK_GUIDES } from "../../questsImported";
   import { wikiHref, wikiImage } from "../../wiki";
@@ -16,6 +17,7 @@
   import { INVENTORY_SIZE, inventorySlots } from "../inventorySlots";
   import { questPath, skillPath } from "../navigation";
   import { questLine } from "../questLine";
+  import { earlierQuests } from "../questMap";
   import { questReadiness } from "../questReadiness";
   import { experienceRewards, groupRewards, rewardSummary } from "../questRewards";
   import { findPlayerQuest } from "../playerProgress";
@@ -81,6 +83,13 @@
   );
   let prerequisitesDone = $derived(
     prerequisites.filter((q) => profile.completedQuests.includes(q.id)).length,
+  );
+  // The quest map's path view, when this quest is on the planning route and needs earlier quests.
+  let allEarlier = $derived(earlierQuests(quest.id, QUESTS).size);
+  let mapHref = $derived(
+    allEarlier && progressionQuests(profile).some((q) => q.id === quest.id)
+      ? `/quests?goal=${encodeURIComponent(quest.id)}&view=path`
+      : undefined,
   );
   let summary = $derived(rewardSummary(quest.rewards));
   let groups = $derived(groupRewards(quest.rewards));
@@ -170,6 +179,9 @@
         {#if quest.completionMembers && profile.mode === "f2p"}<span>Members to finish</span>{/if}
       </div>
       <p class="quest-why"><GameText text={quest.why} /></p>
+      {#if mapHref}<a class="map-path-link" href={mapHref}
+          ><MapIcon size={16} aria-hidden="true" />See the quests before {quest.name} on the quest map ›</a
+        >{/if}
     </div>
     {#if summary.length}<button
           type="button"
@@ -345,6 +357,9 @@
                     completed={profile.completedQuests.includes(prerequisite.id)}
                     onOpen={open}
                   />{/each}
+                {#if mapHref}<a class="map-path-link" href={mapHref}
+                    ><MapIcon size={16} aria-hidden="true" />Show all {allEarlier} earlier quests on the map ›</a
+                  >{/if}
               </li>{/if}
             <li>
               {#if !combat}{@render check("info")}<span>Combat</span><strong>Not recorded</strong
@@ -652,10 +667,25 @@
     font-size: 14px;
     line-height: 22px;
   }
+  .map-path-link {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    gap: 8px;
+    min-height: 32px;
+    color: var(--gold-bright);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .map-path-link:hover {
+    color: var(--heading);
+    text-decoration: underline;
+  }
   .reward-chips {
     grid-area: chips;
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
+    align-content: flex-start;
     min-width: 0;
     gap: 10px;
     padding: 0;
@@ -668,7 +698,8 @@
   }
   .reward-chip {
     display: flex;
-    flex: 0 1 auto;
+    /* Chips keep their full text and wrap onto a new row rather than truncate. */
+    flex: 0 0 auto;
     align-items: center;
     gap: 10px;
     min-width: 0;

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Check, Info, Search, X } from "@lucide/svelte";
-  import type { Profile, QuestRecord } from "../../data";
+  import { progressionQuests, type Profile, type QuestRecord } from "../../data";
   import ChoiceStrip from "./ChoiceStrip.svelte";
   import GameArt from "./GameArt.svelte";
   import IconButton from "./IconButton.svelte";
@@ -10,11 +10,16 @@
     profile,
     current,
     onOpen,
+    trigger = true,
+    label = "Find a quest",
   }: {
     quests: readonly QuestRecord[];
     profile: Profile;
-    current: QuestRecord;
+    current?: QuestRecord;
     onOpen: (id: string) => void;
+    /** False hides the built-in button; the owner calls open() instead. */
+    trigger?: boolean;
+    label?: string;
   } = $props();
   const uid = $props.id();
 
@@ -27,9 +32,13 @@
 
   const isMini = (q: QuestRecord) => q.kind === "miniquest" || q.kind === "saga";
   const done = (q: QuestRecord) => profile.completedQuests.includes(q.id);
-  // The route the planner follows; members quests join it only in Members planning.
-  let route = $derived(quests.filter((q) => profile.mode === "members" || !q.members));
-  let position = $derived(route.findIndex((q) => q.id === current.id) + 1);
+  // The route the planner follows, matching the sidebar count: members quests join it
+  // only in Members planning, and seasonal and tutorial quests stay out (search still finds them).
+  let route = $derived.by(() => {
+    const ids = new Set(progressionQuests(profile).map((q) => q.id));
+    return quests.filter((q) => ids.has(q.id));
+  });
+  let position = $derived(route.findIndex((q) => q.id === current?.id) + 1);
   let needle = $derived(query.trim().toLowerCase());
   let matches = $derived(
     // Searching also finds members quests in F2P planning; they open with a membership notice.
@@ -111,7 +120,7 @@
           ><span class="finder-dot difficulty-{q.difficulty.toLowerCase()}"
           ></span>{q.difficulty} · {q.length}{isMini(q)
             ? " · Miniquest"
-            : ""}{q.members ? " · Members" : ""}{q.id === current.id
+            : ""}{q.members ? " · Members" : ""}{q.id === current?.id
             ? " · open now"
             : ""}</small
         ></span
@@ -120,19 +129,19 @@
   </li>
 {/snippet}
 
-<button
-  type="button"
-  class="finder-trigger"
-  aria-haspopup="dialog"
-  onclick={open}
-  ><Search size={16} /><span class="finder-trigger-label"
-    >Quest log · find a quest</span
-  >{#if position}<span class="finder-trigger-count"
-      >{position} of {route.length}</span
-    >{/if}</button
->
+{#if trigger}<button
+    type="button"
+    class="finder-trigger"
+    aria-haspopup="dialog"
+    onclick={open}
+    ><Search size={16} /><span class="finder-trigger-label"
+      >Quest log · find a quest</span
+    >{#if position}<span class="finder-trigger-count"
+        >{position} of {route.length}</span
+      >{/if}</button
+  >{/if}
 
-<dialog class="app-dialog quest-finder" bind:this={dialog} aria-label="Find a quest">
+<dialog class="app-dialog quest-finder" bind:this={dialog} aria-label={label}>
   <div class="finder-bar">
     <Search size={18} aria-hidden="true" />
     <input

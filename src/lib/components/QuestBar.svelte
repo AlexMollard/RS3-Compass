@@ -1,16 +1,16 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import { ChevronLeft, ChevronRight } from "@lucide/svelte";
-  import { QUESTS, type Profile } from "../../data";
+  import { ChevronLeft, ChevronRight, Map as MapIcon } from "@lucide/svelte";
+  import { QUESTS, progressionQuests, type Profile } from "../../data";
   import { questPath } from "../navigation";
   import GameArt from "./GameArt.svelte";
   import QuestFinder from "./QuestFinder.svelte";
 
   let { profile, selectedId }: { profile: Profile; selectedId: string } = $props();
   let quest = $derived(QUESTS.find((q) => q.id === selectedId) ?? QUESTS[1]);
-  // Previous and next follow the planning route; a members quest opened in F2P
-  // planning steps through the full catalogue instead.
-  let route = $derived(QUESTS.filter((q) => profile.mode === "members" || !q.members));
+  // Previous and next follow the planning route; a quest off the route (a members quest
+  // in F2P planning, or a seasonal one) steps through the full catalogue instead.
+  let route = $derived(progressionQuests(profile));
   let list = $derived(route.some((q) => q.id === quest.id) ? route : QUESTS);
   let at = $derived(list.findIndex((q) => q.id === quest.id));
   let previous = $derived(at > 0 ? list[at - 1] : undefined);
@@ -18,6 +18,7 @@
 </script>
 
 <div class="quest-bar">
+  <a class="map-link" href="/quests"><MapIcon size={16} aria-hidden="true" />Quest map</a>
   <QuestFinder
     quests={QUESTS}
     {profile}
@@ -55,6 +56,23 @@
     align-items: center;
     gap: 12px;
     min-width: 0;
+  }
+  .map-link {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 8px;
+    min-height: var(--control-size);
+    padding: 0 14px;
+    border: 1px solid var(--gold);
+    border-radius: 4px;
+    color: var(--gold-bright);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .map-link:hover {
+    background: var(--panel);
+    color: var(--heading);
   }
   .quest-step {
     display: flex;
