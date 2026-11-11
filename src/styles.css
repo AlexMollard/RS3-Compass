@@ -38,7 +38,7 @@
 }
 @media (forced-colors: none) {
   * {
-    scrollbar-color: var(--gold) var(--bg);
+    scrollbar-color: var(--gold) var(--rail);
   }
   @supports selector(::-webkit-scrollbar) {
     * {
@@ -50,11 +50,11 @@
     }
     ::-webkit-scrollbar-track,
     ::-webkit-scrollbar-corner {
-      background: var(--bg);
+      background: var(--rail);
     }
     ::-webkit-scrollbar-thumb {
       background: var(--gold);
-      border: 3px solid var(--bg);
+      border: 3px solid var(--rail);
       border-radius: 6px;
     }
     ::-webkit-scrollbar-thumb:hover {
@@ -631,7 +631,7 @@ textarea {
 }
 
 .workspace-footer {
-  border-top: 1px solid #2a3b46;
+  position: relative;
   padding: 20px 0;
   margin-top: 36px;
   display: flex;
@@ -642,6 +642,19 @@ textarea {
   font-size: var(--font-caption);
   color: var(--muted);
   line-height: 1.8;
+}
+/* The divider spans the workspace, matching the full-width quest bars. */
+.workspace-footer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100vmax;
+  right: -100vmax;
+  border-top: 1px solid #2a3b46;
+}
+/* On quest pages the footer sits straight under the action bar. */
+.main-content:has(.quest-actionbar) .workspace-footer {
+  margin-top: 0;
 }
 .workspace-footer > span:first-child {
   display: flex;

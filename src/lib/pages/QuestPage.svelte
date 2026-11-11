@@ -551,8 +551,17 @@
       "chips chips start";
     align-items: start;
     gap: 16px 24px;
+    position: relative;
+    isolation: isolate;
     margin: -28px -32px 0;
     padding: 28px 32px;
+  }
+  /* Like the action bar, the band runs to the workspace edges past the capped column. */
+  .quest-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0 -100vmax;
+    z-index: -1;
     background: linear-gradient(var(--panel), var(--bg));
     border-bottom: 1px solid var(--line);
   }
@@ -1197,7 +1206,8 @@
       width: min(100%, 240px);
       box-sizing: border-box;
     }
-    .quest-actionbar::before {
+    .quest-actionbar::before,
+    .quest-hero::before {
       display: none;
     }
     .quest-actionbar {
