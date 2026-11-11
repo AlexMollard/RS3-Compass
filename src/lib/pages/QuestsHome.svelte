@@ -3,7 +3,7 @@
   import { page } from "$app/state";
   import { ChevronDown, Crosshair, X } from "@lucide/svelte";
   import { QUESTS, nextQuest, progressionQuests } from "../../data";
-  import { getCompass } from "../compassContext";
+  import { activeProfile, getCompass } from "../compassContext";
   import { questPath } from "../navigation";
   import {
     difficultyColor,
@@ -25,9 +25,7 @@
   // Big storyline finales offered as one-click goals.
   const SUGGESTED = ["plagues-end", "recipe-for-disaster", "desert-treasure", "sliskes-endgame"];
 
-  let profile = $derived(
-    $saved.profiles.find((p) => p.id === $saved.activeId) ?? $saved.profiles[0],
-  );
+  let profile = $derived(activeProfile($saved));
   let route = $derived(progressionQuests(profile));
   let routeIds = $derived(new Set(route.map((q) => q.id)));
   let layout = $derived(layoutQuestMap(route));

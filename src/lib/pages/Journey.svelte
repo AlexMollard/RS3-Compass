@@ -3,7 +3,7 @@
   import type { QuestRecord } from "../../data";
   import { LOCATIONS } from "../../locations";
   import { wikiHref } from "../../wiki";
-  import { getCompass } from "../compassContext";
+  import { activeProfile, getCompass } from "../compassContext";
   import { questPath, skillPath } from "../navigation";
   import { closeToUnlocking, questReadiness } from "../questReadiness";
   import SkillGrid from "../components/SkillGrid.svelte";
@@ -20,9 +20,7 @@
   const controller = getCompass();
   const saved = controller.state;
   const kindLabel = { quest: "Quest", miniquest: "Miniquest", saga: "Saga" };
-  let profile = $derived(
-    $saved.profiles.find((p) => p.id === $saved.activeId) ?? $saved.profiles[0],
-  );
+  let profile = $derived(activeProfile($saved));
   let quests = $derived(progressionQuests(profile));
   let next = $derived(nextQuest(profile));
   let done = (quest: QuestRecord) => profile.completedQuests.includes(quest.id);

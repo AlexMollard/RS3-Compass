@@ -13,7 +13,7 @@
     trainingRangeLabel,
   } from "../../data";
   import { wikiHref } from "../../wiki";
-  import { getCompass } from "../compassContext";
+  import { activeProfile, getCompass } from "../compassContext";
   import { parseLevel } from "../levelChanges";
   import { questPath } from "../navigation";
   import { packKey } from "../packing";
@@ -37,9 +37,7 @@
   const saved = controller.state;
   const compact = controller.compact;
   const saveError = controller.storageError;
-  let profile = $derived(
-    $saved.profiles.find((p) => p.id === $saved.activeId) ?? $saved.profiles[0],
-  );
+  let profile = $derived(activeProfile($saved));
   let skill = $derived(
     SKILLS.find((s) => s.name === selectedSkill) ?? SKILLS[0],
   );

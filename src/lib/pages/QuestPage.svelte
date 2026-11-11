@@ -13,7 +13,7 @@
   import { QUEST_COMBAT } from "../../combatData";
   import { QUICK_GUIDES } from "../../questsImported";
   import { wikiHref, wikiImage } from "../../wiki";
-  import { getCompass } from "../compassContext";
+  import { activeProfile, getCompass } from "../compassContext";
   import { INVENTORY_SIZE, inventorySlots } from "../inventorySlots";
   import { questPath, skillPath } from "../navigation";
   import { packKey } from "../packing";
@@ -54,9 +54,7 @@
     unlocks: "Unlocks",
   };
 
-  let profile = $derived(
-    $saved.profiles.find((p) => p.id === $saved.activeId) ?? $saved.profiles[0],
-  );
+  let profile = $derived(activeProfile($saved));
   let quest = $derived(QUESTS.find((q) => q.id === selectedId) ?? QUESTS[1]);
   let tab = $state<"prepare" | "rewards">("prepare");
   let tabs = $state<HTMLElement>();

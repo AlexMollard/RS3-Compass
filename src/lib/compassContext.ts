@@ -22,6 +22,10 @@ export interface SavedState {
   welcomed?: boolean;
 }
 
+/** The selected profile, falling back to the first one. */
+export const activeProfile = (state: SavedState): Profile =>
+  state.profiles.find((p) => p.id === state.activeId) ?? state.profiles[0];
+
 export interface CompassController {
   state: Writable<SavedState>;
   storageError: Writable<boolean>;

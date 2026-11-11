@@ -3,16 +3,14 @@
   import { ChevronLeft, Info } from "@lucide/svelte";
   import { SKILLS } from "../../data";
   import { SKILL_GAME_ORDER } from "../../skillNames";
-  import { getCompass } from "../compassContext";
+  import { activeProfile, getCompass } from "../compassContext";
   import { applyLevelChanges, levelChanges, parseLevel } from "../levelChanges";
   import GameArt from "../components/GameArt.svelte";
   import GameWindow from "../components/GameWindow.svelte";
 
   const controller = getCompass();
   const saved = controller.state;
-  let profile = $derived(
-    $saved.profiles.find((p) => p.id === $saved.activeId) ?? $saved.profiles[0],
-  );
+  let profile = $derived(activeProfile($saved));
   // Edits belong to one player; switching players drops them.
   let draft = $state<{ id: string; values: Record<string, string> }>({
     id: "",
