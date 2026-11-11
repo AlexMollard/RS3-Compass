@@ -1,4 +1,5 @@
 import type { PlayerImportStatus } from "../playerTypes.ts";
+import { upstreamInit } from "./upstream.ts";
 
 export function adventurerError(
   value: unknown,
@@ -20,13 +21,7 @@ export async function fetchAdventurer(
     new URL(
       `https://secure.runescape.com/m=adventurers-log/api/v1/${endpoint}/${encodeURIComponent(name)}`,
     ),
-    {
-      signal: AbortSignal.timeout(8000),
-      headers: {
-        accept: "application/json",
-        "user-agent": "RS3 Compass public player lookup",
-      },
-    },
+    upstreamInit("application/json", "RS3 Compass public player lookup"),
   );
   return { value: await response.json(), ok: response.ok };
 }

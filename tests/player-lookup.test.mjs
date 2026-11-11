@@ -485,6 +485,28 @@ test("the Ironman Hiscores decide whether a ranked player is an Ironman", async 
   assert.ok(!unranked.calls.some((path) => path.startsWith("/m=hiscore_ironman/")));
 });
 
+test("every upstream request names its source and carries its own timeout", async () => {
+  const requests = [];
+  const all = fetchAll([]);
+  const service = createPlayerLookupService(async (url, init) => {
+    requests.push({ path: url.pathname, init });
+    return all(url);
+  });
+  await service.lookup("Example");
+  assert.deepEqual(
+    requests.map((r) => [r.path, r.init.headers]).sort(),
+    [
+      ["/m=adventurers-log/api/v1/playerEvents/Example", { accept: "application/json", "user-agent": "RS3 Compass public player lookup" }],
+      ["/m=adventurers-log/api/v1/playerQuests/Example", { accept: "application/json", "user-agent": "RS3 Compass public player lookup" }],
+      ["/m=hiscore/index_lite.json", { accept: "application/json", "user-agent": "RS3 Compass public Hiscores lookup" }],
+      ["/m=hiscore_ironman/index_lite.json", { accept: "application/json", "user-agent": "RS3 Compass public Hiscores lookup" }],
+    ],
+  );
+  const signals = requests.map((r) => r.init.signal);
+  assert.ok(signals.every((s) => s instanceof AbortSignal && !s.aborted));
+  assert.equal(new Set(signals).size, signals.length);
+});
+
 test("only a temporary source failure shortens the player cache", () => {
   const ok = { status: "available" };
   const down = { status: "unavailable", reason: "service-unavailable" };

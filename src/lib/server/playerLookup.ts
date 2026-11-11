@@ -21,6 +21,7 @@ import {
   IN_FLIGHT_RETRY_SECONDS,
   retryAfterSeconds,
 } from "./rateLimit.ts";
+import { upstreamInit } from "./upstream.ts";
 
 export const PLAYER_CACHE_MS = 10 * 60 * 1000;
 export const PLAYER_PARTIAL_CACHE_MS = 30 * 1000;
@@ -34,6 +35,9 @@ const platformSkillNames: Readonly<Record<string, SkillName>> = {
   Hitpoints: "Constitution",
   Runecraft: "Runecrafting",
 };
+
+const hiscoresInit = () =>
+  upstreamInit("application/json", "RS3 Compass public Hiscores lookup");
 
 export function playerCacheMs(player: PlayerLookup): number {
   return hasTransientFailure(player)
@@ -242,13 +246,7 @@ export function createPlayerLookupService(
             "https://secure.runescape.com/m=hiscore/index_lite.json",
           );
           url.searchParams.set("player", name);
-          const response = await sourceFetch(url, {
-            signal: AbortSignal.timeout(8000),
-            headers: {
-              accept: "application/json",
-              "user-agent": "RS3 Compass public Hiscores lookup",
-            },
-          });
+          const response = await sourceFetch(url, hiscoresInit());
           if (response.status === 404)
             return { status: "unranked-or-unavailable" };
           if (!response.ok) return { status: "service-unavailable" };
@@ -269,13 +267,7 @@ export function createPlayerLookupService(
             "https://secure.runescape.com/m=hiscore_ironman/index_lite.json",
           );
           url.searchParams.set("player", name);
-          const response = await sourceFetch(url, {
-            signal: AbortSignal.timeout(8000),
-            headers: {
-              accept: "application/json",
-              "user-agent": "RS3 Compass public Hiscores lookup",
-            },
-          });
+          const response = await sourceFetch(url, hiscoresInit());
           return response.ok ? true : response.status === 404 ? false : undefined;
         } catch {
           return undefined;

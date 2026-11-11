@@ -119,6 +119,23 @@ test("coalesces aliases, caches successes and does not cache failed source data"
   assert.equal(calls, 5);
 });
 
+test("every group request names its source and carries its own timeout", async () => {
+  const inits = [];
+  const service = createGroupLookupService(async (url, init) => {
+    inits.push(init);
+    return response(url.searchParams.has("name") ? listing() : detail());
+  });
+  await service.lookup(query);
+  assert.equal(inits.length, 2);
+  for (const init of inits)
+    assert.deepEqual(init.headers, {
+      accept: "text/html",
+      "user-agent": "RS3 Compass public Group Ironman lookup",
+    });
+  assert.ok(inits.every((i) => i.signal instanceof AbortSignal && !i.signal.aborted));
+  assert.notEqual(inits[0].signal, inits[1].signal);
+});
+
 test("an upstream 429 is reported as busy, not as invalid data", async () => {
   const service = createGroupLookupService(async () =>
     response("Too many requests", 429),

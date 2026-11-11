@@ -7,6 +7,7 @@ import {
   IN_FLIGHT_RETRY_SECONDS,
   retryAfterSeconds,
 } from "./rateLimit.ts";
+import { upstreamInit } from "./upstream.ts";
 
 export const GROUP_CACHE_MS = 10 * 60 * 1000;
 const MAX_CACHED = 128;
@@ -272,13 +273,10 @@ export function createGroupLookupService(
     if (times.length >= MAX_PER_MINUTE)
       throw busy(retryAfterSeconds(times[0], time));
     times.push(time);
-    const response = await fetcher(url, {
-      signal: AbortSignal.timeout(8000),
-      headers: {
-        accept: "text/html",
-        "user-agent": "RS3 Compass public Group Ironman lookup",
-      },
-    });
+    const response = await fetcher(
+      url,
+      upstreamInit("text/html", "RS3 Compass public Group Ironman lookup"),
+    );
     if (response.status === 429) {
       await response.body?.cancel();
       throw busy();
