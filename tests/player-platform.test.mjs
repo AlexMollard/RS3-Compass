@@ -269,7 +269,8 @@ test("non-JSON error pages give friendly lookup errors and keep Retry-After", as
     });
   await assert.rejects(
     fetchPlayer("Real Player"),
-    (error) => error instanceof PlayerFetchError && error.retryAfterMs === 30_000,
+    (error) =>
+      error instanceof PlayerFetchError && error.retryAfterMs === 30_000,
   );
 });
 

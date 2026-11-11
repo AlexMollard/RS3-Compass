@@ -609,6 +609,25 @@ test("Prospective kits keep stronger use-level options, respect F2P and leave un
   );
 });
 
+test("A two-handed staff is never paired with an off-hand, in either kit", () => {
+  const magic = SKILLS.find((skill) => skill.name === "Magic");
+  const offHand = (list) => list.some((item) => item.slot === "magic off hand");
+  const kit = (stage, levels) =>
+    resolveTrainingEquipment(magic, stage, stage.options[0], character(levels));
+  const first = magic.stages[0];
+  const later = magic.stages.find((stage) => stage.from >= 20);
+  for (const levels of [{}, { Magic: 5 }]) {
+    const low = kit(first, levels);
+    assert.ok(low.target.some((item) => item.name === "Staff of air"));
+    assert.ok(!offHand(low.current) && !offHand(low.target));
+    const ahead = kit(later, levels);
+    assert.ok(!offHand(ahead.current));
+    assert.ok(offHand(ahead.target));
+  }
+  const wand = kit(first, { Magic: 10 });
+  assert.ok(wand.target.some((item) => item.name === "Imphide book"));
+});
+
 test("Range targets preserve coherent dragon weapon and protection combinations for each style", () => {
   const skill = SKILLS.find((skill) => skill.name === "Defence");
   const stage = skill.stages.find((stage) =>

@@ -1,6 +1,15 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { NAV_GROUPS, PHONE_TABS, routeFor } from "../src/lib/navigation.ts";
+import { load as loadSkill } from "../src/routes/skills/[[name]]/+page.ts";
+
+test("skill addresses redirect other cases and reject unknown skills", () => {
+  const skill = (name) => () => loadSkill({ params: { name } });
+  assert.equal(skill(undefined)(), undefined);
+  assert.equal(skill("Attack")(), undefined);
+  assert.throws(skill("attack"), { status: 308, location: "/skills/Attack" });
+  assert.throws(skill("Foo"), { status: 404 });
+});
 
 test("routeFor maps paths to shell routes", () => {
   assert.equal(routeFor("/"), "home");

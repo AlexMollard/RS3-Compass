@@ -83,10 +83,15 @@ export function selectEquipment(
       ...items.filter((item) => item.from > selected.from && item !== goal),
     );
   }
+  // Current and target can pick different weapons, so each kit drops its own off hand.
+  const hands = (list: EquipmentRecommendation[]) =>
+    list.some((item) => item.twoHanded)
+      ? list.filter((item) => !/off hand/i.test(item.slot))
+      : list;
   return {
     note: guide.note,
-    current,
-    target,
+    current: hands(current),
+    target: hands(target),
     planningLevel,
     upgrades,
     optional: available.filter((item) => item.optional),
