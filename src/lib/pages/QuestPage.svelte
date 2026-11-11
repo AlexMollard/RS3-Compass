@@ -491,15 +491,17 @@
         {/if}
       </section>
 
-      {#if line}<QuestLine
-          name={line.name}
-          quests={line.quests}
-          current={quest}
-          completed={profile.completedQuests}
-        />{/if}
       <p class="cap">Rewards checked against the RuneScape Wiki, November 2026.</p>
     {/if}
   </div>
+
+  <!-- Outside the tabs, so the storyline shows on Prepare and All rewards alike. -->
+  {#if line}<QuestLine
+      name={line.name}
+      quests={line.quests}
+      current={quest}
+      completed={profile.completedQuests}
+    />{/if}
 
   <div class="quest-actionbar">
     <span class="actionbar-status">{status}</span>
