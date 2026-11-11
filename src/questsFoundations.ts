@@ -85,7 +85,8 @@ export const FOUNDATION_QUESTS: QuestRecord[] = [
     supplies: ["Optional: food for the swamp encounter."],
     rewards: [
       "1 quest point",
-      "125 Prayer XP lamp and five ancient bones worth 200 Prayer XP each",
+      "125 Prayer XP lamp",
+      "Five ancient bones, each worth 200 Prayer experience when buried",
       "Ghostspeak amulet and gravestone upgrades",
     ],
     wiki: "The_Restless_Ghost",

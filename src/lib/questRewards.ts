@@ -73,6 +73,7 @@ export function experienceRewards(lines: readonly string[]) {
     const choice = /chosen skill|\bone of\b|any skill|your choice|choice of/i.test(line);
     let lampMatches = 0;
     let fixedMatches = 0;
+    const fixedSkills = new Set<string>();
     for (const match of line.matchAll(ANY_SKILL_XP)) {
       const before = line.slice(0, match.index);
       const after = line.slice(match.index + match[0].length);
@@ -80,6 +81,10 @@ export function experienceRewards(lines: readonly string[]) {
         lampMatches++;
         lamps.push({ skill: match[2], xp: amount(match[1]), level, choice: false, count: 1, text: line });
       } else {
+        // "8,500 Defence XP (two charges of 4,250 Defence XP)": the bracket restates the total.
+        const inBrackets = before.split("(").length > before.split(")").length;
+        if (inBrackets && fixedSkills.has(match[2])) continue;
+        fixedSkills.add(match[2]);
         fixedMatches++;
         fixed.set(match[2], (fixed.get(match[2]) ?? 0) + amount(match[1]));
       }

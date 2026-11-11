@@ -46,6 +46,19 @@ test("experience splits fixed skill XP from lamps", () => {
   );
 });
 
+test("a bracket that restates a skill's XP is not counted twice", () => {
+  const { fixed } = experienceRewards([
+    "A total of 8,500 Defence XP (via two charges of 4,250 Defence XP each)",
+    "375,000 Divination XP (25,000 Divination XP is awarded each time)",
+    "500 Thieving XP (and 300 Agility XP)",
+  ]);
+  assert.deepEqual(Object.fromEntries(fixed), { Defence: 8500, Divination: 375000, Thieving: 500, Agility: 300 });
+  const xpFor = (id) =>
+    Object.fromEntries(experienceRewards(groupRewards(QUESTS.find((q) => q.id === id).rewards).experience).fixed);
+  assert.deepEqual(xpFor("elemental-workshop-iii"), { Smithing: 8500, Defence: 8500 });
+  assert.deepEqual(xpFor("the-restless-ghost"), {});
+});
+
 test("lamp XP reads every way the Wiki writes it", () => {
   const { fixed, lamps } = experienceRewards([
     "10,000 Thieving XP Thieving XP lamp",
