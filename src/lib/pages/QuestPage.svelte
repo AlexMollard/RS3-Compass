@@ -9,7 +9,12 @@
     Info,
     Map as MapIcon,
   } from "@lucide/svelte";
-  import { QUESTS, SKILLS, progressionQuests, toggleItem } from "../../data";
+  import {
+    QUESTS,
+    progressionQuests,
+    skillByName,
+    toggleItem,
+  } from "../../data";
   import { QUEST_COMBAT } from "../../combatData";
   import { QUICK_GUIDES } from "../../questsImported";
   import { wikiHref, wikiImage } from "../../wiki";
@@ -116,7 +121,7 @@
     }),
   );
   const skillIcon = (name: string) =>
-    SKILLS.find((s) => s.name === name)?.icon ?? "Skills_icon.png";
+    skillByName(name)?.icon ?? "Skills_icon.png";
 
   $effect(() => {
     const id = quest.id;

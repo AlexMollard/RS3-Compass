@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { SKILLS } from "../../data";
+  import { SKILLS, skillByName } from "../../data";
   import { widestGaps, type ComparedPlayer } from "../groupProgress";
   import { skillPath } from "../navigation";
   import GameWindow from "./GameWindow.svelte";
@@ -23,7 +23,7 @@
   {#if gaps.length}
     <ul class="gap-list">
       {#each gaps as gap (gap.skill)}
-        {@const skill = SKILLS.find((s) => s.name === gap.skill)}
+        {@const skill = skillByName(gap.skill)}
         <li>
           {#if skill}<GameArt file={skill.icon} size={28} />{/if}
           <span class="gap-text"

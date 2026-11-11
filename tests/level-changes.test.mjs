@@ -31,6 +31,14 @@ test("invalid and out-of-range levels are ignored, never clamped", () => {
   assert.deepEqual(levelChanges({ Attack: 40 }, { Attack: "150" }), []);
 });
 
+test("each skill's own cap applies, not the 120 fallback", () => {
+  const skill = SKILLS.find((s) => s.maxLevel === 99).name;
+  assert.deepEqual(levelChanges({}, { [skill]: "100" }), []);
+  assert.deepEqual(levelChanges({}, { [skill]: "99" }), [
+    { skill, from: null, to: 99 },
+  ]);
+});
+
 test("parseLevel accepts whole levels within the cap only", () => {
   const cap = SKILLS.find((s) => s.name === "Attack").maxLevel;
   assert.equal(parseLevel("150", cap), null);

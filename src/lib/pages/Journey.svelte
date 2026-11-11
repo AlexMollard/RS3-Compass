@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { progressionQuests, nextQuest, SKILLS } from "../../data";
+  import {
+    progressionQuests,
+    nextQuest,
+    skillByName,
+    SKILLS,
+  } from "../../data";
   import type { QuestRecord } from "../../data";
   import { LOCATIONS } from "../../locations";
   import { wikiHref } from "../../wiki";
@@ -49,7 +54,7 @@
     SKILLS.reduce((sum, s) => sum + (profile.levels[s.name] ?? 0), 0),
   );
   const kindOf = (q: QuestRecord) => kindLabel[q.kind ?? "quest"];
-  const skillIcon = (name: string) => SKILLS.find((s) => s.name === name)?.icon;
+  const skillIcon = (name: string) => skillByName(name)?.icon;
 </script>
 
 <div class="progression-page page-enter">

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { ChevronLeft, Info } from "@lucide/svelte";
-  import { SKILLS } from "../../data";
+  import { skillByName } from "../../data";
   import { SKILL_GAME_ORDER } from "../../skillNames";
   import { activeProfile, getCompass } from "../compassContext";
   import { applyLevelChanges, levelChanges, parseLevel } from "../levelChanges";
@@ -23,9 +23,7 @@
     SKILL_GAME_ORDER.filter((name) => profile.levels[name] !== undefined)
       .length,
   );
-  const skills = SKILL_GAME_ORDER.map(
-    (name) => SKILLS.find((skill) => skill.name === name)!,
-  );
+  const skills = SKILL_GAME_ORDER.map((name) => skillByName(name)!);
 
   function edit(name: string, value: string) {
     if (draft.id !== profile.id) draft = { id: profile.id, values: {} };

@@ -2,6 +2,7 @@
   import { goto } from "$app/navigation";
   import {
     SKILLS,
+    skillByName,
     availableStages,
     nextQuest,
     type Profile,
@@ -38,9 +39,7 @@
   const compact = controller.compact;
   const saveError = controller.storageError;
   let profile = $derived(activeProfile($saved));
-  let skill = $derived(
-    SKILLS.find((s) => s.name === selectedSkill) ?? SKILLS[0],
-  );
+  let skill = $derived(skillByName(selectedSkill) ?? SKILLS[0]);
   let search = $state("");
   let level = $state("");
   let message = $state("");

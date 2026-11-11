@@ -6,6 +6,7 @@ import {
   availableStages,
   availableTrainingOptions,
   trainingMethod,
+  skillByName,
   skillNeedsMembership,
   trainingStage,
 } from "../src/data.ts";
@@ -23,6 +24,12 @@ test("Every public RS3 skill identity has one reachable Compass guide", () => {
     SKILLS.map((skill) => skill.name).sort(),
     [...RS3_SKILL_NAMES].sort(),
   );
+});
+
+test("skillByName finds the same record as a search of SKILLS", () => {
+  for (const skill of SKILLS) assert.equal(skillByName(skill.name), skill);
+  for (const name of ["", "mining", "Mining ", "Skills", "constructor"])
+    assert.equal(skillByName(name), undefined);
 });
 
 test("Training Wiki links name articles, not missing subpages", () => {

@@ -244,6 +244,7 @@ test("reported text links only its typed subjects, not item words inside an NPC 
   const skills = activitySkillReferences(skillEvent);
   assert.equal(skills.length, 1);
   assert.equal(skills[0].wiki, "Mining");
+  assert.equal(skills[0].image, "Mining.png");
 });
 
 test("combined feeds resolve every subject within MediaWiki's 50-title query limit", async () => {

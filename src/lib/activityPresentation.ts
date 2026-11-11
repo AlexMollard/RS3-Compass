@@ -1,4 +1,4 @@
-import { SKILLS } from "../data.ts";
+import { skillByName } from "../data.ts";
 import { tokenizeGameText, type GameTextReference } from "./gameText.ts";
 import type { ActivityWikiArticle } from "./activityWiki.ts";
 import type { PlayerEvent } from "./playerTypes.ts";
@@ -8,9 +8,6 @@ const itemEvents: Readonly<Record<string, true>> = {
   rs_plog_item_found: true,
   rs_plog_item_found_nowhere: true,
 };
-
-const skillIcons: Record<string, string> = {};
-for (const skill of SKILLS) skillIcons[skill.name] = skill.icon;
 
 export function activitySkillReferences(
   event: PlayerEvent,
@@ -26,7 +23,7 @@ export function activitySkillReferences(
       const reference = segment.reference;
       references.set(reference.name, {
         ...reference,
-        image: skillIcons[reference.name],
+        image: skillByName(reference.name)?.icon,
       });
     }
   }

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { ArrowRight, CheckCircle2 } from "@lucide/svelte";
-  import { SKILLS, type Profile, type QuestRecord } from "../../data";
+  import { skillByName, type Profile, type QuestRecord } from "../../data";
   import GameArt from "./GameArt.svelte";
   import GameText from "./GameText.svelte";
   import Button from "./Button.svelte";
@@ -65,7 +65,7 @@
                   ? "Met"
                   : "Below target"}</span
             >
-            {#if SKILLS.some((skill) => skill.name === requirement.skill)}
+            {#if skillByName(requirement.skill)}
               <Button
                 variant="quiet"
                 className="level-check-train"

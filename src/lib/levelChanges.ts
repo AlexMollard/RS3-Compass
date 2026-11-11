@@ -1,4 +1,4 @@
-import { SKILLS } from "../data.ts";
+import { skillByName } from "../data.ts";
 import { SKILL_GAME_ORDER } from "../skillNames.ts";
 
 export interface LevelChange {
@@ -6,8 +6,6 @@ export interface LevelChange {
   from: number | null;
   to: number | null;
 }
-
-const caps = new Map(SKILLS.map((skill) => [skill.name, skill.maxLevel]));
 
 /**
  * Reads a typed level. Blank means unknown (""); whole digits from 1 to the
@@ -33,7 +31,10 @@ export function levelChanges(
   const changes: LevelChange[] = [];
   for (const skill of SKILL_GAME_ORDER) {
     if (!(skill in after)) continue;
-    const parsed = parseLevel(String(after[skill]), caps.get(skill) ?? 120);
+    const parsed = parseLevel(
+      String(after[skill]),
+      skillByName(skill)?.maxLevel ?? 120,
+    );
     if (parsed === null) continue;
     const from = before[skill] ?? null;
     const to = parsed === "" ? null : parsed;

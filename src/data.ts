@@ -408,6 +408,11 @@ export const SKILLS: SkillRecord[] = [
   ...ARTISAN_SKILLS,
   ...SUPPORT_SKILLS,
 ];
+const skillIndex = new Map<string, SkillRecord>(
+  SKILLS.map((skill) => [skill.name, skill]),
+);
+export const skillByName = (name: string): SkillRecord | undefined =>
+  skillIndex.get(name);
 export const SAMPLE_PROFILES: Profile[] = [
   {
     id: "aster",
