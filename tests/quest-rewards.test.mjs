@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { experienceRewards, groupRewards, rewardSummary } from "../src/lib/questRewards.ts";
+import { experienceRewards, groupRewards, lampLabel, rewardSummary } from "../src/lib/questRewards.ts";
 import { QUESTS } from "../src/data.ts";
 
 test("reward lines sort into quest points, experience, unlocks and items", () => {
@@ -44,6 +44,55 @@ test("experience splits fixed skill XP from lamps", () => {
     lamps.map((l) => [l.skill, l.xp]),
     [[undefined, undefined], ["Magic", 250]],
   );
+});
+
+test("lamp XP reads every way the Wiki writes it", () => {
+  const { fixed, lamps } = experienceRewards([
+    "10,000 Thieving XP Thieving XP lamp",
+    "90,000 Agility XP Agility lamp",
+    "50,000 Mining XP Mining Lamp",
+    "Mining XP lamp (30,000 Mining XP)",
+    "Slayer XP lamp (100,000 Slayer XP; requires 87 Slayer)",
+    "Tortle lamp of farming, which gives 1,000 Farming XP",
+    "Glossy lamp granting 110,000 Slayer XP, requiring Slayer",
+    "Three 100 combat XP lamps",
+  ]);
+  assert.equal(fixed.size, 0);
+  assert.deepEqual(
+    lamps.map(({ skill, xp, count }) => [skill, xp, count]),
+    [
+      ["Thieving", 10000, 1],
+      ["Agility", 90000, 1],
+      ["Mining", 50000, 1],
+      ["Mining", 30000, 1],
+      ["Slayer", 100000, 1],
+      ["Farming", 1000, 1],
+      ["Slayer", 110000, 1],
+      [undefined, 100, 3],
+    ],
+  );
+});
+
+test("a lamp with no amount keeps the Wiki's own words", () => {
+  const [medium, huge, plain] = experienceRewards([
+    "Medium XP lamp",
+    "3 huge XP lamps",
+    "lamp",
+  ]).lamps.map(lampLabel);
+  assert.deepEqual(medium, { title: "Medium XP lamp" });
+  assert.deepEqual(huge, { title: "3 huge XP lamps" });
+  assert.deepEqual(plain, { title: "lamp" });
+  const [list] = experienceRewards(["500 Prayer, 1,000 Agility and 1,500 combat XP lamps"]).lamps.map(lampLabel);
+  assert.deepEqual(list, { title: "500 Prayer, 1,000 Agility and 1,500 combat XP lamps" });
+  const [sized] = experienceRewards(["25,000 Mining XP lamp (requires level 65 Mining)"]).lamps.map(lampLabel);
+  assert.deepEqual(sized, { title: "Mining lamp", detail: "25,000 XP · needs level 65" });
+  const [choice] = experienceRewards([
+    "1 large combat XP lamp in one of the following skills: Attack, Strength or Prayer",
+  ]).lamps.map(lampLabel);
+  assert.deepEqual(choice, {
+    title: "Lamp · your choice of skill",
+    detail: "1 large combat XP lamp in one of the following skills: Attack, Strength or Prayer",
+  });
 });
 
 test("lamp XP never counts as fixed XP (Secrets of Amberfell)", () => {

@@ -1,5 +1,7 @@
 <script lang="ts">
+  import { goto } from "$app/navigation";
   import { Crosshair, Lock, Maximize, Minus, Plus } from "@lucide/svelte";
+  import { questPath } from "../navigation";
   import type { QuestRecord } from "../../data";
   import {
     CARD,
@@ -312,6 +314,7 @@
             aria-label={q.name}
             aria-pressed={q.id === selected}
             onclick={() => onSelect(q.id)}
+            ondblclick={() => void goto(questPath(q.id))}
             >{#if !dots}<span class="mark" aria-hidden="true"
                 >{#if s === "done"}<svg viewBox="0 0 24 24" width="12" height="12"
                     ><path d="m5 12 5 5 9-10" /></svg
@@ -323,7 +326,7 @@
       {/each}
     </div>
 
-    <p class="map-hint">Drag to move · Ctrl+scroll or pinch to zoom</p>
+    <p class="map-hint">Drag to move · Ctrl+scroll or pinch to zoom · Double-click to open</p>
 
     <div class="map-toolbar" role="toolbar" aria-label="Map controls">
       <button type="button" aria-label="Zoom out" title="Zoom out (−)" onclick={() => zoomAt(0.8)}

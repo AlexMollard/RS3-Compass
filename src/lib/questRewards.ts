@@ -51,6 +51,10 @@ export interface LampReward {
 }
 
 const ANY_SKILL_XP = new RegExp(`([\\d,]+) (${RS3_SKILL_NAMES.join("|")}) XP\\b`, "g");
+// "10,000 Thieving XP Thieving XP lamp", "90,000 Agility XP Agility lamp"
+const LAMP_AFTER = new RegExp(`^\\s*(?:(?:${RS3_SKILL_NAMES.join("|")}|XP)\\s+)*lamp\\b`, "i");
+// "grants 2,500 Construction XP", "which gives 1,000 Farming XP", "Mining XP lamp (30,000 Mining XP)"
+const LAMP_BEFORE = /\b(?:grants|granting|gives|giving)\s*$|\blamp\b[^()]*\(\s*$/i;
 const NUMBER_WORDS: Record<string, number> = { two: 2, three: 3, four: 4, five: 5, six: 6 };
 const amount = (text: string) => Number(text.replace(/,/g, ""));
 
@@ -72,7 +76,7 @@ export function experienceRewards(lines: readonly string[]) {
     for (const match of line.matchAll(ANY_SKILL_XP)) {
       const before = line.slice(0, match.index);
       const after = line.slice(match.index + match[0].length);
-      if (/^\s*lamp\b/i.test(after) || /\bgrants\s*$/i.test(before)) {
+      if (LAMP_AFTER.test(after) || LAMP_BEFORE.test(before)) {
         lampMatches++;
         lamps.push({ skill: match[2], xp: amount(match[1]), level, choice: false, count: 1, text: line });
       } else {
@@ -81,10 +85,11 @@ export function experienceRewards(lines: readonly string[]) {
       }
     }
     if (!lampMatches && /\blamps?\b|\brequires? level\b/i.test(line)) {
-      const words = line.match(/\b(two|three|four|five|six|\d+)\s+(?:[\w-]+\s+){0,2}lamps\b/i)?.[1];
-      const xp = fixedMatches
+      const words = line.match(/\b(two|three|four|five|six|\d+)\s+(?:[\w-]+\s+){0,3}lamps\b/i)?.[1];
+      // A list of amounts ("500 Prayer, 1,000 Agility and 1,500 combat XP lamps") keeps the Wiki line.
+      const xp = fixedMatches || /\d \w+(?:,| and) [\d,]+ \w+/.test(line)
         ? undefined
-        : amount(line.match(/([\d,]+)\s+(?:[A-Z]\w+\s+)?(?:XP|experience)\b/)?.[1] ?? "");
+        : amount(line.match(/([\d,]+)\s+(?:[A-Z]\w+\s+|combat\s+)?(?:XP|experience)\b/)?.[1] ?? "");
       lamps.push({
         xp: xp || undefined,
         level,
@@ -96,6 +101,23 @@ export function experienceRewards(lines: readonly string[]) {
     }
   }
   return { fixed, lamps };
+}
+
+/** A lamp tile's wording; a lamp with no amount or skill keeps the Wiki's own line ("Medium XP lamp"). */
+export function lampLabel(lamp: LampReward): { title: string; detail?: string } {
+  const detail = [
+    lamp.xp ? lamp.xp.toLocaleString("en") + " XP" : "",
+    lamp.level ? "needs level " + lamp.level : "",
+  ]
+    .filter(Boolean)
+    .join(" · ");
+  if (!detail && !lamp.skill && !lamp.choice) return { title: lamp.text };
+  const name = lamp.skill
+    ? lamp.skill + " lamp"
+    : lamp.choice
+      ? "Lamp · your choice of skill"
+      : "XP lamp";
+  return { title: (lamp.count > 1 ? lamp.count + " × " : "") + name, detail: detail || lamp.text };
 }
 
 /** Header chips: every reward group appears, so nothing is hidden behind quest points. */

@@ -19,7 +19,7 @@
   import { questLine } from "../questLine";
   import { earlierQuests } from "../questMap";
   import { questReadiness } from "../questReadiness";
-  import { experienceRewards, groupRewards, rewardSummary } from "../questRewards";
+  import { experienceRewards, groupRewards, lampLabel, rewardSummary } from "../questRewards";
   import { findPlayerQuest } from "../playerProgress";
   import { LOCATIONS } from "../../locations";
   import Button from "../components/Button.svelte";
@@ -480,26 +480,16 @@
               XP lamps · you choose when to use them
             </h3>
             <ul class="reward-tiles xp-tiles lamp-tiles">
-              {#each experience.lamps as lamp, index (index)}<li>
+              {#each experience.lamps as lamp, index (index)}{@const label = lampLabel(lamp)}<li>
                   <span class="lamp-icon"
                     ><GameArt file="Antique_lamp.png" size={24} />{#if lamp.skill}<span
                         class="lamp-skill"><GameArt file={skillIcon(lamp.skill)} size={14} /></span
                       >{/if}</span
                   ><span
-                    ><strong
-                      >{lamp.count > 1 ? lamp.count + " × " : ""}{lamp.skill
-                        ? lamp.skill + " lamp"
-                        : lamp.choice
-                          ? "Lamp · your choice of skill"
-                          : "XP lamp"}</strong
-                    ><small
-                      >{[
-                        lamp.xp ? lamp.xp.toLocaleString("en") + " XP" : "",
-                        lamp.level ? "needs level " + lamp.level : "",
-                      ]
-                        .filter(Boolean)
-                        .join(" · ") || "See the Wiki for the amount"}</small
-                    >{#if lamp.options}<small class="lamp-options">{lamp.options}</small>{/if}</span
+                    ><strong>{label.title}</strong
+                    >{#if label.detail}<small>{label.detail}</small>{/if}{#if lamp.options && label.detail !== lamp.text}<small
+                        class="lamp-options">{lamp.options}</small
+                      >{/if}</span
                   >
                 </li>{/each}
             </ul>{/if}
