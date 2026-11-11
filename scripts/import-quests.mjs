@@ -243,6 +243,8 @@ async function categoryMembers(name) {
 }
 const category = await categoryMembers("Quests");
 const miniquests = new Set(await categoryMembers("Miniquests"));
+// Historical and past-event quests stay searchable but leave the planning route.
+const removed = new Set(await categoryMembers("Removed content"));
 const inCategory = new Set(category);
 const titles = [
   ...order.filter((t) => inCategory.has(t)),
@@ -278,6 +280,7 @@ for (const title of titles) {
   if (!record.members) { skipped.push(`${title}: free-to-play, add by hand`); continue; }
   if (miniquests.has(title))
     record.kind = /\(saga\)$/i.test(title) ? "saga" : "miniquest";
+  if (removed.has(title)) record.availability = "removed";
   records.push(record);
   combatPlans[record.id] = combat;
 }

@@ -165,7 +165,9 @@
         >{quest.members ? "Members" : "Free-to-play"} · {kindLabel[quest.kind ?? "quest"]}{quest.availability
           ? quest.availability === "seasonal"
             ? " · Seasonal"
-            : " · Tutorial"
+            : quest.availability === "removed"
+              ? " · Removed"
+              : " · Tutorial"
           : ""}</span
       >
       <h1 id="quest-title">{quest.name}</h1>

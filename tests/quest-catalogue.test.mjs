@@ -61,7 +61,7 @@ function assertEnums(quests) {
       quest.id + " kind",
     );
     assert.ok(
-      [undefined, "seasonal", "tutorial"].includes(quest.availability),
+      [undefined, "seasonal", "tutorial", "removed"].includes(quest.availability),
       quest.id + " availability",
     );
     const targets = new Set();
@@ -113,6 +113,21 @@ test("Each quest lists every prerequisite once (a duplicate crashes the quest pa
     (q) => new Set(q.questRequirements).size !== q.questRequirements.length,
   ).map((q) => q.id);
   assert.deepEqual(repeated, []);
+});
+test("Removed and historical quests stay searchable but never join the members route", () => {
+  const profile = { ...structuredClone(SAMPLE_PROFILES[1]), mode: "members" };
+  const removed = [
+    "death-plateau-historical",
+    "druidic-ritual-historical",
+    "wolf-whistle-historical",
+    "hawthorn-holiday-event",
+  ];
+  const route = new Set(progressionQuests(profile).map((q) => q.id));
+  for (const id of removed) {
+    assert.equal(route.has(id), false, id + " is on the members route");
+    assert.equal(QUESTS.find((q) => q.id === id)?.availability, "removed", id);
+  }
+  assert.deepEqual([...route].filter((id) => id.endsWith("-historical")), []);
 });
 test("Imported quest-point requirements stay visible as preparation notes", () => {
   const needs = {

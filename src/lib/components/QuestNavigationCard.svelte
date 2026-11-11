@@ -33,7 +33,9 @@
       ? "Seasonal"
       : quest.availability === "tutorial"
         ? "Tutorial"
-        : "",
+        : quest.availability === "removed"
+          ? "Removed"
+          : "",
   );
   // One colour per RuneScape difficulty tier, low to high.
   let tier = $derived(

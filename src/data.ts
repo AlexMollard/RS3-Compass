@@ -69,7 +69,7 @@ export interface QuestRecord {
   id: string;
   name: string;
   kind?: "quest" | "miniquest" | "saga";
-  availability?: "seasonal" | "tutorial";
+  availability?: "seasonal" | "tutorial" | "removed";
   completionMembers?: boolean;
   preparationNotes?: string[];
   icon: string;

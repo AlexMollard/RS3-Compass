@@ -12700,6 +12700,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Ability to purchase climbing boots from Tenzing, allowing you to cross the secret path for some troll killing (and cross into Rellekka as well). They do not need to be spiked, although it does say that you would need a good reason to go that way when you try to climb over the rocks. This message will disappear and you will be able to climb over the rocks once you have started the Troll Stronghold Quest."
     ],
     "wiki": "Death_Plateau_(historical)",
+    "availability": "removed",
     "questRequirements": []
   },
   {
@@ -12773,6 +12774,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Ability to use the Herblore skill"
     ],
     "wiki": "Druidic_Ritual_(historical)",
+    "availability": "removed",
     "questRequirements": []
   },
   {
@@ -12805,6 +12807,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Icicle crown, which can be charged in a similar way to the sunbeam crown by chopping down evil hawthorn trees."
     ],
     "wiki": "Hawthorn_(holiday_event)",
+    "availability": "removed",
     "questRequirements": []
   },
   {
@@ -13462,6 +13465,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "275 gold charms"
     ],
     "wiki": "Wolf_Whistle_(historical)",
+    "availability": "removed",
     "questRequirements": []
   },
   {
