@@ -150,6 +150,133 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "questRequirements": []
   },
   {
+    "id": "once-upon-a-time-in-gielinor-foreshadowing",
+    "name": "Once Upon a Time in Gielinor: Foreshadowing",
+    "icon": "Once_Upon_a_Time_in_Gielinor_Foreshadowing_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Novice",
+    "length": "Short",
+    "start": {
+      "npc": "Relomia",
+      "npcWiki": "Relomia",
+      "image": "Once_Upon_a_Time_in_Gielinor_Foreshadowing_icon.png",
+      "location": "Once Upon a Time in Gielinor: Foreshadowing",
+      "meetingPoint": "Speak to Relomia in the Blue Moon Inn in Varrock.",
+      "map": {
+        "x": 3222,
+        "y": 3402,
+        "plane": 0
+      }
+    },
+    "why": "Once Upon a Time in Gielinor: Foreshadowing is the first subquest of the special quest, Once Upon a Time in Gielinor. It was originally released as a miniquest and turned into a subquest on 22 November 2021.",
+    "requirements": [],
+    "supplies": [],
+    "rewards": [
+      "Medium XP lamp",
+      "Relomia's party hat cosmetic override"
+    ],
+    "wiki": "Once_Upon_a_Time_in_Gielinor:_Foreshadowing",
+    "questRequirements": []
+  },
+  {
+    "id": "once-upon-a-time-in-gielinor-flashback",
+    "name": "Once Upon a Time in Gielinor: Flashback",
+    "icon": "Once_Upon_a_Time_in_Gielinor_Flashback_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Novice",
+    "length": "Short",
+    "start": {
+      "npc": "Closure",
+      "npcWiki": "Closure",
+      "image": "Closure_chathead.png",
+      "location": "Once Upon a Time in Gielinor: Flashback",
+      "meetingPoint": "Talk to Closure in his office to find out more. It can be accessed through Death's Realm.",
+      "map": {
+        "x": 3102,
+        "y": 3308,
+        "plane": 0
+      }
+    },
+    "why": "Once Upon a Time in Gielinor: Flashback is the second subquest of the special quest, Once Upon a Time in Gielinor. It was originally released as a miniquest and turned into a subquest on 22 November 2021.",
+    "requirements": [],
+    "supplies": [],
+    "rewards": [
+      "Medium XP lamp",
+      "Closure's ghost biography cosmetic override"
+    ],
+    "wiki": "Once_Upon_a_Time_in_Gielinor:_Flashback",
+    "questRequirements": [
+      "once-upon-a-time-in-gielinor-foreshadowing"
+    ]
+  },
+  {
+    "id": "once-upon-a-time-in-gielinor-fortunes",
+    "name": "Once Upon a Time in Gielinor: Fortunes",
+    "icon": "Once_Upon_a_Time_in_Gielinor_Fortunes_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Novice",
+    "length": "Short",
+    "start": {
+      "npc": "Closure",
+      "npcWiki": "Closure",
+      "image": "Closure_chathead.png",
+      "location": "Once Upon a Time in Gielinor: Fortunes",
+      "meetingPoint": "Talk to Closure in his office, which can be accessed through Death's realm, to find out more.",
+      "map": {
+        "x": 3105,
+        "y": 3308,
+        "plane": 0
+      }
+    },
+    "why": "Once Upon a Time in Gielinor: Fortunes is the third subquest of the Once Upon a Time in Gielinor special quest. It was originally released as a miniquest and turned into a subquest on 22 November 2021.",
+    "requirements": [],
+    "supplies": [],
+    "rewards": [
+      "Medium XP lamp",
+      "Relomia's wand cosmetic override"
+    ],
+    "wiki": "Once_Upon_a_Time_in_Gielinor:_Fortunes",
+    "questRequirements": [
+      "once-upon-a-time-in-gielinor-flashback"
+    ]
+  },
+  {
+    "id": "once-upon-a-time-in-gielinor-finale",
+    "name": "Once Upon a Time in Gielinor: Finale",
+    "icon": "Once_Upon_a_Time_in_Gielinor_Finale_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Novice",
+    "length": "Short",
+    "start": {
+      "npc": "Closure",
+      "npcWiki": "Closure",
+      "image": "Closure_chathead.png",
+      "location": "Once Upon a Time in Gielinor: Finale",
+      "meetingPoint": "Talk to Closure in his office to find out more. It can be accessed via Death's realm.",
+      "map": {
+        "x": 3108,
+        "y": 3308,
+        "plane": 0
+      }
+    },
+    "why": "Once Upon a Time in Gielinor: Finale is the final subquest of the special quest, Once Upon a Time in Gielinor.",
+    "requirements": [],
+    "supplies": [],
+    "rewards": [
+      "Medium XP lamp",
+      "Shadow Rip Teleport cosmetic override",
+      "Golden partyhat shard (only during the Golden Partyhat Hunt event)"
+    ],
+    "wiki": "Once_Upon_a_Time_in_Gielinor:_Finale",
+    "questRequirements": [
+      "once-upon-a-time-in-gielinor-fortunes"
+    ]
+  },
+  {
     "id": "once-upon-a-time-in-gielinor",
     "name": "Once Upon a Time in Gielinor",
     "icon": "Once_Upon_a_Time_in_Gielinor_icon.png",
@@ -177,7 +304,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "\"Access to an epilogue of sorts...\""
     ],
     "wiki": "Once_Upon_a_Time_in_Gielinor",
-    "questRequirements": []
+    "questRequirements": [
+      "once-upon-a-time-in-gielinor-finale"
+    ]
   },
   {
     "id": "dimension-of-disaster-shield-of-arrav",
@@ -12738,7 +12867,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Ability to wear cosmetic overrides in New Varrock"
     ],
     "wiki": "Dimension_of_Disaster",
-    "questRequirements": []
+    "questRequirements": [
+      "dimension-of-disaster-curse-of-arrav"
+    ]
   },
   {
     "id": "druidic-ritual-historical",
@@ -12990,133 +13121,6 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ]
   },
   {
-    "id": "once-upon-a-time-in-gielinor-foreshadowing",
-    "name": "Once Upon a Time in Gielinor: Foreshadowing",
-    "icon": "Once_Upon_a_Time_in_Gielinor_Foreshadowing_icon.png",
-    "artwork": "Quest.png",
-    "members": true,
-    "difficulty": "Novice",
-    "length": "Short",
-    "start": {
-      "npc": "Relomia",
-      "npcWiki": "Relomia",
-      "image": "Once_Upon_a_Time_in_Gielinor_Foreshadowing_icon.png",
-      "location": "Once Upon a Time in Gielinor: Foreshadowing",
-      "meetingPoint": "Speak to Relomia in the Blue Moon Inn in Varrock.",
-      "map": {
-        "x": 3222,
-        "y": 3402,
-        "plane": 0
-      }
-    },
-    "why": "Once Upon a Time in Gielinor: Foreshadowing is the first subquest of the special quest, Once Upon a Time in Gielinor. It was originally released as a miniquest and turned into a subquest on 22 November 2021.",
-    "requirements": [],
-    "supplies": [],
-    "rewards": [
-      "Medium XP lamp",
-      "Relomia's party hat cosmetic override"
-    ],
-    "wiki": "Once_Upon_a_Time_in_Gielinor:_Foreshadowing",
-    "questRequirements": []
-  },
-  {
-    "id": "once-upon-a-time-in-gielinor-flashback",
-    "name": "Once Upon a Time in Gielinor: Flashback",
-    "icon": "Once_Upon_a_Time_in_Gielinor_Flashback_icon.png",
-    "artwork": "Quest.png",
-    "members": true,
-    "difficulty": "Novice",
-    "length": "Short",
-    "start": {
-      "npc": "Closure",
-      "npcWiki": "Closure",
-      "image": "Closure_chathead.png",
-      "location": "Once Upon a Time in Gielinor: Flashback",
-      "meetingPoint": "Talk to Closure in his office to find out more. It can be accessed through Death's Realm.",
-      "map": {
-        "x": 3102,
-        "y": 3308,
-        "plane": 0
-      }
-    },
-    "why": "Once Upon a Time in Gielinor: Flashback is the second subquest of the special quest, Once Upon a Time in Gielinor. It was originally released as a miniquest and turned into a subquest on 22 November 2021.",
-    "requirements": [],
-    "supplies": [],
-    "rewards": [
-      "Medium XP lamp",
-      "Closure's ghost biography cosmetic override"
-    ],
-    "wiki": "Once_Upon_a_Time_in_Gielinor:_Flashback",
-    "questRequirements": [
-      "once-upon-a-time-in-gielinor-foreshadowing"
-    ]
-  },
-  {
-    "id": "once-upon-a-time-in-gielinor-fortunes",
-    "name": "Once Upon a Time in Gielinor: Fortunes",
-    "icon": "Once_Upon_a_Time_in_Gielinor_Fortunes_icon.png",
-    "artwork": "Quest.png",
-    "members": true,
-    "difficulty": "Novice",
-    "length": "Short",
-    "start": {
-      "npc": "Closure",
-      "npcWiki": "Closure",
-      "image": "Closure_chathead.png",
-      "location": "Once Upon a Time in Gielinor: Fortunes",
-      "meetingPoint": "Talk to Closure in his office, which can be accessed through Death's realm, to find out more.",
-      "map": {
-        "x": 3105,
-        "y": 3308,
-        "plane": 0
-      }
-    },
-    "why": "Once Upon a Time in Gielinor: Fortunes is the third subquest of the Once Upon a Time in Gielinor special quest. It was originally released as a miniquest and turned into a subquest on 22 November 2021.",
-    "requirements": [],
-    "supplies": [],
-    "rewards": [
-      "Medium XP lamp",
-      "Relomia's wand cosmetic override"
-    ],
-    "wiki": "Once_Upon_a_Time_in_Gielinor:_Fortunes",
-    "questRequirements": [
-      "once-upon-a-time-in-gielinor-flashback"
-    ]
-  },
-  {
-    "id": "once-upon-a-time-in-gielinor-finale",
-    "name": "Once Upon a Time in Gielinor: Finale",
-    "icon": "Once_Upon_a_Time_in_Gielinor_Finale_icon.png",
-    "artwork": "Quest.png",
-    "members": true,
-    "difficulty": "Novice",
-    "length": "Short",
-    "start": {
-      "npc": "Closure",
-      "npcWiki": "Closure",
-      "image": "Closure_chathead.png",
-      "location": "Once Upon a Time in Gielinor: Finale",
-      "meetingPoint": "Talk to Closure in his office to find out more. It can be accessed via Death's realm.",
-      "map": {
-        "x": 3108,
-        "y": 3308,
-        "plane": 0
-      }
-    },
-    "why": "Once Upon a Time in Gielinor: Finale is the final subquest of the special quest, Once Upon a Time in Gielinor.",
-    "requirements": [],
-    "supplies": [],
-    "rewards": [
-      "Medium XP lamp",
-      "Shadow Rip Teleport cosmetic override",
-      "Golden partyhat shard (only during the Golden Partyhat Hunt event)"
-    ],
-    "wiki": "Once_Upon_a_Time_in_Gielinor:_Finale",
-    "questRequirements": [
-      "once-upon-a-time-in-gielinor-fortunes"
-    ]
-  },
-  {
     "id": "recipe-for-disaster",
     "name": "Recipe for Disaster",
     "icon": "Recipe_for_Disaster_icon.png",
@@ -13157,7 +13161,6 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "2 Lemons, 1 Pineapple, 1 Orange"
     ],
     "rewards": [
-      "10 quest points",
       "Experience",
       "Access to the following areas:",
       "Ability to dive for crabs",
@@ -13181,50 +13184,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "horror-from-the-deep",
       "lost-city",
       "monkey-madness",
-      "shadow-of-the-storm"
-    ]
-  },
-  {
-    "id": "that-old-black-magic",
-    "name": "That Old Black Magic",
-    "icon": "That_Old_Black_Magic_icon.png",
-    "artwork": "Quest.png",
-    "members": true,
-    "difficulty": "Experienced",
-    "length": "Long",
-    "start": {
-      "npc": "Lady Grey",
-      "npcWiki": "Lady Grey",
-      "image": "Lady_Grey_chathead.png",
-      "location": "Underworld",
-      "meetingPoint": "Speak to Lady Grey in the City of Um's bandstand.",
-      "map": {
-        "x": 1114,
-        "y": 1776,
-        "plane": 1
-      }
-    },
-    "why": "That Old Black Magic is a quest in the City of Um quest series. This is a four-part quest requiring increasing Necromancy levels to complete each part: 32, 45, 50, and 65.",
-    "requirements": [
-      {
-        "skill": "Necromancy",
-        "level": 32
-      }
-    ],
-    "supplies": [
-      "Restored Everlight trumpet",
-      "Glyphs for ensoul trumpet ritual",
-      "520 bone runes",
-      "360 flesh runes",
-      "Animated drumsticks (may obtain during the quest)"
-    ],
-    "rewards": [
-      "1 quest point",
-      "If you have fully completed all 4 subquests and the quest \"That Old Black Magic\", you will have received the following:"
-    ],
-    "wiki": "That_Old_Black_Magic",
-    "questRequirements": [
-      "necromancy"
+      "shadow-of-the-storm",
+      "recipe-for-disaster-defeating-the-culinaromancer"
     ]
   },
   {
@@ -13386,6 +13347,52 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "wiki": "That_Old_Black_Magic:_Skelly_By_Everlight",
     "questRequirements": [
       "that-old-black-magic-my-one-and-only-lute"
+    ]
+  },
+  {
+    "id": "that-old-black-magic",
+    "name": "That Old Black Magic",
+    "icon": "That_Old_Black_Magic_icon.png",
+    "artwork": "Quest.png",
+    "members": true,
+    "difficulty": "Experienced",
+    "length": "Long",
+    "start": {
+      "npc": "Lady Grey",
+      "npcWiki": "Lady Grey",
+      "image": "Lady_Grey_chathead.png",
+      "location": "Underworld",
+      "meetingPoint": "Speak to Lady Grey in the City of Um's bandstand.",
+      "map": {
+        "x": 1114,
+        "y": 1776,
+        "plane": 1
+      }
+    },
+    "why": "That Old Black Magic is a quest in the City of Um quest series. This is a four-part quest requiring increasing Necromancy levels to complete each part: 32, 45, 50, and 65.",
+    "requirements": [
+      {
+        "skill": "Necromancy",
+        "level": 32
+      }
+    ],
+    "supplies": [
+      "Restored Everlight trumpet",
+      "Glyphs for ensoul trumpet ritual",
+      "520 bone runes",
+      "360 flesh runes",
+      "Animated drumsticks (may obtain during the quest)"
+    ],
+    "rewards": [
+      "1 quest point",
+      "If you have fully completed all 4 subquests and the quest \"That Old Black Magic\", you will have received the following:"
+    ],
+    "wiki": "That_Old_Black_Magic",
+    "questRequirements": [
+      "necromancy",
+      "that-old-black-magic-flesh-and-bone",
+      "that-old-black-magic-hermy-and-bass",
+      "that-old-black-magic-skelly-by-everlight"
     ]
   },
   {

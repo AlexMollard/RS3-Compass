@@ -71,3 +71,16 @@ test("Plague's End's path covers its whole quest chain from the real catalogue",
   for (const id of ["within-the-light", "making-history", "catapult-construction"])
     assert.ok(all.includes(id), id);
 });
+
+test("an umbrella quest's path includes every one of its subquests", () => {
+  for (const umbrella of QUESTS.filter((q) => QUESTS.some((s) => s.name.startsWith(q.name + ": ")))) {
+    const earlier = earlierQuests(umbrella.id, QUESTS);
+    const missing = QUESTS.filter((s) => s.name.startsWith(umbrella.name + ": ") && !earlier.has(s.id));
+    assert.deepEqual(missing.map((s) => s.id), [], umbrella.id);
+  }
+  const rfd = pathColumns("recipe-for-disaster", QUESTS).flat();
+  assert.equal(rfd.filter((id) => id.startsWith("recipe-for-disaster-")).length, 10);
+  // Jagex awards Recipe for Disaster's quest points on its subquests, not the umbrella.
+  const umbrella = QUESTS.find((q) => q.id === "recipe-for-disaster");
+  assert.equal(umbrella.rewards.some((line) => /^\d+ quest points?/.test(line)), false);
+});

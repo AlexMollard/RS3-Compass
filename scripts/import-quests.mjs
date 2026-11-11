@@ -18,6 +18,8 @@ const START_PAGES = {
   // Starts at any house portal; Rimmington is the first one players get.
   "A Clockwork Syringe": ["Rimmington"],
 };
+// Umbrella quests whose quest points Jagex awards on the subquests instead (umbrella qp 0).
+const SUBQUEST_QP = new Set(["Recipe for Disaster"]);
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 async function api(params) {
@@ -159,7 +161,7 @@ function parseQuest(title, content, questreq, npcPins) {
   const questPoints = (details.requirements ?? "").match(/\{\{\s*Skillreq\s*\|\s*Quest points\s*\|(\d+)/i)?.[1];
   if (questPoints) notes.push(`Requires ${questPoints} quest points.`);
   const rewardsTemplate = templateParams(content, "Quest rewards") ?? {};
-  const qp = Number(rewardsTemplate.qp);
+  const qp = SUBQUEST_QP.has(title) ? 0 : Number(rewardsTemplate.qp);
   const rewards = [
     ...(qp > 0 ? [`${qp} quest point${qp === 1 ? "" : "s"}`] : []),
     ...bullets(rewardsTemplate.rewards),
@@ -328,6 +330,15 @@ for (const r of records) {
     members: true,
     summary: `Start of ${r.name}.`,
   };
+}
+
+// An umbrella quest ("Recipe for Disaster") is finished only once its "Name: ..." subquests are,
+// but the Wiki lists just its outer prerequisites. Add the subquests no other subquest needs.
+for (const r of records) {
+  const subquests = records.filter((s) => s.name.startsWith(r.name + ": "));
+  const needed = new Set(subquests.flatMap((s) => s.questRequirements));
+  for (const s of subquests)
+    if (!needed.has(s.id) && !r.questRequirements.includes(s.id)) r.questRequirements.push(s.id);
 }
 
 // Keep the guide order, but pull each imported prerequisite in just before the first
