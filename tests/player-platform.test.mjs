@@ -201,6 +201,33 @@ test("Jagex miniquest, saga and ellipsis variants match without confusing differ
   );
 });
 
+test("Jagex titles match Wiki-named catalogue quests and series parts", () => {
+  const titles = [
+    "Raksha, the Shadow Colossus",
+    "Tears of Guthix",
+    "Foreshadowing",
+    "Flashback",
+    "Fortunes",
+    "Finale",
+    "My One and Only Lute",
+    "Flesh and Bone",
+    "Hermy and Bass",
+    "Skelly By Everlight",
+    "Recipe for Disaster: Defeating the Culinaromancer",
+  ];
+  const profile = { questProgress: availableQuests(titles) };
+  const matched = QUESTS.filter((q) => findPlayerQuest(profile, q)).map((q) => q.id);
+  for (const id of [
+    "raksha-the-shadow-colossus-quest",
+    "tears-of-guthix-quest",
+    "once-upon-a-time-in-gielinor-foreshadowing",
+    "that-old-black-magic-skelly-by-everlight",
+    "recipe-for-disaster-defeating-the-culinaromancer",
+  ])
+    assert.ok(matched.includes(id), id);
+  assert.equal(matched.length, titles.length);
+});
+
 test("malformed and cross-player responses cannot be imported; valid empty logs and zero XP remain available", async (t) => {
   const original = globalThis.fetch;
   t.after(() => {
