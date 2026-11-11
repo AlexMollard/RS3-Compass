@@ -1,5 +1,6 @@
 import type { Profile, QuestRecord } from "../data.ts";
 import { QUEST_COMBAT } from "../combatData.ts";
+import { levelStatus } from "./levelStatus.ts";
 import { packKey } from "./packing.ts";
 import { questStatus, type QuestStatus } from "./questMap.ts";
 
@@ -19,9 +20,9 @@ export function questReadiness(
   let met = 0;
   let unknown = 0;
   for (const { skill, level } of required) {
-    const have = profile.levels[skill];
-    if (have === undefined) unknown++;
-    else if (have >= level) met++;
+    const status = levelStatus(profile.levels[skill], level);
+    if (status === "unknown") unknown++;
+    else if (status === "met") met++;
   }
   const packed = quest.supplies.filter((line) =>
     profile.packed.includes(packKey(quest.id, line)),

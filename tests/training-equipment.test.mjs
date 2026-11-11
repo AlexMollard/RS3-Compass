@@ -663,3 +663,19 @@ test("Range targets preserve coherent dragon weapon and protection combinations 
     } else assert.ok(names.includes("Anti-dragon shield"));
   }
 });
+
+test("equipmentLevels marks each recorded level met, below or unknown", () => {
+  const item = {
+    levels: [
+      { skill: "Attack", level: 40 },
+      { skill: "Defence", level: 40 },
+      { skill: "Mining", level: 40 },
+    ],
+  };
+  assert.deepEqual(equipmentLevels(item, character({ Attack: 40, Defence: 39 })), [
+    { skill: "Attack", level: 40, recorded: 40, status: "met" },
+    { skill: "Defence", level: 40, recorded: 39, status: "below" },
+    { skill: "Mining", level: 40, recorded: undefined, status: "unknown" },
+  ]);
+  assert.deepEqual(equipmentLevels({}, character()), []);
+});

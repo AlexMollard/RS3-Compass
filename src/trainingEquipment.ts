@@ -10,6 +10,7 @@ import type {
 } from "./equipmentTypes.ts";
 import { COMBAT_EQUIPMENT, EQUIPMENT_MATERIALS } from "./equipmentCombat.ts";
 import { SKILLING_EQUIPMENT } from "./equipmentSkilling.ts";
+import { levelStatus } from "./lib/levelStatus.ts";
 
 export const EQUIPMENT_GUIDES = { ...COMBAT_EQUIPMENT, ...SKILLING_EQUIPMENT };
 export const EQUIPMENT_ITEMS: ItemReference[] = [
@@ -57,8 +58,7 @@ export function selectEquipment(
       if (item.levels?.length)
         return item.levels.every(
           ({ skill: requirement, level }) =>
-            profile.levels[requirement] !== undefined &&
-            profile.levels[requirement]! >= level,
+            levelStatus(profile.levels[requirement], level) === "met",
         );
       return true;
     });
@@ -175,12 +175,7 @@ export function equipmentLevels(
     return {
       ...requirement,
       recorded,
-      status:
-        recorded === undefined
-          ? "unknown"
-          : recorded >= requirement.level
-            ? "met"
-            : "below",
+      status: levelStatus(recorded, requirement.level),
     };
   });
 }

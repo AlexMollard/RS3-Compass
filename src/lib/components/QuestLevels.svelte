@@ -1,6 +1,7 @@
 <script lang="ts">
   import { ArrowRight, CheckCircle2 } from "@lucide/svelte";
   import { skillByName, type Profile, type QuestRecord } from "../../data";
+  import { levelStatus } from "../levelStatus";
   import GameArt from "./GameArt.svelte";
   import GameText from "./GameText.svelte";
   import Button from "./Button.svelte";
@@ -36,8 +37,9 @@
       <div class="level-check-list">
         {#each group.levels as requirement (requirement.skill + ":" + requirement.level)}
           {@const current = profile.levels[requirement.skill]}
-          {@const known = current != null}
-          {@const met = known && current >= requirement.level}
+          {@const status = levelStatus(current, requirement.level)}
+          {@const known = status !== "unknown"}
+          {@const met = status === "met"}
           <div class:is-met={met} class="level-check-row">
             <div class="level-check-skill">
               <GameArt file={requirement.skill + "-icon.png"} />
