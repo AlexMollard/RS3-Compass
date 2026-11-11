@@ -1,4 +1,5 @@
 import { isRecord } from "./guards.ts";
+import { LruMap } from "./lru.ts";
 
 export interface ActivityWikiArticle {
   wiki: string;
@@ -86,10 +87,10 @@ export function createActivityWikiLookup(
   fetcher: typeof fetch = fetch,
   now = Date.now,
 ) {
-  const cache = new Map<
+  const cache = new LruMap<
     string,
     { article: ActivityWikiArticle | null; expiresAt: number }
-  >();
+  >(256);
   const inFlight = new Map<string, Promise<ActivityWikiArticle | null>>();
   let activeBatches = 0;
   let windowStart = now();
@@ -129,9 +130,7 @@ export function createActivityWikiLookup(
     article: ActivityWikiArticle | null,
     ttl: number,
   ) {
-    cache.delete(key);
     cache.set(key, { article, expiresAt: now() + ttl });
-    while (cache.size > 256) cache.delete(cache.keys().next().value!);
   }
 
   async function lookup(
@@ -163,8 +162,6 @@ export function createActivityWikiLookup(
       const key = titleKey(title);
       const cached = cache.get(key);
       if (cached && cached.expiresAt > now()) {
-        cache.delete(key);
-        cache.set(key, cached);
         if (cached.article) result.set(title, cached.article);
       } else {
         if (cached) cache.delete(key);
@@ -247,7 +244,7 @@ export function createActivityWikiLookup(
       }),
     );
     for (const title of titles) {
-      const cached = cache.get(titleKey(title));
+      const cached = cache.peek(titleKey(title));
       if (cached?.article && cached.expiresAt > now())
         result.set(title, cached.article);
     }

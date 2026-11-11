@@ -4,6 +4,7 @@ import {
   type SkillName,
 } from "../../skillNames.ts";
 import { isRecord } from "../guards.ts";
+import { LruMap } from "../lru.ts";
 import { hasTransientFailure } from "../playerData.ts";
 import {
   normalizePlayerName,
@@ -19,8 +20,8 @@ import { lookupQuests } from "./questLookup.ts";
 import { lookupEvents } from "./eventLookup.ts";
 import {
   createClientLimiter,
+  createWindowLimiter,
   IN_FLIGHT_RETRY_SECONDS,
-  retryAfterSeconds,
 } from "./rateLimit.ts";
 import { upstreamInit } from "./upstream.ts";
 
@@ -147,32 +148,18 @@ export function createPlayerLookupService(
   fetcher: typeof fetch = fetch,
   now: () => number = Date.now,
 ) {
-  const cache = new Map<string, CacheEntry>();
+  const cache = new LruMap<string, CacheEntry>(MAX_CACHED_PLAYERS);
   const inFlight = new Map<string, Promise<PlayerLookup>>();
-  const requestTimes = new Float64Array(MAX_UPSTREAM_PER_MINUTE);
-  let requestHead = 0;
-  let requestCount = 0;
+  const takeUpstream = createWindowLimiter(MAX_UPSTREAM_PER_MINUTE);
   const takeClient = createClientLimiter();
-  function cacheEntry(key: string, entry: CacheEntry) {
-    cache.delete(key);
-    cache.set(key, entry);
-    while (cache.size > MAX_CACHED_PLAYERS)
-      cache.delete(cache.keys().next().value!);
-  }
   const boundedFetch: typeof fetch = (input, init) => {
-    const time = now();
-    while (requestCount > 0 && time - requestTimes[requestHead] >= 60_000) {
-      requestHead = (requestHead + 1) % MAX_UPSTREAM_PER_MINUTE;
-      requestCount--;
-    }
-    if (requestCount >= MAX_UPSTREAM_PER_MINUTE)
+    const wait = takeUpstream(now());
+    if (wait !== undefined)
       throw new PlayerLookupError(
         "Player lookup is busy. Wait a moment before trying again.",
         429,
-        retryAfterSeconds(requestTimes[requestHead], time),
+        wait,
       );
-    requestTimes[(requestHead + requestCount) % MAX_UPSTREAM_PER_MINUTE] = time;
-    requestCount++;
     return fetcher(input, init);
   };
   /** `client` identifies the caller for its per-client share; omit it to use only the shared budget. */
@@ -192,8 +179,6 @@ export function createPlayerLookupService(
     const key = playerKey(name);
     const cached = cache.get(key);
     if (cached && cached.expiresAt > now()) {
-      cache.delete(key);
-      cache.set(key, cached);
       if ("error" in cached) throw cached.error;
       return cached.player;
     }
@@ -304,7 +289,7 @@ export function createPlayerLookupService(
                 502,
               );
         if (error.status === 404)
-          cacheEntry(key, { expiresAt: now() + NEGATIVE_CACHE_MS, error });
+          cache.set(key, { expiresAt: now() + NEGATIVE_CACHE_MS, error });
         throw error;
       }
       const fetchedAt = now();
@@ -327,7 +312,7 @@ export function createPlayerLookupService(
         quests,
         events,
       };
-      cacheEntry(key, {
+      cache.set(key, {
         expiresAt: fetchedAt + playerCacheMs(player),
         player,
       });

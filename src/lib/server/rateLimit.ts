@@ -10,6 +10,21 @@ export function retryAfterSeconds(oldest: number, now: number): number {
 }
 
 /**
+ * A shared budget of `limit` requests in any one-minute window. `take` records
+ * a request and returns undefined, or returns the Retry-After seconds without
+ * recording when the window is full.
+ */
+export function createWindowLimiter(limit: number) {
+  const times: number[] = [];
+  return function take(time: number): number | undefined {
+    while (times.length && time - times[0] >= WINDOW_MS) times.shift();
+    if (times.length >= limit) return retryAfterSeconds(times[0], time);
+    times.push(time);
+    return undefined;
+  };
+}
+
+/**
  * A per-client share of the shared upstream budget, so one caller cannot use
  * the whole minute for everyone. `take` records a lookup and returns the
  * Retry-After seconds when the client is over its share. The least recently

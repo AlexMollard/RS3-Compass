@@ -7,7 +7,10 @@ import {
   PLAYER_CACHE_MS,
   PLAYER_PARTIAL_CACHE_MS,
 } from "../src/lib/server/playerLookup.ts";
-import { createClientLimiter } from "../src/lib/server/rateLimit.ts";
+import {
+  createClientLimiter,
+  createWindowLimiter,
+} from "../src/lib/server/rateLimit.ts";
 import { normalizePlayerName } from "../src/lib/playerName.ts";
 import { RS3_SKILL_NAMES } from "../src/skillNames.ts";
 
@@ -300,6 +303,17 @@ test("the per-client limiter forgets the least recently seen clients past its ca
   assert.equal(take("a", 1000), 59);
   for (let i = 0; i < 1024; i++) take("client " + i, 1000);
   assert.equal(take("a", 1000), undefined);
+});
+
+test("the shared window limiter records up to its limit and frees each slot after exactly a minute", () => {
+  const take = createWindowLimiter(2);
+  assert.equal(take(0), undefined);
+  assert.equal(take(30_000), undefined);
+  assert.equal(take(59_999), 1);
+  assert.equal(take(60_000), undefined);
+  assert.equal(take(60_000), 30);
+  assert.equal(take(89_999), 1);
+  assert.equal(take(90_000), undefined);
 });
 
 test("partial response at budget boundary keeps available data and retries after short cache", async () => {

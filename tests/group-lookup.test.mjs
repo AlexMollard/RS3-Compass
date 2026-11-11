@@ -171,6 +171,60 @@ test("one client's share leaves the group budget for others", async () => {
   });
 });
 
+test("the shared group budget allows 60 requests a minute and expires each at exactly one minute", async () => {
+  let time = 0;
+  let calls = 0;
+  const service = createGroupLookupService(
+    async () => {
+      calls++;
+      return response(listing([]));
+    },
+    () => time,
+  );
+  const search = (name) => service.lookup({ ...query, name });
+  for (let i = 0; i < 30; i++) await assert.rejects(search("a" + i), { status: 404 });
+  time = 30_000;
+  for (let i = 0; i < 30; i++) await assert.rejects(search("b" + i), { status: 404 });
+  time = 59_999;
+  await assert.rejects(search("c"), { status: 429, retryAfter: 1 });
+  time = 60_000;
+  for (let i = 0; i < 30; i++) await assert.rejects(search("c" + i), { status: 404 });
+  await assert.rejects(search("d"), { status: 429, retryAfter: 30 });
+  assert.equal(calls, 90);
+});
+
+test("the group cache keeps the 128 most recently used searches", async () => {
+  let time = 0;
+  let calls = 0;
+  const named = (name) =>
+    `<section><h1 data-testid="Heading">${name}</h1><div data-testid="GroupMember"><img data-testid="AvatarImage" title="Alice" src="https://secure.runescape.com/m=avatar-rs/Alice/chat.png"></div></section>`;
+  const service = createGroupLookupService(
+    async (url) => {
+      calls++;
+      const name = url.searchParams.get("name");
+      return response(
+        name
+          ? listing([{ ...entry, name }])
+          : named(decodeURIComponent(url.pathname.split("/").pop())),
+      );
+    },
+    () => time,
+  );
+  const search = (name) => service.lookup({ ...query, name });
+  for (let i = 0; i < 128; i++) {
+    if (i % 30 === 0) time += 60_000;
+    await search("g" + i);
+  }
+  await search("g0");
+  time += 60_000;
+  await search("g128");
+  const before = calls;
+  await search("g0");
+  assert.equal(calls, before);
+  await search("g1");
+  assert.equal(calls, before + 2);
+});
+
 test("rejects oversized streaming responses before reading further", async () => {
   let cancelled = false;
   let reads = 0;

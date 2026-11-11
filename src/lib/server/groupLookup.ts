@@ -2,11 +2,12 @@ import { parse } from "parse5";
 import { isGroupLookup, normalizeGroupQuery } from "../groupData.ts";
 import type { GroupLookup, GroupQuery } from "../groupTypes.ts";
 import { isRecord, isSafeInteger } from "../guards.ts";
+import { LruMap } from "../lru.ts";
 import { normalizePlayerName, playerKey } from "../playerName.ts";
 import {
   createClientLimiter,
+  createWindowLimiter,
   IN_FLIGHT_RETRY_SECONDS,
-  retryAfterSeconds,
 } from "./rateLimit.ts";
 import { upstreamInit } from "./upstream.ts";
 
@@ -260,16 +261,13 @@ export function createGroupLookupService(
   fetcher: typeof fetch = fetch,
   now: () => number = Date.now,
 ) {
-  const cache = new Map<string, GroupLookup>();
+  const cache = new LruMap<string, GroupLookup>(MAX_CACHED);
   const pending = new Map<string, Promise<GroupLookup>>();
-  const times: number[] = [];
+  const takeUpstream = createWindowLimiter(MAX_PER_MINUTE);
   const takeClient = createClientLimiter();
   async function request(url: URL): Promise<string> {
-    const time = now();
-    while (times.length && time - times[0] >= 60_000) times.shift();
-    if (times.length >= MAX_PER_MINUTE)
-      throw busy(retryAfterSeconds(times[0], time));
-    times.push(time);
+    const wait = takeUpstream(now());
+    if (wait !== undefined) throw busy(wait);
     const response = await fetcher(
       url,
       upstreamInit("text/html", "RS3 Compass public Group Ironman lookup"),
@@ -320,11 +318,7 @@ export function createGroupLookupService(
     }
     const key = `${query.size}:${query.isCompetitive}:${query.name.toLocaleLowerCase("en")}`;
     const cached = cache.get(key);
-    if (cached && cached.fetchedAt + GROUP_CACHE_MS > now()) {
-      cache.delete(key);
-      cache.set(key, cached);
-      return cached;
-    }
+    if (cached && cached.fetchedAt + GROUP_CACHE_MS > now()) return cached;
     cache.delete(key);
     const existing = pending.get(key);
     if (existing) return existing;
@@ -358,8 +352,6 @@ export function createGroupLookupService(
         cache.set(key, result);
         const alias = `${query.size}:${query.isCompetitive}:${listing.name.toLocaleLowerCase("en")}`;
         cache.set(alias, result);
-        while (cache.size > MAX_CACHED)
-          cache.delete(cache.keys().next().value!);
         return result;
       } catch (cause) {
         throw cause instanceof GroupLookupError ? cause : unavailable();
