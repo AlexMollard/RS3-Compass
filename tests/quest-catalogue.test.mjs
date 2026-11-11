@@ -108,6 +108,12 @@ test("Quest identifiers and lookup titles are unambiguous case-insensitively", (
   assertUniqueIdentities(QUESTS));
 test("Every quest prerequisite and starter location resolves", () =>
   assertReferences(QUESTS));
+test("Each quest lists every prerequisite once (a duplicate crashes the quest page)", () => {
+  const repeated = QUESTS.filter(
+    (q) => new Set(q.questRequirements).size !== q.questRequirements.length,
+  ).map((q) => q.id);
+  assert.deepEqual(repeated, []);
+});
 test("Quest kinds, availability and level checks use valid domain identities", () =>
   assertEnums(QUESTS));
 test("Quest prerequisites cannot soft-lock progression with a cycle", () =>

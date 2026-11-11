@@ -308,7 +308,8 @@ for (const r of records) {
       continue;
     }
     const id = finalIds.get(nameKey(name)) ?? finalIds.get(slug(name));
-    if (id && id !== r.id) r.questRequirements.push(id);
+    // The Wiki can list one quest twice ("X" and "Full:X"); keep it once.
+    if (id && id !== r.id) { if (!r.questRequirements.includes(id)) r.questRequirements.push(id); }
     else r.preparationNotes.push(`Complete ${name} first; Compass doesn't track it.`);
   }
   delete r.questRequirementNames;

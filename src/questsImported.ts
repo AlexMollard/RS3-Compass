@@ -9073,8 +9073,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "the-tale-of-the-muspah",
       "missing-my-mummy",
       "defender-of-varrock",
-      "temple-of-ikov",
-      "missing-my-mummy"
+      "temple-of-ikov"
     ]
   },
   {
@@ -9810,8 +9809,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "smoking-kills",
       "missing-my-mummy",
       "dealing-with-scabaras",
-      "recipe-for-disaster-freeing-king-awowogei",
-      "missing-my-mummy"
+      "recipe-for-disaster-freeing-king-awowogei"
     ]
   },
   {
@@ -10685,8 +10683,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "the-jack-of-spades",
       "spirits-of-the-elid",
       "missing-my-mummy",
-      "dealing-with-scabaras",
-      "missing-my-mummy"
+      "dealing-with-scabaras"
     ]
   },
   {
