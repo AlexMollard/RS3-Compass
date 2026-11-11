@@ -1341,6 +1341,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "why": "Wanted! is a quest that focuses on the completion of your application to become a Temple Knight. Due to an oversight during your recruitment, you are now to hunt down an extremely dangerous wizard and mass murderer named Solus Dellagar.",
     "requirements": [],
     "preparationNotes": [
+      "Requires 33 quest points.",
       "Ability to enter Morytania"
     ],
     "supplies": [
@@ -3954,6 +3955,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
         "level": 33
       }
     ],
+    "preparationNotes": [
+      "Requires 50 quest points."
+    ],
     "supplies": [
       "23 free inventory spaces to collect items during the quest"
     ],
@@ -4757,6 +4761,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
         "skill": "Firemaking",
         "level": 20
       }
+    ],
+    "preparationNotes": [
+      "Requires 21 quest points."
     ],
     "supplies": [
       "At least 10 regular logs. You will need more if you fail when travelling to Taverley (logs other than regular ones won't work). Can be obtained during quest.",
@@ -6029,6 +6036,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
         "level": 20
       }
     ],
+    "preparationNotes": [
+      "Requires 44 quest points."
+    ],
     "supplies": [
       "An oil-filled bullseye lantern",
       "A cut sapphire",
@@ -6831,6 +6841,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
         "level": 25
       }
     ],
+    "preparationNotes": [
+      "Requires 56 quest points."
+    ],
     "supplies": [
       "Ice gloves (can be obtained during the quest)",
       "Harralander potion (unfinished)",
@@ -7444,6 +7457,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
         "skill": "Woodcutting",
         "level": 50
       }
+    ],
+    "preparationNotes": [
+      "Requires 107 quest points."
     ],
     "supplies": [
       "A rope",
@@ -9497,6 +9513,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
         "skill": "Cooking",
         "level": 10
       }
+    ],
+    "preparationNotes": [
+      "Requires 176 quest points."
     ],
     "supplies": [
       "Ice gloves for defeating Flambeed, or expect to fight unarmed",

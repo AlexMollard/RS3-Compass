@@ -155,6 +155,9 @@ function parseQuest(title, content, questreq, npcPins) {
     if (name) skills.set(name, Math.max(skills.get(name) ?? 0, Number(m[2])));
   }
   const notes = bullets(details.requirements).filter((line) => !/^level \d+ /i.test(line));
+  // "{{Skillreq|Quest points|N}}" isn't a skill, so it becomes a note rather than vanishing.
+  const questPoints = (details.requirements ?? "").match(/\{\{\s*Skillreq\s*\|\s*Quest points\s*\|(\d+)/i)?.[1];
+  if (questPoints) notes.push(`Requires ${questPoints} quest points.`);
   const rewardsTemplate = templateParams(content, "Quest rewards") ?? {};
   const qp = Number(rewardsTemplate.qp);
   const rewards = [

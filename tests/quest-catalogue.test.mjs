@@ -114,6 +114,22 @@ test("Each quest lists every prerequisite once (a duplicate crashes the quest pa
   ).map((q) => q.id);
   assert.deepEqual(repeated, []);
 });
+test("Imported quest-point requirements stay visible as preparation notes", () => {
+  const needs = {
+    "heroes-quest": 56,
+    "legends-quest": 107,
+    "recipe-for-disaster-defeating-the-culinaromancer": 176,
+    "carnillean-rising": 50,
+    "tears-of-guthix-quest": 44,
+    wanted: 33,
+    "enlightened-journey": 21,
+  };
+  for (const [id, points] of Object.entries(needs))
+    assert.ok(
+      QUESTS.find((q) => q.id === id)?.preparationNotes?.includes(`Requires ${points} quest points.`),
+      id,
+    );
+});
 test("Quest kinds, availability and level checks use valid domain identities", () =>
   assertEnums(QUESTS));
 test("Quest prerequisites cannot soft-lock progression with a cycle", () =>
