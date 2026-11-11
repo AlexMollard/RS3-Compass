@@ -16,6 +16,7 @@
   import { getCompass } from "../compassContext";
   import { INVENTORY_SIZE, inventorySlots } from "../inventorySlots";
   import { questPath, skillPath } from "../navigation";
+  import { packKey } from "../packing";
   import { questLine } from "../questLine";
   import { earlierQuests } from "../questMap";
   import { questReadiness, questStartMessage } from "../questReadiness";
@@ -73,7 +74,7 @@
   );
 
   let packedItems = $derived(
-    quest.supplies.filter((item) => profile.packed.includes(quest.id + "::" + item)),
+    quest.supplies.filter((item) => profile.packed.includes(packKey(quest.id, item))),
   );
   let inventory = $derived(inventorySlots(quest, profile.packed));
   let readiness = $derived(questReadiness(quest, profile));
@@ -129,7 +130,7 @@
   function toggleSupply(item: string) {
     controller.updateProfile((p) => ({
       ...p,
-      packed: toggleItem(p.packed, quest.id + "::" + item),
+      packed: toggleItem(p.packed, packKey(quest.id, item)),
     }));
   }
   function showRewards() {

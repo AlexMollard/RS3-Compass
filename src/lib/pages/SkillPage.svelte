@@ -16,6 +16,7 @@
   import { getCompass } from "../compassContext";
   import { parseLevel } from "../levelChanges";
   import { questPath } from "../navigation";
+  import { packKey } from "../packing";
   import ActivityNotes from "../components/ActivityNotes.svelte";
   import Button from "../components/Button.svelte";
   import ChoiceStrip from "../components/ChoiceStrip.svelte";
@@ -69,7 +70,7 @@
   );
   let task = $derived("train-" + skill.name);
   let packedItems = $derived(
-    supplies.filter((item) => profile.packed.includes(task + "::" + item)),
+    supplies.filter((item) => profile.packed.includes(packKey(task, item))),
   );
   let done = $derived(profile.completedTasks.includes(task));
   let next = $derived(nextQuest(profile));
@@ -156,7 +157,7 @@
     controller.updateProfile((p) => ({
       ...rememberTrainingSelection(p),
       activeTask: task,
-      packed: toggleItem(p.packed, task + "::" + item),
+      packed: toggleItem(p.packed, packKey(task, item)),
     }));
   }
   function complete() {

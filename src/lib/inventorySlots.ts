@@ -4,6 +4,7 @@ import {
   tokenizeGameText,
   type GameTextReference,
 } from "./gameText.ts";
+import { packKey } from "./packing.ts";
 
 export interface InventorySlot {
   /** Unique per slot, for rendering. */
@@ -74,7 +75,7 @@ export function inventorySlots(
 ): { slots: InventorySlot[]; empty: number; overflow: number } {
   const slots: InventorySlot[] = [];
   for (const line of quest.supplies) {
-    const key = quest.id + "::" + line;
+    const key = packKey(quest.id, line);
     const isPacked = packed.includes(key);
     const items = lineItems(line);
     if (!items.length) {

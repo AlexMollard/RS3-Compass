@@ -1,5 +1,6 @@
 import type { Profile, QuestRecord } from "../data.ts";
 import { QUEST_COMBAT } from "../combatData.ts";
+import { packKey } from "./packing.ts";
 import { questStatus, type QuestStatus } from "./questMap.ts";
 
 export interface QuestReadiness {
@@ -23,7 +24,7 @@ export function questReadiness(
     else if (have >= level) met++;
   }
   const packed = quest.supplies.filter((line) =>
-    profile.packed.includes(quest.id + "::" + line),
+    profile.packed.includes(packKey(quest.id, line)),
   ).length;
   const plan = QUEST_COMBAT[quest.id];
   let danger: string | null = null;
