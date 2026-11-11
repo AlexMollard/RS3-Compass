@@ -16,6 +16,7 @@
     current: QuestRecord;
     onOpen: (id: string) => void;
   } = $props();
+  const uid = $props.id();
 
   let dialog: HTMLDialogElement;
   let input = $state<HTMLInputElement>();
@@ -68,7 +69,7 @@
       const step = event.key === "ArrowDown" ? 1 : -1;
       active = (active + step + rows.length) % Math.max(rows.length, 1);
       dialog
-        .querySelector(`#quest-finder-${active}`)
+        .querySelector(`#${uid}-row-${active}`)
         ?.scrollIntoView({ block: "nearest" });
     } else if (event.key === "Enter" && rows[active]) {
       event.preventDefault();
@@ -91,7 +92,7 @@
 {#snippet row(q: QuestRecord, index: number)}
   <li role="presentation">
     <button
-      id={"quest-finder-" + index}
+      id={uid + "-row-" + index}
       type="button"
       role="option"
       class="finder-row"
@@ -139,8 +140,8 @@
       bind:value={query}
       onkeydown={onKeydown}
       aria-label="Search quests and miniquests"
-      aria-controls="quest-finder-list"
-      aria-activedescendant={rows.length ? "quest-finder-" + active : undefined}
+      aria-controls={uid + "-list"}
+      aria-activedescendant={rows.length ? uid + "-row-" + active : undefined}
       placeholder={`Search ${route.length} quests and miniquests`}
       autocomplete="off"
       spellcheck="false"
@@ -155,7 +156,7 @@
     <ChoiceStrip
       variant="joined"
       label="Type"
-      name="finder-type"
+      name={uid + "-type"}
       value={type}
       choices={[
         { value: "all", label: "All" },
@@ -167,7 +168,7 @@
     <ChoiceStrip
       variant="joined"
       label="Progress"
-      name="finder-progress"
+      name={uid + "-progress"}
       value={progress}
       choices={[
         { value: "todo", label: "To do" },
@@ -177,7 +178,7 @@
       onChange={(v) => (progress = v as typeof progress)}
     />
   </div>
-  <ul class="finder-list" id="quest-finder-list" role="listbox" aria-label="Quests">
+  <ul class="finder-list" id={uid + "-list"} role="listbox" aria-label="Quests">
     {#if upNext.length}<li class="finder-group" role="presentation">
         Continue the route
       </li>{/if}

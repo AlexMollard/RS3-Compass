@@ -37,6 +37,10 @@ test("wikitext becomes plain prose with skill, XP and coin wording", () => {
     plain("{{Sxp|Crafting|3000}} [[Crafting XP lamp (Nature Spirit)|lamp]]"),
     "3,000 Crafting XP lamp",
   );
+  assert.equal(
+    plain("{{Skill XP|Combat|25000}} [[Combat XP lamp (Heralds of Crimson)|lamp]] in one of: {{scl|Attack}} or {{scl|Necromancy}}"),
+    "25,000 Combat XP lamp in one of: Attack or Necromancy",
+  );
   assert.equal(plain("{{Skillreq|Mining|20}} or {{Coins|1500}}"), "level 20 Mining or 1,500 coins");
   assert.equal(plain("'''Lost City''' is a [[quest]]<ref>x</ref>."), "Lost City is a quest.");
   assert.deepEqual(bullets("* [[Vial]]\n** nested\n* None\n* {{Coins|20}}"), ["Vial", "20 coins"]);

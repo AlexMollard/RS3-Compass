@@ -42,7 +42,8 @@ export function plain(text) {
   for (let i = 0; i < 4; i++)
     out = out
       .replace(/\{\{\s*Skillreq\s*\|([^|}]+)\|(\d+)[^}]*\}\}/gi, "level $2 $1")
-      .replace(/\{\{\s*Sxp\s*\|([^|}]+)\|([\d,]+)[^}]*\}\}/gi, (_, skill, n) => `${grouped(n)} ${skill.trim()} XP`)
+      .replace(/\{\{\s*(?:Sxp|Skill XP)\s*\|([^|}]+)\|([\d,]+)[^}]*\}\}/gi, (_, skill, n) => `${grouped(n)} ${skill.trim()} XP`)
+      .replace(/\{\{\s*(?:scl|Skill clickpic)\s*\|([^|}]+)[^}]*\}\}/gi, "$1")
       .replace(/\{\{\s*Coins\s*\|([\d,]+)[^}]*\}\}/gi, (_, n) => `${grouped(n)} coins`)
       .replace(/\{\{\s*(?:plink|plinkp|plinkt|ql|qlink)\s*\|([^|}]+)(?:\|[^}]*)?\}\}/gi, "$1")
       .replace(/\{\{\s*(?:Map|NA|Clear|Needed|Bank|Members|FP|M|DisplayTime)[^{}]*\}\}/gi, "")

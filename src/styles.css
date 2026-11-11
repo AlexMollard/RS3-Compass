@@ -420,6 +420,23 @@ textarea {
 .search-trigger:hover {
   border-color: #8fa3b1;
 }
+/* Quest pages: the quest finder and previous/next replace the search box on desktop. */
+.topbar-quest {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+}
+.search-trigger.has-quest-bar {
+  display: none;
+}
+@media (max-width: 760px) {
+  .topbar-quest {
+    display: none;
+  }
+  .search-trigger.has-quest-bar {
+    display: flex;
+  }
+}
 .search-trigger > span {
   flex-grow: 1;
 }
@@ -2696,60 +2713,4 @@ textarea::placeholder {
 }
 .range-selector .navigation-detail {
   padding: 0 10px 10px;
-}
-
-.quest-start {
-  display: grid;
-  grid-template-columns: 88px minmax(0, 1fr);
-  align-items: start;
-  gap: 16px;
-  padding: 16px;
-  border: 1px solid var(--line);
-  background: var(--panel);
-}
-.quest-start-portrait {
-  display: grid;
-  place-items: center;
-  min-height: 88px;
-}
-.quest-start-portrait img {
-  width: 88px;
-  height: 88px;
-  object-fit: contain;
-}
-.quest-start-label {
-  display: block;
-  color: var(--muted);
-  font-size: var(--font-caption);
-}
-.quest-start-npc {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-weight: 600;
-}
-.quest-start a:not(.quest-start-portrait) {
-  text-decoration: underline;
-  text-decoration-color: var(--gold);
-  text-underline-offset: 3px;
-}
-.quest-start-content p {
-  margin: 8px 0 0;
-}
-.quest-start-access {
-  color: var(--gold-bright);
-}
-@media (max-width: 480px) {
-  .quest-start {
-    grid-template-columns: 56px minmax(0, 1fr);
-    gap: 12px;
-    padding: 12px;
-  }
-  .quest-start-portrait {
-    min-height: 56px;
-  }
-  .quest-start-portrait img {
-    width: 56px;
-    height: 56px;
-  }
 }

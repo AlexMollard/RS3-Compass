@@ -44,6 +44,7 @@
   import Button from "./components/Button.svelte";
   import SourceBanner from "./components/SourceBanner.svelte";
   import FirstVisit from "./components/FirstVisit.svelte";
+  import QuestBar from "./components/QuestBar.svelte";
   import { profileSourceNotice } from "./sourceStatus";
   import IconButton from "./components/IconButton.svelte";
   import "./shell.css";
@@ -68,13 +69,13 @@
   };
   let profile = $derived($saved.profiles.find((p) => p.id === $saved.activeId));
   let route = $derived(routeFor(page.url.pathname));
-  let peopleRoute = $derived(["players", "groups", "activity"].includes(route));
-  let showFirstVisit = $derived(
+  let peopleRoute = $derived(["players", "groups", "activity"].includes(route));  let showFirstVisit = $derived(
     $ready &&
       !page.error &&
       (($saved.welcomed === false && !$storageError) ||
         (!profile && !peopleRoute)),
   );
+  let questBar = $derived(route === "quests" && !page.error && !showFirstVisit && !!profile);
   let samples = $derived(
     $saved.profiles.filter((p) => SAMPLE_PROFILES.some((s) => s.id === p.id)),
   );
@@ -405,8 +406,12 @@
             ? "Welcome"
             : TITLES[route]}</span
       >
+      {#if questBar && profile}<div class="topbar-quest">
+          <QuestBar {profile} selectedId={page.params.id ?? ""} />
+        </div>{/if}
       <button
         class="search-trigger"
+        class:has-quest-bar={questBar}
         aria-label="Search quests and skills"
         title="Search quests and skills"
         onclick={openSearch}

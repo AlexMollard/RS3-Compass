@@ -2,8 +2,6 @@
   import { goto } from "$app/navigation";
   import {
     BookOpen,
-    ChevronLeft,
-    ChevronRight,
     CircleAlert,
     CircleCheck,
     ExternalLink,
@@ -19,20 +17,22 @@
   import { questPath, skillPath } from "../navigation";
   import { questLine } from "../questLine";
   import { questReadiness } from "../questReadiness";
-  import { experienceTotals, groupRewards, rewardSummary } from "../questRewards";
+  import { experienceRewards, groupRewards, rewardSummary } from "../questRewards";
+  import { findPlayerQuest } from "../playerProgress";
+  import { LOCATIONS } from "../../locations";
   import Button from "../components/Button.svelte";
   import GameArt from "../components/GameArt.svelte";
   import GameText from "../components/GameText.svelte";
   import GameWindow from "../components/GameWindow.svelte";
   import ItemList from "../components/ItemList.svelte";
   import QuestCombat from "../components/QuestCombat.svelte";
-  import QuestFinder from "../components/QuestFinder.svelte";
+  import QuestBar from "../components/QuestBar.svelte";
   import QuestLevels from "../components/QuestLevels.svelte";
   import QuestLine from "../components/QuestLine.svelte";
   import QuestNavigationCard from "../components/QuestNavigationCard.svelte";
   import QuestPlayerStatus from "../components/QuestPlayerStatus.svelte";
-  import QuestStart from "../components/QuestStart.svelte";
   import SourceBanner from "../components/SourceBanner.svelte";
+  import WorldMap from "../components/WorldMap.svelte";
 
   let { selectedId = "" }: { selectedId?: string } = $props();
   const controller = getCompass();
@@ -61,12 +61,14 @@
   let complete = $derived(profile.completedQuests.includes(quest.id));
   let quickGuide = $derived(QUICK_GUIDES.has(quest.wiki.replaceAll(" ", "_")));
   let walkthrough = $derived(quickGuide ? quest.wiki + "/Quick_guide" : quest.wiki);
-
-  // Previous and next follow the same route as the quest log.
-  let route = $derived(QUESTS.filter((q) => profile.mode === "members" || !q.members));
-  let at = $derived(route.findIndex((q) => q.id === quest.id));
-  let previous = $derived(at > 0 ? route[at - 1] : undefined);
-  let next = $derived(at >= 0 ? route[at + 1] : undefined);
+  let start = $derived(quest.start);
+  let startLocation = $derived(LOCATIONS[start.location]);
+  // Jagex status: Hiscores players only; sample and hand-entered players have none.
+  let jagex = $derived(
+    profile.source === "hiscores" && profile.questProgress
+      ? findPlayerQuest(profile, quest)
+      : undefined,
+  );
 
   let packedItems = $derived(
     quest.supplies.filter((item) => profile.packed.includes(quest.id + "::" + item)),
@@ -82,11 +84,16 @@
   );
   let summary = $derived(rewardSummary(quest.rewards));
   let groups = $derived(groupRewards(quest.rewards));
-  let experience = $derived(experienceTotals(groups.experience));
-  let lampLines = $derived(
-    experience.xp.size
-      ? groups.experience.filter((line) => /\blamps?\b/i.test(line))
-      : groups.experience,
+  let experience = $derived(experienceRewards(groups.experience));
+  let fixedTotal = $derived([...experience.fixed.values()].reduce((sum, n) => sum + n, 0));
+  let lampCount = $derived(experience.lamps.reduce((sum, lamp) => sum + lamp.count, 0));
+  // Experience lines that are neither fixed XP nor a lamp (rare wording) still show as text.
+  let otherXpLines = $derived(
+    groups.experience.filter(
+      (entry) =>
+        !experience.lamps.some((lamp) => lamp.text === entry) &&
+        !experienceRewards([entry]).fixed.size,
+    ),
   );
   let line = $derived(questLine(quest, QUESTS));
   let levelsShort = $derived(readiness.levels.total - readiness.levels.met - readiness.levels.unknown);
@@ -132,33 +139,8 @@
 {/snippet}
 
 <div class="quest-page page-enter">
-  <div class="quest-bar">
-    <QuestFinder quests={QUESTS} {profile} current={quest} onOpen={open} />
-    {#if previous || next}<nav class="quest-step" aria-label="Previous and next quest">
-        {#if previous}<a
-            href={questPath(previous.id)}
-            class="step-link"
-            aria-label={"Previous quest: " + previous.name}
-            title={previous.name}
-            ><ChevronLeft size={16} aria-hidden="true" /><GameArt
-              file={previous.icon}
-              size={22}
-            /><span class="step-text"
-              ><small>Previous</small><span>{previous.name}</span></span
-            ></a
-          >{/if}{#if next}<a
-            href={questPath(next.id)}
-            class="step-link step-next"
-            aria-label={"Next quest: " + next.name}
-            title={next.name}
-            ><span class="step-text"><small>Next</small><span>{next.name}</span></span
-            ><GameArt file={next.icon} size={22} /><ChevronRight
-              size={16}
-              aria-hidden="true"
-            /></a
-          >{/if}
-      </nav>{/if}
-  </div>
+  <!-- Desktop shows this bar in the app top bar; phones keep it in the page. -->
+  <div class="quest-bar-phone"><QuestBar {profile} {selectedId} /></div>
 
   <section class="quest-hero" aria-labelledby="quest-title">
     <a
@@ -188,7 +170,8 @@
         {#if quest.completionMembers && profile.mode === "f2p"}<span>Members to finish</span>{/if}
       </div>
       <p class="quest-why"><GameText text={quest.why} /></p>
-      {#if summary.length}<button
+    </div>
+    {#if summary.length}<button
           type="button"
           class="reward-chips"
           aria-label="Rewards summary; show all rewards"
@@ -206,12 +189,31 @@
               ></span
             >{/each}</button
         >{/if}
-    </div>
-    <div class="quest-start-window">
-      <GameWindow title="Start here">
-        <QuestStart {quest} />
-      </GameWindow>
-    </div>
+    <aside class="quest-start-card" aria-label={"Start " + quest.name}>
+      <WorldMap point={start.map} label={start.npc} />
+      <div class="start-who">
+        <a
+          class="start-portrait"
+          href={wikiHref(start.npcWiki)}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={start.npc + " on RuneScape Wiki"}
+          ><GameArt file={start.image} alt="" size={44} /></a
+        >
+        <div class="start-text">
+          <small>Start · speak to</small>
+          <a href={wikiHref(start.npcWiki)} target="_blank" rel="noopener noreferrer"
+            ><strong>{start.npc}</strong></a
+          >
+          <span
+            ><a href={wikiHref(startLocation.wiki)} target="_blank" rel="noopener noreferrer"
+              >{startLocation.name}</a
+            > · {start.meetingPoint}</span
+          >
+          {#if start.access}<span class="start-access">{start.access}</span>{/if}
+        </div>
+      </div>
+    </aside>
   </section>
 
   {#if locked}<SourceBanner
@@ -344,6 +346,21 @@
                   >{readiness.danger}</strong
                 >{/if}
             </li>
+            <li>
+              {#if !jagex}{@render check("info")}<span>Jagex status</span><strong
+                  >{profile.source === "hiscores" && profile.questProgress
+                    ? "No match"
+                    : "Not recorded"}</strong
+                >{:else if jagex.status === "COMPLETED"}{@render check("met")}<span
+                  >Jagex status</span
+                ><strong class="ok">Completed</strong>{:else}{@render check(
+                  jagex.eligible ? "met" : "warn",
+                )}<span>Jagex status</span><strong class:ok={jagex.eligible} class:warn={!jagex.eligible}
+                  >{jagex.status === "STARTED" ? "Started" : "Not started"} · {jagex.eligible
+                    ? "can start"
+                    : "requirements not met"}</strong
+                >{/if}
+            </li>
           </ul>
           {#if quest.preparationNotes?.length}<ul class="plain-list before-notes">
               {#each quest.preparationNotes as note}<li><GameText text={note} /></li>{/each}
@@ -416,23 +433,55 @@
       <section class="tool-window" aria-labelledby="r-xp">
         <header class="window-title">
           <h2 id="r-xp">Experience</h2>
-          {#if experience.xp.size}<span
-              >{experience.xp.size}
-              {experience.xp.size === 1 ? "skill" : "skills"} · {[...experience.xp.values()]
-                .reduce((sum, n) => sum + n, 0)
-                .toLocaleString("en")} XP</span
+          {#if experience.fixed.size || lampCount}<span
+              >{[
+                experience.fixed.size
+                  ? `${fixedTotal.toLocaleString("en")} XP in ${experience.fixed.size} ${experience.fixed.size === 1 ? "skill" : "skills"}`
+                  : "",
+                lampCount ? `${lampCount} ${lampCount === 1 ? "lamp" : "lamps"}` : "",
+              ]
+                .filter(Boolean)
+                .join(" · ")}</span
             >{/if}
         </header>
         {#if groups.experience.length}
-          {#if experience.xp.size}<ul class="reward-tiles xp-tiles">
-              {#each [...experience.xp] as [skill, amount] (skill)}<li>
+          {#if experience.fixed.size}<h3 class="xp-heading">Given on completion</h3>
+            <ul class="reward-tiles xp-tiles">
+              {#each [...experience.fixed] as [skill, amount] (skill)}<li>
                   <GameArt file={skillIcon(skill)} size={24} /><span
                     ><strong>{skill}</strong><small>{amount.toLocaleString("en")} XP</small></span
                   >
                 </li>{/each}
             </ul>{/if}
-          {#if lampLines.length}<ul class="reward-list">
-              {#each lampLines as entry}<li><GameText text={entry} /></li>{/each}
+          {#if experience.lamps.length}<h3 class="xp-heading">
+              XP lamps · you choose when to use them
+            </h3>
+            <ul class="reward-tiles xp-tiles lamp-tiles">
+              {#each experience.lamps as lamp, index (index)}<li>
+                  <span class="lamp-icon"
+                    ><GameArt file="Antique_lamp.png" size={24} />{#if lamp.skill}<span
+                        class="lamp-skill"><GameArt file={skillIcon(lamp.skill)} size={14} /></span
+                      >{/if}</span
+                  ><span
+                    ><strong
+                      >{lamp.count > 1 ? lamp.count + " × " : ""}{lamp.skill
+                        ? lamp.skill + " lamp"
+                        : lamp.choice
+                          ? "Lamp · your choice of skill"
+                          : "XP lamp"}</strong
+                    ><small
+                      >{[
+                        lamp.xp ? lamp.xp.toLocaleString("en") + " XP" : "",
+                        lamp.level ? "needs level " + lamp.level : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" · ") || "See the Wiki for the amount"}</small
+                    >{#if lamp.options}<small class="lamp-options">{lamp.options}</small>{/if}</span
+                  >
+                </li>{/each}
+            </ul>{/if}
+          {#if otherXpLines.length}<ul class="reward-list">
+              {#each otherXpLines as entry}<li><GameText text={entry} /></li>{/each}
             </ul>{/if}
           <p class="cap card-note">
             Compass doesn't add reward XP for you; update levels after claiming lamps.
@@ -485,85 +534,29 @@
     color: var(--muted);
   }
 
-  /* Quest bar: search on the left, previous and next on the right. */
-  .quest-bar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 12px;
-  }
-  .quest-step {
-    display: flex;
-    flex: 0 1 360px;
-    min-width: 0;
-    margin-left: auto;
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    overflow: hidden;
-  }
-  .step-link {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex: 1 1 0;
-    min-width: 0;
-    min-height: var(--control-size);
-    padding: 0 12px 0 8px;
-    color: var(--text);
-    text-decoration: none;
-  }
-  .step-link:hover {
-    background: var(--panel);
-  }
-  .step-link :global(svg) {
-    flex: none;
-    color: var(--muted);
-  }
-  .step-next {
-    justify-content: flex-end;
-    padding: 0 8px 0 12px;
-    text-align: right;
-  }
-  .step-link + .step-link {
-    border-left: 1px solid var(--line);
-  }
-  .step-text {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-  }
-  .step-next .step-text {
-    align-items: flex-end;
-  }
-  .step-text small {
-    font-size: 9px;
-    line-height: 11px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-  .step-text span {
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    line-height: 16px;
-    font-weight: 600;
+  /* The quest bar sits in the app top bar on desktop. */
+  .quest-bar-phone {
+    display: none;
   }
 
-  /* Hero */
+  /* Hero: a full-width band under the top bar. */
+  /* Art and title on top, reward chips beneath both, start card beside them. */
   .quest-hero {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 24px;
-    padding: 24px;
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr) minmax(240px, 300px);
+    grid-template-areas:
+      "art copy start"
+      "chips chips start";
+    align-items: start;
+    gap: 16px 24px;
+    margin: -28px -32px 0;
+    padding: 28px 32px;
     background: linear-gradient(var(--panel), var(--bg));
-    border: 1px solid var(--line);
-    border-radius: 2px;
+    border-bottom: 1px solid var(--line);
   }
   .quest-hero-art {
+    grid-area: art;
     position: relative;
-    flex: 0 0 240px;
     height: 160px;
     overflow: hidden;
     background: #0d161c;
@@ -577,7 +570,7 @@
     object-fit: cover;
   }
   .quest-hero-copy {
-    flex: 999 1 360px;
+    grid-area: copy;
     min-width: 0;
     display: flex;
     flex-direction: column;
@@ -639,10 +632,11 @@
     line-height: 22px;
   }
   .reward-chips {
+    grid-area: chips;
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    min-width: 0;
     gap: 10px;
-    margin-top: 6px;
     padding: 0;
     background: none;
     border: 0;
@@ -653,6 +647,7 @@
   }
   .reward-chip {
     display: flex;
+    flex: 0 1 auto;
     align-items: center;
     gap: 10px;
     min-width: 0;
@@ -691,30 +686,78 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: 280px;
+    max-width: 200px;
   }
   .reward-more {
     flex: none;
     font-weight: 400;
     color: var(--gold-bright);
   }
-  .quest-start-window {
-    flex: 1 1 280px;
-    max-width: 360px;
+  /* Start card: a short map over the NPC, sized to the hero copy, never taller. */
+  .quest-start-card {
+    grid-area: start;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    overflow: hidden;
   }
-  .quest-start-window :global(.quest-start) {
-    grid-template-columns: 56px minmax(0, 1fr);
-    gap: 12px;
+  .quest-start-card :global(.world-map) {
     border: 0;
-    background: none;
+    border-radius: 0;
   }
-  .quest-start-window :global(.quest-start-portrait) {
-    min-height: 56px;
+  .quest-start-card :global(.world-map-canvas) {
+    height: 132px;
   }
-  .quest-start-window :global(.quest-start-portrait img) {
-    width: 56px;
-    height: 56px;
+  .quest-start-card :global(.leaflet-control-attribution) {
+    font-size: 10px;
+  }
+  .start-who {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    border-top: 1px solid var(--line);
+  }
+  .start-portrait {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+  }
+  .start-portrait :global(img) {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+  }
+  .start-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    font-size: var(--font-caption);
+    line-height: 18px;
+    color: var(--muted);
+  }
+  .start-text small {
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .start-text strong {
+    font-size: var(--font-ui);
+    color: var(--heading);
+  }
+  .start-text a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: var(--gold);
+    text-underline-offset: 3px;
+  }
+  .start-access {
+    color: var(--gold-bright);
   }
 
   /* Tabs */
@@ -944,11 +987,15 @@
     color: var(--gold-bright);
     text-decoration: underline;
   }
+  /* Same columns as the Prepare grid above, so the card edges line up. */
   .detail-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
     gap: 20px;
     align-items: start;
+  }
+  .detail-grid > :only-child {
+    grid-column: 1 / -1;
   }
   .detail-grid > div {
     scroll-margin-top: calc(var(--topbar-height, 72px) + 12px);
@@ -1010,6 +1057,40 @@
     font-size: var(--font-caption);
     color: var(--muted);
   }
+  .xp-heading {
+    margin: 0;
+    padding: 14px 16px 0;
+    font: 600 10px/14px "DM Sans", sans-serif;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .xp-heading + .reward-tiles {
+    padding-top: 8px;
+  }
+  .lamp-tiles li {
+    align-items: flex-start;
+  }
+  .lamp-icon {
+    position: relative;
+    flex: none;
+  }
+  .lamp-skill {
+    position: absolute;
+    right: -4px;
+    bottom: -4px;
+    display: grid;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    background: var(--panel-raised);
+    border: 1px solid var(--line);
+    border-radius: 50%;
+  }
+  .lamp-options {
+    margin-top: 2px;
+    line-height: 16px;
+  }
   .reward-list {
     list-style: none;
     margin: 0;
@@ -1047,7 +1128,8 @@
     }
   }
   @media (max-width: 900px) {
-    .prepare-grid {
+    .prepare-grid,
+    .detail-grid {
       grid-template-columns: minmax(0, 1fr);
       grid-template-rows: none;
     }
@@ -1057,23 +1139,31 @@
       grid-column: auto;
       grid-row: auto;
     }
-    .quest-start-window {
-      max-width: none;
+    .quest-hero {
+      grid-template-columns: 200px minmax(0, 1fr);
+      grid-template-areas:
+        "art copy"
+        "chips chips"
+        "start start";
+    }
+    .reward-chips {
+      flex-wrap: wrap;
     }
   }
   @media (max-width: 760px) {
-    .quest-step {
-      flex: 1 1 100%;
-      margin-left: 0;
+    .quest-bar-phone {
+      display: flex;
     }
     .quest-hero {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas: "art" "copy" "chips" "start";
+      margin: 0;
       padding: 0 0 16px;
       gap: 14px;
       background: none;
       border: 0;
     }
     .quest-hero-art {
-      flex: 1 1 100%;
       height: 150px;
     }
     .quest-hero-copy h1 {

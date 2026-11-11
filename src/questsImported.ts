@@ -72,6 +72,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "300 Magic XP",
+      "300 Runecrafting XP",
       "First tower robes (top and bottom)",
       "Access to Archmage Sedridor's personal rune chest",
       "Access to the cadmium red, white marble, and vellum material caches in the First Tower excavation site."
@@ -241,6 +243,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "supplies": [],
     "rewards": [
       "1 quest point",
+      "1,500 Thieving XP",
       "coins ( coins from the first part and coins for the second part)",
       "Mark of Hazeel and Carnillean armour (obtained during quest depending on which side you choose and by using the drop trick, but both can be claimed from the Quest Item Storage at May's Quest Caravan)",
       "Can talk to Historian Minas at the Varrock Museum to receive 5 Kudos"
@@ -280,6 +283,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "2,425 Mining XP",
       "Gas mask",
       "A magic scroll, which when read unlocks the Ardougne Teleport with level 51 Magic",
       "Ability to make and use an Ardougne teletab",
@@ -350,6 +354,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "3 quest points",
+      "1,250 Thieving XP",
       "Ability to travel freely through the West Ardougne gate",
       "Access to the Combat Training Camp north of the city"
     ],
@@ -418,6 +423,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
+      "12,175 Attack XP",
+      "2,175 Thieving XP",
       "Khazard armour set"
     ],
     "wiki": "Fight_Arena",
@@ -451,7 +458,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
-      "8 law runes"
+      "8 law runes",
+      "2,000 Woodcutting XP"
     ],
     "wiki": "Monk's_Friend",
     "questRequirements": []
@@ -627,6 +635,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "supplies": [],
     "rewards": [
       "1 quest point",
+      "750 Crafting XP",
       "The ability to buy and use a Dwarf multicannon",
       "The ability to smith cannonballs",
       "You can now add the ammo mould to your tool belt"
@@ -851,6 +860,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "3 quest points",
+      "1,000 Crafting XP",
+      "1,000 Prayer XP",
       "The enchanted key, allowing you to go on your own treasure digs until it disappears; see the enchanted key lore activity",
       "Access to the museum in the Outpost",
       "You can read an incomplete list of all your exploits during the quest on the bookcase at the Outpost, but cannot take it away.",
@@ -887,7 +898,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "supplies": [],
     "rewards": [
       "1 quest point",
-      "lamp (Skill must be level 10 or higher)",
+      "1,000 Magic XP lamp (Skill must be level 10 or higher)",
       "Goebie Warpaint outfit overrides",
       "Mazcab Poker and Mazcab Cudgel weapon override",
       "3 Liberation of Mazcab reroll tokens"
@@ -920,8 +931,10 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "supplies": [],
     "rewards": [
       "1 quest point",
-      "lamp",
-      "lamp in one of the following skills:,,,,,, or",
+      "250 Agility XP",
+      "250 Thieving XP",
+      "250 Constitution XP lamp",
+      "250 Combat XP lamp in one of the following skills: Attack, Strength, Defence, Constitution, Ranged, Magic, Necromancy or Prayer",
       "1 sapphire, 1 emerald, 1 ruby (if picked up from dung kalphites)",
       "Access to the Kalphite nursery, where you can obtain Aten (Heru's shield)(override) and Uraeus (Apep's axe)(override) from slicing dung kalphites"
     ],
@@ -1000,6 +1013,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
+      "4,500 Thieving XP",
+      "4,000 Agility XP",
+      "4,000 Woodcutting XP",
       "Catspeak amulet",
       "Access to the city of Sophanem"
     ],
@@ -1040,7 +1056,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "rewards": [
       "1 quest point",
       "7,000 Thieving XP",
-      "2 7,000 Combat XP lamp in a choice of,,,,, or (Summoning must be level 30 or higher)",
+      "2 7,000 Combat XP lamp in a choice of Attack, Strength, Defence, Constitution, Ranged, Magic or Summoning (Summoning must be level 30 or higher)",
       "Keris, a dagger which is very effective against Kalphites and Scarabs",
       "Access to Sophanem's bank under the Temple of Lesser Deities in the north-east corner (useful for Pyramid Plunder)",
       "Coenus will allow a one-way passage from Menaphos to Sophanem."
@@ -1086,6 +1102,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
+      "4,500 Thieving XP",
       "Rat pole",
       "Able to train Overgrown Cats into wily and lazy cats",
       "The ability to name a lazy or wily cat (up to 6 letters long)"
@@ -1170,7 +1187,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "supplies": [],
     "rewards": [
       "1 quest point",
-      "lamp",
+      "775 Herblore XP lamp",
       "Access to Tai Bwo Wannai Cleanup minigame",
       "Access to hardwood grove",
       "Access to use Rionasta for parcel service",
@@ -1211,9 +1228,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
-      "lamp",
-      "lamp",
-      "lamp",
+      "1,000 Prayer XP lamp",
+      "1,000 Herblore XP lamp",
+      "1,000 Agility XP lamp",
       "Access to Initiate Temple Knight armour. You will be given a helmet (Initiate sallet) for free, and you can buy subsequent helmets for 6,000 coins, the legs (Initiate cuisse) for 8,000 coins, the platebody (Initiate hauberk) for 10,000 coins, and the full set for 20,000 coins. It looks just like White armour, only with a light gold trim and a different helmet visor.",
       "The Gaze of Saradomin"
     ],
@@ -1292,6 +1309,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "supplies": [],
     "rewards": [
       "Ability to enter the Abyss",
+      "1,000 Runecrafting XP",
       "A small pouch (able to carry 3 pure essence or rune essence)",
       "Abyssal book",
       "Increased stock in the Battle Runes shop"
@@ -1331,6 +1349,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "5,000 Slayer XP",
       "Access to the White equipment",
       "20 noted pure/rune essence and the other items (from chasing Solus)"
     ],
@@ -1456,6 +1475,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "1,000 Cooking XP",
+      "1,000 Farming XP",
+      "1,000 Crafting XP",
       "Further access to the Culinaromancer's chest."
     ],
     "wiki": "Recipe_for_Disaster:_Freeing_the_Goblin_Generals",
@@ -1498,6 +1520,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "2,437 Fishing XP",
       "Access to the White Wolf Mountain shortcut",
       "The ability to use the mine cart system to White Wolf Mountain (also requires completion of the quest The Giant Dwarf)"
     ],
@@ -1538,6 +1561,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "1,000 Slayer XP",
+      "1,000 Cooking XP",
       "(Further) access to the Culinaromancer's chest"
     ],
     "wiki": "Recipe_for_Disaster:_Freeing_the_Mountain_Dwarf",
@@ -1578,6 +1603,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
+      "1,000 Construction XP",
+      "500 Crafting XP",
+      "500 Thieving XP",
       "Builder's costume",
       "Access to Creature Creation"
     ],
@@ -1629,6 +1657,10 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "500 Firemaking XP",
+      "1,000 Magic XP",
+      "800 Mining XP",
+      "800 Woodcutting XP",
       "New slayer cave full of jellies",
       "Access to ice strykewyrm cave and ice strykewyrms",
       "Unlocked dialogue with Ali the Wise about the Mahjarrat"
@@ -1677,6 +1709,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "350 Farming XP",
+      "350 Construction XP",
+      "350 Summoning XP",
       "Ability to cook and eat bacon, bacon stacks, piles, heaps and mounds.",
       "Ability to make three pig familiars:",
       "A customisable pig pet. The name can be changed by Martin the Master Gardener and type can be changed by changing the pig machine by right-clicking on it.",
@@ -1973,6 +2008,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "5,000 Crafting XP",
+      "5,000 Smithing XP",
       "Access to the Elemental Workshop",
       "An elemental shield, as well as the ability to make them."
     ],
@@ -2053,8 +2090,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
-      "lamp",
-      "2,000 Combat XP lamp in either,,,,, or",
+      "2,000 Thieving XP lamp",
+      "2,000 Combat XP lamp in either Attack, Strength, Defence, Constitution, Ranged, Magic or Necromancy",
       "Access to the H.A.M. storerooms, where you can loot items.",
       "Access to Dorgesh-Kaan, the Dorgeshuun city.",
       "Access to Dorgesh-Kaan South Dungeon and a route to Kalphite Lair from there.",
@@ -2145,8 +2182,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
-      "lamp (Skill must be level 40 or higher)",
-      "lamp (Skill must be level 30 or higher)",
+      "8,000 Construction XP lamp (Skill must be level 40 or higher)",
+      "3,000 Skill XP lamp (Skill must be level 30 or higher)",
       "The ability to build all three tiers of the Fort Forinthry Kitchen"
     ],
     "wiki": "Murder_on_the_Border",
@@ -2241,7 +2278,12 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Mirror shield (Mask of Stone, Helm of Petrification or sunglasses will work too)"
     ],
     "rewards": [
-      "2 quest points"
+      "2 quest points",
+      "2,500 Constitution XP",
+      "2,500 Slayer XP",
+      "1,500 Prayer XP",
+      "500 Crafting XP",
+      "500 Firemaking XP"
     ],
     "wiki": "Fur_'n_Seek",
     "questRequirements": [
@@ -2278,7 +2320,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "supplies": [],
     "rewards": [
       "5 quest points",
-      "18,400 Combat XP lamp in either,,,,, or",
+      "18,400 Combat XP lamp in either Attack, Strength, Defence, Constitution, Ranged, Magic or Necromancy",
       "7,900 Agility XP lamp",
       "2,150 Magic XP lamp",
       "Ability to use the Grand Tree mine under The Grand Tree",
@@ -2369,11 +2411,11 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
-      "lamp (Skill must be level 4 or higher)",
-      "lamp (Skill must be level 4 or higher)",
-      "lamp (Skill must be level 4 or higher)",
-      "lamp (Skill must be level 4 or higher)",
-      "lamp (Skill must be level 4 or higher)",
+      "600 Attack XP lamp (Skill must be level 4 or higher)",
+      "600 Defence XP lamp (Skill must be level 4 or higher)",
+      "600 Strength XP lamp (Skill must be level 4 or higher)",
+      "600 Constitution XP lamp (Skill must be level 4 or higher)",
+      "600 Crafting XP lamp (Skill must be level 4 or higher)",
       "Access to the area under the Hair of the Dog tavern through the trapdoor",
       "The ability to take the Swamp Boat from Mort'ton to The Hollows",
       "2 uncut rubies and 4 big bones from the Skeleton Hellhound"
@@ -2419,6 +2461,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "5 quest points",
+      "3,000 Agility XP",
+      "3,000 Attack XP",
       "Iban's staff",
       "15 death runes",
       "30 fire runes",
@@ -2473,6 +2517,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
+      "1,000 Thieving XP",
       "The Ring of charos, which allows access to the Werewolf Agility Course",
       "Access to the Experiment cave"
     ],
@@ -2585,6 +2630,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
+      "2,400 Prayer XP",
       "Free passage into Port Phasmatys",
       "The ectophial, which provides a reusable one-click teleport to the Ectofuntus"
     ],
@@ -2683,13 +2729,13 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
-      "(During the quest, you will get even more experience from raking, composting, planting and harvesting)",
+      "5,000 Farming XP (During the quest, you will get even more experience from raking, composting, planting and harvesting)",
       "An activated ring of charos, which is used to charm various NPCs to pay less for certain services, or get choices that are otherwise unavailable.",
       "1 apple seed",
       "1 acorn",
       "5 guam seeds",
       "4 doses of supercompost potion, each of which can be used in a compost bin to turn compost into supercompost.",
-      "After the quest you can visit the garden and pick fruit from the White tree. Each fruit restores about 17% run energy and gives when picked."
+      "After the quest you can visit the garden and pick fruit from the White tree. Each fruit restores about 17% run energy and gives 12 Farming XP when picked."
     ],
     "wiki": "Garden_of_Tranquillity",
     "questRequirements": [
@@ -2752,10 +2798,10 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
-      "lamp",
-      "lamp",
-      "lamp",
-      "lamp",
+      "2,000 Attack XP lamp",
+      "2,000 Strength XP lamp",
+      "2,000 Crafting XP lamp",
+      "2,000 Defence XP lamp",
       "Access to Burgh de Rott and its facilities",
       "Ability to play the Temple Trekking minigame",
       "Ability to use a Gadderhammer, which is strong against shades",
@@ -2801,6 +2847,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
+      "2,500 Hunter XP",
       "Ability to capture ferrets using box traps",
       "Ability to use ferrets to hunt multiple rabbits",
       "Access to the Eagle transport system",
@@ -2858,6 +2905,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "900 Construction XP",
+      "2,300 Magic XP",
+      "1,850 Runecrafting XP",
       "Rune guardian pet",
       "Fire talisman or Water talisman",
       "Binding necklace, obtained during the quest with 14 charges left"
@@ -2952,6 +3002,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
+      "8,000 Agility XP",
+      "4,000 Strength XP",
       "A handful of uncut gems from Ug (1 uncut diamond, 2 uncut rubies and 4 uncut emeralds)",
       "A sled",
       "Unlocks sledding route from Trollweiss",
@@ -2999,6 +3051,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "15,000 Thieving XP",
       "Oak blackjack and willow blackjack",
       "Desert disguise",
       "500 coins",
@@ -3040,6 +3093,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
+      "11,000 Prayer XP",
+      "15,300 Defence XP",
       "Access to the Fisher Realm (code)",
       "Ability to use the King Arthur picture in your player-owned house"
     ],
@@ -3133,7 +3188,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
-      "when obtaining a karambwan vessel for the first time from Lubufu.",
+      "1,500 Fishing XP when obtaining a karambwan vessel for the first time from Lubufu.",
       "Ability to fight the Shaikahan (level 70)",
       "Ability to take part in the Smithing section of Otto's Barbarian training."
     ],
@@ -3178,7 +3233,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
-      ", as a combat XP lamp, in one of:,,,,, or",
+      "10,000 Combat XP, as a combat XP lamp, in one of: Attack, Strength, Defence, Constitution, Ranged, Magic or Necromancy",
       "Demonic sigil (can be used to chant any number of times even after the quest)",
       "Demonic tome (updated in the bookcases)",
       "Silverlight turns into Darklight: It is even more powerful against demons. If a player loses Darklight, it can be retrieved by talking to Gideon Bede at Varrock's north church. You must have him replace Silverlight for you first."
@@ -3314,7 +3369,10 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
-      "lamp in a choice of either Attack, Strength, Defence, Constitution, Ranged, Magic or Necromancy",
+      "1,500 Thieving XP",
+      "1,500 Agility XP",
+      "500 Dungeoneering XP",
+      "1,500 Combat XP lamp in a choice of either Attack, Strength, Defence, Constitution, Ranged, Magic or Necromancy",
       "Jerrod's cape (override) and its permanent passive effects:",
       "Tiny Hazeel",
       "An upgraded Mask of Sliske - when worn in the head slot or carried in the pocket slot during combat, it will occasionally spawn an undead archer, who'll deal damage to your current target before dissipating.",
@@ -3368,6 +3426,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
+      "262 Fletching XP",
+      "1,470 Cooking XP",
+      "735 Ranged XP",
       "Ogre bow",
       "Ability to fletch ogre arrows",
       "Ability to hunt chompy birds and cook raw chompy",
@@ -3403,6 +3464,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "1 quest point",
       "3 Ourg bones",
       "2 Zogre bones",
+      "2,000 Fletching XP",
+      "2,000 Ranged XP",
+      "2,000 Herblore XP",
       "Access to Jiggig",
       "Ability to equip inoculation brace",
       "Ability to fletch composite ogre bow and brutal arrows",
@@ -3451,6 +3515,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "7,500 Smithing XP",
+      "7,500 Crafting XP",
       "Ability to make elemental helmets, mind shields, and mind helmets"
     ],
     "wiki": "Elemental_Workshop_II",
@@ -3504,10 +3570,10 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
-      "lamp",
-      "lamp",
-      "lamp",
-      "lamp",
+      "50,000 Magic XP lamp",
+      "20,000 Herblore XP lamp",
+      "20,000 Agility XP lamp",
+      "20,000 Cooking XP lamp",
       "Ability to catch Hell-Rats bare handed.",
       "Eating spicy stew has a better chance to give positive stats and is guaranteed to boost stats by 2-6 levels.",
       "Ability to chip teleport tablets to alternate teleport destination by using the tablet on Dave's spellbook.",
@@ -3565,6 +3631,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "3,500 Crafting XP",
+      "3,500 Runecrafting XP",
+      "3,500 Thieving XP",
       "Promotion to Proselyte among the Temple Knights. This means you can buy and wear new Temple Knight armour with a greater Defence bonus than Initiate. You can buy each piece individually, or buy the armour pack which, when opened, gives you the plate, helm, and legs/skirt all at once. The pack is worth."
     ],
     "wiki": "The_Slug_Menace",
@@ -3637,6 +3706,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "6,625 Strength XP",
       "Ability to have Thormac make an elemental battlestaff into a corresponding mystic battlestaff for 40,000 coins."
     ],
     "wiki": "Scorpion_Catcher",
@@ -3680,6 +3750,10 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "1,000 Cooking XP",
+      "1,000 Crafting XP",
+      "1,000 Fishing XP",
+      "1,000 Smithing XP",
       "The ability to go diving and fight crabs (you need your diving apparatus) at Mogre Camp",
       "The ability to cook crab meat (heals 100 life points in five bites)",
       "Ability to dive underwater and trade crunchy claw tokens for giant crab pets",
@@ -3731,6 +3805,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "11,000 Herblore XP",
       "Ability to grow and steal goutweed, which can be traded to Sanfew for herbs",
       "Ability to use the Trollheim Teleport spell",
       "Burnt meat"
@@ -3837,6 +3912,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
+      "3,875 Crafting XP",
       "Access to Shilo Village",
       "Access to Precious gem rocks in Shilo Village",
       "Access to the Shilo Village cart system, which travels between Brimhaven and Shilo Village for a fare of",
@@ -3883,7 +3959,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
-      "2x lamps for a total of (Skill must be level 30 or higher)",
+      "2,500 Thieving XP",
+      "2,500 Construction XP",
+      "2x 1,500 Skill XP lamps for a total of 3,000 Skill XP (Skill must be level 30 or higher)",
       "coins for returning Lady Henryeta's necklace, or from opening Sir Ceril's money pouch",
       "Philipe's sweets:",
       "Construction supplies:",
@@ -3951,6 +4029,12 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
+      "2,500 Crafting XP",
+      "2,500 Mining XP",
+      "2,500 Smithing XP",
+      "1,500 Firemaking XP",
+      "1,500 Magic XP",
+      "1,500 Thieving XP",
       "The ability to use the mine cart system to White Wolf Mountain (also requires completion of the quest Fishing Contest)",
       "The ability to work for the company the player has chosen by completing tasks similar to the ones in the quest",
       "The ability to use members-only gravestones, which last longer than the free-to-play gravestones"
@@ -3997,6 +4081,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "3,000 Mining XP",
+      "3,000 Prayer XP",
       "A Dorgesh-kaan sphere",
       "The ancient mace",
       "Ability to buy Goblin village spheres",
@@ -4048,7 +4134,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "rewards": [
       "1 quest point",
       "A total of experience:",
-      "A total of (via two charges of from the Book of knowledge)",
+      "A total of 8,500 Defence XP (via two charges of 4,250 Defence XP from the Book of knowledge)",
       "50 noted pieces of coal",
       "Ability to smith elemental, mind and body bodies, along with body helmets and shields."
     ],
@@ -4099,6 +4185,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
+      "5,000 Farming XP",
+      "5,000 Cooking XP",
       "2 mature dwarven stouts",
       "2 marrentill seeds, if you delivered Rind's letter"
     ],
@@ -4166,6 +4254,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "2,000 Crafting XP",
+      "5,000 Agility XP",
+      "1,500 Construction XP",
       "Ability to make the penguin suit. To enter the suit, you must talk to Larry at the zoo, pier, farm or Iceberg.",
       "Ability to train at the Penguin Agility Course.",
       "Players can also steal more cowbells and make more bongos to play while in a penguin suit.",
@@ -4215,6 +4306,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
+      "4,662 Magic XP",
+      "4,662 Strength XP",
+      "4,662 Ranged XP",
       "A damaged god book of your choice",
       "The Dagannoth Mother is unlocked in the Dominion Tower",
       "Access to The Lighthouse Store and the dagannoth caves underneath (There are level 77 and 78 dagannoths. The level 77's use an inaccurate ranged attack, while the level 78's use a much more effective melee attack)",
@@ -4305,7 +4399,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "supplies": [],
     "rewards": [
       "2 quest points",
-      "lamp",
+      "22,000 Strength XP lamp",
       "Crystal-mine key (which can be added to the steel key ring)",
       "The ability to make salve amulets, which gives combat bonuses against undead creatures. Simply use the salve shard obtained at the end of the quest with a ball of wool.",
       "Access to the Lair of Tarn Razorlor miniquest, where players can create an enhanced version of the salve amulet"
@@ -4354,6 +4448,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "5,000 Slayer XP",
       "Ability to earn the full amount of Slayer points for completing Slayer tasks",
       "New Slayer Master in Pollnivneach",
       "Access to the Pollnivneach Slayer Dungeon and Tomb of Catolax",
@@ -4423,6 +4518,10 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "1,000 Crafting XP",
+      "1,000 Fletching XP",
+      "1,000 Slayer XP",
+      "2,500 Woodcutting XP",
       "Blessed hatchet",
       "Ava's device (Ava's attractor if your Ranged level is less than level 50 Ranged or Ava's accumulator if it is 50 or higher)",
       "Access to Ava's Odds and Ends"
@@ -4469,9 +4568,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
-      "lamp",
-      "lamp",
-      "(2 500 experience lamps) in one of the following skills:,,,,,,, or"
+      "1,500 Runecrafting XP lamp",
+      "1,500 Magic XP lamp",
+      "1,000 Combat XP (2 500 experience lamps) in one of the following skills: Attack, Strength, Defence, Constitution, Ranged, Magic, Necromancy, Prayer or Summoning"
     ],
     "wiki": "Heart_of_Stone",
     "questRequirements": [
@@ -4532,7 +4631,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
-      "lamp",
+      "7,000 Constitution XP lamp",
       "Access to the Amascut statue in Senliten's tomb, giving extra prayer points at the cost of some life points."
     ],
     "wiki": "Missing_My_Mummy",
@@ -4613,6 +4712,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
+      "3,500 Farming XP",
+      "2,000 Attack XP",
+      "1,000 Magic XP",
       "Magic secateurs"
     ],
     "wiki": "A_Fairy_Tale_I_-_Growing_Pains",
@@ -4671,6 +4773,10 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "2,000 Crafting XP",
+      "3,000 Farming XP",
+      "1,500 Woodcutting XP",
+      "4,000 Firemaking XP",
       "Bomber jacket and bomber cap",
       "Access to the balloon transport system",
       "Ability to make origami balloons"
@@ -4737,7 +4843,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Ability to make Guthix rest potions",
       "Access to the gnome glider route to the Feldip Hills",
       "Adamantite stone spirit, an uncut ruby and an uncut diamond dropped by Slagilith",
-      "from repairing the weather vane components"
+      "1,000 Smithing XP from repairing the weather vane components"
     ],
     "wiki": "One_Small_Favour",
     "questRequirements": [
@@ -4775,9 +4881,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
-      "lamp (Skill level must be 45 or higher)",
-      "lamp (Skill level must be 50 or higher)",
-      "lamp (Skill level must be 65 or higher)",
+      "5,000 Magic XP lamp (Skill level must be 45 or higher)",
+      "5,000 Skill XP lamp (Skill level must be 50 or higher)",
+      "33,000 Defence XP lamp (Skill level must be 65 or higher)",
       "The hair clip (a more durable version of the lockpick) if obtained during quest",
       "Access to the Knight Waves training ground",
       "Access to the Court Cases Distraction and Diversion"
@@ -4908,6 +5014,12 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "3,000 Agility XP",
+      "3,000 Herblore XP",
+      "3,000 Thieving XP",
+      "3,000 Fishing XP",
+      "3,000 Strength XP",
+      "2,000 Prayer XP",
       "Access to the Goblin Temple (with an altar to recharge prayer points)",
       "Access to Yu'biusk, using fairy ring code",
       "Ability to buy moving-over-distance spheres (plain of mud sphere) that transports you to the goblin cave",
@@ -4998,6 +5110,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "2,500 Cooking XP",
+      "2,500 Magic XP",
       "(Further) access to the Culinaromancer's chest"
     ],
     "wiki": "Recipe_for_Disaster:_Freeing_the_Lumbridge_Sage",
@@ -5052,16 +5166,16 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "3 quest points",
       "A Fremennik name",
       "Ability to make an Enchanted lyre that can be used to teleport to the gates of Rellekka.",
-      "lamp",
-      "lamp",
-      "lamp",
-      "lamp",
-      "lamp",
-      "lamp",
-      "lamp",
-      "lamp",
-      "lamp",
-      "lamp",
+      "2,812 Agility XP lamp",
+      "2,812 Attack XP lamp",
+      "2,812 Constitution XP lamp",
+      "2,812 Crafting XP lamp",
+      "2,812 Defence XP lamp",
+      "2,812 Fishing XP lamp",
+      "2,812 Fletching XP lamp",
+      "2,812 Strength XP lamp",
+      "2,812 Thieving XP lamp",
+      "2,812 Woodcutting XP lamp",
       "Access to the islands of Miscellania and Etceteria, along with access to the facilities in Rellekka.",
       "Free travel to Waterbirth Island",
       "A Fremennik blade (only if you killed Koschei the deathless the 4th time)",
@@ -5153,9 +5267,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
-      "lamp",
-      "lamp",
-      "lamp",
+      "5,000 Agility XP lamp",
+      "5,000 Slayer XP lamp",
+      "5,000 Constitution XP lamp",
       "Increased resources from Managing Miscellania",
       "Ability to construct a Miscellania table for use in a player-owned house",
       "Access to the dungeon connecting Miscellania and Etceteria"
@@ -5223,6 +5337,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "4 quest points",
+      "15,250 Magic XP",
       "A spell scroll, which will teach you how to use the Watchtower Teleport spell",
       "Access to Gu'Tanoth and the Ogre Enclave"
     ],
@@ -5283,6 +5398,10 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "7,500 Construction XP",
+      "5,000 Prayer XP",
+      "2,000 Farming XP",
+      "1,000 Summoning XP",
       "Jennica's ring",
       "A new Spirit Realm to explore",
       "Ability to fight the level 42 Ghostly warriors at the Spirit realm magic axe hut.",
@@ -5357,7 +5476,10 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
-      "3x tome (Skill must be over level 30)",
+      "7,000 Agility XP",
+      "6,000 Thieving XP",
+      "2,000 Construction XP",
+      "3x 2,000 Skill XP tome (Skill must be over level 30)",
       "Access to Meiyerditch",
       "A shortcut key, can be put on the steel key ring after One Small Favour",
       "Access to the Burgh de Rott Ramble, which is the Temple Trekking minigame in reverse route."
@@ -5405,6 +5527,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "10,500 Ranged XP",
+      "8,000 Fletching XP",
       "Boots of lightness",
       "Pendant of Lucien, giving you access to the front door of the Temple of Ikov (dungeon)",
       "Armadyl pendant (If you sided with Armadyl, but you can get one by killing the guardians if you sided with Lucien)",
@@ -5449,6 +5573,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "supplies": [],
     "rewards": [
       "1 quest point",
+      "4,000 Attack XP",
+      "4,900 Strength XP",
       "Void knight seal"
     ],
     "wiki": "Quiet_Before_the_Swarm",
@@ -5508,6 +5634,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
+      "9,000 Crafting XP",
+      "7,500 Runecrafting XP",
       "50 pieces of coal (noted)",
       "Ability to make and equip elemental cosmic equipment, and chaos equipment.",
       "Ability to make boots and gloves from all known elemental metals."
@@ -5549,6 +5677,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "5,500 Firemaking XP",
       "Access to the All Fired Up minigame"
     ],
     "wiki": "All_Fired_Up",
@@ -5601,6 +5730,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "3,000 Construction XP",
+      "2,000 Thieving XP",
+      "1,500 Hunter XP",
       "Access to the Penguin Hunter area",
       "A Penguin Hide and Seek Distraction and Diversion bonus. A polar bear can be spotted once each week. Its location is the same on every world. It hides inside a well and pops up every few seconds. Inspect the well to spy on the polar bear for 1 penguin point.",
       "Chuck the Polar Bear, located in a cage just south-east of the Penguin enclosure, replaces Larry in the Penguin Hide and Seek activity. At this time, Larry cannot be accessed.",
@@ -5854,6 +5986,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "1,000 Thieving XP",
+      "9,000 Crafting XP",
       "Able to buy pink dye from Betty",
       "Bert will ship 294 buckets of sand to your bank if you talk to him after the quest. This can be done once per week. Clicking on the quest's name will give you the time left before you can ask him again."
     ],
@@ -5902,8 +6036,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "1,000 Crafting XP",
       "Ability to play Tears of Guthix once a week",
-      "Ability to make an ornate bowl for increased experience with 80 and",
+      "Ability to make an ornate bowl for increased experience with 80 Mining and Crafting",
       "Tears of Guthix teleport option on the games necklace"
     ],
     "wiki": "Tears_of_Guthix_(quest)",
@@ -5975,6 +6110,12 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "rewards": [
       "2 quest points",
       "Tome of xp 2nd ed, giving 2,500 experience each in any skill that's at least level 35, up to 3 times in total, or 1,250 experience when used on an elite skill.",
+      "3,000 Magic XP",
+      "2,000 Agility XP",
+      "4,000 Crafting XP",
+      "2,000 Mining XP",
+      "1,000 Construction XP",
+      "2,000 Slayer XP",
       "Ivandis flail",
       "Blood talisman",
       "Ability to craft blood runes at the blood altar with level 77 Runecrafting.",
@@ -6024,9 +6165,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
-      "lamp",
-      "lamp",
-      "lamp (Skill must be level 30 or higher)",
+      "5,000 Mining XP lamp",
+      "5,000 Smithing XP lamp",
+      "5,000 Defence XP lamp (Skill must be level 30 or higher)",
       "Adamant pickaxe + 2",
       "Players may keep their gold helmet and access the Arzinian Mine, where 146 gold rocks and veins can be found."
     ],
@@ -6151,8 +6292,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "supplies": [],
     "rewards": [
       "1 quest point",
-      "lamp (Skill must be level 50 or higher)",
-      "lamp (Skill must be level 50 or higher)",
+      "15,000 Necromancy XP lamp (Skill must be level 50 or higher)",
+      "10,000 Skill XP lamp (Skill must be level 50 or higher)",
       "Access to the standard difficulty of the Ungael combat activity",
       "Ability to build all three tiers of the Botanist's Workbench at Fort Forinthry"
     ],
@@ -6250,6 +6391,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "supplies": [],
     "rewards": [
       "1 quest point",
+      "12,000 Defence XP",
       "20,000 coins coins",
       "4 cut rubies",
       "Access to the Brine Rat Cavern where you can kill brine rats (requires level 47 Slayer)",
@@ -6311,6 +6453,10 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
+      "7,000 Crafting XP",
+      "7,000 Mining XP",
+      "7,000 Firemaking XP",
+      "7,000 Magic XP",
       "A camulet, which allows you to talk to camels and teleport to the temple four times; it can be recharged by using camel dung on it.",
       "Camel mask (use a piece of soft clay on the pedestal with the globes on it to make one)"
     ],
@@ -6367,6 +6513,11 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "5,000 Attack XP",
+      "5,000 Strength XP",
+      "10,000 Crafting XP",
+      "15,000 Mining XP",
+      "20,000 Construction XP",
       "Access to the TokTz-Ket-Dill mine with 1 silver rock, 8 coal rocks, 3 mithril rocks and 2 adamantite rocks (access is obtained after reaching the third dungeon; you don't have to kill the TokTz-Ket-Dill).",
       "Ability to mine stone slabs (unsmithable obsidian) in the TzHaar obsidian mine",
       "The possibility of watching TzHaar-Hur-Brekt's play"
@@ -6532,8 +6683,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "3 quest points",
-      "lamp",
-      "lamp in one of:,,,,,, or",
+      "20,000 Archaeology XP lamp",
+      "20,000 Combat XP lamp in one of: Attack, Strength, Defence, Constitution, Ranged, Magic, Necromancy or Prayer",
       "Cosmic focus",
       "Thok's stick cosmetic override",
       "Remototem base",
@@ -6622,7 +6773,10 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
-      "lamp (Skill must be level 30 or higher)",
+      "6,000 Prayer XP",
+      "3,000 Crafting XP",
+      "2,000 Construction XP",
+      "5,000 Skill XP lamp (Skill must be level 30 or higher)",
       "Barrelchest anchor (If broken, use on Pirate Smith on the docks of Mos Le'Harmless, while having the Book o' piracy and coins in your backpack)",
       "Prayer book",
       "Access to Harmony Island"
@@ -6687,18 +6841,18 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
-      "lamp",
-      "lamp",
-      "lamp",
-      "lamp",
-      "lamp",
-      "lamp",
-      "lamp",
-      "lamp",
-      "lamp",
-      "lamp",
-      "lamp",
-      "lamp",
+      "3,075 Attack XP lamp",
+      "3,075 Defence XP lamp",
+      "3,075 Strength XP lamp",
+      "3,075 Constitution XP lamp",
+      "2,075 Ranged XP lamp",
+      "2,725 Fishing XP lamp",
+      "2,825 Cooking XP lamp",
+      "1,575 Woodcutting XP lamp",
+      "1,575 Firemaking XP lamp",
+      "2,257 Smithing XP lamp",
+      "2,575 Mining XP lamp",
+      "1,325 Herblore XP lamp",
       "Access to the Heroes' Guild",
       "Ability to wield the dragon battleaxe and dragon mace, and buy them, along with their off-hand variants, from the Happy Heroes' H'emporium shop in the guild",
       "Access to Scarface Pete's mansion in Brimhaven (if you are in the Black Arm Gang)",
@@ -6773,6 +6927,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "3 quest points",
+      "20,006 Magic XP",
       "Ability to use Ancient Magicks",
       "Ring of visibility (can be re-obtained from Rasolo for free)",
       "Access to the Smoke Dungeon via the well entrance",
@@ -6845,7 +7000,14 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
-      "A Void knight commendation (can be given to a Void Knight for 50 Void Knight commendation points)"
+      "A Void knight commendation (can be given to a Void Knight for 50 Void Knight commendation points)",
+      "10,000 Hunter XP",
+      "10,000 Herblore XP",
+      "8,000 Summoning XP",
+      "8,000 Woodcutting XP",
+      "5,000 Thieving XP",
+      "5,000 Construction XP",
+      "5,000 Mining XP"
     ],
     "wiki": "A_Void_Dance",
     "questRequirements": [
@@ -6891,7 +7053,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
-      "lamp",
+      "20,000 Necromancy XP lamp",
       "An uncut moonstone"
     ],
     "wiki": "Housing_of_Parliament",
@@ -7054,6 +7216,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "3 quest points",
+      "13,750 Agility XP",
       "Access to Isafdar and the overpass of Arandar",
       "Access to Port Tyras by using charter ships",
       "Ability to wield and use a dragon halberd (bought for from the quartermaster in Tyras Camp)",
@@ -7094,6 +7257,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "10,000 Strength XP",
       "A used crystal bow or crystal ward (your choice, it will be 20% charged)."
     ],
     "wiki": "Roving_Elves",
@@ -7139,6 +7303,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
+      "15,000 Construction XP",
+      "5,000 Fletching XP",
       "30 Teak planks (worth)",
       "An adamant halberd (worth)",
       "Increased damage when using the Castle Wars catapults",
@@ -7198,7 +7364,10 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
-      "2 in Strength, Attack, Defence, or Constitution",
+      "5,000 Construction XP",
+      "5,000 Crafting XP",
+      "10,000 Woodcutting XP",
+      "2 10,000 Combat XP in Strength, Attack, Defence, or Constitution",
       "in assorted rewards during the quest.",
       "A replaceable Fremennik royal helmet known as the Helm of Neitiznot, which is an upgrade to the warrior helm with a +3 prayer bonus and a better defensive bonus.",
       "Access to a new tree, the arctic pine.",
@@ -7345,6 +7514,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "4,000 Cooking XP",
+      "4,000 Constitution XP",
       "Access to the Evil Chicken's Lair, where you can fight black dragons",
       "Further access to the Culinaromancer's chest"
     ],
@@ -7395,7 +7566,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
-      "lamp (skill must be level 30 or higher, bankable)",
+      "3,500 Herblore XP",
+      "2,500 Thieving XP",
+      "2,500 Skill XP lamp (skill must be level 30 or higher, bankable)",
       "Access to the fairy ring network and the Fairy Resistance Hideout",
       "Ability to make magic essence potions"
     ],
@@ -7448,6 +7621,11 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
+      "11,000 Farming XP",
+      "11,000 Thieving XP",
+      "11,000 Magic XP",
+      "1,000 Summoning XP",
+      "1,000 Crafting XP",
       "Magic watering can",
       "Free access to the Zanaris Market",
       "Ability to use the fairy rings and get into Zanaris without a dramen or lunar staff.",
@@ -7515,7 +7693,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
-      "tome (3x) in either,,,, or (Skill must be level 40 or higher)",
+      "10,000 Magic XP",
+      "5,000 Herblore XP",
+      "15,000 Combat XP tome (3x 5,000 Combat XP) in either Attack, Strength, Constitution, Defence, or Ranged (Skill must be level 40 or higher)",
       "An unfinished astral rune that can be traded with Baba Yaga for extra rewards"
     ],
     "wiki": "Glorious_Memories",
@@ -7576,6 +7756,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "15,000 Firemaking XP",
+      "15,000 Hunter XP",
+      "15,000 Woodcutting XP",
       "A mixture of 4 items, either caskets or oysters",
       "Access to the spa facilities",
       "Access to the Oo'glog bank",
@@ -7696,11 +7879,11 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
-      "lamp",
-      "lamp",
-      "lamp",
-      "lamp",
-      "lamp",
+      "15,000 Hunter XP lamp",
+      "10,000 Mining XP lamp",
+      "10,000 Smithing XP lamp",
+      "2,000 Agility XP lamp",
+      "10,000 Defence XP lamp",
       "Access to Chaos Temple Dungeon, where you can kill armoured zombies.",
       "Access to four goldrune material caches",
       "5 Kudos in Varrock Museum and a 1,000 experience antique lamp from Historian Minas on the of the Museum."
@@ -7747,7 +7930,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
-      "15,000 Combat XP Combat XP lamp in one of the following skills:,,,,, or",
+      "15,000 Combat XP Combat XP lamp in one of the following skills: Attack, Strength, Defence, Constitution, Ranged, Magic or Necromancy",
       "10,000 Thieving XP Thieving XP lamp",
       "10,000 Magic XP Magic XP lamp",
       "10,000 Defence XP Defence XP lamp",
@@ -7840,7 +8023,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "supplies": [],
     "rewards": [
       "1 quest point",
-      "lamp",
+      "30,000 Necromancy XP lamp",
       "Access to the Zemouregal & Vorkath boss encounter via a commemorative statue in the town hall."
     ],
     "wiki": "Battle_of_Forinthry",
@@ -7895,8 +8078,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
-      "lamp",
-      "lamp",
+      "25,000 Constitution XP lamp",
+      "25,000 Thieving XP lamp",
       "Access to the Death Guard headquarters",
       "Access to Lletya",
       "Crystal teleport seed",
@@ -7991,10 +8174,10 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "supplies": [],
     "rewards": [
       "1 quest point",
-      "lamp",
-      "lamp",
-      "lamp",
-      "lamp",
+      "25,000 Herblore XP lamp",
+      "25,000 Crafting XP lamp",
+      "25,000 Smithing XP lamp",
+      "25,000 Agility XP lamp",
       "Access to a new Barrows sister, Linza the Disgraced, and her equipment"
     ],
     "wiki": "Kindred_Spirits",
@@ -8203,6 +8386,10 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "7,000 Strength XP",
+      "7,000 Thieving XP",
+      "7,000 Agility XP",
+      "7,000 Prayer XP",
       "The ability to craft an enchanted water tiara - protects against desert heat"
     ],
     "wiki": "Dealing_with_Scabaras",
@@ -8260,6 +8447,10 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "30,000 Strength XP",
+      "20,000 Slayer XP",
+      "5,000 Thieving XP",
+      "5,000 Magic XP",
       "Access to Poison Waste Slayer Dungeon",
       "Access to a new spirit tree",
       "Ability to use the spirit trees for direct teleportation, skipping the route of travelling back to Tree Gnome Village",
@@ -8318,6 +8509,11 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "supplies": [],
     "rewards": [
       "2 quest points",
+      "45,000 Defence XP",
+      "17,500 Constitution XP",
+      "15,000 Herblore XP",
+      "12,500 Summoning XP",
+      "5,000 Dungeoneering XP",
       "100 more bound ammunition/runes in Daemonheim (raising the total to 225)"
     ],
     "wiki": "Salt_in_the_Wound",
@@ -8367,6 +8563,10 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "supplies": [],
     "rewards": [
       "1 quest point",
+      "60,000 Thieving XP",
+      "60,000 Agility XP",
+      "50,000 Construction XP",
+      "45,000 Runecrafting XP",
       "A new glider just outside Tree Gnome Village",
       "Golrana will now store spirit tree seeds for you",
       "Ability to plant up to two spirit trees at a time with 86 Farming.",
@@ -8528,6 +8728,10 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "40,000 Crafting XP",
+      "40,000 Fishing XP",
+      "10,000 Construction XP",
+      "10,000 Thieving XP",
       "Access to a new thieving event in the Circus",
       "Rock and Pop costumes for clockwork penguin",
       "Extension to Penguin Hide and Seek, which consists of a 3-point Penguin Spy that requires the seeker to be wearing a ring of visibility to be able to spot it. The penguin randomly teleports every few minutes. It can also travel across the water and over mountains to any part of the Gielinor surface."
@@ -8585,8 +8789,12 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
-      "antique lamp - found during the quest",
-      "(if you have completed the Invention tutorial. Otherwise it can be claimed from Chuck after you have completed the Invention tutorial).",
+      "500 Skill XP antique lamp - found during the quest",
+      "25,000 Divination XP",
+      "25,000 Runecrafting XP",
+      "15,000 Slayer XP",
+      "15,000 Agility XP",
+      "10,000 Invention XP (if you have completed the Invention tutorial. Otherwise it can be claimed from Chuck after you have completed the Invention tutorial).",
       "An additional penguin to find in Penguin Hide and Seek",
       "Balthazar Beauregard's Big Top Bonanza now rewards 1.5 times as much experience as before."
     ],
@@ -8659,13 +8867,15 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
+      "5,000 Magic XP",
+      "5,000 Runecrafting XP",
       "Full access to Lunar Isle",
       "Ability to use Lunar Spells",
       "A set of Lunar equipment (obtained during quest)",
       "50 astral runes",
       "Ability to have suqahs assigned as a Slayer task",
       "Ability to unlock the Ourania Teleport spell from the Lunar Spellbook, by talking to Baba Yaga with Lunar spells active",
-      "An extra when Swept Away quest is completed and the broomstick is brought to Baba Yaga (with level 73 Magic)",
+      "An extra 10,338 Magic XP when Swept Away quest is completed and the broomstick is brought to Baba Yaga (with level 73 Magic)",
       "The ability to Home Teleport to the Lunar Isle lodestone",
       "The seal of passage can now be used to teleport to Lunar Isle once per day"
     ],
@@ -8704,7 +8914,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
-      "lamp in one of: Strength, Ranged, Magic, Constitution, or Defence",
+      "15,000 Constitution XP",
+      "10,000 Magic XP",
+      "15,000 Combat XP lamp in one of: Strength, Ranged, Magic, Constitution, or Defence",
       "9 new spells added to the Lunar spellbook:",
       "Access to the 'Random' option on NPC Contact"
     ],
@@ -8771,6 +8983,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
+      "15,000 Magic XP",
+      "10,000 Prayer XP",
+      "10,000 Fishing XP",
       "Access to the Piscatoris Fishing Colony",
       "Can get the following items from Malignius Mortifer upon request:",
       "Able to transmute raw bass into raw monkfish"
@@ -8844,6 +9059,13 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "30,000 Mining XP",
+      "14,000 Thieving XP",
+      "9,000 Ranged XP",
+      "9,000 Agility XP",
+      "9,000 Strength XP",
+      "4,000 Summoning XP",
+      "2,500 Slayer XP",
       "Arrav can be faced in the Dominion Tower"
     ],
     "wiki": "The_Curse_of_Arrav",
@@ -8890,7 +9112,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
-      "30,000 Combat XP Combat XP lamp in one of the following skills:,,,,,, or",
+      "30,000 Combat XP Combat XP lamp in one of the following skills: Attack, Strength, Defence, Constitution, Ranged, Magic, or Necromancy",
       "14,000 Thieving XP Thieving XP lamp",
       "9,000 Ranged XP Ranged XP lamp",
       "9,000 Agility XP Agility XP lamp",
@@ -8943,8 +9165,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
-      "lamp for any chosen skill (level 50+)",
-      "Two lamps for any chosen combat skill (level 50+)",
+      "10,000 Prayer XP",
+      "23,000 Skill XP lamp for any chosen skill (level 50+)",
+      "Two 20,000 Combat XP lamps for any chosen combat skill (level 50+)",
       "Access to a new set of prayers, known as the Ancient Curses. You must read the Ancient hymnal, given to you by Azzanadra, in order to activate them.",
       "Access to the Altar of Zaros in the Senntisten Temple, located below the Varrock Dig Site. Praying at this altar boosts your prayer points to 15% over your current maximum level.",
       "Access to Ghorrock - an inhospitable and dangerous fortress to reach, but where iron and steel dragons, waterfiends, and icefiends can be found.",
@@ -9007,6 +9230,10 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
+      "10,000 Smithing XP",
+      "10,000 Mining XP",
+      "10,000 Slayer XP",
+      "10,000 Divination XP",
       "The ability to produce 5% more runes when Runecrafting (does not give additional Runecrafting experience, works on free worlds)",
       "Replayable Abomination boss fight, who can drop main-hand and off-hand dragon javelins, and the abomination cape",
       "Access to the adamant dragons in the Dragonkin Lair, and four new lore journals",
@@ -9058,6 +9285,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
+      "30,000 Firemaking XP",
+      "30,000 Hunter XP",
+      "30,000 Strength XP",
       "Access to the Chaos Dwarf Battlefield and the North Keldagrim mining area.",
       "Ability to wield the hand cannon"
     ],
@@ -9114,13 +9344,17 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
+      "25,000 Thieving XP",
+      "25,000 Smithing XP",
+      "25,000 Agility XP",
+      "25,000 Crafting XP",
       "Free access to the Brimhaven Agility Arena",
       "Access to the Rock Island Prison, where players can steal from customs evidence files",
       "Access to a bank deposit box in Rimmington",
       "The ability to buy Braindeath 'rum' from The Rusty Anchor Inn",
       "The ability to understand pirates on Mos Le'Harmless without the book o' piracy",
-      "The ability to catch pirate implings (with 76)",
-      "The ability to raise an ex-ex-parrot by speaking to Bill Teach and 50 Ships Mufassah (with 71)"
+      "The ability to catch pirate implings (with 76 Hunter)",
+      "The ability to raise an ex-ex-parrot by speaking to Bill Teach and 50 Ships Mufassah (with 71 Summoning)"
     ],
     "wiki": "Rocking_Out",
     "questRequirements": [
@@ -9224,6 +9458,10 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "1,500 Woodcutting XP",
+      "1,500 Cooking XP",
+      "1,500 Crafting XP",
+      "1,500 Ranged XP",
       "Able to use the boat trip to travel between Karamja and Feldip Hills (you must pay a fee of chompies or exotic herbs that can be found on Karamja, such as rogue's purse)",
       "(Further) access to the Culinaromancer's chest",
       "The ability to hunt jubblies (counts for 1 point when hunting chompies, though provides more range experience when killed, and big bones as a drop when killed, and the raw jubbly gives more experience when cooked than a raw chompy)"
@@ -9328,6 +9566,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "supplies": [],
     "rewards": [
       "1 quest point",
+      "70,000 Fishing XP",
+      "26,000 Hunter XP",
+      "8,000 Thieving XP",
       "Any loot you got from the wreckages, up to six items",
       "Wieldable fishing nets after speaking to Jones",
       "The option to hunt the Thalassus 10 more times for a total of 46,660 Hunter XP",
@@ -9378,9 +9619,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "3 quest points",
-      "lamp",
-      "lamp",
-      "lamp",
+      "15,000 Archaeology XP lamp",
+      "25,000 Divination XP lamp",
+      "10,000 Skill XP lamp",
       "The knowledge to restore the pontifex observation ring",
       "The ability to gain Elder Troves from the Elder God Wars Dungeon"
     ],
@@ -9548,6 +9789,10 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "50,000 Magic XP",
+      "50,000 Thieving XP",
+      "40,000 Crafting XP",
+      "30,000 Construction XP",
       "New magic carpet destination at the monkey colony.",
       "Cramulet and the ability to add other speaking amulets to it (catspeak amulet, camulet, cabbagespeak amulet, crocspeak amulet, and crabulet).",
       "The ability to upgrade Ava's accumulator to Ava's alerter.",
@@ -9664,6 +9909,12 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "4,000 Farming XP",
+      "5,000 Herblore XP",
+      "14,000 Woodcutting XP",
+      "6,000 Agility XP",
+      "6,000 Thieving XP",
+      "5,000 Constitution XP",
       "Dwarven helmet"
     ],
     "wiki": "Grim_Tales",
@@ -9719,6 +9970,10 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "24,000 Farming XP",
+      "40,000 Woodcutting XP",
+      "23,000 Slayer XP",
+      "15,000 Agility XP",
       "Access to the Jade vine Farming patch in East Ardougne",
       "Jade vine seed",
       "Ability to slay the wild jade vine for extra Slayer and Farming experience once every 15 hours",
@@ -9773,7 +10028,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
-      "lamp in one of: Attack, Strength, Defence, Magic or Ranged (Skill must be level 75 or higher; can be reobtained after destroying - speak to TzHaar-Mej-Jeh in the main plaza)",
+      "100,000 Combat XP lamp in one of: Attack, Strength, Defence, Magic or Ranged (Skill must be level 75 or higher; can be reobtained after destroying - speak to TzHaar-Mej-Jeh in the main plaza)",
+      "50,000 Magic XP",
+      "30,000 Agility XP",
       "A Tokkul-Zo, which increases damage to TzHaar, lava, and obsidian monsters, while also allowing teleportation around TzHaar City",
       "Access to the Fight Kiln",
       "The title, meaning \"sacred-cold\" or \"human\"",
@@ -9831,7 +10088,11 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Crystal trinket"
     ],
     "rewards": [
-      "2 quest points"
+      "2 quest points",
+      "35,000 Agility XP",
+      "20,000 Fletching XP",
+      "20,000 Ranged XP",
+      "20,000 Woodcutting XP"
     ],
     "wiki": "Within_the_Light",
     "questRequirements": [
@@ -9881,7 +10142,10 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "3 quest points",
-      "lamp (requires level 75 in the chosen skill to use) in one of:,,,,,,, or",
+      "50,000 Archaeology XP",
+      "50,000 Slayer XP",
+      "50,000 Magic XP",
+      "50,000 Combat XP lamp (requires level 75 in the chosen skill to use) in one of: Attack, Strength, Defence, Constitution, Ranged, Magic, Necromancy, Prayer or Summoning",
       "Four new Ancient Magicks spells",
       "Ability to create a pontifex shadow ring"
     ],
@@ -10292,9 +10556,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "rewards": [
       "3 quest points",
       "3 ancient lamps granting 100,000 experience in three different skills at or above level 75 (you may destroy them and get them back from the High Druid)",
-      "3 static lamps granting each in any combat skill at or above level 65 (you may destroy them and get them back from the High Druid)",
-      "Glossy lamp granting, requiring (if you do not have, you can destroy it and get it back from the High Druid)",
-      "Pale lamp granting, requiring (if you do not have, you can destroy it and get it back from the High Druid)",
+      "3 static lamps granting 50,000 Combat XP each in any combat skill at or above level 65 (you may destroy them and get them back from the High Druid)",
+      "Glossy lamp granting 110,000 Slayer XP, requiring Slayer (if you do not have Slayer, you can destroy it and get it back from the High Druid)",
+      "Pale lamp granting 250,000 Prayer XP, requiring Prayer (if you do not have Prayer, you can destroy it and get it back from the High Druid)",
       "4 new ultimate combat abilities",
       "Juna's Gift, Azzanadra's Gift, or Zilyana's Gift (may be changed to either of the three versions for free after the quest by talking to the High Druid)",
       "Access to Guthixian ruins, where you can offer chronicle fragments for Divination experience",
@@ -10346,7 +10610,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "rewards": [
       "2 quest points",
       "The Balmung, a two-handed melee weapon with special passive abilities when used against dagannoths (enhanced through the Koschei's Troubles miniquest);",
-      "(3x) in either,,,,, or (Skill must be level 75 or higher; speak to Chieftain Brundt to receive this)",
+      "450,000 Combat XP (3x 150,000 Combat XP) in either Attack, Defence, Strength, Constitution, Ranged, Magic or Prayer (Skill must be level 75 or higher; speak to Chieftain Brundt to receive this)",
       "Access to Dagannoth guardians",
       "Both the Dagannoth Mother and her sentinels can be faced in the Dominion Tower"
     ],
@@ -10500,6 +10764,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
+      "80,000 Firemaking XP",
+      "30,000 Agility XP",
+      "76,000 Constitution XP",
       "The Book of Char: When activated in the off-hand slot, it causes fiery orbs to spin around the player, spontaneously igniting any log the player walks/runs over.",
       "Access to two new events and a new Firemaker's costume in Balthazar Beauregard's Big Top Bonanza.",
       "Access to Char's training cave (with level 91 or higher Firemaking)."
@@ -10565,6 +10832,13 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "19,000 Defence XP",
+      "18,000 Smithing XP",
+      "18,000 Thieving XP",
+      "15,000 Summoning XP",
+      "11,250 Construction XP",
+      "11,000 Slayer XP",
+      "5,000 Dungeoneering XP",
       "Ability to enter the Braindeath Island 'Rum'-geon and kill the 'Rum'-pumped crabs for the brackish blade.",
       "A scroll allowing quick transport between Mos Le'Harmless and Braindeath Island."
     ],
@@ -10628,7 +10902,14 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "supplies": [],
     "rewards": [
       "2 quest points",
-      "tome (3x - Skill must be level 60 or higher)",
+      "20,000 Agility XP",
+      "50,000 Woodcutting XP",
+      "20,000 Farming XP",
+      "40,000 Fletching XP",
+      "20,000 Crafting XP",
+      "25,000 Slayer XP",
+      "35,000 Magic XP",
+      "150,000 Skill XP tome (3x 50,000 Skill XP - Skill must be level 60 or higher)",
       "Access to Darkmeyer",
       "Ability to fletch and use Blisterwood weapons",
       "Darkmeyer outfit (can be put into a Fancy dress box in a Player-owned house)",
@@ -10689,6 +10970,10 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
+      "50,000 Construction XP",
+      "50,000 Magic XP",
+      "40,000 Smithing XP",
+      "40,000 Crafting XP",
       "Any unused Teleport to house tablets (as many as 99)",
       "Ability to chip Teleport to house tablets",
       "Ability to use the Dark Stone exterior style for a player-owned house",
@@ -10741,6 +11026,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
+      "45,000 Mining XP",
+      "50,000 Smithing XP",
+      "55,000 Strength XP",
       "A new gravestone option (Royal dwarven gravestone)",
       "Access to the Lava Flow Mine and the ability to gild pickaxes and obtain the golden mining suit",
       "Ability to lift big rock (Level level 90 Strength required to carry it away)"
@@ -10794,7 +11082,10 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "3 quest points",
-      "Three lamps (only available for skills level 72 and higher).",
+      "110,000 Agility XP",
+      "40,000 Crafting XP",
+      "40,000 Mining XP",
+      "Three 80,000 Skill XP lamps (only available for skills level 72 and higher).",
       "Access to a new Barrows brother, Akrisae the Doomed, and his equipment.",
       "Access to a banite ore mining site, the spell Tune Bane, and the ability to fletch bane arrows and bane bolts.",
       "Access to the Glacor Cave and the fairy ring. After entering the cave, the Stone of Jas will give the player a 3-6% damage bonus in the surrounding area.",
@@ -10863,6 +11154,11 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "supplies": [],
     "rewards": [
       "2 quest points",
+      "125,000 Magic XP",
+      "100,000 Divination XP",
+      "100,000 Slayer XP",
+      "75,000 Agility XP",
+      "50,000 Summoning XP",
       "The Shard of Zaros, which when equipped grants protection from all factions in the God Wars Dungeon",
       "Access to Freneskae via the World Gate",
       "Access to rune dragons (requires completion of the quest Ritual of the Mahjarrat also)"
@@ -10920,8 +11216,10 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
-      "lamp used for any combat skill (including Summoning, Prayer and Slayer, excluding necromancy) at or above level 79",
-      "lamp used for any combat skill (including Summoning, Prayer and Slayer, excluding necromancy) at or above level 69",
+      "75,000 Combat XP lamp used for any combat skill (including Summoning, Prayer and Slayer, excluding necromancy) at or above level 79",
+      "50,000 Combat XP lamp used for any combat skill (including Summoning, Prayer and Slayer, excluding necromancy) at or above level 69",
+      "80,000 Attack XP",
+      "80,000 Strength XP",
       "A Kyzaj, to which you can add a Bandos hilt to increase its stats from tier 70 to tier 75.",
       "\"Honourable Kyzaj\" and the \"Bloodied Kyzaj\" cosmetic overrides for mauls",
       "The title",
@@ -10972,7 +11270,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "3 quest points",
-      "lamp in a choice of,,,, or (skill must be level 80 or higher)",
+      "275,000 Combat XP lamp in a choice of Attack, Strength, Defence, Ranged, Magic or Necromancy (skill must be level 80 or higher)",
+      "100,000 Mining XP",
       "The title",
       "Ability to smith obsidian armour and donate 15,000 Tokkul to a coffer at the Fight Cauldron to temporarily buff the armour",
       "Access to the Fight Cauldron and an added teleport to the TokKul-Zo",
@@ -11050,7 +11349,13 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
-      "2 Book of Equilibrium (can be stored in bank) - each in any combat skill level 75 or higher (except Necromancy and Constitution)",
+      "20,000 Crafting XP",
+      "20,000 Construction XP",
+      "20,000 Firemaking XP",
+      "20,000 Magic XP",
+      "20,000 Summoning XP",
+      "20,000 Smithing XP",
+      "2 Book of Equilibrium (can be stored in bank) - 50,000 Combat XP each in any combat skill level 75 or higher (except Necromancy and Constitution)",
       "Korasi's sword and the ability to use Jessika's sword",
       "Elite void knight top. Its colour will depend on how many white/black decisions you made in the void quests. Examining it will reveal its type: white for Guardian, grey for Justiciar, and black for Executioner, and it can be changed by talking to Commander Tyr and paying 100,000 coins coins.",
       "The ability to upgrade your Void Knight armour for its elite version at the cost of 100 Void Knight commendation points."
@@ -11100,10 +11405,10 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
-      "Construction Lamp",
-      "Mining Lamp",
-      "Woodcutting Lamp",
-      "Combat lamp",
+      "50,000 Construction XP Construction Lamp",
+      "50,000 Mining XP Mining Lamp",
+      "50,000 Woodcutting XP Woodcutting Lamp",
+      "50,000 Combat XP Combat lamp",
       "Invention blueprints for soul-in-a-box and urn enhancer, both of which require level 24 Invention.",
       "Access to Memory of Nomad, a Distraction & Diversion"
     ],
@@ -11210,6 +11515,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
+      "75,000 Construction XP",
+      "50,000 Slayer XP",
+      "50,000 Hunter XP",
       "The Tome of xp 4th ed with 3 charges, each charge giving 75,000 XP in a chosen skill at or above level 75",
       "The ability to craft more types of blisterwood weapons.",
       "Sunspear, a weapon that automatically burns vyrewatch corpses when you kill vyrelords/ladies (this doesn't count toward your achievements)",
@@ -11282,13 +11590,13 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
-      "Agility lamp",
-      "Crafting lamp",
-      "Herblore lamp",
-      "Prayer lamp",
-      "Slayer lamp",
-      "Woodcutting lamp",
-      "Divination lamp",
+      "90,000 Agility XP Agility lamp",
+      "90,000 Crafting XP Crafting lamp",
+      "90,000 Herblore XP Herblore lamp",
+      "90,000 Prayer XP Prayer lamp",
+      "90,000 Slayer XP Slayer lamp",
+      "90,000 Woodcutting XP Woodcutting lamp",
+      "90,000 Divination XP Divination lamp",
       "Access to Seren spells in the Ancient Magicks spellbook",
       "Access to Seren prayers in the Ancient Curses",
       "Access to Tarddiad, containing:"
@@ -11327,7 +11635,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "supplies": [],
     "rewards": [
       "2 quest points",
-      "journal (3x - Skill must be level 75 or higher)",
+      "300,000 Skill XP journal (3x 100,000 Skill XP - Skill must be level 75 or higher)",
+      "100,000 Agility XP",
+      "100,000 Divination XP",
       "Shard of Mah",
       "Access to nightmares, level level 80 Slayer monsters that drop nightmare gauntlets",
       "Access to ancient memories in Guthixian Caches (these give 4 points per conversion)",
@@ -11411,6 +11721,10 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "rewards": [
       "3 quest points",
       "Tome of XP 5th ed, which contains three chapters worth 75,000 experience each, redeemable on a skill equal to or higher than level 75",
+      "75,000 Herblore XP",
+      "50,000 Firemaking XP",
+      "50,000 Fletching XP",
+      "50,000 Mining XP",
       "A Sunspear (melee), which can be changed into a Sunspear (magic) and Sunspear (ranged), along with a cosmetic override of each accessible via the Customisation interface.",
       "Ability to make blood essences by talking to Vanescula Drakan on the roof of Castle Drakan."
     ],
@@ -11468,15 +11782,15 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
-      "lamp",
-      "lamp",
-      "lamp",
-      "lamp",
+      "90,000 Magic XP lamp",
+      "80,000 Summoning XP lamp",
+      "45,000 Dungeoneering XP lamp",
+      "5,000 Divination XP lamp",
       "Dragon Rider amulet",
       "Access to the Dragontooth Island resource dungeon, containing celestial dragons, and the ability to receive celestial dragons as a Slayer assignment",
-      "Rotate all four mysterious statues during or after the quest to gain in a skill of choice",
+      "Rotate all four mysterious statues during or after the quest to gain 10,000 Skill XP in a skill of choice",
       "The dragon-hunters (archer, mage, and warrior) and Echo of Jas can be faced in the Dominion Tower",
-      "If Ritual of the Mahjarrat has been completed, speak to the Submerged Statue on Entrana again to receive in any non-elite skill (12,500 if elite)",
+      "If Ritual of the Mahjarrat has been completed, speak to the Submerged Statue on Entrana again to receive 25,000 Skill XP in any non-elite skill (12,500 if elite)",
       "The ability to translate murals in the Adamant dragon dungeon and on Mount Firewake with the Dragonkin Primer"
     ],
     "wiki": "One_of_a_Kind",
@@ -11719,8 +12033,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "3 quest points",
-      "Divination XP lamp",
-      "Magic XP lamp",
+      "30,000 Divination XP Divination XP lamp",
+      "30,000 Magic XP Magic XP lamp",
       "Ring of the Abyss",
       "Order of Dis robes",
       "5 Chaos die reroll tokens and the ability to use them.",
@@ -11804,6 +12118,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
+      "100,000 Mining XP",
+      "100,000 Smithing XP",
+      "200,000 Strength XP",
       "30 each of rune, adamant, and mithril bars",
       "Ability to fight Chaos Giants in Barendir",
       "Access to 3 new dragon weapons:",
@@ -11858,10 +12175,10 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
-      "lamp",
-      "lamp",
-      "lamp",
-      "lamp",
+      "50,000 Agility XP lamp",
+      "50,000 Construction XP lamp",
+      "50,000 Firemaking XP lamp",
+      "50,000 Thieving XP lamp",
       "5 black pearls (Zogoth)",
       "Rabid Jack hat, sword and off-hand variant cosmetic overrides",
       "Big Book o' Piracy",
@@ -11958,8 +12275,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
-      "Necromancy XP lamp ( – requires level 75)",
-      "Archaeology XP lamp ( – requires level 86)",
+      "Necromancy XP lamp (100,000 Necromancy XP – requires level 75)",
+      "Archaeology XP lamp (100,000 Archaeology XP – requires level 86)",
       "Zorgoth's ring",
       "Soulfarer title",
       "Access to the Ungael ritual site",
@@ -11999,10 +12316,10 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "rewards": [
       "1 quest point",
       "Amulet of Offerings",
-      "lamp (Skill must be level 60 or higher)",
-      "lamp (Skill must be level 60 or higher)",
-      "lamp (Skill must be level 60 or higher)",
-      "lamp (Skill must be level 60 or higher)",
+      "50,000 Mining XP lamp (Skill must be level 60 or higher)",
+      "50,000 Agility XP lamp (Skill must be level 60 or higher)",
+      "50,000 Divination XP lamp (Skill must be level 60 or higher)",
+      "50,000 Crafting XP lamp (Skill must be level 60 or higher)",
       "Elidinian Mysteries I",
       "Elidinian Mysteries II",
       "Access to the Gate of Elidinis skilling boss."
@@ -12182,8 +12499,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Ring of kinship to find the collection of swords"
     ],
     "rewards": [
+      "2,410 Dungeoneering XP",
       "241 Dungeoneering tokens",
-      "or (having bonus experience in either skill will be used)"
+      "25,415 Agility XP or 25,415 Thieving XP (having bonus experience in either skill will be used)"
     ],
     "wiki": "Vengeance_(saga)",
     "kind": "saga",
@@ -12224,10 +12542,12 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Standard spells must be used for completing this saga"
     ],
     "rewards": [
+      "3,750 Dungeoneering XP",
       "375 Dungeoneering tokens",
       "Ability to purchase Furniture plans: Tied ritual marker from the Daemonheim Rewards shop for 50,000 tokens (requires having purchased Furniture plans: Ritual marker at level 75 Construction)",
+      "21,670 Dungeoneering XP",
       "2,167 Dungeoneering tokens",
-      "or",
+      "11,660 Thieving XP or 37,080 Attack XP",
       "Ability to purchase Furniture plans: Warped ritual marker from the Daemonheim Rewards shop for 100,000 tokens (requires having purchased Furniture plans: Ritual marker at level 75 Construction)"
     ],
     "wiki": "Nadir_(saga)",
@@ -12317,7 +12637,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
-      "lamp",
+      "150,000 Necromancy XP lamp",
       "Access to the Rasial, the First Necromancer boss encounter"
     ],
     "wiki": "Alpha_vs_Omega",
@@ -12357,6 +12677,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
+      "3,000 Attack XP",
       "Steel claws",
       "The ability to make claws",
       "Ability to wear Climbing boots",
@@ -12432,6 +12753,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "4 quest points",
+      "250 Herblore XP",
       "Ability to use the Herblore skill"
     ],
     "wiki": "Druidic_Ritual_(historical)",
@@ -12584,11 +12906,11 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "3 quest points",
-      "lamp (requires level 60 in the chosen skill to use) in one of:,,,,,,, or",
-      "lamp (requires level 51 Crafting)",
-      "lamp (requires level 55 Herblore)",
-      "lamp (requires level 65 Mining)",
-      "lamp (requires level 60 Smithing)",
+      "25,000 Combat XP lamp (requires level 60 in the chosen skill to use) in one of: Attack, Strength, Defence, Constitution, Ranged, Magic, Necromancy, Prayer or Summoning",
+      "15,000 Crafting XP lamp (requires level 51 Crafting)",
+      "15,000 Herblore XP lamp (requires level 55 Herblore)",
+      "25,000 Mining XP lamp (requires level 65 Mining)",
+      "30,000 Smithing XP lamp (requires level 60 Smithing)",
       "Ability to mix super and extreme antisanguine potions",
       "Ability to smith havensilver halberds",
       "Full access to the rest of Havenhythe",
@@ -12639,8 +12961,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
-      "lamp",
-      "lamp",
+      "1,000 Crafting XP lamp",
+      "500 Construction XP lamp",
       "Snippers, a feet slot cosmetic override"
     ],
     "wiki": "Hermit_Permits",
@@ -13086,7 +13408,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "1 quest point",
       "Ben's spare hat",
       "10,000 coins",
-      "lamp",
+      "3,500 Magic XP lamp",
       "Ability to teleport to Marigold Farm via the Wendlewick Teleport spell"
     ],
     "wiki": "Wiz_Kid",
@@ -13119,6 +13441,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "supplies": [],
     "rewards": [
       "1 quest point",
+      "276 Summoning XP",
       "Access to the Summoning skill",
       "275 gold charms"
     ],
@@ -13155,6 +13478,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "supplies": [],
     "rewards": [
+      "1,000 Thieving XP",
       "Ability to steal a craftsman's monocle",
       "Ability to purchase crafting equipment from Urist Loric",
       "Access to the pickpocketing volunteers, advanced pickpocketing trainer and coshing volunteers in the Thieves' Guild",
@@ -13195,7 +13519,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "supplies": [],
     "rewards": [
-      "A total of (5,000 + 4800 for turning in the flame fragments)",
+      "A total of 9,800 Thieving XP (5,000 + 4800 for turning in the flame fragments)",
       "Improved loot from pickpocketing NPCs up to level 40 Thieving",
       "Access to Dodgy Derek's Dirty Deals store run by Dodgy Derek",
       "Access to wall safes",
@@ -13252,6 +13576,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Chopped onion (or bowl, onion)"
     ],
     "rewards": [
+      "30,000 Thieving XP",
+      "4,000 Herblore XP",
       "Ability to mix vials of stench",
       "Full access to the Thieves' Guild, including a bank",
       "Ability to obtain special items from cracking safes"
@@ -14047,7 +14373,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "rewards": [
       "500 Chimes",
       "2 Taijitu",
-      "1 Medium XP lamp in one of the following skills:,,,,,,,,,,, or",
+      "1 Medium XP lamp in one of the following skills: Agility, Herblore, Fishing, Thieving, Cooking, Prayer, Runecrafting, Slayer, Construction, Hunter, Dungeoneering, or Divination",
       "Islands That Once Were Turtles teleport tablet unlocked in the Waiko Reward Shop"
     ],
     "wiki": "Ghosts_from_the_Past_(miniquest)",
@@ -14083,7 +14409,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "rewards": [
       "2,000 chimes",
       "10 taijitu",
-      "1 large combat XP lamp in one of the following skills:,,,,,,,, or",
+      "1 large combat XP lamp in one of the following skills: Attack, Strength, Defence, Constitution, Ranged, Magic, Necromancy, Prayer, or Summoning",
       "Goshima teleport tablet unlocked in the Waiko Reward Shop",
       "Unlocked title"
     ],
@@ -14170,7 +14496,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Ghostspeak amulet or cramulet or hard Morytania achievements"
     ],
     "rewards": [
-      "total from burying all 5 sets of bones (unaffected by any bonus experience)."
+      "13,750 Prayer XP total from burying all 5 sets of bones (unaffected by any bonus experience)."
     ],
     "wiki": "Hopespear's_Will_(miniquest)",
     "kind": "miniquest",
@@ -14216,7 +14542,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Holy water"
     ],
     "rewards": [
-      "See the Wiki for rewards."
+      "20,000 Construction XP",
+      "10,000 Prayer XP"
     ],
     "wiki": "In_Memory_of_the_Myreque_(miniquest)",
     "kind": "miniquest",
@@ -14290,6 +14617,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "supplies": [],
     "rewards": [
+      "5,000 Slayer XP",
       "Tarn's diary",
       "Ability to create enchanted salve amulets, by using Tarn's diary on salve amulets.",
       "Access to terror dogs in Tarn's lair"
@@ -14334,7 +14662,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Macaw pouch or Ravenous locust pouch (for Zemouregal's memory)"
     ],
     "rewards": [
-      "(given during the miniquest; is awarded each time a memory is turned in)",
+      "375,000 Divination XP (given during the miniquest; 25,000 Divination XP is awarded each time a memory is turned in)",
       "150,000 bonus experience in Divination.",
       "An engrammeter that Kharshai states could be useful in Freneskae when charged",
       "15 lore books",
@@ -14422,11 +14750,11 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Magic watering can (tool belt works)"
     ],
     "rewards": [
-      "(during the miniquest)",
-      "(during the miniquest)",
-      "(during the miniquest)",
-      "(during the miniquest)",
-      "(during the miniquest)",
+      "50,000 Magic XP (during the miniquest)",
+      "18,000 Construction XP (during the miniquest)",
+      "20,000 Farming XP (during the miniquest)",
+      "10,000 Mining XP (during the miniquest)",
+      "5,000 Prayer XP (during the miniquest)",
       "A dragonkin lamp",
       "Chance to receive Effy after rubbing dragonkin lamps and using dragonkin stars"
     ],
@@ -14553,6 +14881,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "The Shadow sword, which can be reclaimed from the ghost that will appear after Bouncer's defeat for free.",
+      "2,000 Slayer XP",
       "After completion of Fate of the Gods, The World Wakes, and Ritual of the Mahjarrat, if you visit the Empyrean Citadel throne room and attempt to leave, Sliske will appear and answer one question, before giving you a gift: the ability to see into the Shadow Realm without the ring of visibility. This still happens after Sliske's Endgame."
     ],
     "wiki": "The_General's_Shadow_(miniquest)",
@@ -14629,7 +14958,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Ring of kinship to find scribbled notes"
     ],
     "rewards": [
-      "3,708 Dungeoneering tokens"
+      "37,080 Dungeoneering XP",
+      "3,708 Dungeoneering tokens",
+      "75,765 Strength XP"
     ],
     "wiki": "Thok_It_To_'Em_(saga)",
     "kind": "saga",
