@@ -12,7 +12,7 @@ export async function fetchGroup(
     competitive: String(normalized.isCompetitive),
   });
   const response = await fetch(`/api/group?${params}`, { signal });
-  const data: unknown = await response.json();
+  const data: unknown = await response.json().catch(() => undefined);
   if (!response.ok) {
     const message =
       data &&

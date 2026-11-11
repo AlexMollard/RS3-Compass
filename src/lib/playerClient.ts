@@ -21,7 +21,7 @@ export async function fetchPlayer(
     `/api/player?name=${encodeURIComponent(normalized)}&schema=4`,
     { signal },
   );
-  const data: unknown = await response.json();
+  const data: unknown = await response.json().catch(() => undefined);
   if (!response.ok) {
     const message =
       data &&

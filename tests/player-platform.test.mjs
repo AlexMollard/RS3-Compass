@@ -2,7 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { get } from "svelte/store";
 import { createCompassController } from "../src/lib/profileStore.ts";
-import { fetchPlayer } from "../src/lib/playerClient.ts";
+import { fetchPlayer, PlayerFetchError } from "../src/lib/playerClient.ts";
+import { fetchGroup } from "../src/lib/groupClient.ts";
 import { isPlayerLookup } from "../src/lib/playerData.ts";
 import { findPlayerQuest } from "../src/lib/playerProgress.ts";
 import { QUESTS } from "../src/data.ts";
@@ -247,6 +248,29 @@ test("malformed and cross-player responses cannot be imported; valid empty logs 
     globalThis.fetch = async () => new Response(JSON.stringify(bad));
     await assert.rejects(fetchPlayer("Real Player"), /invalid player data/);
   }
+});
+
+test("non-JSON error pages give friendly lookup errors and keep Retry-After", async (t) => {
+  const original = globalThis.fetch;
+  t.after(() => {
+    globalThis.fetch = original;
+  });
+  globalThis.fetch = async () =>
+    new Response("<html><body>Bad gateway</body></html>", { status: 502 });
+  await assert.rejects(fetchPlayer("Real Player"), /lookup is unavailable/);
+  await assert.rejects(
+    fetchGroup({ name: "ironmanies", size: 3, isCompetitive: true }),
+    /lookup is unavailable/,
+  );
+  globalThis.fetch = async () =>
+    new Response("Slow down", {
+      status: 429,
+      headers: { "retry-after": "30" },
+    });
+  await assert.rejects(
+    fetchPlayer("Real Player"),
+    (error) => error instanceof PlayerFetchError && error.retryAfterMs === 30_000,
+  );
 });
 
 test("lookup validation accepts independent available sources and rejects conflicting or empty primary data", () => {
