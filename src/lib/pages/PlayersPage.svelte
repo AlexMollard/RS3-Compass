@@ -2,6 +2,8 @@
   import { onMount, untrack } from "svelte";
   import { Download, RefreshCw } from "@lucide/svelte";
   import { getCompass } from "../compassContext";
+  import { isSyncBusy } from "../sourceStatus";
+  import { startVisibleRefresh } from "../visibleRefresh";
   import PlayerManager from "../components/PlayerManager.svelte";
   import PageHeading from "../components/PageHeading.svelte";
   import Button from "../components/Button.svelte";
@@ -14,12 +16,7 @@
     $saved.profiles.filter((p) => p.source === "hiscores").map((p) => p.id),
   );
   let key = $derived(JSON.stringify(ids));
-  let busy = $derived(
-    ids.some(
-      (id) =>
-        $sync[id]?.state === "queued" || $sync[id]?.state === "refreshing",
-    ),
-  );
+  let busy = $derived(ids.some((id) => isSyncBusy($sync[id])));
   function refresh(staleOnly = true) {
     if (document.visibilityState !== "hidden")
       void controller.refreshPlayers(ids, {
@@ -29,13 +26,7 @@
   }
   onMount(() => {
     mounted = true;
-    const timer = window.setInterval(() => refresh(), 60_000);
-    const visible = () => refresh();
-    document.addEventListener("visibilitychange", visible);
-    return () => {
-      window.clearInterval(timer);
-      document.removeEventListener("visibilitychange", visible);
-    };
+    return startVisibleRefresh(() => refresh());
   });
   $effect(() => {
     key;

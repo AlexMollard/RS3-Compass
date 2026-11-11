@@ -9,6 +9,7 @@
   } from "../../data";
   import {
     isSnapshotStale,
+    isSyncBusy,
     rateLimitNotice,
     snapshotFetchedAt,
   } from "../sourceStatus";
@@ -97,7 +98,7 @@
 <div class="player-list">
   {#each players as player (player.id)}
     {@const status = $sync[player.id]}
-    {@const busy = status?.state === "queued" || status?.state === "refreshing"}
+    {@const busy = isSyncBusy(status)}
     {@const isPublic = player.source === "hiscores"}
     {@const selected = player.id === $saved.activeId}
     {@const fetched = snapshotFetchedAt(player)}

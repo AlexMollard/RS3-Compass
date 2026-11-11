@@ -46,6 +46,7 @@
   import FirstVisit from "./components/FirstVisit.svelte";
   import QuestBar from "./components/QuestBar.svelte";
   import { profileSourceNotice } from "./sourceStatus";
+  import { startVisibleRefresh } from "./visibleRefresh";
   import IconButton from "./components/IconButton.svelte";
   import "./shell.css";
 
@@ -240,8 +241,7 @@
           scope: "shell",
         });
     };
-    const refreshTimer = window.setInterval(refreshSelected, 60_000);
-    document.addEventListener("visibilitychange", refreshSelected);
+    const stopRefresh = startVisibleRefresh(refreshSelected);
     const keydown = (event: KeyboardEvent) => {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
@@ -262,8 +262,7 @@
       abortLookup();
       window.removeEventListener("keydown", keydown);
       headerSize.disconnect();
-      window.clearInterval(refreshTimer);
-      document.removeEventListener("visibilitychange", refreshSelected);
+      stopRefresh();
       document.documentElement.style.removeProperty("--topbar-height");
     };
   });

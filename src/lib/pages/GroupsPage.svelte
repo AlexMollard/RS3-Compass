@@ -9,9 +9,11 @@
   import { relativeTime } from "../relativeTime";
   import {
     isSnapshotStale,
+    isSyncBusy,
     rateLimitNotice,
     snapshotFetchedAt,
   } from "../sourceStatus";
+  import { startVisibleRefresh } from "../visibleRefresh";
   import SkillComparison from "../components/SkillComparison.svelte";
   import SkillGaps from "../components/SkillGaps.svelte";
   import { RefreshCw } from "@lucide/svelte";
@@ -53,12 +55,7 @@
   let memberIds = $derived(
     group?.members.map((m) => publicProfileId(m.name)) ?? [],
   );
-  let memberBusy = $derived(
-    memberIds.some(
-      (id) =>
-        $sync[id]?.state === "queued" || $sync[id]?.state === "refreshing",
-    ),
-  );
+  let memberBusy = $derived(memberIds.some((id) => isSyncBusy($sync[id])));
   // Skills where a member is among the leaders; unknown without published levels.
   let highestCounts = $derived(
     members.map((m) =>
@@ -172,13 +169,10 @@
   }
   onMount(() => {
     mounted = true;
-    const timer = window.setInterval(() => void refresh(), 60_000);
-    const visible = () => void refresh();
-    document.addEventListener("visibilitychange", visible);
+    const stop = startVisibleRefresh(() => void refresh());
     return () => {
       cancelLookup();
-      window.clearInterval(timer);
-      document.removeEventListener("visibilitychange", visible);
+      stop();
     };
   });
   $effect(() => {
@@ -394,9 +388,9 @@
                     tone="warn"
                     label="Refresh failed"
                   />
-                {:else if memberSync?.state === "queued" || memberSync?.state === "refreshing"}<StatusChip
+                {:else if isSyncBusy(memberSync)}<StatusChip
                     tone="info"
-                    label={memberSync.state === "queued"
+                    label={memberSync?.state === "queued"
                       ? "Queued for refresh"
                       : "Loading public data…"}
                   />

@@ -2,12 +2,21 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   isSnapshotStale,
+  isSyncBusy,
   mapTilesNotice,
   profileSourceNotice,
   rateLimitNotice,
   snapshotFetchedAt,
 } from "../src/lib/sourceStatus.ts";
 import { hasTransientFailure } from "../src/lib/playerData.ts";
+
+test("isSyncBusy is true only while a refresh is queued or running", () => {
+  assert.equal(isSyncBusy({ state: "queued" }), true);
+  assert.equal(isSyncBusy({ state: "refreshing" }), true);
+  assert.equal(isSyncBusy({ state: "idle" }), false);
+  assert.equal(isSyncBusy({ state: "error" }), false);
+  assert.equal(isSyncBusy(undefined), false);
+});
 
 test("snapshotFetchedAt prefers the public lookup time over the legacy Hiscores time", () => {
   assert.equal(snapshotFetchedAt({ publicFetchedAt: 5, hiscoresFetchedAt: 3 }), 5);

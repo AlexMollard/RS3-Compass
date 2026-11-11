@@ -14,6 +14,7 @@
   import StatusChip from "../components/StatusChip.svelte";
   import { isSnapshotStale } from "../sourceStatus";
   import { relativeTime } from "../relativeTime";
+  import { startVisibleRefresh } from "../visibleRefresh";
   import type { Profile } from "../../data";
 
   const controller = getCompass();
@@ -120,13 +121,7 @@
   }
   onMount(() => {
     mounted = true;
-    const timer = window.setInterval(() => refresh(), 60_000);
-    const visible = () => refresh();
-    document.addEventListener("visibilitychange", visible);
-    return () => {
-      window.clearInterval(timer);
-      document.removeEventListener("visibilitychange", visible);
-    };
+    return startVisibleRefresh(() => refresh());
   });
   $effect(() => {
     sourceKey;

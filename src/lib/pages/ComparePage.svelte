@@ -12,7 +12,12 @@
   } from "../groupProgress";
   import { publicProfileId } from "../playerName";
   import { relativeTime } from "../relativeTime";
-  import { isSnapshotStale, snapshotFetchedAt } from "../sourceStatus";
+  import {
+    isSnapshotStale,
+    isSyncBusy,
+    snapshotFetchedAt,
+  } from "../sourceStatus";
+  import { startVisibleRefresh } from "../visibleRefresh";
   import { wikiHref } from "../../wiki";
   import PageHeading from "../components/PageHeading.svelte";
   import ChoiceStrip from "../components/ChoiceStrip.svelte";
@@ -118,13 +123,10 @@
   }
   onMount(() => {
     mounted = true;
-    const timer = window.setInterval(() => refresh(), 60_000);
-    const visible = () => refresh();
-    document.addEventListener("visibilitychange", visible);
+    const stop = startVisibleRefresh(() => refresh());
     return () => {
       cancelLookup();
-      window.clearInterval(timer);
-      document.removeEventListener("visibilitychange", visible);
+      stop();
     };
   });
   $effect(() => {
@@ -221,7 +223,7 @@
               >
               <p class="caption">{profile.kind}</p>
               <div class="player-chip">
-                {#if state?.state === "queued" || state?.state === "refreshing"}<StatusChip
+                {#if isSyncBusy(state)}<StatusChip
                     tone="info"
                     label="Loading public data…"
                   />

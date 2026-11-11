@@ -24,6 +24,10 @@ type SyncInfo = {
 
 const isPublic = (profile: Profile) => profile.source === "hiscores";
 
+/** A refresh is waiting or running for this player. */
+export const isSyncBusy = (sync?: { state: string }): boolean =>
+  sync?.state === "queued" || sync?.state === "refreshing";
+
 /** When the public snapshot was taken; older saves only have hiscoresFetchedAt. */
 export const snapshotFetchedAt = (
   profile?: Pick<Profile, "publicFetchedAt" | "hiscoresFetchedAt">,
