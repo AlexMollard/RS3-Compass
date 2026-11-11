@@ -458,7 +458,13 @@ textarea {
   margin: 0 auto;
   padding: 28px 32px 0;
   outline: none;
-  min-height: calc(100vh - 65px);
+  min-height: calc(100vh - var(--topbar-height, 65px));
+  /* Short pages on tall windows: the last block grows so the footer stays at the bottom. */
+  display: flex;
+  flex-direction: column;
+}
+.main-content > :not(.workspace-footer):nth-last-child(2) {
+  flex-grow: 1;
 }
 
 .preview-label {

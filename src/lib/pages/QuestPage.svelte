@@ -1120,7 +1120,8 @@
     flex-wrap: wrap;
     align-items: center;
     gap: 10px;
-    margin: 0 -32px;
+    /* auto: on short pages the bar drops to sit on the footer. */
+    margin: auto -32px 0;
     padding: 12px 32px;
   }
   /* The background runs past the capped page column to the workspace edges;
@@ -1218,6 +1219,9 @@
       border: 0;
       flex-direction: column;
       align-items: stretch;
+    }
+    .actionbar-status {
+      flex: none;
     }
     .quest-actionbar :global(.btn) {
       min-height: 48px;
