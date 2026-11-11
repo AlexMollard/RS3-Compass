@@ -46,6 +46,14 @@ test("experience splits fixed skill XP from lamps", () => {
   );
 });
 
+test("hand-written quests show their quest points in the quest point chip", () => {
+  const points = { "cooks-assistant": "1", "swept-away": "2", "waterfall-quest": "1", "tree-gnome-village": "2" };
+  for (const [id, n] of Object.entries(points)) {
+    const chip = rewardSummary(QUESTS.find((q) => q.id === id).rewards).find((c) => c.group === "questPoints");
+    assert.equal(chip?.text, `${n} quest point${n === "1" ? "" : "s"}`, id);
+  }
+});
+
 test("a bracket that restates a skill's XP is not counted twice", () => {
   const { fixed } = experienceRewards([
     "A total of 8,500 Defence XP (via two charges of 4,250 Defence XP each)",

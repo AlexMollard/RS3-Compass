@@ -172,7 +172,8 @@ const CORE_QUESTS: QuestRecord[] = [
     questRequirements: [],
     supplies: ["A pot of flour", "A bucket of milk", "An egg"],
     rewards: [
-      "300 Cooking XP and 1 quest point",
+      "1 quest point",
+      "300 Cooking XP",
       "500 coins and 3 noted sardines",
       "Access to the Cook-o-matic 25 range",
     ],
@@ -279,6 +280,7 @@ const CORE_QUESTS: QuestRecord[] = [
       "Food for dangerous areas",
     ],
     rewards: [
+      "1 quest point",
       "13,750 Attack XP",
       "13,750 Strength XP",
       "Gold bars, diamonds, and mithril seeds",
@@ -308,7 +310,7 @@ const CORE_QUESTS: QuestRecord[] = [
     requirements: [],
     questRequirements: [],
     supplies: ["6 normal logs", "Combat gear and food"],
-    rewards: ["11,450 Attack XP", "Travel progression"],
+    rewards: ["2 quest points", "11,450 Attack XP", "Travel progression"],
     wiki: "Tree_Gnome_Village",
   },
 ];

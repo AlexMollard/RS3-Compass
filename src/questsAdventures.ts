@@ -27,7 +27,7 @@ export const ADVENTURE_QUESTS: QuestRecord[] = [
     questRequirements: [],
     supplies: [],
     rewards: [
-      "1 or 2 quest points, depending on historical miniquest completion",
+      "2 quest points (1 if the historical miniquest was already completed)",
       "Broomstick and 10 portions of experience-giving goulash",
       "Optional post-quest Magic experience from witches, subject to their requirements",
     ],
