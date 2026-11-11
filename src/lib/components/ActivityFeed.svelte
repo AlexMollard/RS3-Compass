@@ -36,7 +36,11 @@
     /** Page mode: the feed sits in a window and per-player status lives in a separate panel. */
     framed?: boolean;
   } = $props();
-  const now = Date.now();
+  // Re-stamped whenever a refresh brings new sources, so ages do not freeze at mount.
+  let now = $derived.by(() => {
+    void sources;
+    return Date.now();
+  });
   const instance = $props.id();
   let player = $state("all");
   let category = $state("all");

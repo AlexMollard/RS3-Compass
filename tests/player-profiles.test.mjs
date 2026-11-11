@@ -105,6 +105,58 @@ test("Legacy profiles survive the framework cutover and later storage writes rec
   assert.deepEqual(restored.profiles[1], legacy.profiles[1]);
 });
 
+test("A second tab adopts the other tab's saves instead of overwriting them", (t) => {
+  const descriptors = ["localStorage", "window"].map((key) => [
+    key,
+    Object.getOwnPropertyDescriptor(globalThis, key),
+  ]);
+  const storage = new Map();
+  const tabs = [new EventTarget(), new EventTarget()];
+  let writer;
+  Object.defineProperty(globalThis, "localStorage", {
+    configurable: true,
+    value: {
+      getItem: (key) => storage.get(key) ?? null,
+      setItem: (key, value) => {
+        const old = storage.get(key) ?? null;
+        storage.set(key, value);
+        // Browsers notify only the other tabs, and only when the value changes.
+        if (old !== value)
+          for (const tab of tabs)
+            if (tab !== writer)
+              tab.dispatchEvent(
+                Object.assign(new Event("storage"), { key, newValue: value }),
+              );
+      },
+    },
+  });
+  const open = (tab) => {
+    writer = tab;
+    globalThis.window = tab;
+    const controller = createCompassController();
+    controller.initialize();
+    return controller;
+  };
+  const a = open(tabs[0]);
+  const b = open(tabs[1]);
+  t.after(() => {
+    a.destroy();
+    b.destroy();
+    for (const [key, descriptor] of descriptors)
+      if (descriptor) Object.defineProperty(globalThis, key, descriptor);
+      else delete globalThis[key];
+  });
+  writer = tabs[0];
+  a.addPlayer(player, "Regular account", "f2p");
+  a.updateProfile((p) => ({ ...p, notes: { quest: "Saved in tab A" } }));
+  writer = tabs[1];
+  b.updateProfile((p) => ({ ...p, activeTask: "train-Mining" }));
+  const saved = JSON.parse(storage.get(KEY));
+  const real = saved.profiles.find((p) => p.id === "rs3:real player");
+  assert.equal(real?.notes.quest, "Saved in tab A");
+  assert.equal(real.activeTask, "train-Mining");
+});
+
 test("A fresh controller is unwelcomed until a sample is picked", () => {
   const controller = createCompassController();
   assert.equal(get(controller.state).welcomed, false);

@@ -404,6 +404,31 @@ test("missing Hiscores preserve published levels separately from manual edits wh
   controller.destroy();
 });
 
+test("a typed level survives a refresh whose published level has not changed", () => {
+  const controller = createCompassController();
+  controller.addPlayer(
+    { ...snapshot("Alice", 1000), levels: { Mining: 55 } },
+    "Group Ironman",
+    "f2p",
+  );
+  controller.updateProfile((p) => ({
+    ...p,
+    levels: { ...p.levels, Mining: 60 },
+  }));
+  controller.addPlayer(
+    { ...snapshot("Alice", 2000), levels: { Mining: 55 } },
+    "Group Ironman",
+    "f2p",
+    { select: false },
+  );
+  const after = get(controller.state).profiles.find(
+    (p) => p.id === "rs3:alice",
+  );
+  assert.equal(after.levels.Mining, 60);
+  assert.equal(after.hiscoresLevels.Mining, 55);
+  controller.destroy();
+});
+
 test("an unranked player with public quests does not acquire fictional levels or XP", () => {
   const controller = createCompassController();
   controller.addPlayer(

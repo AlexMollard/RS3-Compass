@@ -100,6 +100,33 @@ function validProfile(value: unknown): value is Profile {
   );
 }
 
+/** The saved state in `raw`, or undefined when it is not a supported, valid save. */
+function parseSaved(raw: string): SavedState | undefined {
+  let saved: unknown;
+  try {
+    saved = JSON.parse(raw);
+  } catch {
+    return undefined;
+  }
+  if (!saved || typeof saved !== "object") return undefined;
+  const s = saved as SavedState;
+  if (
+    s.version === 1 &&
+    Array.isArray(s.profiles) &&
+    (s.groups === undefined ||
+      (Array.isArray(s.groups) && s.groups.every(isGroupLookup))) &&
+    s.profiles.every(validProfile) &&
+    (s.profiles.length === 0
+      ? s.activeId === ""
+      : s.profiles.some((p) => p.id === s.activeId))
+  )
+    return {
+      ...s,
+      welcomed: typeof s.welcomed === "boolean" ? s.welcomed : true,
+    };
+  return undefined;
+}
+
 function rememberSelection(profile: Profile) {
   if (typeof document === "undefined") return;
   if (profile.source === "hiscores") rememberPlayer(profile.name);
@@ -120,6 +147,15 @@ export function createCompassController(): CompassController {
   let unsubscribe: (() => void) | undefined;
   let timer: ReturnType<typeof setTimeout> | undefined;
   let initialized = false;
+  let storageTarget: Window | undefined;
+  // Another tab saved: adopt its whole state, selection included, so this
+  // tab's next write cannot discard changes it never saw. Writing the same
+  // string back fires no further storage event, so the tabs do not ping-pong.
+  function onStorage(event: StorageEvent) {
+    if (event.key !== KEY || event.newValue === null) return;
+    const saved = parseSaved(event.newValue);
+    if (saved) state.set(saved);
+  }
   const synchronizer = createPlayerSynchronizer({
     profile: (id) => get(state).profiles.find((p) => p.id === id),
     allowed(target) {
@@ -236,36 +272,15 @@ export function createCompassController(): CompassController {
       try {
         const raw = localStorage.getItem(KEY);
         if (raw) {
-          const saved: unknown = JSON.parse(raw);
-          if (saved && typeof saved === "object") {
-            const s = saved as SavedState;
-            if (
-              s.version === 1 &&
-              Array.isArray(s.profiles) &&
-              (s.groups === undefined ||
-                (Array.isArray(s.groups) && s.groups.every(isGroupLookup))) &&
-              s.profiles.every(validProfile) &&
-              (s.profiles.length === 0
-                ? s.activeId === ""
-                : s.profiles.some((p) => p.id === s.activeId))
-            ) {
-              state.set({
-                ...s,
-                welcomed:
-                  typeof s.welcomed === "boolean" ? s.welcomed : true,
-              });
-              if (!s.profiles.length && typeof document !== "undefined")
-                clearRememberedPlayer();
-            } else {
-              storageError.set(true);
-              ready.set(true);
-              return;
-            }
-          } else {
+          const saved = parseSaved(raw);
+          if (!saved) {
             storageError.set(true);
             ready.set(true);
             return;
           }
+          state.set(saved);
+          if (!saved.profiles.length && typeof document !== "undefined")
+            clearRememberedPlayer();
         }
       } catch {
         storageError.set(true);
@@ -280,12 +295,18 @@ export function createCompassController(): CompassController {
           storageError.set(true);
         }
       });
+      if (typeof window !== "undefined") {
+        storageTarget = window;
+        storageTarget.addEventListener("storage", onStorage);
+      }
       if (typeof document !== "undefined")
         document.addEventListener?.("visibilitychange", synchronizer.wake);
       ready.set(true);
     },
     destroy() {
       unsubscribe?.();
+      storageTarget?.removeEventListener("storage", onStorage);
+      storageTarget = undefined;
       clearTimeout(timer);
       synchronizer.destroy();
       if (typeof document !== "undefined")
@@ -389,7 +410,16 @@ export function createCompassController(): CompassController {
             ...existing,
             name: player.name,
             kind: detectedAccountKind(existing.kind, player.ironman),
-            levels: { ...existing.levels, ...player.levels },
+            // Only newly published levels replace a level typed for planning.
+            levels: {
+              ...existing.levels,
+              ...Object.fromEntries(
+                Object.entries(player.levels).filter(
+                  ([skill, level]) =>
+                    existing.hiscoresLevels?.[skill] !== level,
+                ),
+              ),
+            },
             completedQuests: [
               ...new Set([...existing.completedQuests, ...imported]),
             ],
