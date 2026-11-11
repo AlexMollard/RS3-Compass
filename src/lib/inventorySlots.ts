@@ -21,7 +21,8 @@ export interface InventorySlot {
 export const INVENTORY_SIZE = 28;
 
 // Stackable in a backpack without noting. Anything else takes one slot per item.
-const STACKABLE = /^(coins|thread|(\w+ )?nails|\w+ rune)$/i;
+const STACKABLE =
+  /^(coins|thread|feather|fishing bait|(\w+ )?nails|\w+ rune|\w+ ghostly ink|\w+ seeds?)$/i;
 
 /** The part of a supply line that lists what to carry, before alternatives and explanations. */
 function mainClause(line: string): string {

@@ -161,6 +161,19 @@ const items: ItemReference[] = [
     aliases: ["diamonds"],
   },
   { name: "Mithril seeds", wiki: "Mithril_seeds", image: "Mithril_seeds.png" },
+  // Longer than "cabbage" and "onion", so "3 cabbage seeds" names the seed. The Wiki has stack images only.
+  {
+    name: "Cabbage seed",
+    wiki: "Cabbage_seed",
+    image: "Cabbage_seed_5.png",
+    aliases: ["cabbage seeds"],
+  },
+  {
+    name: "Onion seed",
+    wiki: "Onion_seed",
+    image: "Onion_seed_5.png",
+    aliases: ["onion seeds"],
+  },
   {
     name: "Fishing bait",
     wiki: "Fishing_bait",

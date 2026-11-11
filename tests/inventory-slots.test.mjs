@@ -58,6 +58,14 @@ test("stackable items share one slot with their count", () => {
   assert.deepEqual(summary("100 coins"), [["Coins", 100]]);
   assert.deepEqual(summary("2,000 coins to purchase the ship"), [["Coins", 2000]]);
   assert.deepEqual(summary("6 air runes"), [["Air rune", 6]]);
+  assert.deepEqual(summary("10 feathers"), [["Feather", 10]]);
+  assert.deepEqual(summary("10 fishing bait"), [["Fishing bait", 10]]);
+  assert.deepEqual(summary("7 basic ghostly ink for drawing glyphs"), [["Basic ghostly ink", 7]]);
+});
+
+test("seeds name the seed, not the vegetable, and stack", () => {
+  assert.deepEqual(summary("3 cabbage seeds (6 recommended)"), [["Cabbage seed", 3]]);
+  assert.deepEqual(summary("3 onion seeds (6 recommended)"), [["Onion seed", 3]]);
 });
 
 test("unnoted overrides stacking and counts every item", () => {
