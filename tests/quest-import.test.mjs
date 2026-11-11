@@ -46,6 +46,18 @@ test("wikitext becomes plain prose with skill, XP and coin wording", () => {
   assert.deepEqual(bullets("* [[Vial]]\n** nested\n* None\n* {{Coins|20}}"), ["Vial", "20 coins"]);
 });
 
+test("nested reward and supply lists join their parent line instead of vanishing", () => {
+  assert.deepEqual(bullets("* Two lore books:\n** Book A\n** Book B\n* 1 quest point", true), [
+    "Two lore books: Book A; Book B",
+    "1 quest point",
+  ]);
+  assert.deepEqual(bullets("* Either:\n** One of:\n*** A\n** B", true), ["Either: One of: A; B"]);
+  assert.equal(
+    plain("A total of {{scm|Smithing|8500}} experience:"),
+    "A total of 8,500 Smithing experience:",
+  );
+});
+
 test("map pins read named, bare and colon coordinates and drop the default map", () => {
   assert.deepEqual(mapPin("{{Map|mapID=-1|plane=0|x=3438|y=9895|mtype=pin}}"), { x: 3438, y: 9895, plane: 0 });
   assert.deepEqual(mapPin("{{Maplink|mapID=28|plane=1|x=3149|y=3206}}"), { x: 3149, y: 3206, plane: 1 });

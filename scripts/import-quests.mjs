@@ -164,7 +164,7 @@ function parseQuest(title, content, questreq, npcPins) {
   const qp = SUBQUEST_QP.has(title) ? 0 : Number(rewardsTemplate.qp);
   const rewards = [
     ...(qp > 0 ? [`${qp} quest point${qp === 1 ? "" : "s"}`] : []),
-    ...bullets(rewardsTemplate.rewards),
+    ...bullets(rewardsTemplate.rewards, true),
   ];
   const image = (infobox.image ?? "").match(/\[\[File:([^|\]]+)/i)?.[1];
   // Required kills: "* 3 [[Ghast]]s (level 35)". Identity is the linked page plus the level.
@@ -207,7 +207,8 @@ function parseQuest(title, content, questreq, npcPins) {
       requirements: [...skills].map(([skill, level]) => ({ skill, level })),
       questRequirementNames: questreq.get(title) ?? [],
       preparationNotes: notes,
-      supplies: bullets(details.items),
+      // Nested items stay on their parent line: they are often alternatives ("one of the following:").
+      supplies: bullets(details.items, true),
       rewards: rewards.length ? rewards : ["See the Wiki for rewards."],
       wiki: title.replaceAll(" ", "_"),
     },

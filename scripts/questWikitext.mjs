@@ -43,6 +43,8 @@ export function plain(text) {
     out = out
       .replace(/\{\{\s*Skillreq\s*\|([^|}]+)\|(\d+)[^}]*\}\}/gi, "level $2 $1")
       .replace(/\{\{\s*(?:Sxp|Skill XP)\s*\|([^|}]+)\|([\d,]+)[^}]*\}\}/gi, (_, skill, n) => `${grouped(n)} ${skill.trim()} XP`)
+      // {{scm|Smithing|8500}} is a skill amount in a sentence ("a total of 8,500 Smithing experience").
+      .replace(/\{\{\s*scm\s*\|([^|}]+)\|([\d,]+)[^}]*\}\}/gi, (_, skill, n) => `${grouped(n)} ${skill.trim()}`)
       .replace(/\{\{\s*(?:scl|Skill clickpic)\s*\|([^|}]+)[^}]*\}\}/gi, "$1")
       .replace(/\{\{\s*Coins\s*\|([\d,]+)[^}]*\}\}/gi, (_, n) => `${grouped(n)} coins`)
       .replace(/\{\{\s*(?:plink|plinkp|plinkt|ql|qlink)\s*\|([^|}]+)(?:\|[^}]*)?\}\}/gi, "$1")
@@ -60,12 +62,25 @@ export function plain(text) {
     .trim();
 }
 
-export const bullets = (text = "") =>
-  text
-    .split("\n")
-    .filter((line) => /^\*[^*]/.test(line.trim()))
-    .map((line) => plain(line.trim().slice(1)))
+/**
+ * The top-level "*" lines as plain text. Nested "**" lines are dropped, or with `join`
+ * appended to their parent ("Two lore books: Book A; Book B") so a list keeps its contents.
+ */
+export function bullets(text = "", join = false) {
+  const lines = [];
+  for (const raw of text.split("\n")) {
+    const line = raw.trim();
+    if (/^\*[^*]/.test(line)) lines.push({ text: plain(line.slice(1)), children: [] });
+    else if (join && line.startsWith("**") && lines.length)
+      lines.at(-1).children.push(plain(line.replace(/^\*+/, "")));
+  }
+  return lines
+    .map(({ text, children }) => {
+      const nested = children.filter(Boolean).join("; ").replace(/:;/g, ":");
+      return nested ? `${text} ${nested}` : text;
+    })
     .filter((line) => line && !/^(none|n\/a)\.?$/i.test(line));
+}
 
 /** Every [[link]] target in order, without anchors or labels. */
 export function links(text = "") {

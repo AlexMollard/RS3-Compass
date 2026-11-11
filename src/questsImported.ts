@@ -75,7 +75,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "300 Magic XP",
       "300 Runecrafting XP",
       "First tower robes (top and bottom)",
-      "Access to Archmage Sedridor's personal rune chest",
+      "Access to Archmage Sedridor's personal rune chest For every level reached in Runecrafting, pure essence will be placed into the chest for you equal to five times your new Runecrafting level.; This adds up to 2.5 \\times level \\times (level+1) pure essence when first opened, where level is your current Runecrafting level.; More pure essence will be added even after it is opened, and there is no benefit or detriment whatsoever in waiting to increase your runecrafting level to use the chest.",
       "Access to the cadmium red, white marble, and vellum material caches in the First Tower excavation site."
     ],
     "wiki": "Rune_Memories",
@@ -301,7 +301,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "supplies": [],
     "rewards": [
       "4 quest points",
-      "\"Access to an epilogue of sorts...\""
+      "\"Access to an epilogue of sorts...\" A special clue scroll can be found in Closure's personal space, inside a set of drawers. To enter this room, talk to Closure again after completing all four subquests of Once Upon a Time in Gielinor. When Closure teleports away, it is possible to enter the private room. Complete the clue by following the steps below: First step: Talk to Relomia in Draynor Village.; Second step: Read the scroll and talk to Relomia again, then dig (right-click on the clue scroll, spade will not work) while standing next to her.; You will receive a reward casket containing ghostly undergarment token to unlock the Closure's robes outfit cosmetic override."
     ],
     "wiki": "Once_Upon_a_Time_in_Gielinor",
     "questRequirements": [
@@ -622,8 +622,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
-      "experience lamp",
-      "Depending on the astrological sign you see through the telescope, you will receive one of these items:",
+      "2,250 Crafting experience lamp",
+      "Depending on the astrological sign you see through the telescope, you will receive one of these items: An uncut sapphire (Aquarius, Aries, Cancer, Capricorn, Gemini, Leo, Libra, Sagittarius, Scorpio, Taurus, Virgo, Pisces); 25 water runes (Aquarius); An amulet of defence (Cancer); A black two-handed sword (Gemini); 3 law runes (Libra); 3 fish pies or 3 tunas (Pisces); A maple longbow (Sagittarius); Weapon poison (Scorpio); Super strength (1) (Taurus); 875 Attack experience lamp (Aries); 875 Strength experience lamp (Capricorn); 875 Defence experience lamp (Virgo); 875 Constitution experience lamp (Leo)",
       "You can talk to Historian Minas at the Varrock Museum to receive 5 kudos.",
       "Ability to use 'Chipped' Watchtower teleport after also completing Evil Dave's Big Day Out."
     ],
@@ -657,7 +657,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Bat bones (can be obtained during the quest)",
       "Black candle",
       "Bucket (can be obtained during the quest)",
-      "Insect repellent (can be obtained during the quest)"
+      "Insect repellent (can be obtained during the quest) Can be used from the tool belt"
     ],
     "rewards": [
       "6 quest points",
@@ -826,8 +826,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "requirements": [],
     "supplies": [
       "20 regular planks",
-      "88 stone wall segments",
-      "8 wooden frames",
+      "88 stone wall segments 352 limestone bricks (for making wall segments)",
+      "8 wooden frames 96 regular planks (for making wooden frames)",
       "352 limestone bricks to make stone wall segments",
       "96 regular planks to make wooden frames"
     ],
@@ -1102,7 +1102,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "500 Dungeoneering XP",
       "500 Thieving XP",
       "Access to Menaphos",
-      "Access to the Menaphos reputation system",
+      "Access to the Menaphos reputation system Menaphos reputation gain increased to 125%",
       "Access to the Shifting Tombs",
       "Talk to Assistant Librarian Subotai to receive the Menaphos journal. After obtaining the journal, the Jewels of the Elid, Cats of Menaphos, and Insects of the Desert can be collected."
     ],
@@ -1185,7 +1185,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "rewards": [
       "1 quest point",
       "7,000 Thieving XP",
-      "2 7,000 Combat XP lamp in a choice of Attack, Strength, Defence, Constitution, Ranged, Magic or Summoning (Summoning must be level 30 or higher)",
+      "2 7,000 Combat XP lamp in a choice of Attack, Strength, Defence, Constitution, Ranged, Magic or Summoning (Summoning must be level 30 or higher) If you accidentally destroy the experience lamp, another may be obtained by seeing the High Priest",
       "Keris, a dagger which is very effective against Kalphites and Scarabs",
       "Access to Sophanem's bank under the Temple of Lesser Deities in the north-east corner (useful for Pyramid Plunder)",
       "Coenus will allow a one-way passage from Menaphos to Sophanem."
@@ -1218,8 +1218,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "why": "Rat Catchers is a quest in which you help various people with rat-related problems, whilst training your cat.",
     "requirements": [],
     "supplies": [
-      "Cat or hellcat",
-      "1 rat poison (can be found in the Clock Tower Dungeon)",
+      "Cat or hellcat A kitten works, but it catches rats very slowly and needs to be fed. An overgrown cat does not work.; Your cat may die on this quest.",
+      "1 rat poison (can be found in the Clock Tower Dungeon) Alternatively the ingredients to make it during the quest are: 1 vial (must be empty); 1 clean kwuarm (if needed, Zahur in Nardah cleans grimy herbs for 200 coins); 1 red spiders' eggs",
       "4 cheese",
       "1 unicorn horn dust",
       "1 clean marrentill (if needed, Zahur in Nardah cleans grimy herbs for 200 coins)",
@@ -1271,12 +1271,12 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Bucket of milk",
       "Logs (can be obtained south of Unferth's house)",
       "Four potato seeds (can be obtained south-west of Unferth's house from Head Farmer Jones)",
-      "Vial of water (as it will dry up in the desert, it is recommended to take this after you are finished with that part of the quest.)",
+      "Vial of water (as it will dry up in the desert, it is recommended to take this after you are finished with that part of the quest.) A vial is more reliable. There is a sink right where you need the vial of water.",
       "White desert robe outfit, druid's robe outfit, or other white-coloured robes"
     ],
     "rewards": [
       "2 quest points",
-      "A mysterious present containing",
+      "A mysterious present containing 2 antique lamps, which grant 2,500 experience each in a skill above level 30; Mouse toy",
       "Catspeak amulet (e), which allows you to locate Bob.",
       "Doctor's hat or nurse hat (you can switch by destroying your hat and requesting a new one from the Apothecary)",
       "You can talk to Historian Minas in the Varrock Museum to receive 5 kudos."
@@ -1521,7 +1521,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
-      "A total of experience:",
+      "A total of 1,025 Thieving experience: 500 Thieving XP from quest completion; 3 Thieves' guild pamphlets (each granting 175 Thieving for a total of 525 Thieving XP)",
       "Access to the Thieves' Guild",
       "Ability to collect hanky points"
     ],
@@ -1560,7 +1560,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "1 Greenman's ale",
       "1 Rotten tomato",
       "1 Ashes",
-      "1 Fruit Blast (premade does not work). The fruit blast can also be made with the following items:"
+      "1 Fruit Blast (premade does not work). The fruit blast can also be made with the following items: 1 Cocktail shaker; 1 Cocktail glass; 2 Lemons, 1 pineapple, 1 orange"
     ],
     "rewards": [
       "1 quest point",
@@ -1783,7 +1783,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "supplies": [
       "4 cut sapphires (can be mined and cut during the quest if you have the recommended crafting level)",
-      "Equipment to cast Lvl-1 Enchant 8 times (one of the following):"
+      "Equipment to cast Lvl-1 Enchant 8 times (one of the following): 8 cosmic runes and 8 water runes; 8 cosmic runes and a staff that provides water runes, such as a staff of water; 8 Lvl-1 enchant tablets"
     ],
     "rewards": [
       "1 quest point",
@@ -1842,8 +1842,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "350 Farming XP",
       "350 Construction XP",
       "350 Summoning XP",
-      "Ability to cook and eat bacon, bacon stacks, piles, heaps and mounds.",
-      "Ability to make three pig familiars:",
+      "Ability to cook and eat bacon, bacon stacks, piles, heaps and mounds. Ability to create pork pie.; Ability to brew pigswill.",
+      "Ability to make three pig familiars: Spirit pack pig; Spirit prayer pig; Spirit war pig",
       "A customisable pig pet. The name can be changed by Martin the Master Gardener and type can be changed by changing the pig machine by right-clicking on it.",
       "Access to pig pens in Falador farm, Falador, Varrock, and East Ardougne",
       "Weekly raw bacon (55 pieces) or familiar reward claimable from Eli."
@@ -2305,8 +2305,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Build Chapel (Tier 1)"
     ],
     "supplies": [
-      "6 stone wall segments",
-      "12 willow frames",
+      "6 stone wall segments 24 limestone bricks",
+      "12 willow frames 144 willow planks",
       "24 limestone bricks to make stone wall segments",
       "144 willow planks to make willow frames"
     ],
@@ -2534,7 +2534,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       }
     ],
     "supplies": [
-      "Six steel weapons (cannot be +1 or off-hand versions):",
+      "Six steel weapons (cannot be +1 or off-hand versions): Steel dagger; Steel mace; 2 steel swords; Steel longsword; Steel warhammer",
       "75 steel nails",
       "Druid pouch containing at least 5 charges (You can bring the items without filling the pouch until needed, to ensure you have enough charges)",
       "6 normal planks (Protean planks do not work)"
@@ -2704,7 +2704,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "2,000 Herblore XP",
       "2 gold bars",
       "Ability to do specimen cleaning in Varrock Museum to obtain Kudos and a clean necklace",
-      "Talk to Terry Balando with either level 75 Magic, level 75 Ranged, or level 91 Constitution to obtain the Codex Ultimatus, which when read, unlocks 3 ancient abilities:",
+      "Talk to Terry Balando with either level 75 Magic, level 75 Ranged, or level 91 Constitution to obtain the Codex Ultimatus, which when read, unlocks 3 ancient abilities: Shadow Tendrils - An enhanced ability requiring level 75 Ranged; Smoke Tendrils - An enhanced ability requiring level 75 Magic; Ice Asylum - An ultimate ability requiring level 91 Constitution",
       "Talk to Marfet or Torrcs on the of Varrock Museum, who say you can re-obtain Teddy, by pickpocketing Katarina.",
       "Bring Seth Minas, located in the Archaeology Guild, the level 1, 2 and 3 certificates during or after the quest to receive a Fruit Blast or a chocolate cake.",
       "Ability to assemble the frozen key"
@@ -2756,7 +2756,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Nettle tea (a bowl of water and any pair of gloves will be required if you brew the nettle tea during the quest)",
       "Bucket of milk",
       "Ghostspeak amulet",
-      "3 randomly chosen standard dyes (to save time, bring three of each primary colour to mix as needed):"
+      "3 randomly chosen standard dyes (to save time, bring three of each primary colour to mix as needed): 3 red dye; 3 blue dye; 3 yellow dye"
     ],
     "rewards": [
       "2 quest points",
@@ -3308,8 +3308,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       }
     ],
     "supplies": [
-      "One agility potion (4)",
-      "Iron spear, steel spear, mithril spear, adamant spear, rune spear or dragon spear which will be consumed",
+      "One agility potion (4) You can combine lower dose potions to get to 4 doses; low-level Ironmen can do Temple Trekking to exchange yellow reward tokens for grimy toadflax",
+      "Iron spear, steel spear, mithril spear, adamant spear, rune spear or dragon spear which will be consumed A rune spear can be bought from Scavvo's Rune Store, iron to rune spears can be bought from the Warriors' Guild Armoury",
       "22 karambwanji (can be obtained during quest by fishing near hobgoblins)",
       "Karamjan rum (cannot be taken off the island nor teleported with)",
       "Seaweed (can be obtained during quest on beach west of Tai Bwo Wannai)",
@@ -3397,7 +3397,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "why": "Recipe for Disaster: Freeing Evil Dave is a subquest of Recipe for Disaster.",
     "requirements": [],
     "supplies": [
-      "Wily cat, cat, kitten, or lazy cat",
+      "Wily cat, cat, kitten, or lazy cat Overgrown cats won't work as they do not hunt rats; A kitten is not recommended as the chance of them catching a rat is a low 15% compared to 50% for a normal cat, and will take longer to complete",
       "Up to 10 bowls of stew (If you make no mistakes, you will not need more than 10 bowls. The Forester's Arms sells stew for 20 coins)."
     ],
     "rewards": [
@@ -3449,7 +3449,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "3 quest points",
       "5,000 Crafting XP lamp",
       "5,000 Magic XP lamp",
-      "Access to ingredients for strength potions in the New Varrock demon camp",
+      "Access to ingredients for strength potions in the New Varrock demon camp Only three strength potions may be made as the six ingredients, limpwurt root and red spiders' eggs, are obtained only once from looting the chest in the south-east corner of New Varrock",
       "Always: Darklight",
       "Always: 300 zemomarks"
     ],
@@ -3503,7 +3503,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "1,500 Agility XP",
       "500 Dungeoneering XP",
       "1,500 Combat XP lamp in a choice of either Attack, Strength, Defence, Constitution, Ranged, Magic or Necromancy",
-      "Jerrod's cape (override) and its permanent passive effects:",
+      "Jerrod's cape (override) and its permanent passive effects: 80% chance to note the items stolen from Bakery Stalls (works on free worlds); Replaces gem drops from the safes in the Rogues' Den with noted gems; Triples the amount of coins you get from the Rogues' Den; Coshing volunteers in the Thieves' Guild yield items from the rogue's pickpocket drop table",
       "Tiny Hazeel",
       "An upgraded Mask of Sliske - when worn in the head slot or carried in the pocket slot during combat, it will occasionally spawn an undead archer, who'll deal damage to your current target before dissipating.",
       "Access to the stalker dungeon"
@@ -3756,7 +3756,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "supplies": [
       "Swamp paste",
       "At least 5 rune essence or pure essence (the essence can break during the quest, so to be safe, bring 10-15)",
-      "Tools to access air, earth, water, fire, and mind altar by any means:",
+      "Tools to access air, earth, water, fire, and mind altar by any means: An air, an earth, a water, a fire and a mind talisman; An elemental and a mind talisman; An omni-talisman; Their corresponding tiaras; A wicked hood charged with any of above combinations will also work; Access to the Abyss",
       "Commorb (can be obtained during quest)"
     ],
     "rewards": [
@@ -4096,8 +4096,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "2,500 Construction XP",
       "2x 1,500 Skill XP lamps for a total of 3,000 Skill XP (Skill must be level 30 or higher)",
       "coins for returning Lady Henryeta's necklace, or from opening Sir Ceril's money pouch",
-      "Philipe's sweets:",
-      "Construction supplies:",
+      "Philipe's sweets: Contains 5 purple sweets",
+      "Construction supplies: 100 oak planks (worth); 30 teak planks (worth); 10 mahogany planks (worth)",
       "A treasure chest, containing a gold bar (the treasure chest itself can be used to create personal treasure hunts)",
       "Philipe's note"
     ],
@@ -4158,7 +4158,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Runes to cast Telekinetic Grab (1 law rune and 1 air rune)",
       "3 cut sapphires",
       "1 Redberry pie (not required if you have completed The Knight's Sword quest)",
-      "About 10 of each of the following items in your bank or metal bank, which may or may not be necessary for the timed delivery tasks. There is the Keldagrim bank and a metal bank access in Keldagrim, so you don't have to carry everything there. Once you're there, take the items out for use in the quest."
+      "About 10 of each of the following items in your bank or metal bank, which may or may not be necessary for the timed delivery tasks. There is the Keldagrim bank and a metal bank access in Keldagrim, so you don't have to carry everything there. Once you're there, take the items out for use in the quest. Clay (not soft clay); Copper ore; Tin ore; Iron ore; Silver ore; Gold ore; Mithril ore; Coal; Bronze bar; Iron bar; Silver bar; Gold bar; Steel bar; Mithril bar"
     ],
     "rewards": [
       "2 quest points",
@@ -4208,7 +4208,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "supplies": [
       "At least 3 free backpack spaces, however 8 is preferable",
-      "Magic, Ranged, or Necromancy gear to fight a level 28 H.A.M. ranger and a level 28 H.A.M. mage.",
+      "Magic, Ranged, or Necromancy gear to fight a level 28 H.A.M. ranger and a level 28 H.A.M. mage. They cannot be killed using Melee weapons. A crossbow and 50 bronze bolts can be found at their location.",
       "A light source (A bug lantern does not work)",
       "A rope (only if you have never entered the Lumbridge Swamp Caves from the surface before)"
     ],
@@ -4266,7 +4266,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "1 quest point",
-      "A total of experience:",
+      "A total of 8,500 Smithing experience: 2,000 Smithing XP from finishing the quest; A Book of knowledge worth 6,500 Smithing XP (two charges of 3,250 Smithing experience each)",
       "A total of 8,500 Defence XP (via two charges of 4,250 Defence XP from the Book of knowledge)",
       "50 noted pieces of coal",
       "Ability to smith elemental, mind and body bodies, along with body helmets and shields."
@@ -4373,7 +4373,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       }
     ],
     "supplies": [
-      "Access to a clockmaker's bench 3 or clockmaker's bench 4 (you can use a friend's house if you're not an ironman)",
+      "Access to a clockmaker's bench 3 or clockmaker's bench 4 (you can use a friend's house if you're not an ironman) Alternatively, 12 oak planks and 3 molten glass to make the clockmaker's bench 3 from scratch",
       "10 oak planks (protean planks and plank box will not work)",
       "10 steel nails",
       "Plank (protean and other types of planks do not work)",
@@ -4645,7 +4645,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "5 iron bars (cannot be noted)",
       "Ghostspeak amulet (the reward from completing the hard Morytania achievements will not work)",
       "Holy symbol",
-      "Polished buttons",
+      "Polished buttons level 15 Thieving to pickpocket from a H.A.M. Member or; Drop from H.A.M. Guard or; Obtained from digging at the Varrock Dig Site east of Varrock",
       "Hard leather",
       "20 ecto-tokens"
     ],
@@ -4656,7 +4656,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "1,000 Slayer XP",
       "2,500 Woodcutting XP",
       "Blessed hatchet",
-      "Ava's device (Ava's attractor if your Ranged level is less than level 50 Ranged or Ava's accumulator if it is 50 or higher)",
+      "Ava's device (Ava's attractor if your Ranged level is less than level 50 Ranged or Ava's accumulator if it is 50 or higher) If you get Ava's attractor and then later get level 50 Ranged, you can talk to Ava, who will upgrade it if you give her 75 steel arrows); Ava's accumulator ammunition pickup passive effect (requires level 50 Ranged)",
       "Access to Ava's Odds and Ends"
     ],
     "wiki": "Animal_Magnetism",
@@ -4848,7 +4848,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "3,500 Farming XP",
       "2,000 Attack XP",
       "1,000 Magic XP",
-      "Magic secateurs"
+      "Magic secateurs Wielding the magic secateurs, having them in the backpack or in the tool belt while harvesting allotments, herbs, hops and nightshades, increases the chance of saving a harvest life by 10%."
     ],
     "wiki": "A_Fairy_Tale_I_-_Growing_Pains",
     "questRequirements": [
@@ -4913,7 +4913,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "3,000 Farming XP",
       "1,500 Woodcutting XP",
       "4,000 Firemaking XP",
-      "Bomber jacket and bomber cap",
+      "Bomber jacket and bomber cap Gnome goggles from the Gnome Restaurant minigame can be combined with the bomber cap by talking to Auguste",
       "Access to the balloon transport system",
       "Ability to make origami balloons"
     ],
@@ -5078,8 +5078,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "A light source (such as a torch, mining helmet, bullseye lantern or Seer's headband)",
       "Rope",
       "One or two spools of thread",
-      "A weapon for each melee attack style - stab (sword), crush (mace) and slash (scimitar) (other styles work but are extremely inefficient)",
-      "A method of attacking with at least 4 range"
+      "A weapon for each melee attack style - stab (sword), crush (mace) and slash (scimitar) (other styles work but are extremely inefficient) For higher melee levelled players, all may not be needed",
+      "A method of attacking with at least 4 range A Bow or crossbow with ammo unless using chargebow (a shortbow and bronze arrows can be found during the quest); A magic weapon and runes; A necromancy weapon"
     ],
     "rewards": [
       "2 quest points",
@@ -5136,13 +5136,13 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       }
     ],
     "supplies": [
-      "Toadflax potion (unfinished)",
+      "Toadflax potion (unfinished) Ironmen can easily obtain a clean toadflax from the Brimhaven Agility Arena",
       "Goblin mail (any colour)",
       "Yellow dye",
       "Blue dye",
       "Orange dye",
       "Purple dye",
-      "Black mushroom ink (obtainable during the quest)",
+      "Black mushroom ink (obtainable during the quest) Empty vial (if you don't already have the black mushroom ink)",
       "Whitefish (obtainable during the quest)",
       "Raw slimy eel",
       "A light source",
@@ -5205,8 +5205,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "1 quest point",
       "30,000 Divination XP lamp",
       "30,000 Archaeology XP lamp",
-      "Order of Dis weapon cosmetic overrides",
-      "Infernal Puzzle Box tier 2 upgrade"
+      "Order of Dis weapon cosmetic overrides Order of Dis Blade and its off-hand variant; Order of Dis May(ce) and its off-hand variant",
+      "Infernal Puzzle Box tier 2 upgrade 45% reduced environmental damage within Infernus; 10% damage reduction in Wilderness; 5% increased damage dealt to monsters in the Wilderness"
     ],
     "wiki": "Daughter_of_Chaos",
     "questRequirements": []
@@ -5618,7 +5618,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "3x 2,000 Skill XP tome (Skill must be over level 30)",
       "Access to Meiyerditch",
       "A shortcut key, can be put on the steel key ring after One Small Favour",
-      "Access to the Burgh de Rott Ramble, which is the Temple Trekking minigame in reverse route."
+      "Access to the Burgh de Rott Ramble, which is the Temple Trekking minigame in reverse route. Ability to unlock the Burgh de Rott teleport for a games necklace with 500 companion levels from Temple Trekking."
     ],
     "wiki": "The_Darkness_of_Hallowvale",
     "questRequirements": [
@@ -5809,7 +5809,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       }
     ],
     "supplies": [
-      "45 logs of any kind that you have the Firemaking level to use, in 2 sets of 20 and 1 set of 5. The sets have to be of the same kind for the quest."
+      "45 logs of any kind that you have the Firemaking level to use, in 2 sets of 20 and 1 set of 5. The sets have to be of the same kind for the quest. Regular logs are enough for the quest, which can be cut from nearby trees.; Some logs like acadia logs, corrupted magic logs, and eternal magic logs will not properly work.; You may refer to All Fired Up (minigame)#Lighting the beacons."
     ],
     "rewards": [
       "1 quest point",
@@ -5857,7 +5857,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       }
     ],
     "supplies": [
-      "Clockwork suit",
+      "Clockwork suit 1 silk, 1 plank and 1 clockwork to make one",
       "8 silk",
       "4 normal planks (protean planks do not work)",
       "1 thread",
@@ -5968,7 +5968,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Ectoplasm",
       "Necromancy weapons, including a conduit",
       "Bucket",
-      "Items for the empower vessel ritual:"
+      "Items for the empower vessel ritual: 11 basic ghostly ink; 2 regular ghostly ink; 4 light sources"
     ],
     "rewards": [
       "1 quest point",
@@ -6125,7 +6125,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "1,000 Thieving XP",
       "9,000 Crafting XP",
       "Able to buy pink dye from Betty",
-      "Bert will ship 294 buckets of sand to your bank if you talk to him after the quest. This can be done once per week. Clicking on the quest's name will give you the time left before you can ask him again."
+      "Bert will ship 294 buckets of sand to your bank if you talk to him after the quest. This can be done once per week. Clicking on the quest's name will give you the time left before you can ask him again. This number is increased to 420 after completing the Elite Ardougne achievements."
     ],
     "wiki": "The_Hand_in_the_Sand",
     "questRequirements": []
@@ -6169,9 +6169,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Requires 44 quest points."
     ],
     "supplies": [
-      "An oil-filled bullseye lantern",
+      "An oil-filled bullseye lantern This can be obtained from the Lorehound with the 50 quest point upgrade",
       "A cut sapphire",
-      "A rope, if it is your first time accessing Lumbridge Swamp Caves, and you are not accessing it through the Lumbridge Castle entrance."
+      "A rope, if it is your first time accessing Lumbridge Swamp Caves, and you are not accessing it through the Lumbridge Castle entrance. This can be obtained from the Lorehound with the 50 quest point upgrade"
     ],
     "rewards": [
       "1 quest point",
@@ -6239,7 +6239,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Combat gear (Necromancy or two different combat styles recommended for lower-level players)",
       "10 nails (obtained during quest from Flaygian)",
       "1 coal (can be obtained during the quest)",
-      "Items to use Lvl-2 Enchant:",
+      "Items to use Lvl-2 Enchant: Lvl-2 enchant tablet (if not on the standard spellbook) or;; 1 cosmic rune and 3 air runes (can be obtained during the quest)",
       "1 mithril bar (can be obtained during the quest, metal bank works)",
       "1 silver bar (can be obtained during the quest, metal bank works)",
       "1 silver sickle (b) (can be obtained during the quest)",
@@ -6308,7 +6308,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "5,000 Smithing XP lamp",
       "5,000 Defence XP lamp (Skill must be level 30 or higher)",
       "Adamant pickaxe + 2",
-      "Players may keep their gold helmet and access the Arzinian Mine, where 146 gold rocks and veins can be found."
+      "Players may keep their gold helmet and access the Arzinian Mine, where 146 gold rocks and veins can be found. A dwarven boatman due east of the mine will bank the player's gold ore for a small fee; He keeps 20% of the ores, rounded up, or 10% if the player has the ring of charos (a)."
     ],
     "wiki": "Between_a_Rock...",
     "questRequirements": [
@@ -6348,14 +6348,14 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       }
     ],
     "supplies": [
-      "14 maple frames",
-      "6 stone wall segments"
+      "14 maple frames 168 maple planks",
+      "6 stone wall segments 24 limestone bricks"
     ],
     "rewards": [
       "1 quest point",
       "Ability to build all three tiers of the Fort Forinthry Guardhouse and Grove.",
       "The Raptor will operate as a Slayer master inside Fort Forinthry.",
-      "Access to the crypt north of Fort Forinthry, containing two new slayer monsters:"
+      "Access to the crypt north of Fort Forinthry, containing two new slayer monsters: Risen ghost, requiring 85 Slayer.; Armoured phantom, requiring 113 Slayer."
     ],
     "wiki": "Unwelcome_Guests",
     "questRequirements": [
@@ -6478,7 +6478,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "supplies": [
       "3 rune bars",
-      "2 runite stone spirits",
+      "2 runite stone spirits The stone spirits must not be in an ore box. They must be in the backpack.",
       "10 mind runes",
       "10 gleaming energy",
       "Old necklace or necklace of Charos (obtainable during the quest)",
@@ -6580,7 +6580,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "supplies": [
       "Two 5 granite blocks (can be obtained during the quest, with level 45 Mining)",
       "A total of 52 of sandstone (any combination will work as long as the number adds up to exactly 32 and 20 in separate sets; sandstone can be cut into smaller pieces if required. It's recommended to get 10 blocks of 5 and one block of 2)",
-      "One of the following (burnt versions do not work):",
+      "One of the following (burnt versions do not work): Bread; Any kind of pie (partial pies and mince pie will not work); Any kind of cake (partial cakes, RS Anniversary cake, mint cake, and cheesecakes will not work); Any kind of pizza (partial pizza do not work); A baked potato with topping",
       "A wand or staff with air and fire runes to cast an air and fire spell (standard spellbook required)",
       "A white candle (a black candle or a red candle will not work)",
       "Logs",
@@ -6858,7 +6858,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "requirements": [],
     "supplies": [],
     "rewards": [
-      "Two lore books:"
+      "Two lore books: Colossi & the time of colossi, written by Charos as Reldo, that details some aspects of colossi.; Reldo's ages seventeenth edition, written by Reldo and revised by Charos, that details major events that define the Ages of Gielinor.; This 17th edition is updated with discoveries found with the expedition to Anachronia."
     ],
     "wiki": "Desperate_Creatures",
     "questRequirements": [
@@ -6905,7 +6905,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "A holy symbol",
       "Ring of charos",
       "38+ nails of any kind over bronze (the nails have a chance to accidentally bend, so it is recommended to bring more)",
-      "10 wooden cats",
+      "10 wooden cats Can be crafted with 10 bear fur and 10 planks (requires partial completion of quest, protean planks do not work)",
       "8 regular planks (cannot be used from within plank box)",
       "A hammer (tool belt does not work)",
       "A tinderbox (tool belt does not work, obtainable during quest)"
@@ -6978,8 +6978,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Harralander potion (unfinished)",
       "Fishing rod (can be obtained during the quest)",
       "Fishing bait if baitless fishing is not unlocked (can be obtained during the quest)",
-      "For completing the quest solo:",
-      "For completing the quest with a partner:"
+      "For completing the quest solo: Multiple lockpicks in case of failure, or a hair clip, or master thief's lockpick (tool belt works); Either one (you may switch your gang): Black Arm Gang members: black full helm, platebody and platelegs (plateskirt will not work; trimmed armour versions also do not work); Phoenix Gang members: or ring of charos (a)",
+      "For completing the quest with a partner: Black Arm Gang members: black full helm, platebody and platelegs (plateskirt will not work); Phoenix Gang members: ranged or magic weapons"
     ],
     "rewards": [
       "1 quest point",
@@ -7057,7 +7057,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "6 molten glass (can be noted)",
       "12 magic logs (can be noted)",
       "6 steel bars (can be noted)",
-      "Cake (a slice, or full)",
+      "Cake (a slice, or full) Alternatively, chocolate cake, chocolate bar, cooking apple, or pineapple pizza",
       "Face mask (can be replaced by masked earmuffs, a slayer helmet, a full slayer helmet, or a gas mask)",
       "Garlic",
       "Up to 100 lockpicks (the lower your Thieving level, the more lockpicks you may require), hair clips, or a master thief's lockpick (which has no chance of breaking)",
@@ -7070,10 +7070,10 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "rewards": [
       "3 quest points",
       "20,006 Magic XP",
-      "Ability to use Ancient Magicks",
+      "Ability to use Ancient Magicks You can now also pray either at the pyramid altar or the elven grimoire in Prifddinas (after completing Plague's End) and change between the standard and Ancient Magicks spellbooks. You can also enter the altar room by accessing the back-door of the pyramid. Changing spellbooks at the altar will drain your prayer to 0.",
       "Ring of visibility (can be re-obtained from Rasolo for free)",
       "Access to the Smoke Dungeon via the well entrance",
-      "Access to the Zarosian gravestone",
+      "Access to the Zarosian gravestone Also requires completion of the quest The Giant Dwarf",
       "The Bandit Camp lodestone is now automatically unlocked upon completion",
       "Ability to wield an ancient staff, and buy one from Eblis for 80,000 coins"
     ],
@@ -7245,7 +7245,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "12,500 Fletching XP",
       "11,556 Crafting XP",
       "5 phoenix quills worth",
-      "Access to the Phoenix Lair"
+      "Access to the Phoenix Lair Killing the Phoenix to get 2 phoenix quills each time; The chance to receive a phoenix eggling pet; Raising the pet requires level 72 Summoning. Players without the required level will receive a phoenix egg instead, which they can later hatch once the requirements are met."
     ],
     "wiki": "In_Pyre_Need",
     "questRequirements": []
@@ -7300,7 +7300,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "supplies": [
       "Ghostspeak amulet or cramulet (unless the player has claimed the reward for completing the hard Morytania achievements)",
       "Jennica's ring",
-      "At least 1 Summoning pouch made with a blue charm. (Bring more in case you make a mistake)"
+      "At least 1 Summoning pouch made with a blue charm. (Bring more in case you make a mistake) The lowest level pouches are: Albino rat pouch , Spirit kalphite pouch  and Giant chinchompa pouch; For Ironman, Albino rat pouches are easily obtainable, as their tertiary ingredient, raw rat meat, can be bought in bulk from the Rufus's Meat Emporium in Canifis or obtained by killing giant rats."
     ],
     "rewards": [
       "1 quest point",
@@ -7349,7 +7349,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       }
     ],
     "supplies": [
-      "Items to get through the Underground Pass (other items can be banked until the lodestone is active):",
+      "Items to get through the Underground Pass (other items can be banked until the lodestone is active): A bow (excluding all chargebows); A few of bronze, iron, steel, mithril, adamant, rune, dragon, or dark arrows; A plank (can be obtained in the underground pass); 1-5 ropes (you won't necessarily use all of them)",
       "Limestone (limestone bricks will not work)",
       "6-30 pieces of coal (coal in an orebox will not work)",
       "An empty pot (can be obtained in the elf camp)",
@@ -7497,12 +7497,12 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       }
     ],
     "supplies": [
-      "Ores (can be noted) depending on your Mining level:",
+      "Ores (can be noted) depending on your Mining level: 8 tin ores if between 1-10; 7 coal if between 11-54; 6 mithril ores if 55+",
       "Raw tuna",
       "8 ropes",
       "8 split logs",
-      "Yak-hide armour",
-      "Fremennik round shield"
+      "Yak-hide armour 3 cured yak-hides; Thread spool",
+      "Fremennik round shield Bronze nail; Rope"
     ],
     "rewards": [
       "1 quest point",
@@ -7603,7 +7603,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Runes for two casts of any Charge Orb spell (bring more to be safe)",
       "Lockpick, hair clip or a master thief's lockpick (tool belt works)",
       "Unaugmented rune hatchet or better (tool belt works; the hatchet might have to be used on the item)",
-      "Runes, depending on your version of RuneScape:"
+      "Runes, depending on your version of RuneScape: English: 1 soul, mind, earth, and 2 law runes; German: 1 air, blood, nature, and 2 earth runes; French: 1 law, air, death, mind, and blood rune; Portuguese: 1 fire, water, earth, air, and law rune"
     ],
     "rewards": [
       "4 quest points",
@@ -7775,10 +7775,10 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Free access to the Zanaris Market",
       "Ability to use the fairy rings and get into Zanaris without a dramen or lunar staff.",
       "Ability to fetch teeth to get a Tooth creature by speaking to the Tooth Fairy after the quest.",
-      "Ability to have gardeners keep your farming patches weed free. First, talk to Martin the Master Gardener after the quest, then talk to a gardener at one of the patches.",
+      "Ability to have gardeners keep your farming patches weed free. First, talk to Martin the Master Gardener after the quest, then talk to a gardener at one of the patches. If any patch has preexisting weeds, you'll have to remove them before this takes effect.",
       "Access to a new battle area in Ork's Rift, which contains cursed Ivory Bre'egth, cursed Ivory Gromblod, and cursed Ivory Shredflesh.",
       "Ability to sell suqah teeth to the Tooth Fairy for each. You can also sell her old teeth, monkey dentures, and kebbit teeth, for amounts ranging from to.",
-      "Access to Mos Le'Harmless through K'Chunk's island; accessible from fairy ring code."
+      "Access to Mos Le'Harmless through K'Chunk's island; accessible from fairy ring code. Requires 8 planks and 16 of any type of nail to repair the bridge which must be repaired from both sides."
     ],
     "wiki": "A_Fairy_Tale_III_-_Battle_at_Ork's_Rift",
     "questRequirements": [
@@ -7892,11 +7892,11 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Four spears of the same type (bone spears work; poisoned spears and leaf-bladed spears do not work)",
       "8 achey tree logs",
       "15-30 eucalyptus logs (If you don't make any mistakes in the logic section, 20 is more than enough)",
-      "2 raw chompy",
+      "2 raw chompy Available to be caught in the ogre chompy hunting area, which requires partial completion of Big Chompy Bird Hunting. If hunting, remember to bring an ogre comp or a plain ogre bow, ogre arrows and ogre bellows",
       "8 stripy feathers (available from the tropical wagtails in the hunting area to the north of Oo'glog)",
       "4 wolf bones (available from killing the wolves outside Oo'glog)",
       "8 larupia furs (tatty or perfect, available from pit-fall hunting Larupia in the hunting area to the north of Oo'glog)",
-      "Each of the following plants found near Oo'glog:",
+      "Each of the following plants found near Oo'glog: 11-14 fever grass; 7-11 lavender; 6 primweed; 6 stinkbloom; 8-12 tansymum",
       "Some logs of any kind for traps"
     ],
     "rewards": [
@@ -7908,7 +7908,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Access to the spa facilities",
       "Access to the Oo'glog bank",
       "Access to the Oo'glog Hunter area",
-      "Access to the platypus summoning pet (requires level 10 Summoning).",
+      "Access to the platypus summoning pet (requires level 10 Summoning). If you release your pet in the spot you released the others during the quest you will receive another casket or oyster",
       "Access to the Fresh Meat shop",
       "Access to the Gift Shop",
       "Ability to travel to Oo'glog using the charter ships",
@@ -7965,11 +7965,11 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Cooked swordfish",
       "2 cut rubies",
       "Antipoison or super antipoison, any number of doses",
-      "Either one to defeat Chronozon:"
+      "Either one to defeat Chronozon: Runes, magic weapon and standard spellbook to cast Air, Water, Earth, and Fire Blast which require level 59 Magic; A deathtouched dart can be used instead of Magic to kill Chronozon"
     ],
     "rewards": [
       "1 quest point",
-      "Family gauntlets, which can then be enchanted into chaos, cooking, or smelting gauntlets."
+      "Family gauntlets, which can then be enchanted into chaos, cooking, or smelting gauntlets. To change the enchantment on the gauntlets, use the right-click switch option for each time. To own all three versions simultaneously, first speak with Dimintheis about buying new steel gauntlets, then visit the other two respective brothers and pay them each.; If players drop or destroy the family gauntlets immediately upon receiving them to reclaim them from Dimintheis, Dimintheis gives back both the cooking and smelting gauntlets. This may be a way to only have to pay 1,000,000 coins for the chaos gauntlets if desired."
     ],
     "wiki": "Family_Crest",
     "questRequirements": []
@@ -8070,8 +8070,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "supplies": [
       "Vial (not necessary if you already have a vial of red mist)",
-      "500 zemomarks for:",
-      "To get the code (not necessary on replays as it will show when unlocking the door):"
+      "500 zemomarks for: If unlocked, the New Varrock Zombie cosmetic override works in place of wearing the items (unlocked with silver pennies from Aris' reward shop from finishing the quest series).; Zombie mask; Zombie shirt; Zombie trousers; Zombie gloves; Zombie boots",
+      "To get the code (not necessary on replays as it will show when unlocking the door): 3 tin ores; 4 fire runes (or a fire staff); 1 nature rune"
     ],
     "rewards": [
       "2 quest points",
@@ -8216,7 +8216,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "1 mahogany log",
       "1 barrel of naphtha",
       "1 piece of bear fur †",
-      "Red, yellow, blue, and green dye †",
+      "Red, yellow, blue, and green dye † Or at least 30 coins to buy them from Oronwen during the quest (it is advised to get 3-4 of each)",
       "1 rotten apple †",
       "An empty barrel †",
       "ogre bellows †"
@@ -8322,7 +8322,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "25,000 Herblore XP lamp",
       "25,000 Crafting XP lamp",
       "25,000 Smithing XP lamp",
-      "25,000 Agility XP lamp",
+      "25,000 Agility XP lamp If you do not have four free backpack spaces, you must speak to Major Mary Rancour at her post in Burthorpe to claim the lamps.",
       "Access to a new Barrows sister, Linza the Disgraced, and her equipment"
     ],
     "wiki": "Kindred_Spirits",
@@ -9014,7 +9014,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "2 quest points",
       "5,000 Magic XP",
       "5,000 Runecrafting XP",
-      "Full access to Lunar Isle",
+      "Full access to Lunar Isle Use of the Astral altar; Access to Livid Farm; Ability to buy astral runes from Baba Yaga",
       "Ability to use Lunar Spells",
       "A set of Lunar equipment (obtained during quest)",
       "50 astral runes",
@@ -9054,7 +9054,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "why": "Dream Mentor is a quest in the Fremennik quest series that takes place on Lunar Isle. It involves helping the adventurer Cyrisus literally overcome his fears and doubts of combat using oneiromancy.",
     "requirements": [],
     "supplies": [
-      "3 different kinds of food: 6 of 1 type and 7 of 2 others for a total of 20 pieces.",
+      "3 different kinds of food: 6 of 1 type and 7 of 2 others for a total of 20 pieces. Purple sweets, roast potatoes, mince pies, yule logs, and mint cakes cannot be used; stackable foods, such as holy biscuits, will be counted as a single piece of food; cake can be used in all 3 pieces.; An easy way to acquire the food items is to use the lodestone teleport to Port Sarim, which brings you right next to the Wydin's Food Store, and then lodestone teleport right back to Lunar Isle.; Cabbages, onions, and raw potatoes can be found within Rellekka. To use fewer backpack space, you can fill the vegetables into empty sacks, or alternatively bring uncut pineapples.",
       "1 astral rune"
     ],
     "rewards": [
@@ -9062,7 +9062,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "15,000 Constitution XP",
       "10,000 Magic XP",
       "15,000 Combat XP lamp in one of: Strength, Ranged, Magic, Constitution, or Defence",
-      "9 new spells added to the Lunar spellbook:",
+      "9 new spells added to the Lunar spellbook: Monster Examine; Humidify; Hunter Kit; Stat Spy; Superglass Make; Dream; Plank Make; Spin Flax; Spellbook Swap",
       "Access to the 'Random' option on NPC Contact"
     ],
     "wiki": "Dream_Mentor",
@@ -9131,8 +9131,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "15,000 Magic XP",
       "10,000 Prayer XP",
       "10,000 Fishing XP",
-      "Access to the Piscatoris Fishing Colony",
-      "Can get the following items from Malignius Mortifer upon request:",
+      "Access to the Piscatoris Fishing Colony Able to fish monkfish; Able to use Skeletal mages for training; Seaweed spawns; Bank and obelisk very close by",
+      "Can get the following items from Malignius Mortifer upon request: Bone seeds (requires pot and pot lid)",
       "Able to transmute raw bass into raw monkfish"
     ],
     "wiki": "Swan_Song",
@@ -9251,8 +9251,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Zombie shirt",
       "Zombie trousers",
       "Zombie gloves",
-      "Zombie boots",
-      "After starting a new replay, these items are either given or not necessary:"
+      "Zombie boots The cosmetic override reward from the quest series also works.",
+      "After starting a new replay, these items are either given or not necessary: 3 Vials of red mist; Lockpick; Mithril crossbow (the enhanced grappling hook in tool belt does not work); Mithril grapple; Onion; 2 vials of water"
     ],
     "rewards": [
       "1 quest point",
@@ -9481,9 +9481,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       }
     ],
     "supplies": [
-      "3 pieces of pirate clothing",
+      "3 pieces of pirate clothing You can buy pirate clothing from Dodgy Mike in Mos Le'Harmless, east of the bank",
       "Book o' piracy (can be obtained during quest)",
-      "The following items are required, but will need to be retrieved from your bank once you escape prison as you will be forced to deposit all of your worn/inventory items before the Customs Sergeant will send you to jail:",
+      "The following items are required, but will need to be retrieved from your bank once you escape prison as you will be forced to deposit all of your worn/inventory items before the Customs Sergeant will send you to jail: Fishbowl helmet; Diving apparatus; Ghostspeak amulet (or cramulet) (unless you have completed the Hard Morytania achievements); 2 rolls of bronze wire; Charcoal (can be obtained during quest)",
       "20 coins (or more, depending on how you travel to Port Phasmatys)"
     ],
     "rewards": [
@@ -9717,9 +9717,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "26,000 Hunter XP",
       "8,000 Thieving XP",
       "Any loot you got from the wreckages, up to six items",
-      "Wieldable fishing nets after speaking to Jones",
+      "Wieldable fishing nets after speaking to Jones Small cast net; Big cast net",
       "The option to hunt the Thalassus 10 more times for a total of 46,660 Hunter XP",
-      "8 new deposit boxes in the following locations:"
+      "8 new deposit boxes in the following locations: North-west of Bedabin Camp; South of Elf Camp; West coast of Harmony Island; West coast of Mort Myre Swamp; Piscatoris - south of the Piscatoris falconry area; North-east of Pollnivneach; South coast of Ape Atoll; South of Brimhaven"
     ],
     "wiki": "Deadliest_Catch",
     "questRequirements": [
@@ -9854,7 +9854,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Mining XP lamp (30,000 Mining XP)",
       "Divination XP lamp (30,000 Divination XP)",
       "Magical meteorite chunk",
-      "Access to Zolarea",
+      "Access to Zolarea Access to meteorites for meteorite chunks, which can be crushed into dust to create meteorite cannonballs that deal 150% damage. Requires level 85 Mining to mine, 85 Crafting to crush, and 85 Smithing to smith the cannonballs.; Access to a new single flower patch with +25% yield when growing Starbloom.",
       "5% increased experience when mining shooting stars",
       "500 stardust"
     ],
@@ -10170,7 +10170,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "supplies": [
       "Adamant pickaxe (or better), or a melee weapon if the pickaxe is on the tool belt.",
-      "Melee, magic or ranged armour, weapons, potions, and food."
+      "Melee, magic or ranged armour, weapons, potions, and food. Necromancy does not work on TokTz-Ket-Dill.; A dwarf multicannon is not allowed in all encounters.; Summoning familiars are not allowed in last encounter."
     ],
     "rewards": [
       "2 quest points",
@@ -10292,7 +10292,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "50,000 Slayer XP",
       "50,000 Magic XP",
       "50,000 Combat XP lamp (requires level 75 in the chosen skill to use) in one of: Attack, Strength, Defence, Constitution, Ranged, Magic, Necromancy, Prayer or Summoning",
-      "Four new Ancient Magicks spells",
+      "Four new Ancient Magicks spells Smoke Cloud; Animate Dead; Exsanguinate; Incite Fear",
       "Ability to create a pontifex shadow ring"
     ],
     "wiki": "City_of_Senntisten",
@@ -10507,7 +10507,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
-      "Experience in 10 skills (if you lose any of the reward lamps for any reason, you will not be able to re-obtain them):",
+      "Experience in 10 skills (if you lose any of the reward lamps for any reason, you will not be able to re-obtain them): 50,000 Agility XP lamp; 50,000 Construction XP lamp; 50,000 Crafting XP lamp; 50,000 Dungeoneering XP lamp; 50,000 Herblore XP lamp; 50,000 Mining XP lamp; 50,000 Prayer XP lamp; 50,000 Ranged XP lamp; 50,000 Summoning XP lamp; 50,000 Woodcutting XP lamp",
       "Access to the city of Prifddinas",
       "The title",
       "The Trahaearn exoskeleton set, which inherits the benefits of the black ibis outfit if previously owned, and also provides a set bonus.",
@@ -10642,7 +10642,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Lantern lens",
       "Mort myre fungus (can be obtained during the quest)",
       "Unpowered orb",
-      "Ring of charos (a)",
+      "Ring of charos (a) or 5,000 coins",
       "Equipment to enter the Black Knights' Fortress",
       "Runes to cast the NPC Contact spell four times (8 air runes, 4 astral runes, and 4 cosmic runes)",
       "Runes for any charge orb spell (30 runes of a chosen element and three cosmic runes)",
@@ -10654,7 +10654,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "5,000 coins",
       "A lump of dragon metal",
       "4 × 100,000 experience from Idria, in any skill that is at least 65.",
-      "Opportunity to loot Movario's base.",
+      "Opportunity to loot Movario's base. 100 magic logs, 100 coal, 100 fire runes, and 100 death runes; all items are in their un-noted form.; A strange key teeth and a strange key loop",
       "Opportunity to kill tormented demons for dragon metal pieces, dragon claw and dragon limbs.",
       "A new pet – Broav.",
       "A set of elite black armour",
@@ -10705,7 +10705,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "3 static lamps granting 50,000 Combat XP each in any combat skill at or above level 65 (you may destroy them and get them back from the High Druid)",
       "Glossy lamp granting 110,000 Slayer XP, requiring Slayer (if you do not have Slayer, you can destroy it and get it back from the High Druid)",
       "Pale lamp granting 250,000 Prayer XP, requiring Prayer (if you do not have Prayer, you can destroy it and get it back from the High Druid)",
-      "4 new ultimate combat abilities",
+      "4 new ultimate combat abilities Death's Swiftness (Ranged); Sunshine (Magic); Natural Instinct (Defence); Guthix's Blessing (Constitution)",
       "Juna's Gift, Azzanadra's Gift, or Zilyana's Gift (may be changed to either of the three versions for free after the quest by talking to the High Druid)",
       "Access to Guthixian ruins, where you can offer chronicle fragments for Divination experience",
       "Access to the memory of Naragun using fairy ring with code"
@@ -10755,7 +10755,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "2 quest points",
-      "The Balmung, a two-handed melee weapon with special passive abilities when used against dagannoths (enhanced through the Koschei's Troubles miniquest);",
+      "The Balmung, a two-handed melee weapon with special passive abilities when used against dagannoths (enhanced through the Koschei's Troubles miniquest); 25% (45%) extra damage with auto attacks (15% (35%) against Dagannoth Supreme); 12.5% (22.5%) extra damage with with abilities (7.5% (17.5%) against Dagannoth Supreme); 30% (45%) increase in hit chance",
       "450,000 Combat XP (3x 150,000 Combat XP) in either Attack, Defence, Strength, Constitution, Ranged, Magic or Prayer (Skill must be level 75 or higher; speak to Chieftain Brundt to receive this)",
       "Access to Dagannoth guardians",
       "Both the Dagannoth Mother and her sentinels can be faced in the Dominion Tower"
@@ -10812,7 +10812,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "supplies": [
       "Rope",
-      "Enough fishing bait (20-30 recommended) to catch 1 beltfish or activation of Tier 1 prawn perks",
+      "Enough fishing bait (20-30 recommended) to catch 1 beltfish or activation of Tier 1 prawn perks Some bait can be obtained during the quest from Meena's Fishing Shop",
       "Cat (or kitten)",
       "At least 28,000 coins for buying croc ice"
     ],
@@ -10914,7 +10914,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "76,000 Constitution XP",
       "The Book of Char: When activated in the off-hand slot, it causes fiery orbs to spin around the player, spontaneously igniting any log the player walks/runs over.",
       "Access to two new events and a new Firemaker's costume in Balthazar Beauregard's Big Top Bonanza.",
-      "Access to Char's training cave (with level 91 or higher Firemaking)."
+      "Access to Char's training cave (with level 91 or higher Firemaking). Ability to collect the four fire creature pets (Warming Flame, Twisted Firestarter, Glowing Ember, and Searing Flame)."
     ],
     "wiki": "The_Firemaker's_Curse",
     "questRequirements": []
@@ -11054,11 +11054,11 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "20,000 Crafting XP",
       "25,000 Slayer XP",
       "35,000 Magic XP",
-      "150,000 Skill XP tome (3x 50,000 Skill XP - Skill must be level 60 or higher)",
+      "150,000 Skill XP tome (3x 50,000 Skill XP - Skill must be level 60 or higher) Only 75,000 Skill XP is granted if used on elite skills (3x 25,000 Skill XP)",
       "Access to Darkmeyer",
       "Ability to fletch and use Blisterwood weapons",
       "Darkmeyer outfit (can be put into a Fancy dress box in a Player-owned house)",
-      "A new title depending on your status bar progress",
+      "A new title depending on your status bar progress (0–24%); (25–49%); (50–99%); / (100%)",
       "Drakan's medallion, allowing teleportation to various places in Morytania (Barrows, Burgh de Rott, Meiyerditch, Darkmeyer and Meiyerditch tunnels).",
       "Ability to receive Vyrewatch as a Slayer task from Chaeldar, Sumona, Duradel or Lapalok, Kuradal, Morvran, and Laniakea.",
       "Access to a Bloodwood tree outside the Arboretum."
@@ -11234,9 +11234,9 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Access to a new Barrows brother, Akrisae the Doomed, and his equipment.",
       "Access to a banite ore mining site, the spell Tune Bane, and the ability to fletch bane arrows and bane bolts.",
       "Access to the Glacor Cave and the fairy ring. After entering the cave, the Stone of Jas will give the player a 3-6% damage bonus in the surrounding area.",
-      "Glacors will now drop Shards of Armadyl, which can be used to craft Armadyl runes and the Armadyl battlestaff.",
+      "Glacors will now drop Shards of Armadyl, which can be used to craft Armadyl runes and the Armadyl battlestaff. Ability to create Armadyl runes and the Armadyl battlestaff.",
       "Access to the spell Storm of Armadyl",
-      "Access to the Mahjarrat Ritual Site and the majority of Zemouregal's fort.",
+      "Access to the Mahjarrat Ritual Site and the majority of Zemouregal's fort. Returning to the ritual site and speaking to Arrav near the location of the northern beacon will grant the player 3,000 Prayer XP.",
       "Access to a Bloodwood tree south of the Ritual Plateau.",
       "Completing this quest and Fate of the Gods unlocks rune dragons through the World Gate."
     ],
@@ -11305,7 +11305,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "75,000 Agility XP",
       "50,000 Summoning XP",
       "The Shard of Zaros, which when equipped grants protection from all factions in the God Wars Dungeon",
-      "Access to Freneskae via the World Gate",
+      "Access to Freneskae via the World Gate The ability to fight bladed, force, and throwing muspah in the Cradle; The ability to fight blood, shadow, ice, and smoke nihil in the Pit; Access to the Elder Halls, with a level Divination training spot; The ability to collect elder energy and to create portents of degradation, signs of death, and portents of death, as well as elder charm summoning pouches",
       "Access to rune dragons (requires completion of the quest Ritual of the Mahjarrat also)"
     ],
     "wiki": "Fate_of_the_Gods",
@@ -11553,7 +11553,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "50,000 Construction XP Construction Lamp",
       "50,000 Mining XP Mining Lamp",
       "50,000 Woodcutting XP Woodcutting Lamp",
-      "50,000 Combat XP Combat lamp",
+      "50,000 Combat XP Combat lamp If your inventory space is full, the lamps can be claimed from your respective Soul Wars host, depending on your choice at the end of the quest.",
       "Invention blueprints for soul-in-a-box and urn enhancer, both of which require level 24 Invention.",
       "Access to Memory of Nomad, a Distraction & Diversion"
     ],
@@ -11664,7 +11664,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "50,000 Slayer XP",
       "50,000 Hunter XP",
       "The Tome of xp 4th ed with 3 charges, each charge giving 75,000 XP in a chosen skill at or above level 75",
-      "The ability to craft more types of blisterwood weapons.",
+      "The ability to craft more types of blisterwood weapons. This is granted early in the quest when you first talk to Veliaf Hurtz inside the Arboretum.",
       "Sunspear, a weapon that automatically burns vyrewatch corpses when you kill vyrelords/ladies (this doesn't count toward your achievements)",
       "The House Drakan outfit",
       "Drakan Wings",
@@ -11731,7 +11731,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Trahaearn exoskeleton set",
       "Grand defence potion (6) (only a 6 dose potion will work)",
       "3 light cores",
-      "Access to the Baxtorian Falls resource dungeon:"
+      "Access to the Baxtorian Falls resource dungeon: Glarial's amulet; Rope; Alternatively, the hoardstalker ring or Dungeoneering cape can be used to teleport there if you've accessed it before, removing the need for amulet and rope."
     ],
     "rewards": [
       "2 quest points",
@@ -11744,7 +11744,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "90,000 Divination XP Divination lamp",
       "Access to Seren spells in the Ancient Magicks spellbook",
       "Access to Seren prayers in the Ancient Curses",
-      "Access to Tarddiad, containing:"
+      "Access to Tarddiad, containing: Crystal Shapeshifters, Slayer creatures.; Solid crystals, Mining locations.; Branching crystals, Woodcutting locations.; Floating crystals, Fishing locations.; Crystal armour, bought from Angof's Crystal Armour Shop."
     ],
     "wiki": "The_Light_Within",
     "questRequirements": [
@@ -11780,7 +11780,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "supplies": [],
     "rewards": [
       "2 quest points",
-      "300,000 Skill XP journal (3x 100,000 Skill XP - Skill must be level 75 or higher)",
+      "300,000 Skill XP journal (3x 100,000 Skill XP - Skill must be level 75 or higher) Only 150,000 Skill XP is granted if used on elite skills (3x 50,000 Skill XP)",
       "100,000 Agility XP",
       "100,000 Divination XP",
       "Shard of Mah",
@@ -11969,13 +11969,13 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "why": "Sliske's Endgame is the finale to the Sliske's Game quest series, released on 19 December 2016. It involves the culmination of Sliske's plan, reaching as far back as the assassination of Guthix.",
     "requirements": [],
     "supplies": [
-      "A disguise with which to enter the Black Knights' Fortress"
+      "A disguise with which to enter the Black Knights' Fortress Alternatively, the Dulcin armour cosmetic override or the teleport option on the Skull of Remembrance can be used; Alternatively, the Communication device from Dishonour among Thieves may be used to teleport to Zamorak"
     ],
     "rewards": [
       "3 quest points",
       "Tiny Sliske bobblehead pet",
       "Five stone-touched lamps, giving 250,000 experience each on a skill of at least level 85 (125,000 experience on elite skills)",
-      "A set of skilling items:",
+      "A set of skilling items: A hunter's Catalyst fragment, which resets several hunter traps if they fail to catch any prey.; A runecrafter's Catalyst fragment, which halves the degradation rate of runecrafting pouches.; A farmer's Catalyst fragment, which allows the player to cure diseased herbs for free while also providing Farming experience and Herblore experience in the form of shadow-infused herbs.; The Ring of Whispers that gives a bonus to gathering skills.; The Necklace of Shadows that stops familiars draining Summoning points after they have initially been summoned.; A set effect of a manifested knowledge randomly spawning and providing bonus experience when all three items (after combining the Catalyst fragments into the combined Catalyst fragment) are worn.",
       "The Agent of the Eldest outfit after replaying the quest the first time",
       "A medium prismatic lamp after replaying the quest"
     ],
@@ -12030,7 +12030,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Rope",
       "Raw fish",
       "Law rune",
-      "Any set of equipment that allows access to the Black Knights' Fortress",
+      "Any set of equipment that allows access to the Black Knights' Fortress Bronze med helm and iron chainbody; Black full helm, black platebody and black platelegs (all variants work, including trimmed, gold-trimmed, heraldic and bugged); Elite black helm, elite black platebody and elite black platelegs; Dagon'hai hat, Dagon'hai robe top and Dagon'hai robe bottom; Black Knight captain's helm, Black Knight captain's cuirass and Black Knight captain's gown (the override version works); Cosmetic overrides will prevent access to the Black Knight's Fortress",
       "Pat of butter (optional, not needed if picking or breaking the locks on Tessa's manacles)"
     ],
     "rewards": [
@@ -12124,7 +12124,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "rewards": [
       "4 quest points",
       "4 XP lamps (requiring level 75 in the chosen skill and yielding 175,000 experience each)",
-      "Access to the Dream of Iaia",
+      "Access to the Dream of Iaia Access to high-tier resource-limited rates in six skills: Construction, Crafting, Fishing, Fletching, Herblore and Hunter. Anachronia base camp resources can be used for skilling.; Sufficient training unlocks two new skyboxes: Amber Haze and Iaia (Surface)",
       "The ability to upgrade the pontifex shadow ring into the enriched pontifex shadow ring",
       "A warped gem, which you can collect from Vicendithas in the Effigy Incubator, after visiting Iaia, to combine with the ring of vigour in order to gain its benefits passively",
       "Access to 'Accidental' Fletching and Firemaking",
@@ -12268,7 +12268,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "200,000 Strength XP",
       "30 each of rune, adamant, and mithril bars",
       "Ability to fight Chaos Giants in Barendir",
-      "Access to 3 new dragon weapons:",
+      "Access to 3 new dragon weapons: Main and off-hand dragon throwing axes, dropped by Chaos Giants; Dragon battlestaff, sold in the Quality Weapons Shop; Main and off-hand dragon warhammers, sold in Vigr's Warhammers shop",
       "Access to the lava geyser in the Lava Flow Mine, which has a chance to reward fragments of the Imcando pickaxe"
     ],
     "wiki": "Birthright_of_the_Dwarves",
@@ -12316,7 +12316,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       }
     ],
     "supplies": [
-      "The following items are required, but will need to be retrieved from your bank once you escape prison as you will be forced to deposit all of your worn/inventory items before the Customs Sergeant will send you to jail:"
+      "The following items are required, but will need to be retrieved from your bank once you escape prison as you will be forced to deposit all of your worn/inventory items before the Customs Sergeant will send you to jail: Two pieces of leather; Gold bar; Blurberry Special (premade works); Drunk Dragon (premade works); Chocolate Saturday (premade works)"
     ],
     "rewards": [
       "2 quest points",
@@ -12373,7 +12373,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       }
     ],
     "supplies": [
-      "Restored necromantic focus, or:",
+      "Restored necromantic focus, or: A necromantic focus (damaged); 30 ancient vis; 26 blood of Orcus; 20 imperial steel",
       "120 ancient vis (in material storage container)",
       "104 blood of Orcus (in material storage container)",
       "80 imperial steel (in material storage container)"
@@ -12382,7 +12382,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "1 quest point",
       "60,000 Necromancy XP lamp",
       "40,000 Archaeology XP lamp",
-      "Ability to learn four ancient Necromancy incantations from the Well of Souls:"
+      "Ability to learn four ancient Necromancy incantations from the Well of Souls: Darkness; Greater Bone Shield; Invoke Death; Life Transfer"
     ],
     "wiki": "Tomes_of_the_Warlock",
     "questRequirements": [
@@ -12416,7 +12416,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "30 white marble (material storage works)",
       "30 white oak (material storage works)",
       "5 greater ensouled bars",
-      "Ink and candles for two level 75 Necromancy rituals (assuming no glyphs or light sources are present at the Um ritual site):"
+      "Ink and candles for two level 75 Necromancy rituals (assuming no glyphs or light sources are present at the Um ritual site): 4 basic ghostly ink; 10 regular ghostly ink; 16 greater ghostly ink; 12 basic ritual candle or better"
     ],
     "rewards": [
       "1 quest point",
@@ -12548,7 +12548,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Agility XP lamp (60,000 Agility XP; requires level 50)",
       "Thieving XP lamp (60,000 Thieving XP; requires level 70)",
       "title",
-      "The following passive effects:"
+      "The following passive effects: 20% less damage from Corrupted Scarabs and soul obelisks.; 5% boost to the number of runes created at the soul altar, plus a 5% experience boost.; 2.5x increase to reputation gain in Menaphos.; 4% extra chance to save a feather of Ma'at.; 5% increase in ushabti catch rate (regular and cursed).; 10% increase in experience and movement ability cooldown halved in the Shifting Tombs. (Stacks with Shadow's Grace or Mobile, resulting in a cooldown of 5.4 seconds.); Improved drop rates for objects needed for Jewels of the Elid and Insects of the Desert."
     ],
     "wiki": "Pharaoh's_Folly",
     "questRequirements": [
@@ -12589,7 +12589,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "supplies": [
       "A cat or kitten",
       "A monkeyspeak amulet or cramulet",
-      "Ink and candles for two level 90 Necromancy rituals"
+      "Ink and candles for two level 90 Necromancy rituals 20 powerful ghostly ink; 31 greater ghostly ink; 18 regular ghostly ink; 16 ritual candles"
     ],
     "rewards": [
       "3 quest points",
@@ -12597,13 +12597,13 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Moon-touched lamp (yields 250,000 experience; requires level 85)",
       "Life-touched lamp (yields 250,000 experience; requires level 85)",
       "Death-touched lamp (yields 250,000 experience; requires level 85)",
-      "Access to Amascut, the Devourer boss fight",
+      "Access to Amascut, the Devourer boss fight The quest variant will also be considered a normal mode kill count for the purpose of Reaper Crew; You may also replay the version of the fight from the quest by speaking with Icthlarin in the Imperial District afterwards.",
       "Title",
       "Amascut's Eye skybox",
       "Desert outfit for the Lorehound pet",
       "Improved experience from divine carpet dust; it now provides 10% of the experience that would be received from rubbing a medium XP lamp",
       "Access to the fourth room in the Sunken Pyramid (can be purchased from Slayer Rewards for 3,000 Slayer points)",
-      "Four demigod boons activated from the statues in Menaphos plaza. (These are toggled off by default after completing the quest; all four boons can be toggled on simultaneously for permanent effects.)"
+      "Four demigod boons activated from the statues in Menaphos plaza. (These are toggled off by default after completing the quest; all four boons can be toggled on simultaneously for permanent effects.) Boon of Het: Increases life points by 5% base life points; Boon of Apmeken: Gives any nearby players a 1% experience boost for one hour via any emote; Boon of Crondis: 2% chance of gathering an additional material while skilling; Boon of Scabaras: Completing any clue scroll gives a 1% chance of finishing the trail"
     ],
     "wiki": "Eclipse_of_the_Heart",
     "questRequirements": [
@@ -12858,7 +12858,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "1 coin",
       "652 zemomarks beforehand to purchase items listed below for all subquests",
       "Must be on the standard spellbook and prayerbook",
-      "Obtained during quest:"
+      "Obtained during quest: 2 zemomarks; Cabbage; Rotten tomato; Beer glass; 90 Zemomarks or; Black hood; Black robe top; Black robe bottom; Black mushroom; Vial; Dog hair; 500 zemomarks or; Zombie mask; Zombie shirt; Zombie trousers; Zombie gloves; Zombie boots; Vial; 3 tin ore or 60 zemomarks; 4 fire runes (or a fire staff); 1 nature rune or 372 zemomarks; 2 vials of water; Raw onion; Ring of life or 582 zemomarks"
     ],
     "rewards": [
       "2 quest points",
@@ -13161,8 +13161,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "2 Lemons, 1 Pineapple, 1 Orange"
     ],
     "rewards": [
-      "Experience",
-      "Access to the following areas:",
+      "Experience 28,000 Cooking XP; 1,000 Slayer XP; 3,500 Crafting XP; 1,000 Farming XP; 1,000 Fishing XP; 1,000 Smithing XP; 2,500 Magic XP; 1,500 Woodcutting XP; 1,500 Ranged XP; 4,000 Constitution XP; 10,000 Agility XP; 20,000 Skill XP antique lamp for any skill above 50 (can be banked)",
+      "Access to the following areas: Mogre Camp; Evil Chicken's Lair",
       "Ability to dive for crabs",
       "Ability to own a crab",
       "Ability to cook crab meat",
@@ -13171,7 +13171,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Ability to add coloured spices to stews of any sort",
       "Ability to use the boat trip to travel between Karamja and Feldip Hills",
       "Ape Atoll Teleport spell",
-      "Full access to Culinaromancer's Chest"
+      "Full access to Culinaromancer's Chest Access to the metal gloves such as Dragon gloves, plus Barrows gloves; Access to Kitchen weaponry; Access to the banking chest (under Lumbridge Castle); Access to a food store in the Chest; Ability to use the kitchen tile floor style in a player-owned house"
     ],
     "wiki": "Recipe_for_Disaster",
     "questRequirements": [
@@ -13337,8 +13337,8 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       }
     ],
     "supplies": [
-      "A restored Everlight trumpet artefact",
-      "Glyphs for ensoul trumpet ritual"
+      "A restored Everlight trumpet artefact 28 Everlight silvthril; 24 goldrune",
+      "Glyphs for ensoul trumpet ritual 2 Elemental I, 1 Change I, and 1 Commune I; 13 basic ghostly ink and 2 regular ghostly ink from scratch"
     ],
     "rewards": [
       "7,500 Necromancy XP lamp",
@@ -13377,15 +13377,15 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       }
     ],
     "supplies": [
-      "Restored Everlight trumpet",
-      "Glyphs for ensoul trumpet ritual",
+      "Restored Everlight trumpet 28 Everlight silvthril; 24 goldrune",
+      "Glyphs for ensoul trumpet ritual 2 Elemental I, 1 Change I, and 1 Commune I; 13 basic ghostly ink and 2 regular ghostly ink from scratch",
       "520 bone runes",
       "360 flesh runes",
       "Animated drumsticks (may obtain during the quest)"
     ],
     "rewards": [
       "1 quest point",
-      "If you have fully completed all 4 subquests and the quest \"That Old Black Magic\", you will have received the following:"
+      "If you have fully completed all 4 subquests and the quest \"That Old Black Magic\", you will have received the following: 85 vessel souls; Necromancy XP lamp for 5,000 Necromancy XP; Necromancy XP lamp for 7,500 Necromancy XP; Necromancy XP lamp for 12,500 Necromancy XP; Necromancy XP lamp for 20,000 Necromancy XP"
     ],
     "wiki": "That_Old_Black_Magic",
     "questRequirements": [
@@ -13605,7 +13605,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     "rewards": [
       "30,000 Thieving XP",
       "4,000 Herblore XP",
-      "Ability to mix vials of stench",
+      "Ability to mix vials of stench If players take the vial of stench (a) from the quest back to Chief Thief Robin, he re-enchants it so players can sell stolen goods to shopkeepers as long as they have the potion in the backpack",
       "Full access to the Thieves' Guild, including a bank",
       "Ability to obtain special items from cracking safes"
     ],
@@ -14119,7 +14119,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "4,000 Slayer XP (1,000 experience after every boss kill, with four boss monsters to kill)",
-      "Ability to enter four rooms, each room filled a certain creature:"
+      "Ability to enter four rooms, each room filled a certain creature: Cave crawlers; Basilisks; Turoths; Kurasks"
     ],
     "wiki": "Desert_Slayer_Dungeon_(miniquest)",
     "kind": "miniquest",
@@ -14155,7 +14155,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       }
     ],
     "supplies": [
-      "12 rune bars or",
+      "12 rune bars or 6 rune bars; 3 rune swords",
       "20 steel bars or 4 steel platebodies"
     ],
     "rewards": [
@@ -14196,7 +14196,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       }
     ],
     "supplies": [
-      "16 orikalkum bars or"
+      "16 orikalkum bars or 8 orikalkum bars; Orikalkum warhammer + 2"
     ],
     "rewards": [
       "8,000 Smithing XP",
@@ -14475,7 +14475,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Complete Anachronia base camp tutorial first; Compass doesn't track it."
     ],
     "supplies": [
-      "Raw arcane apoterrasaur meat (can be bought from the Grand Exchange or another player)"
+      "Raw arcane apoterrasaur meat (can be bought from the Grand Exchange or another player) Ironmen: 1-3 Raw sharks"
     ],
     "rewards": [
       "Totem of Intimidation middle"
@@ -14520,7 +14520,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Goblin potion",
       "Dramen staff or Lunar staff (unless A Fairy Tale III - Battle at Ork's Rift has been completed)",
       "Ring of visibility or Sliske's gift",
-      "Ghostspeak amulet or cramulet or hard Morytania achievements"
+      "Ghostspeak amulet or cramulet or hard Morytania achievements If you have the cramulet, it will have to be dismantled so you just wear the ghostspeak amulet, otherwise the goblins won't drop their bones. Or you could take off the amulet after speaking to the ghost and before fighting."
     ],
     "rewards": [
       "13,750 Prayer XP total from burying all 5 sets of bones (unaffected by any bonus experience)."
@@ -14606,7 +14606,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
     ],
     "rewards": [
       "Antique lamp giving 30,000 experience in any skill of level 75 or higher.",
-      "An enhanced Balmung axe, depending on the colour of gem made:"
+      "An enhanced Balmung axe, depending on the colour of gem made: Turning the jewel red will morph the Balmung into a Crimson Balmung.; Turning the jewel blue will morph the Balmung into a Cobalt Balmung.; Turning the jewel green will morph the Balmung into a Viridian Balmung.; Using the \"Toggle-colour\" option to turn it into an Achromatic Balmung."
     ],
     "wiki": "Koschei's_Troubles_(miniquest)",
     "kind": "miniquest",
@@ -14731,7 +14731,7 @@ export const IMPORTED_QUESTS: QuestRecord[] = [
       "Get partway through Back to my Roots first; check the Wiki for the point needed."
     ],
     "supplies": [
-      "Hand (from the Back to my Roots quest)"
+      "Hand (from the Back to my Roots quest) If lost, you can get a new one as a drop from creatures at the jade vine maze"
     ],
     "rewards": [
       "10,000 Magic experience",
