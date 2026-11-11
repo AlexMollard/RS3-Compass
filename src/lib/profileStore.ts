@@ -22,7 +22,7 @@ import { questTitleKey } from "./playerProgress.ts";
 import { createPlayerSynchronizer, type SyncTarget } from "./playerSync.ts";
 import { snapshotFetchedAt } from "./sourceStatus.ts";
 import { isGroupLookup } from "./groupData.ts";
-import { isSkillName } from "../skillNames.ts";
+import { isRecord, isSkillLevel, isSkillLevelMap } from "./guards.ts";
 
 const KEY = "rs3-compass-design-v1";
 
@@ -46,17 +46,8 @@ function validProfile(value: unknown): value is Profile {
     (p.hiscoresImportStatus === undefined ||
       isHiscoresImportStatus(p.hiscoresImportStatus)) &&
     (p.hiscoresLevels === undefined ||
-      (!!p.hiscoresLevels &&
-        typeof p.hiscoresLevels === "object" &&
-        !Array.isArray(p.hiscoresLevels) &&
-        Object.keys(p.hiscoresLevels).length > 0 &&
-        Object.entries(p.hiscoresLevels).every(
-          ([name, level]) =>
-            isSkillName(name) &&
-            Number.isInteger(level) &&
-            level >= 1 &&
-            level <= 120,
-        ))) &&
+      (isSkillLevelMap(p.hiscoresLevels) &&
+        Object.keys(p.hiscoresLevels).length > 0)) &&
     (p.questImportStatus === undefined ||
       isPlayerImportStatus(p.questImportStatus)) &&
     (p.eventImportStatus === undefined ||
@@ -72,31 +63,19 @@ function validProfile(value: unknown): value is Profile {
         isPlayerEvents(p.eventLog.events) &&
         isFetchedAt(p.eventLog.fetchedAt))) &&
     (p.trainingRanges === undefined ||
-      (!!p.trainingRanges &&
-        typeof p.trainingRanges === "object" &&
-        !Array.isArray(p.trainingRanges) &&
-        Object.values(p.trainingRanges).every(
-          (n) => Number.isInteger(n) && n >= 1 && n <= 120,
-        ))) &&
+      (isRecord(p.trainingRanges) &&
+        Object.values(p.trainingRanges).every((n) => isSkillLevel(n)))) &&
     (p.trainingMethods === undefined ||
-      (!!p.trainingMethods &&
-        typeof p.trainingMethods === "object" &&
-        !Array.isArray(p.trainingMethods) &&
+      (isRecord(p.trainingMethods) &&
         Object.values(p.trainingMethods).every(
           (id) => typeof id === "string" && id.length > 0 && id.length <= 128,
         ))) &&
-    !!p.levels &&
-    typeof p.levels === "object" &&
-    !Array.isArray(p.levels) &&
-    Object.values(p.levels).every(
-      (n) => Number.isInteger(n) && n >= 1 && n <= 120,
-    ) &&
+    isRecord(p.levels) &&
+    Object.values(p.levels).every((n) => isSkillLevel(n)) &&
     [p.completedQuests, p.packed, p.completedTasks].every(
       (a) => Array.isArray(a) && a.every((x) => typeof x === "string"),
     ) &&
-    !!p.notes &&
-    typeof p.notes === "object" &&
-    !Array.isArray(p.notes) &&
+    isRecord(p.notes) &&
     Object.values(p.notes).every((n) => typeof n === "string")
   );
 }

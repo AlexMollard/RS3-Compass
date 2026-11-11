@@ -1,11 +1,12 @@
+import { isRecord } from "../guards.ts";
 import type { PlayerImportStatus } from "../playerTypes.ts";
 import { upstreamInit } from "./upstream.ts";
 
 export function adventurerError(
   value: unknown,
 ): Exclude<PlayerImportStatus, "available"> {
-  if (value && typeof value === "object" && !Array.isArray(value)) {
-    const error = (value as Record<string, unknown>).error;
+  if (isRecord(value)) {
+    const error = value.error;
     if (error === "PLAYER_NOT_FOUND") return "private-or-unavailable";
     if (error === "PLAYER_NOT_MEMBER") return "not-member";
   }

@@ -1,4 +1,6 @@
 import type { PlayerQuest, QuestImport } from "../playerTypes.ts";
+import { isRecord, isSafeInteger } from "../guards.ts";
+import { isPlayerQuestStatus } from "../playerData.ts";
 import { samePlayerName } from "../playerName.ts";
 import { adventurerError, fetchAdventurer } from "./adventurerLookup.ts";
 
@@ -7,45 +9,28 @@ export function parseQuestResponse(value: unknown): QuestImport {
     status: "unavailable",
     reason: adventurerError(value),
   });
-  if (!value || typeof value !== "object" || Array.isArray(value))
-    return unavailable();
-  const response = value as Record<string, unknown>;
+  if (!isRecord(value)) return unavailable();
+  const response = value;
   if (
     typeof response.name !== "string" ||
     !response.name.trim() ||
-    !Number.isSafeInteger(response.qp) ||
-    (response.qp as number) < 0 ||
-    !Number.isSafeInteger(response.qp_max) ||
-    (response.qp_max as number) < 0 ||
-    !response.quests ||
-    typeof response.quests !== "object" ||
-    Array.isArray(response.quests)
+    !isSafeInteger(response.qp) ||
+    !isSafeInteger(response.qp_max) ||
+    !isRecord(response.quests)
   )
     return unavailable();
-  if ((response.qp as number) > (response.qp_max as number))
-    return unavailable();
+  if (response.qp > response.qp_max) return unavailable();
   const records: PlayerQuest[] = [];
-  for (const [id, entry] of Object.entries(response.quests)) {
-    if (
-      !/^\d+$/.test(id) ||
-      !entry ||
-      typeof entry !== "object" ||
-      Array.isArray(entry)
-    )
-      return unavailable();
-    const quest = entry as Record<string, unknown>;
+  for (const [id, quest] of Object.entries(response.quests)) {
+    if (!/^\d+$/.test(id) || !isRecord(quest)) return unavailable();
     if (
       typeof quest.title !== "string" ||
       !quest.title.trim() ||
       typeof quest.eligible !== "boolean" ||
       typeof quest.members !== "boolean" ||
-      !Number.isSafeInteger(quest.difficulty) ||
-      (quest.difficulty as number) < 0 ||
-      !Number.isSafeInteger(quest.qp) ||
-      (quest.qp as number) < 0 ||
-      (quest.status !== "NOT_STARTED" &&
-        quest.status !== "STARTED" &&
-        quest.status !== "COMPLETED")
+      !isSafeInteger(quest.difficulty) ||
+      !isSafeInteger(quest.qp) ||
+      !isPlayerQuestStatus(quest.status)
     )
       return unavailable();
     records.push({
@@ -54,16 +39,16 @@ export function parseQuestResponse(value: unknown): QuestImport {
       status: quest.status,
       eligible: quest.eligible,
       members: quest.members,
-      difficulty: quest.difficulty as number,
-      questPoints: quest.qp as number,
+      difficulty: quest.difficulty,
+      questPoints: quest.qp,
     });
   }
   return {
     status: "available",
     name: response.name,
     records,
-    questPoints: response.qp as number,
-    maxQuestPoints: response.qp_max as number,
+    questPoints: response.qp,
+    maxQuestPoints: response.qp_max,
   };
 }
 

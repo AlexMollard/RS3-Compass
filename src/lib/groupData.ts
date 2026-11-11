@@ -1,19 +1,10 @@
-import { RS3_SKILL_NAMES } from "../skillNames.ts";
+import { isRecord, isSafeInteger, isSkillLevelMap } from "./guards.ts";
+import { isFetchedAt } from "./playerData.ts";
 import { playerKey } from "./playerName.ts";
 import type { GroupLookup, GroupQuery, GroupSize } from "./groupTypes.ts";
 
-function record(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
-}
-
-function integer(value: unknown, minimum = 0): value is number {
-  return (
-    typeof value === "number" && Number.isSafeInteger(value) && value >= minimum
-  );
-}
-
 export function normalizeGroupQuery(value: unknown): GroupQuery {
-  if (!record(value) || typeof value.name !== "string") {
+  if (!isRecord(value) || typeof value.name !== "string") {
     throw new Error("Enter a Group Ironman name.");
   }
   const name = value.name.trim().replace(/ +/g, " ");
@@ -40,20 +31,19 @@ export function normalizeGroupQuery(value: unknown): GroupQuery {
 }
 
 export function isGroupLookup(value: unknown): value is GroupLookup {
-  if (!record(value)) return false;
+  if (!isRecord(value)) return false;
   try {
     normalizeGroupQuery(value);
   } catch {
     return false;
   }
   if (
-    !integer(value.id, 1) ||
+    !isSafeInteger(value.id, 1) ||
     typeof value.founder !== "boolean" ||
-    (value.rank !== undefined && !integer(value.rank, 1)) ||
-    !integer(value.totalLevel, 1) ||
-    !integer(value.totalXp) ||
-    !integer(value.fetchedAt) ||
-    value.fetchedAt > 8_640_000_000_000_000 ||
+    (value.rank !== undefined && !isSafeInteger(value.rank, 1)) ||
+    !isSafeInteger(value.totalLevel, 1) ||
+    !isSafeInteger(value.totalXp) ||
+    !isFetchedAt(value.fetchedAt) ||
     !Array.isArray(value.members) ||
     value.members.length === 0 ||
     value.members.length > (value.size as number)
@@ -61,7 +51,7 @@ export function isGroupLookup(value: unknown): value is GroupLookup {
     return false;
   const names = new Set<string>();
   for (const member of value.members) {
-    if (!record(member) || typeof member.name !== "string") return false;
+    if (!isRecord(member) || typeof member.name !== "string") return false;
     let name: string;
     try {
       name = playerKey(member.name);
@@ -71,20 +61,15 @@ export function isGroupLookup(value: unknown): value is GroupLookup {
     if (names.has(name)) return false;
     names.add(name);
     if (
-      (member.totalLevel !== undefined && !integer(member.totalLevel, 1)) ||
-      (member.totalXp !== undefined && !integer(member.totalXp))
+      (member.totalLevel !== undefined &&
+        !isSafeInteger(member.totalLevel, 1)) ||
+      (member.totalXp !== undefined && !isSafeInteger(member.totalXp))
     )
       return false;
     if (
       member.levels !== undefined &&
-      (!record(member.levels) ||
-        Object.keys(member.levels).length === 0 ||
-        !Object.entries(member.levels).every(
-          ([skill, level]) =>
-            (RS3_SKILL_NAMES as readonly string[]).includes(skill) &&
-            integer(level, 1) &&
-            level <= 120,
-        ))
+      (!isSkillLevelMap(member.levels) ||
+        Object.keys(member.levels).length === 0)
     )
       return false;
   }

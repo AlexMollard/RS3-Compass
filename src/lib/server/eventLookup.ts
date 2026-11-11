@@ -1,4 +1,6 @@
 import type { PlayerEvent, PlayerEventsImport } from "../playerTypes.ts";
+import { isRecord } from "../guards.ts";
+import { isPlayerEvent } from "../playerData.ts";
 import { samePlayerName } from "../playerName.ts";
 import { adventurerError, fetchAdventurer } from "./adventurerLookup.ts";
 
@@ -7,9 +9,8 @@ export function parseEventResponse(value: unknown): PlayerEventsImport {
     status: "unavailable",
     reason: adventurerError(value),
   });
-  if (!value || typeof value !== "object" || Array.isArray(value))
-    return unavailable();
-  const response = value as Record<string, unknown>;
+  if (!isRecord(value)) return unavailable();
+  const response = value;
   if (
     typeof response.name !== "string" ||
     !response.name.trim() ||
@@ -18,23 +19,9 @@ export function parseEventResponse(value: unknown): PlayerEventsImport {
   )
     return unavailable();
   const events: PlayerEvent[] = [];
-  for (const entry of response.events) {
-    if (!entry || typeof entry !== "object" || Array.isArray(entry))
-      return unavailable();
-    const event = entry as Record<string, unknown>;
-    if (
-      typeof event.type !== "string" ||
-      !event.type.trim() ||
-      typeof event.date !== "string" ||
-      !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(
-        event.date,
-      ) ||
-      !Number.isFinite(Date.parse(event.date)) ||
-      typeof event.text !== "string" ||
-      typeof event.details !== "string"
-    )
-      return unavailable();
-    if (!event.text.trim()) return unavailable();
+  for (const event of response.events) {
+    if (!isPlayerEvent(event)) return unavailable();
+    // Copy only the known fields.
     events.push({
       type: event.type,
       date: event.date,

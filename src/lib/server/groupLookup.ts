@@ -1,6 +1,7 @@
 import { parse } from "parse5";
 import { isGroupLookup, normalizeGroupQuery } from "../groupData.ts";
 import type { GroupLookup, GroupQuery } from "../groupTypes.ts";
+import { isRecord, isSafeInteger } from "../guards.ts";
 import { normalizePlayerName, playerKey } from "../playerName.ts";
 import {
   createClientLimiter,
@@ -23,10 +24,6 @@ type Node = {
   parentNode?: Node;
 };
 type RecordValue = Record<string, unknown>;
-const record = (v: unknown): v is RecordValue =>
-  !!v && typeof v === "object" && !Array.isArray(v);
-const integer = (v: unknown, min = 0): v is number =>
-  typeof v === "number" && Number.isSafeInteger(v) && v >= min;
 const attr = (node: Node, name: string) =>
   node.attrs?.find((item) => item.name === name)?.value;
 const sameName = (a: string, b: string) =>
@@ -127,10 +124,10 @@ export function parseGroupListing(
         const item = stack.pop();
         if (++visited > 100_000) throw unavailable();
         if (Array.isArray(item)) stack.push(...item);
-        else if (record(item)) {
+        else if (isRecord(item)) {
           if (
-            record(item.data) &&
-            record(item.data.groups) &&
+            isRecord(item.data) &&
+            isRecord(item.data.groups) &&
             item.groupSize === query.size &&
             item.mode === (query.isCompetitive ? "competitive" : "regular")
           )
@@ -145,13 +142,13 @@ export function parseGroupListing(
   if (
     !Array.isArray(groups.content) ||
     typeof groups.empty !== "boolean" ||
-    !integer(groups.numberOfElements) ||
+    !isSafeInteger(groups.numberOfElements) ||
     groups.numberOfElements !== groups.content.length ||
     groups.empty !== (groups.content.length === 0) ||
-    !integer(groups.pageNumber) ||
-    !integer(groups.size) ||
-    !integer(groups.totalElements) ||
-    !integer(groups.totalPages) ||
+    !isSafeInteger(groups.pageNumber) ||
+    !isSafeInteger(groups.size) ||
+    !isSafeInteger(groups.totalElements) ||
+    !isSafeInteger(groups.totalPages) ||
     (!groups.empty && groups.totalPages === 0) ||
     typeof groups.first !== "boolean" ||
     typeof groups.last !== "boolean"
@@ -159,7 +156,7 @@ export function parseGroupListing(
     throw unavailable();
   const matches = groups.content.filter(
     (v: unknown) =>
-      record(v) && typeof v.name === "string" && sameName(v.name, query.name),
+      isRecord(v) && typeof v.name === "string" && sameName(v.name, query.name),
   );
   if (matches.length === 0) {
     if (groups.empty) throw notFound();
@@ -168,19 +165,19 @@ export function parseGroupListing(
   if (matches.length !== 1) throw unavailable();
   const group = matches[0] as RecordValue;
   if (
-    !integer(group.id, 1) ||
+    !isSafeInteger(group.id, 1) ||
     typeof group.name !== "string" ||
     group.size !== query.size ||
     group.isCompetitive !== query.isCompetitive ||
     typeof group.founder !== "boolean" ||
-    !integer(group.groupTotalLevel, 1) ||
-    !integer(group.groupTotalXp) ||
+    !isSafeInteger(group.groupTotalLevel, 1) ||
+    !isSafeInteger(group.groupTotalXp) ||
     group.toHighlight !== true
   )
     throw unavailable();
   const index = groups.content.indexOf(matches[0]);
   const rank = groups.pageNumber * groups.size + index + 1;
-  if (!integer(rank, 1)) throw unavailable();
+  if (!isSafeInteger(rank, 1)) throw unavailable();
   return {
     id: group.id,
     name: group.name,

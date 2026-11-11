@@ -1,3 +1,5 @@
+import { isRecord } from "./guards.ts";
+
 export interface ActivityWikiArticle {
   wiki: string;
   image?: string;
@@ -13,23 +15,23 @@ function titleKey(title: string): string {
   return clean ? clean[0].toLocaleUpperCase("en") + clean.slice(1) : "";
 }
 
-function object(value: unknown): value is Record<string, unknown> {
-  return !!value && typeof value === "object" && !Array.isArray(value);
-}
-
 function readArticles(
   value: unknown,
   titles: string[],
 ): Map<string, ActivityWikiArticle> {
   const found = new Map<string, ActivityWikiArticle>();
-  if (!object(value) || !object(value.query) || !object(value.query.pages))
+  if (
+    !isRecord(value) ||
+    !isRecord(value.query) ||
+    !isRecord(value.query.pages)
+  )
     return found;
   const aliases = new Map<string, string>();
   for (const entries of [value.query.normalized, value.query.redirects]) {
     if (!Array.isArray(entries)) continue;
     for (const entry of entries) {
       if (
-        object(entry) &&
+        isRecord(entry) &&
         typeof entry.from === "string" &&
         typeof entry.to === "string"
       )
@@ -39,7 +41,7 @@ function readArticles(
   const pages = new Map<string, ActivityWikiArticle>();
   for (const page of Object.values(value.query.pages)) {
     if (
-      !object(page) ||
+      !isRecord(page) ||
       page.ns !== 0 ||
       typeof page.title !== "string" ||
       "missing" in page ||
@@ -49,7 +51,7 @@ function readArticles(
     const article: ActivityWikiArticle = { wiki: page.title };
     if (typeof page.pageimage === "string" && page.pageimage.trim())
       article.image = page.pageimage;
-    if (object(page.thumbnail) && typeof page.thumbnail.source === "string") {
+    if (isRecord(page.thumbnail) && typeof page.thumbnail.source === "string") {
       try {
         const image = new URL(page.thumbnail.source);
         if (
@@ -208,10 +210,10 @@ export function createActivityWikiLookup(
           if (!response.ok) return null;
           const value: unknown = await response.json();
           if (
-            !object(value) ||
+            !isRecord(value) ||
             "error" in value ||
-            !object(value.query) ||
-            !object(value.query.pages)
+            !isRecord(value.query) ||
+            !isRecord(value.query.pages)
           )
             return null;
           return readArticles(value, batchTitles);

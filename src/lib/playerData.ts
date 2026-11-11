@@ -1,25 +1,20 @@
 import { isSkillName } from "../skillNames.ts";
+import {
+  isRecord,
+  isSafeInteger,
+  isSkillLevelMap,
+  MAX_DATE_MS,
+} from "./guards.ts";
 import { normalizePlayerName, playerKey } from "./playerName.ts";
 import type {
   HiscoresImportStatus,
   PlayerEvent,
   PlayerImportStatus,
   PlayerLookup,
+  PlayerQuest,
   PlayerQuestProgress,
   PlayerStatistics,
 } from "./playerTypes.ts";
-
-function record(value: unknown): value is Record<string, unknown> {
-  return !!value && typeof value === "object" && !Array.isArray(value);
-}
-
-function nonnegative(value: unknown): value is number {
-  return typeof value === "number" && Number.isSafeInteger(value) && value >= 0;
-}
-
-function positive(value: unknown): value is number {
-  return nonnegative(value) && value > 0;
-}
 
 function playerName(value: unknown): value is string {
   try {
@@ -31,14 +26,37 @@ function playerName(value: unknown): value is string {
 
 function skillStatistics(value: unknown): boolean {
   return (
-    record(value) &&
-    (value.xp === undefined || nonnegative(value.xp)) &&
-    (value.rank === undefined || positive(value.rank))
+    isRecord(value) &&
+    (value.xp === undefined || isSafeInteger(value.xp)) &&
+    (value.rank === undefined || isSafeInteger(value.rank, 1))
   );
 }
 
 export function isFetchedAt(value: unknown): value is number {
-  return nonnegative(value) && value <= 8_640_000_000_000_000;
+  return isSafeInteger(value) && value <= MAX_DATE_MS;
+}
+
+export function isPlayerQuestStatus(
+  value: unknown,
+): value is PlayerQuest["status"] {
+  return value === "NOT_STARTED" || value === "STARTED" || value === "COMPLETED";
+}
+
+/** One Adventurer's Log entry: named type and text, details, and an ISO timestamp. */
+export function isPlayerEvent(value: unknown): value is PlayerEvent {
+  return (
+    isRecord(value) &&
+    typeof value.type === "string" &&
+    value.type.trim().length > 0 &&
+    typeof value.text === "string" &&
+    value.text.trim().length > 0 &&
+    typeof value.details === "string" &&
+    typeof value.date === "string" &&
+    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(
+      value.date,
+    ) &&
+    Number.isFinite(Date.parse(value.date))
+  );
 }
 
 export function isPlayerImportStatus(
@@ -64,31 +82,32 @@ export function isHiscoresImportStatus(
 
 export function isPlayerStatistics(value: unknown): value is PlayerStatistics {
   return (
-    record(value) &&
-    record(value.overall) &&
+    isRecord(value) &&
+    isRecord(value.overall) &&
     skillStatistics(value.overall) &&
-    (value.overall.level === undefined || positive(value.overall.level)) &&
-    record(value.skills) &&
+    (value.overall.level === undefined ||
+      isSafeInteger(value.overall.level, 1)) &&
+    isRecord(value.skills) &&
     Object.entries(value.skills).every(
       ([name, statistics]) => isSkillName(name) && skillStatistics(statistics),
     ) &&
     Array.isArray(value.activities) &&
     value.activities.every(
       (activity) =>
-        record(activity) &&
+        isRecord(activity) &&
         typeof activity.name === "string" &&
         activity.name.trim().length > 0 &&
-        (activity.score === undefined || nonnegative(activity.score)) &&
-        (activity.rank === undefined || positive(activity.rank)),
+        (activity.score === undefined || isSafeInteger(activity.score)) &&
+        (activity.rank === undefined || isSafeInteger(activity.rank, 1)),
     )
   );
 }
 
 export function isQuestProgress(value: unknown): value is PlayerQuestProgress {
   if (
-    !record(value) ||
-    !nonnegative(value.questPoints) ||
-    !nonnegative(value.maxQuestPoints) ||
+    !isRecord(value) ||
+    !isSafeInteger(value.questPoints) ||
+    !isSafeInteger(value.maxQuestPoints) ||
     value.questPoints > value.maxQuestPoints ||
     !Array.isArray(value.records)
   )
@@ -96,19 +115,17 @@ export function isQuestProgress(value: unknown): value is PlayerQuestProgress {
   const ids = new Set<string>();
   for (const quest of value.records) {
     if (
-      !record(quest) ||
+      !isRecord(quest) ||
       typeof quest.id !== "string" ||
       !/^\d+$/.test(quest.id) ||
       ids.has(quest.id) ||
       typeof quest.title !== "string" ||
       !quest.title.trim() ||
-      !["NOT_STARTED", "STARTED", "COMPLETED"].includes(
-        quest.status as string,
-      ) ||
+      !isPlayerQuestStatus(quest.status) ||
       typeof quest.eligible !== "boolean" ||
       typeof quest.members !== "boolean" ||
-      !nonnegative(quest.difficulty) ||
-      !nonnegative(quest.questPoints)
+      !isSafeInteger(quest.difficulty) ||
+      !isSafeInteger(quest.questPoints)
     )
       return false;
     ids.add(quest.id);
@@ -120,20 +137,7 @@ export function isPlayerEvents(value: unknown): value is PlayerEvent[] {
   return (
     Array.isArray(value) &&
     value.length <= 20 &&
-    value.every(
-      (event) =>
-        record(event) &&
-        typeof event.type === "string" &&
-        event.type.trim().length > 0 &&
-        typeof event.text === "string" &&
-        event.text.trim().length > 0 &&
-        typeof event.details === "string" &&
-        typeof event.date === "string" &&
-        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(
-          event.date,
-        ) &&
-        Number.isFinite(Date.parse(event.date)),
-    )
+    value.every((event) => isPlayerEvent(event))
   );
 }
 
@@ -147,18 +151,15 @@ function unavailable(value: Record<string, unknown>): boolean {
 
 export function isPlayerLookup(value: unknown): value is PlayerLookup {
   if (
-    !record(value) ||
+    !isRecord(value) ||
     !playerName(value.name) ||
     !isFetchedAt(value.fetchedAt) ||
     !isHiscoresImportStatus(value.hiscoresImportStatus) ||
     (value.ironman !== undefined && typeof value.ironman !== "boolean") ||
-    !record(value.levels) ||
-    !Object.entries(value.levels).every(
-      ([name, level]) => isSkillName(name) && positive(level) && level <= 120,
-    ) ||
+    !isSkillLevelMap(value.levels) ||
     !isPlayerStatistics(value.statistics) ||
-    !record(value.quests) ||
-    !record(value.events)
+    !isRecord(value.quests) ||
+    !isRecord(value.events)
   )
     return false;
   if (value.hiscoresImportStatus === "available") {

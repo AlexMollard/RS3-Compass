@@ -3,6 +3,7 @@ import {
   RS3_SKILL_NAMES,
   type SkillName,
 } from "../../skillNames.ts";
+import { isRecord } from "../guards.ts";
 import { hasTransientFailure } from "../playerData.ts";
 import {
   normalizePlayerName,
@@ -68,9 +69,8 @@ export function parseHiscores(
       502,
     );
   };
-  if (!value || typeof value !== "object" || Array.isArray(value))
-    return invalid();
-  const response = value as Record<string, unknown>;
+  if (!isRecord(value)) return invalid();
+  const response = value;
   if (
     typeof response.name !== "string" ||
     !samePlayerName(response.name, name) ||
@@ -84,10 +84,8 @@ export function parseHiscores(
   const seen = new Set<string>();
   const valid = (v: unknown, min: number): v is number =>
     typeof v === "number" && Number.isSafeInteger(v) && (v === -1 || v >= min);
-  for (const entry of response.skills) {
-    if (!entry || typeof entry !== "object" || Array.isArray(entry))
-      return invalid();
-    const skill = entry as Record<string, unknown>;
+  for (const skill of response.skills) {
+    if (!isRecord(skill)) return invalid();
     if (typeof skill.name !== "string" || !skill.name.trim()) return invalid();
     const name = Object.hasOwn(platformSkillNames, skill.name)
       ? platformSkillNames[skill.name]
@@ -118,10 +116,8 @@ export function parseHiscores(
   if (!overall || RS3_SKILL_NAMES.some((skill) => !seen.has(skill)))
     return invalid();
   const activities: PlayerLevels["statistics"]["activities"] = [];
-  for (const entry of response.activities) {
-    if (!entry || typeof entry !== "object" || Array.isArray(entry))
-      return invalid();
-    const activity = entry as Record<string, unknown>;
+  for (const activity of response.activities) {
+    if (!isRecord(activity)) return invalid();
     if (
       typeof activity.name !== "string" ||
       !activity.name.trim() ||
