@@ -192,3 +192,16 @@ export function isPlayerLookup(value: unknown): value is PlayerLookup {
       : unavailable(value.events))
   );
 }
+
+/** A source was down rather than private or missing, so the lookup is worth retrying soon. */
+export function hasTransientFailure(
+  player: Pick<PlayerLookup, "hiscoresImportStatus" | "quests" | "events">,
+): boolean {
+  return (
+    player.hiscoresImportStatus === "service-unavailable" ||
+    (player.quests.status === "unavailable" &&
+      player.quests.reason === "service-unavailable") ||
+    (player.events.status === "unavailable" &&
+      player.events.reason === "service-unavailable")
+  );
+}

@@ -5,7 +5,33 @@ import {
   mapTilesNotice,
   profileSourceNotice,
   rateLimitNotice,
+  snapshotFetchedAt,
 } from "../src/lib/sourceStatus.ts";
+import { hasTransientFailure } from "../src/lib/playerData.ts";
+
+test("snapshotFetchedAt prefers the public lookup time over the legacy Hiscores time", () => {
+  assert.equal(snapshotFetchedAt({ publicFetchedAt: 5, hiscoresFetchedAt: 3 }), 5);
+  assert.equal(snapshotFetchedAt({ hiscoresFetchedAt: 3 }), 3);
+  assert.equal(snapshotFetchedAt({ publicFetchedAt: 0, hiscoresFetchedAt: 3 }), 0);
+  assert.equal(snapshotFetchedAt({}), undefined);
+  assert.equal(snapshotFetchedAt(undefined), undefined);
+});
+
+test("hasTransientFailure flags only service outages, not private or missing sources", () => {
+  const ok = { status: "available" };
+  const down = { status: "unavailable", reason: "service-unavailable" };
+  const hidden = { status: "unavailable", reason: "private-or-unavailable" };
+  const player = (hiscoresImportStatus, quests, events) => ({
+    hiscoresImportStatus,
+    quests,
+    events,
+  });
+  assert.equal(hasTransientFailure(player("available", ok, ok)), false);
+  assert.equal(hasTransientFailure(player("not-found", hidden, hidden)), false);
+  assert.equal(hasTransientFailure(player("service-unavailable", ok, ok)), true);
+  assert.equal(hasTransientFailure(player("available", down, hidden)), true);
+  assert.equal(hasTransientFailure(player("available", hidden, down)), true);
+});
 
 const hiscores = (extra = {}) => ({ source: "hiscores", ...extra });
 const idle = { state: "idle" };

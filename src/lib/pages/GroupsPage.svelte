@@ -7,7 +7,11 @@
   import { groupPlayers, groupSkillSummary } from "../groupProgress";
   import { publicProfileId } from "../playerName";
   import { relativeTime } from "../relativeTime";
-  import { isSnapshotStale, rateLimitNotice } from "../sourceStatus";
+  import {
+    isSnapshotStale,
+    rateLimitNotice,
+    snapshotFetchedAt,
+  } from "../sourceStatus";
   import SkillComparison from "../components/SkillComparison.svelte";
   import SkillGaps from "../components/SkillGaps.svelte";
   import { RefreshCw } from "@lucide/svelte";
@@ -443,9 +447,8 @@
           {#if profile}
             <details class="source source-times">
               <summary
-                >Public lookup · {(profile.publicFetchedAt ??
-                  profile.hiscoresFetchedAt) != null
-                  ? date((profile.publicFetchedAt ?? profile.hiscoresFetchedAt)!)
+                >Public lookup · {snapshotFetchedAt(profile) != null
+                  ? date(snapshotFetchedAt(profile)!)
                   : "Not fetched"}</summary
               >
               <p>

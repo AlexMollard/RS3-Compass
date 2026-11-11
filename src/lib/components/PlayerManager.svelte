@@ -7,7 +7,11 @@
     SKILLS,
     type AccountKind,
   } from "../../data";
-  import { isSnapshotStale, rateLimitNotice } from "../sourceStatus";
+  import {
+    isSnapshotStale,
+    rateLimitNotice,
+    snapshotFetchedAt,
+  } from "../sourceStatus";
   import SourceBanner from "./SourceBanner.svelte";
   import { relativeTime } from "../relativeTime";
   import GameArt from "./GameArt.svelte";
@@ -96,7 +100,7 @@
     {@const busy = status?.state === "queued" || status?.state === "refreshing"}
     {@const isPublic = player.source === "hiscores"}
     {@const selected = player.id === $saved.activeId}
-    {@const fetched = player.publicFetchedAt ?? player.hiscoresFetchedAt}
+    {@const fetched = snapshotFetchedAt(player)}
     {@const stale = isSnapshotStale(player, status)}
     <section
       class="player-card game-surface"

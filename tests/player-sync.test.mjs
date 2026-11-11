@@ -89,6 +89,34 @@ test("hidden views queue work without requests and resume only when visible", as
   assert.equal(calls, 1);
 });
 
+test("only a temporary source failure schedules the next refresh a minute out", async (t) => {
+  const now = 5_000_000;
+  const down = { status: "unavailable", reason: "service-unavailable" };
+  const hidden = { status: "unavailable", reason: "private-or-unavailable" };
+  const players = {
+    Fine: snapshot("Fine", now - 1000),
+    Private: platformPlayer({ name: "Private", fetchedAt: now - 1000, quests: hidden, events: hidden }),
+    Quests: platformPlayer({ name: "Quests", fetchedAt: now - 1000, quests: down, events: hidden }),
+    Events: snapshot("Events", now - 1000),
+    Hiscores: { ...snapshot("Hiscores", now - 1000), hiscoresImportStatus: "service-unavailable" },
+  };
+  players.Events.events = down;
+  const engine = createPlayerSynchronizer({
+    now: () => now,
+    visible: () => true,
+    profile: () => undefined,
+    allowed: () => true,
+    apply() {},
+    fetch: async (name) => players[name],
+  });
+  t.after(() => engine.destroy());
+  for (const name of Object.keys(players)) await engine.refresh(target(name));
+  const next = (name) => get(engine.state)["rs3:" + name.toLowerCase()].nextRefreshAt;
+  assert.equal(next("Fine"), now - 1000 + 10 * 60_000);
+  assert.equal(next("Private"), now - 1000 + 10 * 60_000);
+  for (const name of ["Quests", "Events", "Hiscores"]) assert.equal(next(name), now + 60_000, name);
+});
+
 test("a removed player cannot be revived by a transport that ignores cancellation", async (t) => {
   let allowed = true;
   let applied = 0;

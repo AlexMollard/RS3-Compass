@@ -3,6 +3,7 @@ import {
   RS3_SKILL_NAMES,
   type SkillName,
 } from "../../skillNames.ts";
+import { hasTransientFailure } from "../playerData.ts";
 import {
   normalizePlayerName,
   playerKey,
@@ -35,13 +36,9 @@ const platformSkillNames: Readonly<Record<string, SkillName>> = {
 };
 
 export function playerCacheMs(player: PlayerLookup): number {
-  const transient =
-    player.hiscoresImportStatus === "service-unavailable" ||
-    (player.quests.status === "unavailable" &&
-      player.quests.reason === "service-unavailable") ||
-    (player.events.status === "unavailable" &&
-      player.events.reason === "service-unavailable");
-  return transient ? PLAYER_PARTIAL_CACHE_MS : PLAYER_CACHE_MS;
+  return hasTransientFailure(player)
+    ? PLAYER_PARTIAL_CACHE_MS
+    : PLAYER_CACHE_MS;
 }
 
 export class PlayerLookupError extends Error {

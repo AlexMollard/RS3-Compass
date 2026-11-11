@@ -24,6 +24,11 @@ type SyncInfo = {
 
 const isPublic = (profile: Profile) => profile.source === "hiscores";
 
+/** When the public snapshot was taken; older saves only have hiscoresFetchedAt. */
+export const snapshotFetchedAt = (
+  profile?: Pick<Profile, "publicFetchedAt" | "hiscoresFetchedAt">,
+): number | undefined => profile?.publicFetchedAt ?? profile?.hiscoresFetchedAt;
+
 /** Jagex asked us to slow down: a calm wait, not a failure. */
 export function rateLimitNotice(nextRefreshAt?: number): SourceNotice {
   const wait = nextRefreshAt ? nextRefreshAt - Date.now() : 60_000;

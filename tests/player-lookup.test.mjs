@@ -3,7 +3,9 @@ import assert from "node:assert/strict";
 import {
   createPlayerLookupService,
   parseHiscores,
+  playerCacheMs,
   PLAYER_CACHE_MS,
+  PLAYER_PARTIAL_CACHE_MS,
 } from "../src/lib/server/playerLookup.ts";
 import { createClientLimiter } from "../src/lib/server/rateLimit.ts";
 import { normalizePlayerName } from "../src/lib/playerName.ts";
@@ -481,6 +483,25 @@ test("the Ironman Hiscores decide whether a ranked player is an Ironman", async 
   const unranked = await lookup(200, false);
   assert.equal(unranked.ironman, undefined);
   assert.ok(!unranked.calls.some((path) => path.startsWith("/m=hiscore_ironman/")));
+});
+
+test("only a temporary source failure shortens the player cache", () => {
+  const ok = { status: "available" };
+  const down = { status: "unavailable", reason: "service-unavailable" };
+  const hidden = { status: "unavailable", reason: "private-or-unavailable" };
+  const player = (hiscoresImportStatus, quests, events) => ({
+    hiscoresImportStatus,
+    quests,
+    events,
+  });
+  assert.equal(playerCacheMs(player("available", ok, ok)), PLAYER_CACHE_MS);
+  assert.equal(playerCacheMs(player("not-found", hidden, hidden)), PLAYER_CACHE_MS);
+  for (const transient of [
+    player("service-unavailable", ok, ok),
+    player("available", down, ok),
+    player("available", ok, down),
+  ])
+    assert.equal(playerCacheMs(transient), PLAYER_PARTIAL_CACHE_MS);
 });
 
 test("non-breaking spaces in names normalize to ordinary spaces", () => {

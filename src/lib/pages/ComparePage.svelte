@@ -12,7 +12,7 @@
   } from "../groupProgress";
   import { publicProfileId } from "../playerName";
   import { relativeTime } from "../relativeTime";
-  import { isSnapshotStale } from "../sourceStatus";
+  import { isSnapshotStale, snapshotFetchedAt } from "../sourceStatus";
   import { wikiHref } from "../../wiki";
   import PageHeading from "../components/PageHeading.svelte";
   import ChoiceStrip from "../components/ChoiceStrip.svelte";
@@ -241,7 +241,7 @@
                     tone="ok"
                     label={"Checked " +
                       relativeTime(
-                        profile.publicFetchedAt ?? profile.hiscoresFetchedAt ?? 0,
+                        snapshotFetchedAt(profile) ?? 0,
                       )}
                   />{/if}
               </div>

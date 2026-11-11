@@ -3,6 +3,8 @@ import type { Profile } from "../data.ts";
 import type { PlayerLookup } from "./playerTypes.ts";
 import type { PlayerSyncStatus } from "./compassContext.ts";
 import { fetchPlayer, PlayerFetchError } from "./playerClient.ts";
+import { hasTransientFailure } from "./playerData.ts";
+import { snapshotFetchedAt } from "./sourceStatus.ts";
 
 const CACHE_MS = 10 * 60_000;
 const RETRY_MS = 60_000;
@@ -48,7 +50,7 @@ export function createPlayerSynchronizer(options: {
     state.update((current) => ({ ...current, [id]: value }));
   }
   function dueAt(profile: Profile | undefined) {
-    const fetchedAt = profile?.publicFetchedAt ?? profile?.hiscoresFetchedAt;
+    const fetchedAt = snapshotFetchedAt(profile);
     if (
       fetchedAt == null ||
       !profile?.hiscoresImportStatus ||
@@ -70,12 +72,7 @@ export function createPlayerSynchronizer(options: {
       player.hiscoresImportStatus !== "available" ||
       player.quests.status !== "available" ||
       player.events.status !== "available";
-    const transient =
-      player.hiscoresImportStatus === "service-unavailable" ||
-      (player.quests.status === "unavailable" &&
-        player.quests.reason === "service-unavailable") ||
-      (player.events.status === "unavailable" &&
-        player.events.reason === "service-unavailable");
+    const transient = hasTransientFailure(player);
     return {
       state: "idle",
       attemptedAt: clock(),

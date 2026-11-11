@@ -20,6 +20,7 @@ import {
 } from "./playerData.ts";
 import { questTitleKey } from "./playerProgress.ts";
 import { createPlayerSynchronizer, type SyncTarget } from "./playerSync.ts";
+import { snapshotFetchedAt } from "./sourceStatus.ts";
 import { isGroupLookup } from "./groupData.ts";
 import { isSkillName } from "../skillNames.ts";
 
@@ -396,8 +397,7 @@ export function createCompassController(): CompassController {
       };
       state.update((current) => {
         const existing = current.profiles.find((p) => p.id === id);
-        const fetchedAt =
-          existing?.publicFetchedAt ?? existing?.hiscoresFetchedAt;
+        const fetchedAt = snapshotFetchedAt(existing);
         if (fetchedAt !== undefined && fetchedAt > player.fetchedAt)
           return options?.select === false
             ? current
