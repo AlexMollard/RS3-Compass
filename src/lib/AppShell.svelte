@@ -12,6 +12,7 @@
     Compass,
     ExternalLink,
     Info,
+    RefreshCw,
     Search,
     TriangleAlert,
     X,
@@ -287,9 +288,7 @@
 {/snippet}
 
 <div
-  class:is-compact={$compact &&
-    !!profile &&
-    (route === "skills" || route === "quests")}
+  class:is-compact={$compact && !!profile && route === "skills"}
   class="app-shell"
 >
   <a
@@ -339,6 +338,13 @@
             >Members</button
           >
         </div>
+        <a
+          class="btn btn-secondary update-levels"
+          href="/levels"
+          aria-current={route === "levels" ? "page" : undefined}
+          onclick={() => compact.set(false)}
+          ><RefreshCw size={15} />Update levels</a
+        >
       </div>
     {:else if $ready}
       <Button className="rail-lookup" onclick={() => openLookup("")}
@@ -409,12 +415,6 @@
         ></button
       >
       {#if profile && !showFirstVisit}
-        <a
-          class="btn btn-secondary update-levels"
-          href="/levels"
-          aria-current={route === "levels" ? "page" : undefined}
-          onclick={() => compact.set(false)}>Update levels</a
-        >
         <div class="player-chip">
           <a
             class="player-chip-link"

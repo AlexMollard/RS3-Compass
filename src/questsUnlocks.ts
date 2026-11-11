@@ -213,7 +213,7 @@ export const UNLOCK_QUESTS: QuestRecord[] = [
     rewards: [
       "2 quest points",
       "Pirate's treasure casket containing 450 coins, an emerald and a gold ring",
-      "Paid banana plantation work",
+      "Access to paid banana plantation work",
     ],
     wiki: "Pirate's Treasure",
   },

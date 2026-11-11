@@ -7,11 +7,14 @@ export interface RewardGroups {
   items: string[];
 }
 
-export type RewardHighlight =
-  | { kind: "quest-points"; points: number }
-  | { kind: "skill-xp"; skill: string; xp: number }
-  | { kind: "lamp" }
-  | { kind: "unlock"; text: string };
+/** One header chip per reward group; `more` counts the group's other lines. */
+export interface RewardSummary {
+  group: keyof RewardGroups;
+  text: string;
+  more: number;
+  /** The only skill with fixed XP, when there is exactly one. */
+  skill?: string;
+}
 
 const QUEST_POINTS = /^(\d+) quest points?\b/i;
 const EXPERIENCE = /\bXP\b|\bexperience\b|\blamps?\b/i;
@@ -39,18 +42,11 @@ export function groupRewards(rewards: readonly string[]): RewardGroups {
   return groups;
 }
 
-/** Short header chips: quest points, fixed skill XP, a lamp marker and the first unlock. */
-export function rewardHighlights(
-  rewards: readonly string[],
-  limit = 5,
-): RewardHighlight[] {
-  const groups = groupRewards(rewards);
-  const chips: RewardHighlight[] = [];
-  const points = groups.questPoints[0]?.match(QUEST_POINTS);
-  if (points) chips.push({ kind: "quest-points", points: Number(points[1]) });
+/** Fixed XP per skill, and whether any line also grants lamps or unnamed XP. */
+export function experienceTotals(lines: readonly string[]) {
   const xp = new Map<string, number>();
   let lamp = false;
-  for (const line of groups.experience) {
+  for (const line of lines) {
     let found = false;
     for (const match of line.matchAll(SKILL_XP)) {
       found = true;
@@ -59,10 +55,42 @@ export function rewardHighlights(
     }
     if (!found || /\blamps?\b/i.test(line)) lamp = true;
   }
-  for (const [skill, amount] of xp)
-    chips.push({ kind: "skill-xp", skill, xp: amount });
-  if (lamp) chips.push({ kind: "lamp" });
-  if (groups.unlocks[0])
-    chips.push({ kind: "unlock", text: groups.unlocks[0] });
-  return chips.slice(0, limit);
+  return { xp, lamp };
+}
+
+/** Header chips: every reward group appears, so nothing is hidden behind quest points. */
+export function rewardSummary(rewards: readonly string[]): RewardSummary[] {
+  const groups = groupRewards(rewards);
+  const chips: RewardSummary[] = [];
+  const points = groups.questPoints[0]?.match(QUEST_POINTS);
+  if (points)
+    chips.push({
+      group: "questPoints",
+      text: `${points[1]} ${points[1] === "1" ? "quest point" : "quest points"}`,
+      more: 0,
+    });
+  if (groups.experience.length) {
+    const { xp, lamp } = experienceTotals(groups.experience);
+    const total = [...xp.values()].reduce((sum, n) => sum + n, 0);
+    const [only] = xp.size === 1 ? [...xp.keys()] : [];
+    const fixed = only
+      ? `${total.toLocaleString("en")} ${only} XP`
+      : xp.size
+        ? `${total.toLocaleString("en")} XP in ${xp.size} skills`
+        : "";
+    chips.push({
+      group: "experience",
+      text: fixed ? (lamp ? `${fixed} + lamps` : fixed) : "XP lamps",
+      more: 0,
+      ...(only ? { skill: only } : {}),
+    });
+  }
+  for (const group of ["items", "unlocks"] as const)
+    if (groups[group].length)
+      chips.push({
+        group,
+        text: groups[group][0],
+        more: groups[group].length - 1,
+      });
+  return chips;
 }
