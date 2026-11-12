@@ -63,6 +63,13 @@ test("Completion of / Partial completion of a link is a quest", () => {
     { kind: "skill", skill: "Slayer", level: 95 },
   ]);
   assert.equal(a.tier, "Low");
+  assert.equal(a.releaseDate, "1 May 2020");
+});
+
+test("the last row's release date has no closing table markup", () => {
+  const last = rows.at(-1);
+  assert.doesNotMatch(last.releaseDate, /[|}]/);
+  for (const r of rows) if (r.releaseDate) assert.doesNotMatch(r.releaseDate, /[|}]/, r.name);
 });
 
 test("signature lists mix plink and plinkp, and {{na}} cells are empty", () => {

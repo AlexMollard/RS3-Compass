@@ -15138,6 +15138,6 @@ export const IMPORTED_BOSSES: BossRecord[] = [
       "Wall Gets Knocked Down, I'll Build It Up Again"
     ],
     "strategyPage": "Zemouregal & Vorkath/Strategies",
-    "releaseDate": "20 November 2023 |}"
+    "releaseDate": "20 November 2023"
   }
 ];

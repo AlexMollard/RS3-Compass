@@ -44,7 +44,8 @@ function requirementsOf(cell) {
 export function parseBossesTable(wikitext) {
   const rows = [];
   for (const chunk of section(wikitext, "Combat bosses").split(/^\|-[^\n]*$/m).slice(1)) {
-    const cells = chunk.split(/^\|(?![}-])/m).slice(1).map((c) => c.replace(/\s+$/, ""));
+    // The last row is followed by the table's closing "|}", which isn't part of its last cell.
+    const cells = chunk.split(/^\|\}/m)[0].split(/^\|(?![}-])/m).slice(1).map((c) => c.replace(/\s+$/, ""));
     if (cells.length < 5) continue;
     const [image, name, level, tier, team, ...rest] = cells;
     const [requirements = "", signature = "", release = ""] = rest;

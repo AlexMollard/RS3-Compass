@@ -72,7 +72,9 @@ for (const row of rows) {
   });
 }
 
-const missing = records.filter((r) => !r.tier || !Number.isFinite(r.level));
+const marked = records.filter((r) => /[|}]/.test(r.releaseDate ?? ""));
+if (marked.length) throw new Error(`Wikitext markup in releaseDate: ${marked.map((r) => r.name).join(", ")}`);
+const missing =records.filter((r) => !r.tier || !Number.isFinite(r.level));
 if (missing.length) throw new Error(`Rows without tier or level: ${missing.map((r) => r.name).join(", ")}`);
 
 const today = new Date().toISOString().slice(0, 10);
