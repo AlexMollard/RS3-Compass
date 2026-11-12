@@ -22,6 +22,24 @@ test("meanQuantity", () => {
   assert.equal(meanQuantity("14 (noted)"), 14);
   assert.equal(meanQuantity("1,000"), 1000);
   assert.equal(meanQuantity("lots"), undefined);
+  assert.equal(meanQuantity("0x10"), undefined);
+  assert.equal(meanQuantity("1e3"), undefined);
+});
+
+test("meanQuantity averages comma-separated alternatives", () => {
+  assert.equal(meanQuantity("120, 180"), 150);
+  near(meanQuantity("5,10,20"), 35 / 3);
+  assert.equal(meanQuantity("100000, 150000"), 125000);
+  assert.equal(meanQuantity("4-7, 6-10"), 6.75);
+  assert.equal(meanQuantity("175-225, 200-300 (noted)"), 225);
+  assert.equal(meanQuantity("5, lots"), undefined);
+});
+
+test("rarityProbability handles case and decimals", () => {
+  assert.equal(rarityProbability("always"), 1);
+  near(rarityProbability("1/87.5"), 1 / 87.5);
+  near(rarityProbability("44.5/128"), 44.5 / 128);
+  near(rarityProbability("1/1725.6"), 1 / 1725.6);
 });
 
 const drops = [
