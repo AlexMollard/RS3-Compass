@@ -6,7 +6,19 @@ import { writeFileSync } from "node:fs";
 import { QUESTS } from "../src/data.ts";
 import { IMPORTED_QUESTS } from "../src/questsImported.ts";
 import { RS3_SKILL_NAMES } from "../src/skillNames.ts";
-import { bullets, firstLink, links, mapPin, parseQuestreq, plain, questSeries, templateParams } from "./questWikitext.mjs";
+import { groupRewards } from "../src/lib/questRewards.ts";
+import {
+  bullets,
+  firstLink,
+  linkedBullets,
+  links,
+  mapPin,
+  musicTracks,
+  parseQuestreq,
+  plain,
+  questSeries,
+  templateParams,
+} from "./questWikitext.mjs";
 
 const API = "https://runescape.wiki/api.php";
 const USER_AGENT = "RS3 Compass quest import (https://github.com/AlexMollard/RS3-Compass)";
@@ -113,6 +125,62 @@ async function pageImages(titles) {
   return images;
 }
 
+// Infobox templates that say what a linked page is; the first kind listed wins (Ghast is NPC and Monster).
+const KIND_TEMPLATES = [
+  ["item", ["Item", "Bonuses"]],
+  ["spell", ["Spell"]],
+  ["music", ["Music"]],
+  ["npc", ["NPC", "Monster"]],
+  ["place", ["Location", "City", "Dungeon", "Shop"]],
+];
+// For pages without such an infobox, such as the "Ancient Magicks" spellbook.
+const KIND_CATEGORIES = [["spell", "Spells"], ["music", "Music tracks"]];
+
+/** Each page's kind (item, spell, music, npc, place or other) and its title after redirects. */
+async function pageKinds(pages) {
+  const kinds = new Map();
+  const templates = KIND_TEMPLATES.flatMap(([, names]) => names.map((n) => "Template:Infobox " + n));
+  const categories = KIND_CATEGORIES.map(([, name]) => "Category:" + name);
+  for (const batch of chunks([...new Set(pages)])) {
+    const resolve = new Map();
+    const found = new Map();
+    let next;
+    do {
+      const json = await api({
+        action: "query",
+        prop: "templates|categories",
+        tltemplates: templates.join("|"),
+        tllimit: "max",
+        clcategories: categories.join("|"),
+        cllimit: "max",
+        redirects: "1",
+        titles: batch.join("|"),
+        ...next,
+      });
+      for (const n of json.query.normalized ?? []) resolve.set(n.from, n.to);
+      for (const r of json.query.redirects ?? []) resolve.set(r.from, r.to);
+      for (const page of json.query.pages) {
+        if (page.missing || page.invalid) continue;
+        const marks = found.get(page.title) ?? new Set();
+        for (const t of [...(page.templates ?? []), ...(page.categories ?? [])]) marks.add(t.title);
+        found.set(page.title, marks);
+      }
+      next = json.continue;
+    } while (next);
+    for (const page of batch) {
+      let title = page;
+      for (let i = 0; i < 3 && resolve.has(title); i++) title = resolve.get(title);
+      const marks = found.get(title) ?? new Set();
+      const kind =
+        KIND_TEMPLATES.find(([, names]) => names.some((n) => marks.has("Template:Infobox " + n)))?.[0] ??
+        KIND_CATEGORIES.find(([, name]) => marks.has("Category:" + name))?.[0] ??
+        "other";
+      kinds.set(page, { kind, title });
+    }
+  }
+  return kinds;
+}
+
 function lead(content) {
   const infobox = content.search(/\{\{\s*Infobox Quest/i);
   let rest = content.slice(infobox === -1 ? 0 : infobox);
@@ -162,10 +230,18 @@ function parseQuest(title, content, questreq, npcPins) {
   if (questPoints) notes.push(`Requires ${questPoints} quest points.`);
   const rewardsTemplate = templateParams(content, "Quest rewards") ?? {};
   const qp = SUBQUEST_QP.has(title) ? 0 : Number(rewardsTemplate.qp);
-  const rewards = [
-    ...(qp > 0 ? [`${qp} quest point${qp === 1 ? "" : "s"}`] : []),
-    ...bullets(rewardsTemplate.rewards, true),
-  ];
+  const rewards = [...(qp > 0 ? [`${qp} quest point${qp === 1 ? "" : "s"}`] : [])];
+  // Item and unlock lines keep their Wiki links (by index into rewards) for icons and links.
+  const rewardLinks = {};
+  const titlePages = new Set();
+  for (const line of linkedBullets(rewardsTemplate.rewards)) {
+    const groups = groupRewards([line.text]);
+    if ((groups.items.length || groups.unlocks.length) && Object.keys(line.links).length) {
+      rewardLinks[rewards.length] = line.links;
+      for (const page of line.titles) titlePages.add(page);
+    }
+    rewards.push(line.text);
+  }
   const image = (infobox.image ?? "").match(/\[\[File:([^|\]]+)/i)?.[1];
   // Required kills: "* 3 [[Ghast]]s (level 35)". Identity is the linked page plus the level.
   const required = [];
@@ -186,6 +262,9 @@ function parseQuest(title, content, questreq, npcPins) {
     required.push({ name, wiki, image: fileName(`${name}.png`), level });
   }
   return {
+    rewardLinks,
+    titlePages,
+    music: musicTracks(rewardsTemplate.music),
     combat: { required, hazards: [], notes: [] },
     record: {
       id: slug(title),
@@ -274,11 +353,15 @@ for (const [npc, content] of npcPages) {
 
 const records = [];
 const combatPlans = {};
+const rewardLinks = {};
+const titlePages = new Set();
+const music = {};
 const skipped = [];
 for (const title of titles) {
   const content = contents.get(title);
   if (!content) { skipped.push(`${title}: page not found`); continue; }
-  const { record, combat, skip } = parseQuest(title, content, questreq, npcPins);
+  const result = parseQuest(title, content, questreq, npcPins);
+  const { record, combat, skip } = result;
   if (skip) { skipped.push(`${title}: ${skip}`); continue; }
   if (!record.members) { skipped.push(`${title}: free-to-play, add by hand`); continue; }
   if (miniquests.has(title))
@@ -286,7 +369,26 @@ for (const title of titles) {
   if (removed.has(title)) record.availability = "removed";
   records.push(record);
   combatPlans[record.id] = combat;
+  if (Object.keys(result.rewardLinks).length) rewardLinks[record.id] = result.rewardLinks;
+  for (const page of result.titlePages) titlePages.add(page);
+  if (result.music.length) music[record.id] = result.music;
 }
+
+// What each linked reward page is, and a sprite for items whose File:<page>.png exists.
+const linkedPages = [
+  ...new Set(Object.values(rewardLinks).flatMap((lines) => Object.values(lines).flatMap(Object.values))),
+].filter((page) => !titlePages.has(page));
+const kinds = await pageKinds(linkedPages);
+const sprites = await existingFiles(
+  [...kinds.values()].filter((k) => k.kind === "item").map((k) => fileName(k.title + ".png")),
+);
+const references = {};
+for (const page of linkedPages) {
+  const { kind, title } = kinds.get(page);
+  const image = fileName(title + ".png");
+  references[page] = kind === "item" && sprites.has(image) ? { kind, image } : { kind };
+}
+for (const page of titlePages) references[page] = { kind: "title" };
 
 const files = await existingFiles([
   ...records.flatMap((r) => [r.icon, r.artwork, r.start.image]),
@@ -380,7 +482,16 @@ for (const q of [...handWritten, ...records]) {
   const text = contents.get(title) ?? handContents.get(title);
   const found = text && questSeries(text);
   if (found) series[q.wiki.replaceAll(" ", "_")] = found;
+  // Imported quests already have theirs; hand-written ones get music from the same template.
+  const tracks = text && !music[q.id] ? musicTracks(templateParams(text, "Quest rewards")?.music) : [];
+  if (tracks.length) music[q.id] = tracks;
 }
+// Tables written one entry per line, keys sorted, to keep the generated file compact and stable.
+const table = (object) =>
+  Object.entries(object)
+    .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+    .map(([key, value]) => `  ${JSON.stringify(key)}: ${JSON.stringify(value)},`)
+    .join("\n");
 const sortedSeries = Object.fromEntries(Object.entries(series).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)));
 
 const today = new Date().toISOString().slice(0, 10);
@@ -390,6 +501,7 @@ const source = `// Generated by scripts/import-quests.mjs on ${today}. Do not ed
 import type { QuestRecord } from "./data";
 import type { LocationRecord } from "./locations";
 import type { CombatPlan } from "./combatData";
+import type { RewardReference } from "./lib/questRewards";
 
 export const IMPORTED_QUESTS: QuestRecord[] = ${JSON.stringify(records, null, 2)};
 
@@ -402,8 +514,28 @@ export const QUICK_GUIDES: ReadonlySet<string> = new Set(${JSON.stringify(quickG
 
 /** Storyline series per quest wiki page (from the Wiki infobox main_series / series_nth). */
 export const QUEST_SERIES: Readonly<Record<string, { name: string; order: number }>> = ${JSON.stringify(sortedSeries, null, 2)};
+
+/** Wiki pages linked from imported item and unlock reward lines: kind, and the sprite of items that have File:<page>.png. */
+export const REWARD_REFERENCES: Readonly<Record<string, RewardReference>> = {
+${table(references)}
+};
+
+/** Per imported quest id: reward line index → linked label (as the line shows it) → REWARD_REFERENCES page. */
+export const REWARD_LINKS: Readonly<Record<string, Readonly<Record<number, Readonly<Record<string, string>>>>>> = {
+${table(rewardLinks)}
+};
+
+/** Music tracks (Wiki pages) each quest unlocks, by quest id. */
+export const QUEST_MUSIC: Readonly<Record<string, readonly string[]>> = {
+${table(music)}
+};
 `;
 writeFileSync(OUT, source.replace(/\r?\n/g, "\r\n"));
 console.log(`Imported ${records.length} quests, ${Object.keys(locations).length} locations.`);
+const linkedLines = Object.values(rewardLinks).reduce((sum, lines) => sum + Object.keys(lines).length, 0);
+const byKind = {};
+for (const { kind } of Object.values(references)) byKind[kind] = (byKind[kind] ?? 0) + 1;
+console.log(`Reward lines with links: ${linkedLines}; pages: ${JSON.stringify(byKind)}; item sprites: ${Object.values(references).filter((r) => r.image).length}.`);
+console.log(`Music: ${Object.values(music).flat().length} tracks for ${Object.keys(music).length} quests.`);
 console.log(`Skipped ${skipped.length}:`);
 for (const line of skipped) console.log("  " + line);

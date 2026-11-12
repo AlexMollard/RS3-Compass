@@ -5,10 +5,13 @@
     text,
     references,
     catalogue = true,
+    images = true,
   }: {
     text: string;
     references?: readonly GameTextReference[];
     catalogue?: boolean;
+    /** false: links only, when the surrounding tile already shows the art. */
+    images?: boolean;
   } = $props();
   let segments = $derived(tokenizeGameText(text, references, catalogue));
 </script>
@@ -27,7 +30,7 @@
           ? "Exact Wiki artwork unavailable; search for " +
             segment.reference.name
           : segment.reference.name + " on RuneScape Wiki"}
-        >{#if segment.reference.imageUrl || segment.reference.image}<img
+        >{#if images && (segment.reference.imageUrl || segment.reference.image)}<img
             src={segment.reference.imageUrl ??
               wikiImage(segment.reference.image!)}
             alt=""

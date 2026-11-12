@@ -1,4 +1,15 @@
 import { RS3_SKILL_NAMES } from "../skillNames.ts";
+import type { GameTextReference } from "./gameText.ts";
+
+/** What a Wiki page linked from a reward line is, from its infobox (set by scripts/import-quests.mjs). */
+export type RewardKind = "item" | "place" | "spell" | "music" | "npc" | "title" | "other";
+export interface RewardReference {
+  kind: RewardKind;
+  /** The item's sprite, only when the Wiki has File:<page>.png. */
+  image?: string;
+}
+/** The tile icon for a reward line without a sprite. */
+export type RewardIcon = "place" | "spell" | "music" | "npc" | "title" | "unlock" | "item";
 
 export interface RewardGroups {
   questPoints: string[];
@@ -124,6 +135,42 @@ export function lampLabel(lamp: LampReward): { title: string; detail?: string } 
       : "XP lamp";
   return { title: (lamp.count > 1 ? lamp.count + " × " : "") + name, detail: detail || lamp.text };
 }
+
+/**
+ * A reward line's linked phrases as GameText references. They carry no image: the tile icon
+ * shows the art, so the sentence doesn't repeat it.
+ */
+export function rewardLineReferences(
+  links: Readonly<Record<string, string>> | undefined,
+  pages: Readonly<Record<string, RewardReference>>,
+): GameTextReference[] {
+  return Object.entries(links ?? {}).map(([name, wiki]) => {
+    const kind = pages[wiki]?.kind;
+    return { name, wiki, kind: kind === "item" || kind === "place" ? kind : "reference" };
+  });
+}
+
+/**
+ * A reward tile's icon: the first linked item sprite, else a title, else the first linked page
+ * with an icon of its own, else the group's fallback (unlock or item).
+ */
+export function rewardTileArt(
+  line: string,
+  group: "unlocks" | "items",
+  links: Readonly<Record<string, string>> | undefined,
+  pages: Readonly<Record<string, RewardReference>>,
+): { image: string } | { icon: RewardIcon } {
+  const found = Object.values(links ?? {}).map((page) => pages[page]).filter(Boolean);
+  const sprite = found.find((page) => page.image)?.image;
+  if (sprite) return { image: sprite };
+  if (/\btitles?\b/i.test(line) || found.some((page) => page.kind === "title"))
+    return { icon: "title" };
+  const kind = found.find((page) => page.kind !== "other")?.kind;
+  return { icon: kind && kind !== "other" ? kind : group === "unlocks" ? "unlock" : "item" };
+}
+
+/** A music track's name from its Wiki page: "Undercity (music track)" → "Undercity". */
+export const musicTrackName = (page: string) => page.replace(/\s+\(music(?: track)?\)$/i, "");
 
 /** Header chips: every reward group appears, so nothing is hidden behind quest points. */
 export function rewardSummary(rewards: readonly string[]): RewardSummary[] {

@@ -1,13 +1,19 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import {
+    Award,
     BookOpen,
     CircleAlert,
     CircleCheck,
+    EighthNotes,
     ExternalLink,
     Globe,
     Info,
+    LockOpen,
     Map as MapIcon,
+    MapPin,
+    Package,
+    User,
   } from "@lucide/svelte";
   import {
     QUESTS,
@@ -16,7 +22,7 @@
     toggleItem,
   } from "../../data";
   import { QUEST_COMBAT } from "../../combatData";
-  import { QUICK_GUIDES } from "../../questsImported";
+  import { QUEST_MUSIC, QUICK_GUIDES, REWARD_LINKS, REWARD_REFERENCES } from "../../questsImported";
   import { wikiHref, wikiImage } from "../../wiki";
   import { activeProfile, getCompass } from "../compassContext";
   import { INVENTORY_SIZE, inventorySlots } from "../inventorySlots";
@@ -25,7 +31,15 @@
   import { questLine } from "../questLine";
   import { earlierQuests } from "../questMap";
   import { questReadiness, questStartMessage } from "../questReadiness";
-  import { experienceRewards, groupRewards, lampLabel, rewardSummary } from "../questRewards";
+  import {
+    experienceRewards,
+    groupRewards,
+    lampLabel,
+    musicTrackName,
+    rewardLineReferences,
+    rewardSummary,
+    rewardTileArt,
+  } from "../questRewards";
   import { findPlayerQuest } from "../playerProgress";
   import { LOCATIONS } from "../../locations";
   import Button from "../components/Button.svelte";
@@ -51,6 +65,16 @@
     experience: "Antique_lamp.png",
     items: "Coins_1000.png",
     unlocks: "Quest_map_icon.png",
+  };
+  // Item and unlock tiles without a sprite: an icon for what the line links to.
+  const REWARD_ICON = {
+    place: MapPin,
+    spell: BookOpen,
+    music: EighthNotes,
+    npc: User,
+    title: Award,
+    unlock: LockOpen,
+    item: Package,
   };
   const GROUP_LABEL = {
     questPoints: "Quest points",
@@ -97,6 +121,16 @@
   );
   let summary = $derived(rewardSummary(quest.rewards));
   let groups = $derived(groupRewards(quest.rewards));
+  // Imported reward lines' Wiki links, by line text (REWARD_LINKS is keyed by line index).
+  let rewardLinks = $derived(
+    new Map(
+      Object.entries(REWARD_LINKS[quest.id] ?? {}).map(([index, links]) => [
+        quest.rewards[Number(index)],
+        links,
+      ]),
+    ),
+  );
+  let music = $derived(QUEST_MUSIC[quest.id] ?? []);
   let experience = $derived(experienceRewards(groups.experience));
   let fixedTotal = $derived([...experience.fixed.values()].reduce((sum, n) => sum + n, 0));
   let lampCount = $derived(experience.lamps.reduce((sum, lamp) => sum + lamp.count, 0));
@@ -429,6 +463,21 @@
         </div>
       {/if}
     {:else}
+      <!-- Linked lines carry the sprite or kind icon on the tile, so the sentence links without art. -->
+      {#snippet rewardTile(line: string, group: "unlocks" | "items")}
+        {@const links = rewardLinks.get(line)}
+        {@const art = rewardTileArt(line, group, links, REWARD_REFERENCES)}
+        <li>
+          <span class="reward-icon"
+            >{#if "image" in art}<GameArt file={art.image} size={24} />{:else}{@const Icon =
+                REWARD_ICON[art.icon]}<Icon size={18} aria-hidden="true" />{/if}</span
+          >{#if links}<GameText
+              text={line}
+              references={rewardLineReferences(links, REWARD_REFERENCES)}
+              images={false}
+            />{:else}<GameText text={line} />{/if}
+        </li>
+      {/snippet}
       <div class="reward-cards">
         {#if groups.questPoints.length}<section class="tool-window" aria-labelledby="r-qp">
             <header class="window-title"><h2 id="r-qp">Quest points</h2></header>
@@ -443,18 +492,30 @@
               <h2 id="r-items">Items</h2>
               <span>{groups.items.length}</span>
             </header>
-            <ul class="reward-tiles">
-              {#each groups.items as line}<li><GameText text={line} /></li>{/each}
+            <ul class="reward-tiles line-tiles">
+              {#each groups.items as line}{@render rewardTile(line, "items")}{/each}
             </ul>
           </section>{/if}
-        {#if groups.unlocks.length}<section class="tool-window" aria-labelledby="r-unlocks">
+        {#if groups.unlocks.length || music.length}<section class="tool-window" aria-labelledby="r-unlocks">
             <header class="window-title">
               <h2 id="r-unlocks">Unlocks</h2>
-              <span>{groups.unlocks.length}</span>
+              {#if groups.unlocks.length}<span>{groups.unlocks.length}</span>{/if}
             </header>
-            <ul class="reward-list">
-              {#each groups.unlocks as line}<li><GameText text={line} /></li>{/each}
-            </ul>
+            {#if groups.unlocks.length}<ul class="reward-tiles line-tiles">
+                {#each groups.unlocks as line}{@render rewardTile(line, "unlocks")}{/each}
+              </ul>{/if}
+            {#if music.length}<p class="music-row">
+                <span class="music-label"><EighthNotes size={14} aria-hidden="true" />Music</span>
+                <span
+                  >{#each music as track, index (track)}{#if index}{", "}{/if}<a
+                      class="wiki-ref"
+                      href={wikiHref(track)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title={musicTrackName(track) + " on RuneScape Wiki"}>{musicTrackName(track)}</a
+                    >{/each}</span
+                >
+              </p>{/if}
           </section>{/if}
       </div>
 
@@ -1163,6 +1224,37 @@
   .lamp-options {
     margin-top: 2px;
     line-height: 16px;
+  }
+  .line-tiles li {
+    align-items: flex-start;
+  }
+  .reward-icon {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    color: var(--gold);
+  }
+  .music-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 10px;
+    margin: 0;
+    padding: 14px 16px;
+  }
+  .line-tiles + .music-row {
+    padding-top: 0;
+  }
+  .music-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font: 600 10px/14px "DM Sans", sans-serif;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
   }
   .reward-list {
     list-style: none;

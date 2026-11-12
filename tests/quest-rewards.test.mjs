@@ -1,7 +1,16 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { experienceRewards, groupRewards, lampLabel, rewardSummary } from "../src/lib/questRewards.ts";
+import {
+  experienceRewards,
+  groupRewards,
+  lampLabel,
+  musicTrackName,
+  rewardLineReferences,
+  rewardSummary,
+  rewardTileArt,
+} from "../src/lib/questRewards.ts";
 import { QUESTS } from "../src/data.ts";
+import { QUEST_MUSIC, REWARD_LINKS, REWARD_REFERENCES } from "../src/questsImported.ts";
 
 test("reward lines sort into quest points, experience, unlocks and items", () => {
   assert.deepEqual(
@@ -180,6 +189,77 @@ test("the summary shows every reward group, not just quest points", () => {
     rewardSummary(["100 Cooking XP and 150 Thieving XP", "Two XP lamps"])[0].text,
     "250 XP in 2 skills + 2 XP lamps",
   );
+});
+
+test("reward tiles use the item sprite, else a title, else the first linked kind, else the group fallback", () => {
+  const pages = {
+    "Ring of charos": { kind: "item", image: "Ring_of_charos.png" },
+    "Werewolf Agility Course": { kind: "place" },
+    "Ancient Magicks": { kind: "spell" },
+    "Body Parts": { kind: "music" },
+    Eblis: { kind: "npc" },
+    Titles: { kind: "title" },
+    "Build mode": { kind: "other" },
+    "Trahaearn exoskeleton set": { kind: "other" },
+  };
+  const art = (line, group, links) => rewardTileArt(line, group, links, pages);
+  assert.deepEqual(
+    art("The Ring of charos, for the Werewolf Agility Course", "items", {
+      "Werewolf Agility Course": "Werewolf Agility Course",
+      "Ring of charos": "Ring of charos",
+    }),
+    { image: "Ring_of_charos.png" },
+  );
+  assert.deepEqual(art("Access to the course", "unlocks", { course: "Werewolf Agility Course" }), { icon: "place" });
+  assert.deepEqual(art("Ability to use Ancient Magicks", "unlocks", { "Ancient Magicks": "Ancient Magicks" }), { icon: "spell" });
+  assert.deepEqual(art("Body Parts", "unlocks", { "Body Parts": "Body Parts" }), { icon: "music" });
+  assert.deepEqual(art("Buy from Eblis", "items", { Eblis: "Eblis" }), { icon: "npc" });
+  assert.deepEqual(art("The of the Elves title", "unlocks", { "of the Elves": "Titles" }), { icon: "title" });
+  assert.deepEqual(art("The Yt'Haar- title", "unlocks", undefined), { icon: "title" });
+  // "other" pages are skipped for a later linked kind, then fall back to the group's icon.
+  assert.deepEqual(art("floor styles for Eblis", "unlocks", { "floor styles": "Build mode", Eblis: "Eblis" }), { icon: "npc" });
+  assert.deepEqual(art("floor styles", "unlocks", { "floor styles": "Build mode" }), { icon: "unlock" });
+  assert.deepEqual(art("The set", "items", { set: "Trahaearn exoskeleton set" }), { icon: "item" });
+  assert.deepEqual(art("500 coins", "items", undefined), { icon: "item" });
+});
+
+test("reward line references link without inline art and map kinds onto GameText's", () => {
+  const references = rewardLineReferences(
+    { "Ring of charos": "Ring of charos", "Experiment cave": "Experiment cave", Eblis: "Eblis" },
+    {
+      "Ring of charos": { kind: "item", image: "Ring_of_charos.png" },
+      "Experiment cave": { kind: "place" },
+      Eblis: { kind: "npc" },
+    },
+  );
+  assert.deepEqual(references, [
+    { name: "Ring of charos", wiki: "Ring of charos", kind: "item" },
+    { name: "Experiment cave", wiki: "Experiment cave", kind: "place" },
+    { name: "Eblis", wiki: "Eblis", kind: "reference" },
+  ]);
+  assert.equal(musicTrackName("Melzar's Maze (music track)"), "Melzar's Maze");
+  assert.equal(musicTrackName("Freneskae (music)"), "Freneskae");
+  assert.equal(musicTrackName("Bone Dry"), "Bone Dry");
+});
+
+test("imported reward links classify the Wiki pages they point at", () => {
+  const linksOf = (id, line) => {
+    const quest = QUESTS.find((q) => q.id === id);
+    return REWARD_LINKS[id][quest.rewards.findIndex((text) => text.startsWith(line))];
+  };
+  const fenkenstrain = linksOf("creature-of-fenkenstrain", "The Ring of charos");
+  assert.equal(fenkenstrain["Ring of charos"], "Ring of charos");
+  assert.deepEqual(REWARD_REFERENCES["Ring of charos"], { kind: "item", image: "Ring_of_charos.png" });
+  assert.equal(REWARD_REFERENCES[linksOf("creature-of-fenkenstrain", "Access to the Experiment cave")["Experiment cave"]].kind, "place");
+  assert.equal(REWARD_REFERENCES[linksOf("desert-treasure", "Ability to use Ancient Magicks")["Ancient Magicks"]].kind, "spell");
+  assert.equal(REWARD_REFERENCES[linksOf("plagues-end", "Access to the city")["Prifddinas"]].kind, "place");
+  assert.ok(QUESTS.find((q) => q.id === "plagues-end").rewards.includes("The of the Elves title"));
+  assert.equal(REWARD_REFERENCES[linksOf("plagues-end", "The of the Elves title")["of the Elves"]].kind, "title");
+  assert.deepEqual(QUEST_MUSIC["creature-of-fenkenstrain"], ["Body Parts"]);
+  // Every linked page is in the shared table.
+  for (const lines of Object.values(REWARD_LINKS))
+    for (const links of Object.values(lines))
+      for (const page of Object.values(links)) assert.ok(REWARD_REFERENCES[page], page);
 });
 
 test("every catalogue reward lands in exactly one group", () => {

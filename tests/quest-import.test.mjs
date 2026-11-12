@@ -2,12 +2,72 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   bullets,
+  linkedBullets,
   mapPin,
+  musicTracks,
   parseQuestreq,
   plain,
   questSeries,
   templateParams,
 } from "../scripts/questWikitext.mjs";
+
+test("reward lines keep their links as label → page, with labels exactly as the line shows them", () => {
+  const [ring, cave, staff] = linkedBullets(
+    "* The [[Ring of charos]], which allows access to the [[Werewolf Agility Course]]\n" +
+      "* Access to the [[Experiment cave]]<ref>[[Not shown]]</ref>\n" +
+      "* Ability to wield an [[ancient staff]], and buy one from [[Eblis]] for 80,000 coins",
+  );
+  assert.equal(ring.text, "The Ring of charos, which allows access to the Werewolf Agility Course");
+  assert.deepEqual(ring.links, {
+    "Ring of charos": "Ring of charos",
+    "Werewolf Agility Course": "Werewolf Agility Course",
+  });
+  assert.deepEqual(cave.links, { "Experiment cave": "Experiment cave" });
+  // Lowercase targets become page titles; the label keeps the line's own case.
+  assert.deepEqual(staff.links, { "ancient staff": "Ancient staff", Eblis: "Eblis" });
+});
+
+test("piped links, link trails, anchors, plinks and joined children all land on the line", () => {
+  const [line] = linkedBullets(
+    "* Ability to use [[Build mode#Floor styles|floor styles]], 13 [[Bandos chronicle]]s and {{plink|Ring of visibility}}\n" +
+      "** Also [[Prifddinas]] [[File:X.png]] [[Category:Y]]",
+  );
+  assert.equal(line.text, "Ability to use floor styles, 13 Bandos chronicles and Ring of visibility Also Prifddinas");
+  assert.deepEqual(line.links, {
+    "floor styles": "Build mode",
+    "Bandos chronicles": "Bandos chronicle",
+    Prifddinas: "Prifddinas",
+    "Ring of visibility": "Ring of visibility",
+  });
+});
+
+test("a label used for two pages is dropped rather than guessed", () => {
+  const [line] = linkedBullets("* XP: [[Agility XP lamp|lamp]] and [[Mining XP lamp|lamp]], plus [[Coal]]");
+  assert.deepEqual(line.links, { Coal: "Coal" });
+});
+
+test("TitleAnchor shows the title's text and links it to its page or the titles list", () => {
+  assert.equal(plain("The {{TitleAnchor|t=of the Elves|c=#00FFFF|loc=s|bg=yes}} title"), "The of the Elves title");
+  const [elves, tzhaar] = linkedBullets(
+    "* The {{TitleAnchor|t=of the Elves|c=#00FFFF|loc=s|bg=yes}} title\n" +
+      "* The {{TitleAnchor|t=TzHaar-|c=#C12006|loc=p|space=no|link=TzHaar (title)}} title",
+  );
+  assert.equal(elves.text, "The of the Elves title");
+  assert.deepEqual(elves.links, { "of the Elves": "Titles" });
+  assert.deepEqual(elves.titles, ["Titles"]);
+  assert.equal(tzhaar.text, "The TzHaar- title");
+  assert.deepEqual(tzhaar.links, { "TzHaar-": "TzHaar (title)" });
+});
+
+test("music bullets become track pages, linked or plain, once each", () => {
+  assert.deepEqual(
+    musicTracks(
+      "* [[Bone Dry]] (Smoke Dungeon)\n* [[melzar's Maze (music track)|Melzar's Maze]]\n* Plain Song (somewhere)\n* [[Bone Dry]]\n* None",
+    ),
+    ["Bone Dry", "Melzar's Maze (music track)", "Plain Song"],
+  );
+  assert.deepEqual(musicTracks(undefined), []);
+});
 
 test("quest series reads the infobox name and position, and skips missing or odd ones", () => {
   const page = (extra) => `{{Infobox Quest\n|name = X\n${extra}\n}}\nLead.`;
