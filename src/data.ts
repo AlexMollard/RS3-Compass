@@ -64,6 +64,10 @@ export interface Profile {
   statistics?: PlayerStatistics & { fetchedAt: number };
   questProgress?: PlayerQuestProgress & { fetchedAt: number };
   eventLog?: { events: PlayerEvent[]; fetchedAt: number };
+  /** Collection log keys `boss:<bossId>:<item>` the player has ticked. */
+  collected?: string[];
+  /** Keys ever auto-ticked from the activity log, so they're never re-added. */
+  collectedAuto?: string[];
 }
 export interface QuestRecord {
   id: string;

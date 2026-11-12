@@ -489,3 +489,91 @@ test("Hiscores detection sets regular or Solo Ironman on lookup and refresh, and
   assert.equal(kindOf(), "Group Ironman");
   controller.destroy();
 });
+
+test("Review Focus 4: a save without collection log fields loads, and a malformed one is kept", (t) => {
+  const descriptor = Object.getOwnPropertyDescriptor(
+    globalThis,
+    "localStorage",
+  );
+  const legacy = structuredClone(get(createCompassController().state));
+  assert.ok(
+    legacy.profiles.every(
+      (p) => !("collected" in p) && !("collectedAuto" in p),
+    ),
+  );
+  const ticked = structuredClone(legacy);
+  ticked.profiles[0].collected = ["boss:giant-mole:Mole claw"];
+  ticked.profiles[0].collectedAuto = ["boss:giant-mole:Mole claw"];
+  const badCollected = structuredClone(legacy);
+  badCollected.profiles[0].collected = [1];
+  const badAuto = structuredClone(legacy);
+  badAuto.profiles[0].collectedAuto = "boss:giant-mole:Mole claw";
+  let stored;
+  Object.defineProperty(globalThis, "localStorage", {
+    configurable: true,
+    value: { getItem: () => stored, setItem: (_, value) => (stored = value) },
+  });
+  t.after(() => {
+    if (descriptor)
+      Object.defineProperty(globalThis, "localStorage", descriptor);
+    else delete globalThis.localStorage;
+  });
+  const load = (saved) => {
+    stored = JSON.stringify(saved);
+    const original = stored;
+    const controller = createCompassController();
+    controller.initialize();
+    controller.destroy();
+    return { controller, original };
+  };
+  for (const saved of [legacy, ticked]) {
+    const { controller } = load(saved);
+    assert.equal(get(controller.storageError), false);
+    assert.deepEqual(get(controller.state), saved);
+  }
+  for (const saved of [badCollected, badAuto]) {
+    const { controller, original } = load(saved);
+    assert.equal(get(controller.storageError), true);
+    assert.equal(stored, original);
+  }
+});
+
+test("A synced event log auto-ticks boss uniques once, and an untick survives the next sync", () => {
+  const controller = createCompassController();
+  const key = "boss:giant-mole:Mole claw";
+  const withDrop = (fetchedAt) => ({
+    ...player,
+    fetchedAt,
+    events: {
+      status: "available",
+      name: "Real Player",
+      events: [
+        {
+          type: "rs_plog_item_drop",
+          date: "13-Nov-2026 10:00",
+          text: "I found a mole claw.",
+          details: "",
+        },
+      ],
+    },
+  });
+  controller.addPlayer(player, "Regular account", "f2p");
+  assert.equal(current(controller).collected, undefined);
+  assert.equal(current(controller).collectedAuto, undefined);
+  controller.addPlayer(withDrop(2000), "Regular account", "f2p");
+  assert.deepEqual(current(controller).collected, [key]);
+  assert.deepEqual(current(controller).collectedAuto, [key]);
+  controller.updateProfile((p) => ({
+    ...p,
+    collected: p.collected.filter((k) => k !== key),
+  }));
+  controller.addPlayer(withDrop(3000), "Regular account", "f2p");
+  assert.deepEqual(current(controller).collected, []);
+  assert.deepEqual(current(controller).collectedAuto, [key]);
+  assert.ok(
+    get(controller.state).profiles.every(
+      (p) => p.source === "hiscores" || !("collected" in p),
+    ),
+  );
+  controller.destroy();
+});

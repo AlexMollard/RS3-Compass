@@ -23,6 +23,8 @@ import { createPlayerSynchronizer, type SyncTarget } from "./playerSync.ts";
 import { snapshotFetchedAt } from "./sourceStatus.ts";
 import { isGroupLookup } from "./groupData.ts";
 import { isRecord, isSkillLevel, isSkillLevelMap } from "./guards.ts";
+import { BOSSES } from "../bosses.ts";
+import { mergeAutoTicks } from "./collectionLog.ts";
 
 const KEY = "rs3-compass-design-v1";
 
@@ -70,6 +72,11 @@ function validProfile(value: unknown): value is Profile {
         Object.values(p.trainingMethods).every(
           (id) => typeof id === "string" && id.length > 0 && id.length <= 128,
         ))) &&
+    [p.collected, p.collectedAuto].every(
+      (a) =>
+        a === undefined ||
+        (Array.isArray(a) && a.every((x) => typeof x === "string")),
+    ) &&
     isRecord(p.levels) &&
     Object.values(p.levels).every((n) => isSkillLevel(n)) &&
     [p.completedQuests, p.packed, p.completedTasks].every(
@@ -421,6 +428,7 @@ export function createCompassController(): CompassController {
           };
           profile.activeTask = nextQuest(profile)?.id ?? "train-Mining";
         }
+        if (sourceData.eventLog) profile = mergeAutoTicks(profile, BOSSES);
         return {
           ...current,
           welcomed: options?.select !== false ? true : current.welcomed,
