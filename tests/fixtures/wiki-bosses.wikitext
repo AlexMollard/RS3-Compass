@@ -1,0 +1,1018 @@
+{{External|os|rsc|dw}}
+{{Otheruses|the powerful class of monsters|other uses|Boss (disambiguation)}}
+[[File:Nex.png|thumb|200px|[[Nex]], the [[Zaros]]ian general]]
+'''Bosses''' are powerful, usually unique [[monster]]s that are fought to accomplish an objective, be it the completion of a [[quests|quest]] or [[minigames|minigame]], or as part of [[player versus monster]] activities. Many quests feature boss fights at their climaxes; such bosses are often the main antagonists of the quest series or are somehow related to the main antagonists.
+
+Bosses are very powerful monsters that are commonly fought by players, both in teams and alone, in search of highly valuable drops. Many bosses have extremely high [[combat level]]s, and all of the [[strongest monster]]s in the game are bosses. Bosses are typically immune to a combination of either stun, poison, or reflect damage. Even fewer bosses are immune to a combination of leeching effects (from the Ancient Curses) or status abnormalities (defence drain (not affinity value) or damage increasing hexes), generally recovering from the latter very quickly.
+
+Older, traditional bosses such as [[General Graardor]] usually reward their [[drops]] to the player who dealt the most damage, while other bosses, such as [[Vorago]] or [[Nex, Angel of Death]], may also give drops to vital non-damaging roles, such as taking the boss' aggression and/or attacks. Most bosses that are often fought in a group (such as raids and elite dungeon bosses) generally have participants receive their own individual drop as long as they dealt some damage.
+
+[[Dwarf multicannon]]s and [[combat dummy MKII|combat dummies]] often cannot be set up in the areas of many bosses.
+
+Since the introduction of [[Kerapac, the bound]], most updates that introduce new bosses to the game start a week-long event where [[Death]] provides free item reclaims. The event ends at noon seven days after the update that introduces the boss. The release of [[Rasial, the First Necromancer]] and [[Hermod, the Spirit of War]] was an exception, as no free death week occurred during the week of release.
+
+Defeating every boss at least once completes the achievement [[Reaper Crew]], unlocking the title {{TitleAnchor|the Reaper}} and permanently boosting some of the player's combat stats.
+
+==Combat bosses==
+{| class="wikitable sortable sticky-header align-center-3 align-center-4 align-center-5"
+! class="unsortable" |
+! Name
+! Level
+! Difficulty<ref name="difficulty">As per the [[PvM portal#Strategy guides|RS Wiki Boss tier]] classification</ref>
+! Encounter type
+! class="unsortable" | Requirements
+! Special rewards
+! Release date
+|-
+| [[File:Amascut, the Devourer.png|64px]]
+| [[Amascut, the Devourer]]
+| 9999
+| data-sort-value="4" class="table-bg-red" | High tier
+| Group-only (2-5)
+|
+* {{QuestIcon|Eclipse of the Heart}}
+| 
+* {{plink|Shard of Genesis Essence}}
+* {{plink|The Devourer's Nexus}}
+* {{plink|Tumeken's Light}}
+* {{plink|Tumeken's resplendence equipment|pic=Mask of Tumeken's resplendence}}
+| [[4 August]] [[2025]]
+|-
+| [[File:The Ambassador.png|64px]]
+| [[The Ambassador]]
+| 5500
+| data-sort-value="4" class="table-bg-red" | High tier
+| Solo or group (1-3)
+| {{NA}}
+| 
+* {{plink|Eldritch crossbow}}
+| [[25 February]] [[2019]]
+|-
+| [[File:Araxxi.png|64px]]
+| [[Araxxi]]
+| 3000
+| data-sort-value="4" class="table-bg-red" | High tier
+| Solo or group (1-2)
+|
+* Access to [[Morytania]]
+|
+* {{plink|Noxious scythe}}
+* {{plink|Noxious longbow}}
+* {{plink|Noxious staff}}
+| [[28 July]] [[2014]]
+|-
+| [[File:Arch-Glacor.png|64px]]
+| [[Arch-Glacor]]
+| 7000
+| data-sort-value="2" class="table-bg-green" | Low tier
+| Solo or group (Normal mode)<br>Solo-only (Hard mode)
+| {{na}}
+|
+* {{plink|Dark Shard of Leng}}
+* {{plink|Dark Sliver of Leng}}
+* {{plink|Dark ice shard}}
+* {{plink|Dark ice sliver}}
+* {{plink|Scripture of Wen}}
+* {{plink|Leng artefact}}
+| [[31 August]] [[2021]]
+|-
+| [[File:Astellarn.png|64px]]
+| [[Astellarn]]
+| 1200
+| data-sort-value="4" class="table-bg-red" | High tier
+| Solo or group (1-3)
+| {{na}}
+| 
+* {{plink|Greater Flurry ability codex}}
+| [[13 August]] [[2018]]
+|-
+| [[File:Dharok the Wretched.png|64px]]
+| [[The Barrows Brothers]]
+| 150
+| data-sort-value="2" class="table-bg-green" | Low tier
+| Solo-only
+| 
+* Access to [[Morytania]]
+* Completion of {{QuestIcon|Ritual of the Mahjarrat}} to fight [[Akrisae]]
+* Completion of {{QuestIcon|Kindred Spirits}} to fight [[Linza]]
+| 
+* {{plink|Barrows equipment|pic=Dharok's greataxe}}
+* {{plink|Amulet of the forsaken}}
+| [[9 May]] [[2005]]
+|-
+| [[File:Ahrim the Blighted (Shadow).png|64px]]
+| [[The Barrows: Rise of the Six]]
+| 650
+| data-sort-value="4" class="table-bg-red" | High tier
+| Solo or group (1-4)
+| 
+* Access to [[Morytania]]
+* Needs a [[Barrows totem]] per instance
+| 
+* {{plink|Malevolent kiteshield}}
+* {{plink|Merciless kiteshield}}
+* {{plink|Vengeful kiteshield}}
+* {{plink|Malevolent armour|pic=Malevolent cuirass}}
+| [[13 November]] [[2013]]
+|-
+| [[File:Beastmaster Durzag.png|64px]]
+| [[Beastmaster Durzag]]
+| 2000
+| data-sort-value="4" class="table-bg-red" | High tier
+| Solo or group
+| {{na}}
+| 
+* {{plink|Mazcab ability codex}}
+* {{plink|Achto Teralith equipment|pic=Achto Teralith helmet}}
+* {{plink|Achto Primeval equipment|pic=Achto Primeval mask}}
+* {{plink|Achto Tempest equipment|pic=Achto Tempest cowl}}
+| [[13 July]] [[2015]]
+|-
+| [[File:Black stone dragon.png|64px]]
+| [[Black Stone Dragon]]
+| 2500
+| data-sort-value="4" class="table-bg-red" | High tier
+| Solo or group (1-3)
+| {{na}}
+| 
+* {{plink|Draconic energy}}
+* {{plink|Greater Barge ability codex}}
+| [[13 August]] [[2018]]
+|-
+| [[File:Chaos Elemental.png|64px]]
+| [[Chaos Elemental]]
+| 305
+| data-sort-value="1" class="table-bg-blue" | Free tier
+| Solo or group
+| {{na}}
+|
+* {{plink|Corrupt dragon equipment|pic=Corrupt dragon helm}}
+* {{plink|Ancient Warriors' equipment|pic=Statius's warhammer}}
+| [[20 February]] [[2006]]
+|-
+| [[File:Commander Zilyana.png|64px]]
+| [[Commander Zilyana]]
+| 596
+| data-sort-value="2" class="table-bg-green" | Low tier
+| Solo or group
+| 
+* {{Skillreq|Agility|70}}
+* Defeat [[Dad]] from the {{QuestIcon|Troll Stronghold}} quest
+| 
+* {{plink|Warpriest of Saradomin armour|pic=Warpriest of Saradomin helm}}
+* {{plinkp|Armadyl crossbow}} {{plinkp|Off-hand Armadyl crossbow}} [[Armadyl crossbow]]
+* {{plink|Saradomin sword}}
+* {{plink|Saradomin godsword}}
+* {{plinkp|Saradomin's hiss}} {{plinkp|Saradomin's murmur}} {{plinkp|Saradomin's whisper}}{{plinkp|Saradomin's hum}} Saradomin's amulets
+| [[28 August]] [[2007]]
+|-
+| [[File:Corporeal Beast.png|64px]]
+| [[Corporeal Beast]]
+| 785
+| data-sort-value="3" class="table-bg-orange" | Mid tier
+| Solo or group
+|
+* Completion of {{QuestIcon|Summer's End}}
+| 
+* {{plink|Holy elixir}}
+* {{plinkp|Spectral spirit shield}} {{plinkp|Arcane spirit shield}}{{plinkp|Elysian spirit shield}}{{plinkp|Divine spirit shield}} Spirit shield sigils
+| [[15 September]] [[2008]]
+|-
+| [[File:Crassian Leviathan.png|64px]]
+| [[Crassian Leviathan]]
+| 1500
+| data-sort-value="4" class="table-bg-red" | High tier
+| Solo or group (1-3)
+| {{na}}
+| {{na}}
+| [[25 February]] [[2019]]
+|-
+| [[File:Dagannoth Rex.png|64px]]
+| [[Dagannoth Kings]]
+| 303
+| data-sort-value="2" class="table-bg-green" | Low tier
+| Solo or group
+|
+* Partial completion of {{QuestIcon|The Fremennik Trials}}
+| 
+* {{plinkp|Seers' ring}} {{plinkp|Archers' ring}} {{plinkp|Warrior ring}} {{plinkp|Berserker ring}} [[Fremennik rings]]
+* {{plink|Dragon hatchet}}
+* {{plink|Mud battlestaff}}
+* {{plink|Seercull}}
+| [[7 November]] [[2005]]
+|-
+| [[File:Flesh-hatcher Mhekarnahz.png|64px]]
+| [[Flesh-hatcher Mhekarnahz]]
+| 368
+| data-sort-value="2" class="table-bg-green" | Low tier
+| Solo-only
+|
+* {{Skillreq|Dungeoneering|40}}
+| 
+* {{plink|Stalker's charm}}
+* {{plink|Dragon harpoon}}
+| [[8 December]] [[2025]]
+|-
+| [[File:General Graardor.png|64px]]
+| [[General Graardor]]
+| 624
+| data-sort-value="2" class="table-bg-green" | Low tier
+| Solo or group
+| 
+* {{Skillreq|Strength|70}}
+* Defeat [[Dad]] from the {{QuestIcon|Troll Stronghold}} quest
+| 
+* {{plink|Warpriest of Bandos armour|pic=Warpriest of Bandos helm}}
+* {{plink|Bandos equipment|pic=Bandos helmet}}
+* {{plink|Bandos godsword}}
+| [[28 August]] [[2007]]
+|-
+| [[File:Lady Karmina Ghrazi.png|64px]]
+| [[The Ghrazi Blood Knights]]
+| 4914
+| data-sort-value="4" class="table-bg-red" | High tier
+| Solo or group (1-2)
+|
+* Completion of {{QuestIcon|Heralds of Crimson}}
+| 
+* {{plinkp|Malachi's tooth}} {{plinkp|Malachi's claw}} [[Malachi's tooth]] and [[Malachi's claw]]
+* {{plink|Invoke Arisen Flesh incantation codex}}
+| [[12 October]] [[2026]]
+|-
+| [[File:Giant mole.png|64px]]
+| [[Giant Mole]]
+| 230
+| data-sort-value="1" class="table-bg-blue" | Free tier
+| Solo or group
+| {{na}}
+| 
+* {{plink|Dragon 2h sword}}
+* {{plinkp|Mole skin}} {{plinkp|Mole claw}} [[Mole skins]] and [[Mole claws]]
+| [[7 March]] [[2006]]
+|-
+| [[File:Gregorovic.png|64px]]
+| [[Gregorovic]]
+| 1000
+| data-sort-value="3" class="table-bg-orange" | Mid tier
+| Solo or group
+|
+* {{skillreq|Prayer|80}}
+| 
+* {{plink|Anima core of Sliske armour|pic=Anima core helm of Sliske}}
+* {{plinkp|Shadow glaive}} {{plinkp|Off-hand shadow glaive}} [[Shadow glaives]]
+* {{plink|Sliskean essence}}
+| [[7 March]] [[2016]]
+|-
+| [[File:Har-Aken.png|64px]]
+| [[Har-Aken]]
+| 800
+| data-sort-value="4" class="table-bg-red" | High tier
+| Solo-only
+| 
+* Completion of {{QuestIcon|The Elder Kiln}}
+* You must have sacrificed a [[Fire cape]]
+| 
+* {{plinkp|TokHaar-Kal-Ket}} {{plinkp|TokHaar-Kal-Mej}} {{plinkp|TokHaar-Kal-Xil}} {{plinkp|TokHaar-Kal-Mor}} TokHaar-Kal capes
+* {{plink|Uncut onyx}}
+| [[14 February]] [[2012]]
+|-
+| [[File:Helwyr.png|64px]]
+| [[Helwyr]]
+| 1000
+| data-sort-value="3" class="table-bg-orange" | Mid tier
+| Solo or group
+|
+* {{Skillreq|Magic|80}}
+| 
+* {{plink|Anima core of Seren armour|pic=Anima core helm of Seren}}
+* {{plinkp|Wand of the Cywir elders}} {{plinkp|Orb of the Cywir elders}} Cywir elders weaponry
+* {{plink|Serenic essence}}
+| [[17 March]] [[2016]]
+|-
+| [[File:Ivar, King of Bones.png|64px]]
+| [[Ivar, King of Bones]]
+| 206
+| data-sort-value="1" class="table-bg-blue" | Free tier
+| Solo or group
+|
+* Completion of {{QuestIcon|Visions of Havenhythe}}
+| 
+* {{plink|Bonecrusher maul}}
+* {{plink|Magic skull mask}}
+* {{plink|Colossal bone}}
+| [[23 March]] [[2026]]
+|-
+| [[File:Kalphite King (Melee).png|64px]]
+| [[Kalphite King]]
+| 2500
+| data-sort-value="3" class="table-bg-orange" | Mid tier
+| Solo or group 
+| {{na}}
+|
+* {{plink|Drygore weaponry|pic=Drygore longsword}}
+| [[14 January]] [[2013]]
+|-
+| [[File:Kalphite Queen.png|64px]]
+| [[Kalphite Queen]]
+| 333
+| data-sort-value="2" class="table-bg-green" | Low tier
+| Solo or group
+| {{na}}
+|
+* {{plink|Dragon chainbody}}
+* {{plink|Dragon 2h sword}}
+| [[7 September]] [[2004]]
+|-
+| [[File:Kerapac, the bound.png|64px]]
+| [[Kerapac, the bound]]
+| 3000
+| data-sort-value="4" class="table-bg-red" | High tier
+| Solo or group (1-3)
+| {{na}}
+|
+* {{plink|Fractured Staff of Armadyl}}
+* {{plink|Scripture of Jas}}
+* {{plink|Greater Concentrated blast ability codex}}
+* {{plink|Kerapac's wrist wraps}}
+| [[26 July]] [[2021]]
+|-
+| [[File:Kezalam, the Wanderer.png|64px]]
+| [[Kezalam, the Wanderer]]
+| 1440
+| data-sort-value="4" class="table-bg-red" | High tier
+| Solo or group (1-4)
+|
+* Completion of {{QuestIcon|Soul Searching}}
+| 
+* {{plink|Divine Rage prayer codex}}
+* {{plink|Scripture of Amascut}}
+| [[22 July]] [[2024]]
+|-
+| [[File:King Black Dragon.png|64px]]
+| [[King Black Dragon]]
+| 276
+| data-sort-value="1" class="table-bg-blue" | Free tier
+| Solo or group
+| {{na}}
+|
+* {{plink|Draconic visage}}
+* {{plink|Dragon Rider gloves}}
+* {{plink|Dragon Rider boots}}
+| [[24 September]] [[2002]]
+|-
+| [[File:Kree'arra.png|64px]]
+| [[Kree'arra]]
+| 580
+| data-sort-value="2" class="table-bg-green" | Low tier
+| Solo or group
+| 
+* {{Skillreq|Agility|60}} or {{Skillreq|Strength|60}}
+* {{Skillreq|Ranged|70}}
+* Defeat [[Dad]] from the {{QuestIcon|Troll Stronghold}} quest
+| 
+* {{plink|Warpriest of Armadyl armour|pic=Warpriest of Armadyl helm}}
+* {{plink|Armadyl equipment|pic=Armadyl helmet}}
+* {{plink|Armadyl godsword}}
+| [[28 August]] [[2007]]
+|-
+| [[File:K'ril Tsutsaroth.png|64px]]
+| [[K'ril Tsutsaroth]]
+| 650
+| data-sort-value="2" class="table-bg-green" | Low tier
+| Solo or group
+|
+* {{Skillreq|Agility|60}} or {{Skillreq|Strength|60}}
+* {{Skillreq|Constitution|70}}
+* Defeat [[Dad]] from the {{QuestIcon|Troll Stronghold}} quest
+|
+* {{plink|Warpriest of Zamorak armour|pic=Warpriest of Zamorak helm}}
+* {{plink|Subjugation robe armour|pic=Hood of subjugation}}
+* {{plink|Zamorakian spear}}
+* {{plink|Zamorak godsword}}
+* {{plink|Steam battlestaff}}
+| [[28 August]] [[2007]]
+|-
+| [[File:Legio Primus.png|64px]] 
+| [[Legiones]]
+| 304
+| data-sort-value="3" class="table-bg-orange" | Mid tier
+| Solo or group (1-2)
+| 
+* {{Skillreq|Slayer|95}}
+* An [[ascension keystone]]
+|
+* {{plink|Ascension grips}}
+* {{plink|Ascension signets|pic=Ascension signet I}}
+| [[5 August]] [[2013]]
+|-
+| [[File:The Magister.png|64px]]
+| [[The Magister]]
+| 899
+| data-sort-value="4" class="table-bg-red" | High tier
+| Solo-only
+| 
+* {{Skillreq|Slayer|115}}
+* Partial completion of {{QuestIcon|Icthlarin's Little Helper}}
+* A [[Key to the Crossing]] is needed every kill
+|
+* {{plink|Phylactery}}
+* {{plink|Gloves of passage}}
+| [[3 July]] [[2017]]
+|-
+| [[File:Masuta the Ascended.png|64px]]
+| [[Masuta the Ascended]]
+| 1000
+| data-sort-value="4" class="table-bg-red" | High tier
+| Solo or group (1-3)
+|
+* Completion of {{QuestIcon|Impressing the Locals}}
+|
+* {{plink|Masuta's warspear}}
+| [[25 June]] [[2018]]
+|-
+| [[File:Nakatra, Devourer Eternal.png|64px]]
+| [[Nakatra, Devourer Eternal]]
+| 2160
+| data-sort-value="4" class="table-bg-red" | High tier
+| Solo or group (1-4)
+|
+* Completion of {{QuestIcon|Soul Searching}}
+|
+* {{plinkp|Roar of Awakening}} {{plinkp|Ode to Deceit}} [[Roar of Awakening]] and [[Ode to Deceit]]
+* {{plink|Shard of Genesis Essence}}
+* {{plink|Scripture of Amascut}}
+* {{plink|Divine Rage prayer codex}}
+| [[22 July]] [[2024]]
+|-
+| [[File:Nex.png|64px]]
+| [[Nex]]
+| 1001
+| data-sort-value="3" class="table-bg-orange" | Mid tier
+| Solo or group
+|
+* [[Frozen key]] and [[ancient ceremonial robes]]
+* {{Skillreq|Agility|70}}
+* {{Skillreq|Strength|70}}
+* {{Skillreq|Ranged|70}}
+* {{Skillreq|Constitution|70}}
+|
+* {{plink|Torva armour|pic=Torva full helm}}
+* {{plink|Pernix armour|pic=Pernix cowl}}
+* {{plink|Virtus equipment|pic=Virtus mask}} including the [[virtus wand]] and [[virtus book|book]]
+* {{plink|Zaryte bow}}
+| [[10 January]] [[2011]]
+|-
+| [[File:Nex, Angel of Death.png|64px]]
+| [[Nex, Angel of Death]]
+| 7000
+| data-sort-value="4" class="table-bg-red" | High tier
+| Solo or group
+|
+* [[Frozen key]] and [[ancient ceremonial robes]]
+* {{Skillreq|Agility|70}}
+* {{Skillreq|Strength|70}}
+* {{Skillreq|Ranged|70}}
+* {{Skillreq|Constitution|70}}
+|
+* {{plinkp|Wand of the praesul}} {{plinkp|Imperium core}} [[Wand of the praesul]] and [[imperium core]]
+* {{plink|Praesul codex}}
+| [[30 January]] [[2017]]
+|-
+| [[File:Osseous.png|64px]]
+| [[Osseous]]
+| 888
+| data-sort-value="3" class="table-bg-orange" | Mid tier
+| Solo or group
+|
+* Completion of {{QuestIcon|Osseous Rex}}
+|
+* {{plink|Occultist's ring}}
+* {{plink|Heart of the Berserker}}
+| [[28 May]] [[2024]]
+|-
+| [[File:Queen Black Dragon.png|64px]]
+| [[Queen Black Dragon]]
+| 900
+| data-sort-value="3" class="table-bg-orange" | Mid tier
+| Solo-only
+|
+* {{Skillreq|Summoning|60}}
+|
+* {{plink|Royal crossbow}}
+* {{plink|Dragonbone upgrade kit}}
+* {{plink|Dragon kiteshield}}
+| [[29 May]] [[2012]]
+|-
+| [[File:Raksha, the Shadow Colossus.png|64px]]
+| [[Raksha, the Shadow Colossus]]
+| 6000
+| data-sort-value="4" class="table-bg-red" | High tier
+| Solo or group (1-2)
+|
+* Completion of {{QuestIcon|Raksha, the Shadow Colossus (quest)}}
+|
+* {{plink|Greater Ricochet ability codex}}
+* {{plink|Greater Chain ability codex}}
+* {{plink|Divert ability codex}}
+* {{plink|Shadow spike}}
+* {{plink|Fleeting boots}}
+| [[7 December]] [[2020]]
+|-
+| [[File:Rasial, the First Necromancer.png|64px]]
+| [[Rasial, the First Necromancer]]
+| 8462
+| data-sort-value="4" class="table-bg-red" | High tier
+| Solo-only
+| 
+* Completion of {{QuestIcon|Alpha vs Omega}}
+|
+* {{plink|Omni guard}} {{plinkp|Soulbound lantern}} [[Omni guard]] and [[soulbound lantern]]
+* {{plink|First Necromancer's equipment|pic=Crown of the First Necromancer}}
+| [[7 August]] [[2023]]
+|-
+| [[File:Orikalka.png|64px]]
+| [[Rex Matriarchs]]
+| 888
+| data-sort-value="3" class="table-bg-orange" | Mid tier
+| Solo or group
+|
+* Access to [[Anachronia]]
+|
+* {{plink|Laniakea's spear}}
+* {{plink|Heart of the Berserker}}
+* {{plink|Heart of the Seer}}
+* {{plink|Heart of the Archer}}
+* {{plink|Heart of the Warrior}}
+| [[19 April]] [[2021]]
+|-
+| [[File:The Sanctum Guardian.png|64px]]
+| [[The Sanctum Guardian]]
+| 850
+| data-sort-value="4" class="table-bg-red" | High tier
+| Solo or group (1-3)
+|
+* Completion of {{QuestIcon|Impressing the Locals}}
+| {{na}}
+| [[25 June]] [[2018]]
+|-
+| [[File:Seiryu the Azure Serpent.png|64px]]
+| [[Seiryu the Azure Serpent]]
+| 10000
+| data-sort-value="4" class="table-bg-red" | High tier
+| Solo or group (1-3)
+|
+* Completion of {{QuestIcon|Impressing the Locals}}
+|
+* {{plink|Ancient scale|txt=Ancient scales}}
+| [[25 June]] [[2018]]
+|-
+| [[File:Silverquill, the Dreadhog.png|64px]]
+| [[Silverquill, the Dreadhog]]
+| 222
+| data-sort-value="2" class="table-bg-green" | Low tier
+| Solo or group
+|
+* Completion of {{QuestIcon|Hearts of Sanguine}}
+|
+* {{plink|Silver spines}}
+* {{plink|Sanguine spines}}
+| [[23 March]] [[2026]]
+|-
+| [[File:Solak, Guardian of the Grove.png|64px]]
+| [[Solak, Guardian of the Grove]]
+| 7000
+| data-sort-value="4" class="table-bg-red" | High tier
+| Solo or group (1-7)
+| {{na}}
+|
+* {{plinkp|Blightbound crossbow}} {{plinkp|Off-hand Blightbound crossbow}} [[Blightbound crossbows]]
+* {{plink|Erethdor's grimoire}}
+| [[29 May]] [[2018]]
+|-
+| [[File:Taraket the Necromancer.png|64px]]
+| [[Taraket the Necromancer]]
+| 1200
+| data-sort-value="4" class="table-bg-red" | High tier
+| Solo or group (1-3)
+| {{na}}
+| {{na}}
+| [[25 June]] [[2018]]
+|-
+| [[File:Telos, the Warden.png|64px]]
+| [[Telos, the Warden]]
+| 2000
+| data-sort-value="4" class="table-bg-red" | High tier
+| Solo-only
+| 
+* [[Ancient sigil]]
+|
+* {{plink|Seren godbow}}
+* {{plink|Staff of Sliske}}
+* {{plink|Zaros godsword}}
+| [[27 June]] [[2016]]
+|-
+| [[File:Nymora, the Vengeful.png|64px]]
+| [[The Twin Furies]]
+| 1000
+| data-sort-value="3" class="table-bg-orange" | Mid tier
+| Solo or group
+|
+* {{Skillreq|Ranged|80}}
+|
+* {{plink|Anima core of Zamorak armour|pic=Anima core helm of Zamorak}}
+* {{plinkp|Blade of Nymora}} {{plinkp|Blade of Avaryss}} [[Blade of Nymora]] and [[Blade of Avaryss]]
+* {{plink|Zamorakian essence}}
+| [[29 March]] [[2016]]
+|-
+| [[File:TzKal-Zuk.png|64px]]
+| [[TzKal-Zuk]]
+| 14000
+| data-sort-value="4" class="table-bg-red" | High tier
+| Solo-only
+| {{na}}
+|
+* {{plink|Ek-ZekKil}}
+* {{plink|Scripture of Ful}}
+* {{plink|Igneous stone}}
+* {{plink|Magma Tempest ability codex}}
+| [[25 October]] [[2021]]
+|-
+| [[File:TzTok-Jad.png|64px]]
+| [[TzTok-Jad]]
+| 702
+| data-sort-value="3" class="table-bg-orange" | Mid tier
+| Solo-only
+| {{na}}
+|
+* {{plink|Fire cape}}
+| [[4 October]] [[2005]]
+|-
+| [[File:Verak Lith.png|64px]]
+| [[Verak Lith]]
+| 1450
+| data-sort-value="4" class="table-bg-red" | High tier
+| Solo or group (1-3)
+| {{na}}
+|
+* {{plink|Greater Fury ability codex}}
+| [[13 August]] [[2018]]
+|-
+| [[File:Vermyx, Brood Mother.png|64px]]
+| [[Vermyx, Brood Mother]]
+| 720
+| data-sort-value="4" class="table-bg-red" | High tier
+| Solo or group (1-4)
+|
+* Completion of {{QuestIcon|Soul Searching}}
+| 
+* {{plink|Divine Rage prayer codex}}
+* {{plink|Scripture of Amascut}}
+| [[22 July]] [[2024]]
+|-
+| [[File:Vindicta.png|64px]]
+| [[Vindicta & Gorvek]]
+| 1000
+| data-sort-value="3" class="table-bg-orange" | Mid tier
+| Solo or group
+|
+* {{Skillreq|Attack|80}}
+|
+* {{plink|Anima core of Zaros armour|pic=Anima core helm of Zaros}}
+* {{plink|Dragon Rider lance}}
+* {{plink|Zarosian essence}}
+| [[29 March]] [[2016]]
+|-
+| [[File:Vorago.png|64px]]
+| [[Vorago]]
+| 10000
+| data-sort-value="4" class="table-bg-red" | High tier
+| Solo or group
+| {{na}}
+|
+* {{plinkp|Seismic wand}} {{plinkp|Seismic singularity}} [[Seismic wand]] and [[Seismic singularity|singularity]]
+* {{plink|Tectonic energy}}
+| [[3 July]] [[2013]]
+|-
+| [[File:Yakamaru.png|64px]]
+| [[Yakamaru]]
+| 10000
+| data-sort-value="4" class="table-bg-red" | High tier
+| Solo or group (1-10)
+| {{na}}
+|
+* {{plink|Mazcab ability codex}}
+* {{plink|Achto Teralith equipment|pic=Achto Teralith cuirass}}
+* {{plink|Achto Primeval equipment|pic=Achto Primeval robe top}}
+* {{plink|Achto Tempest equipment|pic=Achto Tempest body}}
+| [[13 June]] [[2015]]
+|-
+| [[File:Zamorak, Lord of Chaos.png|64px]]
+| [[Zamorak, Lord of Chaos]]
+| 14000
+| data-sort-value="4" class="table-bg-red" | High tier
+| Solo or group (1-5)
+| {{na}}
+|
+* {{plink|Bow of the Last Guardian}}
+* {{plink|Chaos Roar ability codex}}
+* {{plink|Vestments of havoc armour|pic=Vestments of havoc hood}}
+* {{plink|Codex of lost knowledge}}
+| [[4 July]] [[2022]]
+|-
+| [[File:Vorkath.png|64px]]
+| [[Zemouregal & Vorkath]]
+| 789
+| data-sort-value="4" class="table-bg-red" | High tier
+| Solo or group (1-10)
+|
+* Completion of {{QuestIcon|Battle of Forinthry}}
+|
+* {{plink|Vorkath's scale}}
+* {{plink|Vorkath's spike}}
+* {{plink|Dracolich armour|pic=Dracolich coif}}
+* {{plink|Invoke Lord of Bones incantation codex}}
+| [[20 November]] [[2023]]
+|}
+<references/>
+
+==Skilling bosses==
+These are bosses that do not involve combat.
+{| class="wikitable sortable sticky-header align-center-3 align-center-4 align-center-5"
+! class="unsortable" |
+! Name
+! Level
+! Difficulty<ref name="difficulty">As per the [[PvM portal#Strategy guides|RS Wiki Boss tier]] classification</ref>
+! Encounter type
+! class="unsortable" | Requirements
+! Special rewards
+! Release date
+|-
+| [[File:Croesus.png|64px]]
+| [[Croesus]]
+| 6000
+| data-sort-value="4" class="table-bg-red" | High tier
+| Solo or group
+| {{na}}
+| 
+* {{plink|Cryptbloom armour|pic=Cryptbloom helm}}
+* {{plink|Sana's fyrtorch}}
+* {{plink|Tagga's corehammer}}
+* {{plink|Seed bag}}
+* {{plink|Scripture of Bik}}
+| [[27 September]] [[2021]]
+|-
+| [[File:The Gate of Elidinis.png|64px]]
+| [[The Gate of Elidinis]]
+| 650
+| data-sort-value="3" class="table-bg-orange" | Mid tier
+| Solo or group
+| Completion of [[Ode of the Devourer]]
+| 
+* {{plink|Runic attuner}}
+* {{plink|Memory dowser}}
+* {{plink|Scripture of Elidinis}}
+* {{plink|Latent Offering}}
+* {{plink|Eclipsed Soul prayer codex}}
+| [[16 September]] [[2024]]
+|}
+{{Reflist}}
+
+==Minigame bosses==
+Some bosses are fought in minigames or as part of [[Distractions and Diversions]]. These are not considered bosses for the purposes of [[Soul Reaper]] or [[War's Retreat]], and do not have their kill counts tracked. These include:
+* The [[Penance Queen]] and [[Penance King]], fought in the [[Barbarian Assault]] minigame
+* The [[Avatar of Creation]] and [[Avatar of Destruction]], fought in the [[Soul Wars]] minigame
+* [[Agoroth]], who can be killed twice a week (or once a week for non-memmbers) as part of a D&D
+* [[Cliff]], fought in the [[Troll Invasion]] minigame
+* [[Demon bosses]], which are encountered in the [[Demon Flash Mobs]] event
+* [[Bork]], who can be fought once per day for {{scl|Slayer}} experience
+* [[Nomad]], fought as part of the [[Memory of Nomad]] D&D
+* The [[skeletal horror]], which can be fought once per week for {{scl|Slayer}} and {{scl|Prayer}} experience
+* The [[Phoenix]], fought once per day as part of the [[Phoenix Lair]] D&D, giving {{scl|Firemaking}}, {{scl|Fletching}}, and {{scl|Slayer}} experience
+* [[Hollowtoof]], who can be fought during [[Goblin Raids]]
+* The [[Abomination]], a quest boss whose second phase can be replayed for rewards including the rare [[abomination cape]].
+
+==Quest bosses==
+[[File:Balance Elemental.png|thumb|x300px|The [[Balance Elemental]], guardian of the [[Stone of Jas]]]]
+[[File:Culinaromancer.png|thumb|x300px|The [[Culinaromancer]], the evil culinary sorcerer and main antagonist of [[Recipe for Disaster]].]]
+[[File:Nomad.png|thumb|x200px|[[Nomad]], the scourge of souls, and the final boss of [[Nomad's Requiem]] and [[Nomad's Elegy]].]]
+[[File:Spirit Beast.png|thumb|x200px|The [[Spirit Beast]], terror of the [[Spirit Realm]].]]
+[[File:Eruni.png|thumb|right|x200px|[[Eruni]], embodiment of the corruption of [[Apmeken]].]]
+[[File:Sliske (Sliske's Endgame).png|thumb|right|x300px|Sliske the Serpent-tongued, the Majarrat puppetmaster and agent of the [[Elder Gods]].]]
+A large number of quests involve or conclude with a battle against a powerful monster, which often is or is related to the quest's main antagonist. Except where otherwise noted, these bosses cannot be fought once their respective quests have been completed. However, many of them could be fought after in the [[Dominion Tower]], after some other requirements have been met.
+
+The [[Armour of Trials]] set earned from spending [[quest points]] at [[May's Quest Caravan]] provides +1% damage reduction per armour piece worn per death against quest bosses, up to a maximum of 5% per piece, or 25% damage reduction for the full set worn. In addition, the [[Vanquish]] weapon gains a +5% damage boost against quest bosses per death, up to a maximum of 25% with 5 deaths.
+
+A '''sub-boss''' is a powerful or semi-powerful monster fought as a prelude to the actual boss fight.
+* The '''[[Abomination]]''' is the mutated form of [[Tarshak]] the dragonkin and is battled during [[Hero's Welcome]].
+* '''[[Agoroth]]''' is the leader of the [[Crassian]]s and is fought in [[A Shadow over Ashdale]]. After the quest, he may be fought for [[Black pearl]]s or coins, twice a week for members and once a week for F2P players. A stronger variant, the '''[[Zogoth]]''', is fought during [[Pieces of Hate]].
+* '''[[Agrith Naar]]''', a demon summoned to Gielinor by a group of [[Zamorak]]ians, is fought at the end of [[Shadow of the Storm]].
+* '''[[Ambassador Jabari]]''' is the scheming chancellor of [[Menaphos]] and a powerful sorcerer; he is fought at the climax of [[Our Man in the North]].
+* '''[[Apep]]''' and '''[[Heru]]''', the bodyguards of [[Lady Keli]], serve as the final battle of [[Diamond in the Rough]].
+* The '''[[Arzinian Avatar]]''' is the boss of [[Between a Rock...]].
+* '''[[Arrg]]''' is the strongest [[mountain troll]] in the game and is the boss monster of [[Troll Romance]].
+* The '''[[Balance Elemental]]''' is a Guthixian avatar that guards the [[Stone of Jas]]. It is one of the final boss monsters of the Grandmaster quest [[While Guthix Sleeps]].
+* The '''[[Bandos Avatar]]''' is the final boss of [[The Chosen Commander]]. He is the [[High Priest (Bighead)|Goblin High Priest]] under the control of the god [[Bandos]].
+* The '''[[Banshee Mistress]]''' is the boss of [[Smoking Kills]].
+* '''[[Barrelchest]]''', a hulking artificial construct controlled by [[Mi-Gor]], is the boss of [[The Great Brain Robbery]].
+** '''[[Barrelchest Mk II]]''', an improved version of the original Barrelchest, is fought at the beginning of [[A Clockwork Syringe]].
+* A '''[[Black Demon]]''' controlled by [[Glough]] is the final challenge in [[The Grand Tree]].
+* The '''[[Black Knight Titan]]''' is the scourge of the [[Fisher Realm]] and is fought during [[Holy Grail]]. '''[[Black Knight Titan (Gower Quest)|His wonderfully updated form]]''' is the boss of [[Gower Quest]].
+* A [[Black stone dragon (Desperate Measures)|'''Black stone dragon''']] is fought during [[Desperate Measures]]. It's considerably weaker than its Dragonkin Laboratory incarnation, but still powerful.
+* '''[[Bouncer]]''' is a powerful [[hellhound]], the pet of [[General Khazard]], and is fought during [[Fight Arena]].
+** Its '''[[Bouncer (ghost)|ghost]]''' is fought during [[The General's Shadow (miniquest)|The General's Shadow]] miniquest.
+* The '''[[Cave Wolf Matriarch]]''' is fought during [[Carnillean Rising]].
+* '''[[Char (monster)|Char]]''' is a powerful [[Auspah]] fought at the end of the Master quest, [[The Firemaker's Curse]]
+* '''[[Chronozon]]''' is a demon who is the boss of [[Family Crest]].
+* '''[[Count Draynor]]''' is a notorious vampyre who is the boss of [[Vampyre Slayer]]. He is one of the few [[free-to-play]] bosses.
+* The '''[[Culinaromancer]]''' is a powerful sorcerer who draws his power from [[food]]. He is the main antagonist of the [[Recipe for Disaster]] quest series and is the final boss of its conclusion, [[Recipe for Disaster/Defeating the Culinaromancer|Defeating the Culinaromancer]].
+* '''[[Dad]]''' is a mountain troll fought during [[Troll Stronghold]].
+* There are a few [[Dagannoth]] bosses:
+** '''[[Dagannoth mother (Horror from the Deep)|The original Dagannoth Mother]]''' is the boss of [[Horror from the Deep]].
+** Her offspring grows up to be '''[[Dagannoth Mother (Blood Runs Deep)|the second Dagannoth Mother]]''', which is the final boss of [[Blood Runs Deep]].
+** Two '''[[Dagannoth Sentinel]]s''' are fought near the end of [[Blood Runs Deep]]. They guard the lair of [[Dagannoth Mother (Blood Runs Deep)|the new Dagannoth Mother]].
+* The '''[[Dark Lord]]''' is fought during [[Plague's End]]. It is a fragment of [[Seren]]'s mind that was imprisoned inside the [[Temple of Light]] but with its voice drove any inside the [[Underground Pass (dungeon)|Underground Pass]] mad.
+* '''[[Lensig]]''', under the alias "Dawn", is a witch who is fought during [[The Death of Chivalry]].
+* The '''[[decaying avatar]]''', a failing [[Soul Wars]] avatar, is the sub-boss of the Grandmaster quest [[Nomad's Requiem]].
+* '''[[Delrith]]''' is an ancient demon who was summoned to destroy [[Varrock]]; he is the boss of [[Demon Slayer]]. He is one of the few [[free-to-play]] bosses.
+* The '''[[Dramen Tree Spirit]]''' guards the [[dramen tree]] within [[Entrana Dungeon]] and is the boss of [[Lost City]]. Because of the restrictions on Entrana, no weapons or armour may be used to fight the tree spirit.
+* '''[[The Draugen]]''' is a spirit fought as part of [[The Fremennik Trials]].
+* '''[[Elvarg]]''' is a [[green dragon]] who has decimated the island of [[Crandor]], where she roosts. She is the final boss of [[Dragon Slayer]] and is one of the few [[free-to-play]] bosses.
+* An '''[[Evil Spirit]]''' is the boss monster of [[Rum Deal]].
+* The '''[[Fairy Godfather]]''', along with his army of [[ork]]s, is the final boss of [[A Fairy Tale III - Battle at Ork's Rift]].
+* The '''[[Foreshadow]]''' is a shadow version of the player created by [[Sliske]], fought during [[Dishonour among Thieves]].
+* '''[[Ikadia the Exile]]''', the elder leader of the [[chaos druid]]s, the sub-boss of [[Birthright of the Dwarves]].
+* '''[[Hreidmar]]''', the Director of the [[Red Axe]], is one of the final bosses of [[Birthright of the Dwarves]], challenged by the player after he transforms into a [[Chaos Dwarf]].
+* '''[[Colonel Grimsson]] ''', the Butcher of Barendir, is the boss of [[King of the Dwarves]]. He is also fought, along with Hreidmar, as a Chaos Dwarf at the climax of [[Birthright of the Dwarves]].
+* '''[[Gadderanks]]''' is a human supporter of the vampyric regime in [[Morytania]]. He is fought during [[In Aid of the Myreque]].
+* '''[[General Khazard]]''' can be optionally fought during [[Fight Arena]].
+* The '''[[Giant Roc]]''' is a large avian fought atop [[Trollheim]] during [[My Arm's Big Adventure]]. He has the uncommon ability to knock players around the area with his massive wings.
+* A '''[[giant scarab]]''' is fought at the end of [[Contact!]]. '''[[Giant scarab (Dealing with Scabaras)|Another, weaker scarab]]''' is fought close to the end of [[Dealing with Scabaras]].
+* The '''[[Giant Sea Snake]]''' is the boss of [[Royal Trouble]].
+* '''[[Glod]]''' is an enormous [[giant]] who resides in the cloud world above the magic beanstalk that players plant during [[Grim Tales]]; he is the quest's boss. He can disable prayers and force players towards or away from him.
+* The '''[[ice demon]]''' prowls the halls of the fortress at [[Ghorrock]] and is the boss of [[The Temple at Senntisten]].
+* The '''[[Ice Troll King]]''', leader of the [[ice troll]]s, is the boss of [[The Fremennik Isles]].
+* The '''[[Jungle demon]]''' is a powerful demon who serves as the final boss of [[Monkey Madness]].
+* '''[[The Kendal (monster)|The Kendal]]''', a deranged murderer styling himself after a [[The Kendal (god)|Fremennik demigod]], is the boss of [[Mountain Daughter]].
+* A '''[[Khazard Ogre]]''' and '''[[Khazard scorpion]]''' are the mini-bosses of [[Fight Arena]].
+* '''[[Koschei the Deathless]]''' is a [[Fremennik]] warrior who cannot be truly killed. He must be defeated in battle three times in a row as part of [[The Fremennik Trials]].
+* '''[[Lowerniel Drakan]]''' is the tyrannical dictator of Morytania, he is fought in the final battle during [[The Lord of Vampyrium]].
+* While '''[[Lucien]]''' is present at the final battle during [[The Ritual of the Mahjarrat]], players do not directly defeat him. Rather, he summons two '''[[enhanced ice titan]]s''' and two '''[[ice demon]]s''' that players battle.
+* '''[[Me]]''', who takes the form of players who fight them, is fought at the end of [[Lunar Diplomacy]].
+* '''[[Melzar the Mad]]''' is the keeper of [[Melzar's Maze]]. He is a sub-boss of [[Dragon Slayer]]. He is one of the few [[Free-to-play]] bosses.
+* A powerful '''[[Moss giant (Glarial's Tomb)|Moss giant]]''' must be fought, without weapons, armour, or [[Prayer]], to obtain the [[Consecration seed]] in [[Roving Elves]].
+* '''[[Nezikchened]]''' is a [[black demon]] who is fought three times during [[Legends' Quest]], including at the quest's climax.
+* '''[[Nial Swiftfling]]''' is a [[Fremennik]] warrior who was cursed and turned into a yeti. He is fought during [[Glorious Memories]].
+* '''[[Nomad (monster)|Nomad]]''', the mysterious warden of the [[Soul Wars]] activity, is also the final boss of the Grandmaster quest [[Nomad's Requiem]], as well as the Master quest [[Nomad's Elegy]]. He is extremely powerful, and his Elegy incarnation is widely regarded as one of the most difficult quest bosses to defeat in the game.
+* The '''[[Pest Queen]]''' is the mother of all pests, the scourges of the [[Void Knights]]. She is the final boss of the Grandmaster quest [[The Void Stares Back]].
+* The '''[[Pharaoh]]''' of [[Menaphos]], controlled by the dread goddess [[Amascut]], is the final boss of [['Phite Club]].
+* The '''[[Possessed Priest]]''' is the boss of [[Icthlarin's Little Helper]].
+*'''[[Captain Rabid Jack]]''', an undead pirate captain attempting to summon Xau-Tak, is fought as the final boss of [[Pieces of Hate]].
+* The '''[[Sea Troll Queen]]''', ruler of the sea trolls, is the final boss of [[Swan Song]].
+* The goddess '''[[Seren]]''' serves as the final boss of [[Extinction]].
+* '''[[Sigmund]]''' is a supporter of [[H.A.M.]] who is fought in three quests: [[Death to the Dorgeshuun]], [[Another Slice of H.A.M.]], and [[The Chosen Commander]].
+* '''[[Sir Leye]]''' is a [[Temple Knight]] who cannot be defeated by any man alive. Thusly, he must be fought as a woman during [[Recruitment Drive]].
+* '''[[Sir Mordred]]''' is the leader of the [[Renegade Knight]]s and is fought during [[Merlin's Crystal]].
+* '''[[Slagilith]]''' is an animated golem of rock who is fought during [[One Small Favour]]. It can be fought after the quest is complete.
+* '''[[Slash Bash]]''' is a strong [[zogre]] who is the boss of [[Zogre Flesh Eaters]].
+* The '''[[Spirit Beast]]''' is the terror of the [[Spirit Realm]]. It cannot be fought by conventional means, but nonetheless serves as the bosses for [[Spirit of Summer]] and [[Summer's End]]. During Summer's End, the Spirit Beast has a combat level of 615; it is technically the strongest quest monster in the game.
+* '''[[Tarn Razorlor]]''' is a necromancer and is the boss of the miniquest [[Lair of Tarn Razorlor (miniquest)|Lair of Tarn Razorlor]].
+* '''[[TokHaar-Hok]]''', the spokesman of the [[TokHaar]] race and architect of the near-extinction of their cousins, the [[TzHaar]], is the final boss of [[The Brink of Extinction]].
+* '''[[Tolna]]''' is a young boy who succumbed to the evils of what later became known as the [[Dungeon of Tolna]]. He is the boss of [[A Soul's Bane]], taking the form of a three-headed monster.
+* '''[[Treus Dayth]]''', now a ghost, was a follower of [[Drakan]] who was sealed within the [[Abandoned Mine]]. He is the boss of [[Haunted Mine]].
+* '''[[Tumeken's shadow]]''' is the boss monster of [[Missing My Mummy]]. Players must fight him five increasingly difficult times in a row to reunite [[Senliten]]'s shadow with her body.
+* '''[[Ulfric]]''' is an undead [[Fremennik]] who is the boss of [[Olaf's Quest]].
+* '''[[Ukunduka]]''' is the embodiment of [[Amascut]]'s corruption of [[Crondis]] and the final boss of [[Crocodile Tears]].
+* '''[[Vanstrom Klause]]''', an elite [[vampyre]], is the boss of [[The Branches of Darkmeyer]].
+* The '''[[Witch's experiment]]''' is the final boss of [[Witch's House]] and must be fought in four increasingly difficult forms to obtain [[Harvey]]'s [[ball]].
+* The '''[[Wyrd]]''', the crazed vampyrised form of [[Safalaan]] Hallow, is the final challenge of [[River of Blood]] and of the [[Myreque quest series]].
+* [[Zemouregal & Vorkath]] is part of [[Battle of Forinthry]]. Completing the quest unlocks the full, repeatable boss encounter.
+
+===Quests with multiple bosses===
+Some quests have several boss monsters that must be defeated, usually one after the other.
+* In [[Dragon Slayer]], the player must face off against [[Melzar the Mad]] and against [[Elvarg]].
+*[[The World Wakes]] has four boss fights, featuring weaker versions of three of the [[god wars dungeon]] bosses: '''[[Kree'arra#The World Wakes|Kree'arra]]''', '''[[General Graardor#The World Wakes|General Graardor]]''', and '''[[K'ril Tsutsaroth#The World Wakes|K'ril Tsutsaroth]]''' as well as a double boss fight with '''[[Zemouregal#The World Wakes|Zemouregal]]''' and '''[[Enakhra#The World Wakes|Enakhra]]'''
+* [[Do No Evil]] features three powerful bosses: '''[[Leeuni]]''', '''[[Ayuni]]''', and '''[[Eruni]]'''. Each uses different combat styles and have unique powers.
+* [[Spirits of the Elid]] has three bosses: The '''[[black golem]]''', '''[[grey golem]]''', and '''[[white golem]]'''.
+* [[Desert Treasure]] has four Zamorakian warriors as bosses: '''[[Dessous]]''', '''[[Kamil]]''', '''[[Fareed]]''', and '''[[Damis]]'''.
+* During [[Land of the Goblins]], five undead goblin priests must be defeated: '''[[Snothead]]''', '''[[Snailfeet]]''', '''[[Mosschin]]''', '''[[Redeyes]]''', and '''[[Strongbones]]'''.
+* The [[Recipe for Disaster]] quest series culminates in the final subquest, [[Recipe for Disaster/Defeating the Culinaromancer|Defeating the Culinaromancer]]. Six bosses must be defeated: '''[[Agrith Na-Na]]''', '''[[Flambeed]]''', '''[[Karamel]]''', '''[[Dessourt]]''', '''[[Gelatinnoth Mother]]''' and the '''[[Culinaromancer]]''' himself. Each of these bosses except for the Culinaromancer is a play on another boss of one of the quests required to finish Recipe for Disaster.
+* During [[Dream Mentor]], four boss monsters are fought, in order: '''[[The Inadequacy]]''', '''[[The Everlasting]]''', '''[[The Untouchable]]''' and '''[[The Illusive]]'''.
+* There is a miniquest, titled the [[Desert Slayer Dungeon (miniquest)|Desert Slayer Dungeon]], that is available after completing [[Smoking Kills]]. Four boss versions of Slayer monsters are fought: The '''[[monstrous cave crawler]]''', the '''[[basilisk boss]]''', the '''[[mightiest turoth]]''' and the '''[[kurask overlord]]'''.
+* During [[Ritual of the Mahjarrat]], '''[[General Khazard]]''' must be first defeated, and then the player battles two '''[[Enhanced ice titan]]s''' together and then two '''[[Ice demon (Ritual of the Mahjarrat)|ice demons]]''' at once.
+* During [[The Elder Kiln]], a very large number of monsters must be defeated, though not all at once: two '''[[TzHaar-Ket (Hardened)]]''', two '''[[TzHaar-Xil (Hardened)]]''', '''[[TzHaar-Ket-Yit'tal]]''', twelve '''[[Lava monster (Elder Kiln)|lava monsters]]''', three '''[[TokTz-Ket-Dill]]''', two '''[[Ket-Zek]]''', '''[[Yt-MejKot]]''', '''[[TokHaar-Hur (The Elder Kiln)|TokHaar-Hur]]''', '''[[TokHaar-Xil (The Elder Kiln)|TokHaar-Xil]]''', '''[[TokHaar-Ket (The Elder Kiln)|TokHaar-Ket]]''', '''[[TokHaar-Mej (The Elder Kiln)|TokHaar-Mej]]''' and the '''[[TokHaar-Ket Champion (The Elder Kiln)|TokHaar-Ket Champion]]'''.
+* During [[Underground Pass]], the player must fight several monsters to assemble the [[Doll of Iban]]. The demons '''[[Holthion]], [[Othainian]], and [[Doomion]]''' must be fought to obtain [[Iban's shadow]], while giant spider '''[[Kalrag]]''' must be defeated to obtain Iban's blood. '''[[Lord Iban]]''' himself is the quest's final challenge, but the player does not directly fight him; instead, the player must dodge his attacks while attempting to throw the Doll into the [[Well of Voyage]].
+* At the climax of [[Sliske's Endgame]], the player must survive a three-wave final confrontation. First, basic '''[[Wight footsoldier (Sliske's Endgame)|wight footsoldiers]]''' and '''[[Wight ranger (Sliske's Endgame)|rangers]]''' must be fought, with the addition of '''[[Imbued wight footsoldier|imbued]]''' and '''[[Unstable wight footsoldier|unstable wights]]''' as the battle progressed. Sliske will then send his three strongest wights, '''[[Nomad]]''', '''[[Linza the Disgraced]]''', and '''[[Gregorovic]]''', into battle at once. When all are defeated, '''[[Sliske]]''' himself will challenge the player.
+* During [[Curse of the Black Stone]], the player proceeds through all three Elite Dungeons, fighting all nine of the major bosses present along the way (whether regularly or in story mode).
+
+==Dungeoneering bosses==
+{{main|Dungeoneering/Bosses}}[[File:Gluttonous behemoth.png|thumb|200px|The [[gluttonous behemoth]], a boss found during Dungeoneering.]]
+At the end of each [[floor]] of [[Daemonheim]] is a powerful boss monster that must be defeated in order to complete the dungeon. The levels and strengths of these bosses vary according to a combination of factors, including the dungeon's size and complexity rating, but they will otherwise always have the same qualities. [[Kal'Ger the Warmonger]] is the strongest boss in Daemonheim.
+
+==Enrage==
+Enrage is a mechanic with certain bosses, first introduced with [[Araxxi]], that increases the damage dealt by the bosses from both auto-attacks and special attacks. Some bosses have new or changed special attacks at certain enrage thresholds, and most bosses life points scale to enrage too.
+
+Araxxor and Araxxi increase their enrage throughout the fight via various mechanics. After killing and looting Araxxi's corpse, the next fight with the pair will add an additional 20% enrage to the fight, stacking with every kill afterwards, capping at 300% (although additional enrage can still be obtained during the fight). Enrage also affects the drop rate of the [[araxyte pheromone]] and [[araxyte pet]], although the latter is only affected by enrage gained during the fight. An araxyte pheromone can be broken to reset their enrage level back to 0%.
+
+On [[27 June]] [[2016]], another boss with enrage, [[Telos, the Warden]], was released. Telos' enrage functions similarly to Araxxor and Araxxi's, but with additional functions. Although the auto-attack scaling is significantly weaker (as a 300% enrage Telos deals far less damage than Araxxi), the damage dealt from his special attacks scales significantly higher. Various mechanics are added and/or modified as his enrage increases (such as a final phase in encounters of 100% enrage and higher). The higher Telos' enrage is, the more likely a unique can be rolled, although streaks still play a higher role in the drop rate in most cases. Telos does not possess any mechanics that increase his enrage during the fight; this is only applied whenever the player continues their streak after each kill, with a 5-20% enrage stack accumulating to the current level of enrage. Telos' health caps at 600,000 at 200%+ enrage and 150,000 health at 300%+ enrage during the fifth phase.
+
+The [[Arch-Glacor]] boss fight features enrage and streak mechanics largely similar to those of Telos. Unlike Telos, the Arch-Glacor has no health cap, resulting in it possessing 3,300,000 health at 4000% enrage, the highest of any solo boss in game and is widely considered the hardest challenge outside of soloing team bosses. The only mechanic that initially changes with enrage is the addition of a [[Bolstered Glacyte]] at 250% enrage and higher. The next change comes in at 2500% and higher enrage, in which the health of the [[Icy Arm]]s and glacytes begin to scale alongside the boss.
+
+[[The Zamorakian Undercity]] utilises an enrage system, with the selected enrage affecting the entire dungeon. This increases all enemies' health and damage, up to a cap at 250%. All enrages from 0% to 4000% are unlocked by default, with additional enrages up to 60,000% unlocked in increments of 100% per successful kill. At specific enrage intervals, enemies are also replaced with stronger variants intended to make clearing the dungeon significantly harder. Like Telos, Zamorak has an additional phase at encounters of 100%+ enrage, and mechanics begin to be modified starting at 500% enrage up to 1600% enrage. Zamorak's health caps at 1,600,000 per player at 1740%+ enrage and 250,000 health at 1000%+ enrage during the seventh phase.
+
+[[Amascut, the Devourer]] also has an enrage system. However, she has 2 additional phases at 100% enrage instead of 1. She may also be fought in preset enrages of 100%, 500%, 750%, 1000%, 2000% and 4000%, all of which modify and/or enhance existing mechanics at these thresholds. Unlike previous enrage bosses, players can only choose fixed enrages and it does not increase after defeating her. At 2000% and higher enrage, the [[Lone Soul]] debuff is applied onto all players, preventing them from benefitting off of [[Heal Other]], [[Heal Group]] and [[Intercept]].
+
+[[The Ghrazi Blood Knights]] also use an enrage system that follows the very simialr rules as Amascut's enrage system. The prevention of certain group spells occurs at 1000% enrage instead.
+
+Before [[20 April]] [[2026]], enrage at Telos, the Arch-Glacor and Zamorak functioned differently. Rather than having all enrages up to 4000% unlocked, enrages had to be reached first. While Zamorak still had a 60,000% enrage cap, successful kills allowed the player to climb in 10% enrage intervals rather than the current 100%. This meant hundreds of kills were required in order to unlock the maximum enrages.
+
+==Bosses that prevent teleports==
+
+During certain boss fights, the player is prevented from using teleports to escape. 
+
+Prior to [[16 August]] [[2021]], most high-level bosses prevented players from teleporting, resulting in it being a fight to the death. These bosses included [[Nex: Angel of Death]], [[The Barrows: Rise of the Six]], [[Vorago]], [[Araxxor]] and [[Araxxi]], the [[Liberation of Mazcab]] raid, [[Telos, the Warden]] and hard mode [[Arch-Glacor]]. After the update, players can now safely teleport away from most bosses, apart from Telos and hard mode Arch-Glacor due to their unique reward mechanics.
+
+{{Bosses that prevent teleports}}
+
+==Transcript==
+{{Hasdialogue}}
+
+==Update history==
+{{UH|
+* {{UL|type=patch|update=Game Jam QoL, Simpler Enrage Scaling & More!|date=20 April 2026}}
+** Boss Enrage Unlocking has now been unlocked for the following encounters:
+*** [[Telos]]
+*** [[Arch-Glacor]]
+*** [[Zamorak]]
+**** Across all three encounters, players can now start at any enrage level they choose, up to the fabled 4,000%.
+**** To respect the time and achievements of our most dedicated Zamorak players, the Zamorak encounter will initially allow entry up to 4,000% enrage only. Once 4,000% has been defeated, players will still be able to push beyond this threshold.
+**** The only change being, a successful Zamorak kill at your highest enrage above 4,000% will now increase enrage in 100% increments (up from 10%).
+
+* {{UL|type=update|update=Garden of Kharid & DXP: LIVE Friday! - This Week In RuneScape|date=7 November 2022}}
+** All bosses dropping grimy herbs will now drop seeds of the same type of herb, in reduced amounts.
+
+* {{UL|type=patch|update=This Week In RuneScape: The Croesus Front|date=27 September 2021}}
+** Fixed an issue with the [[Arch-Glacor]] Hard Mode toggle being affected by other bosses.
+
+* {{UL|type=patch|update=This Week In RuneScape: September Skilling Bundle|date=6 September 2021}}
+** The Bossing Path can now be removed from the Activity Tracker.
+** The Bossing Path, if selected, now advances to the next available boss in the path when the selected boss is first defeated.
+
+* {{UL|type=ninja|update=This Week In RuneScape: Ninja Strike 24 - Combat Bonanza & The Beach|date=12 July 2021}}
+** Added a boss instance timer.
+*** The timer includes a button which opens the Boss Collection Log for the enemy you're currently facing.
+*** The timer can be moved from its default position using Edit Layout mode.
+*** To turn the timer on or off, navigate to the Information Windows settings menu, which can be found under Gameplay Settings.
+*** Important note: With this update, you'll see that the timer will show 59 minutes and X seconds (depending when the instance started) instead of the full 60 minutes. This doesn't change the amount of time you have - this is just the first time that exact minutes and seconds remaining have been displayed visually.
+** Added new [[graphics]] for the boss kill timer.
+** Achieving a new best kill time will now show how you've improved compared to your previous best.
+** Phase number and [[enrage]] percentage are now displayed under the bosses' health bar for both [[Araxxor]] and [[Araxxi]].
+*** The now redundant enrage buff icon has been removed.
+** After each boss kill, players will receive a message stating their current kill count. Another message has been added for milestone kill counts.
+** The terminology used for the entrances to boss fights is now more consistent and will be labelled either 'instanced encounter' or 'uninstanced encounter'.
+*** The term 'custom encounter' has been removed.
+*** Messaging has been added to various places informing [[Ironmen]] that they may only enter an instanced encounter.
+
+* {{UL|type=patch|update=Patch Notes (26 May 2020)|date=26 May 2020}}
+** 'Join' and 'Rejoin last instance' options have been added to the right-click/long-press menus on boss instance entrances.
+**'Custom encounter' and 'Enter encounter' options have also been added to various bosses.
+** Resolved an issue where players could rejoin a [[Nex: Angel of Death]] instance which had already ended and were forced to log out in order to leave.
+
+* {{UL|type=patch|update=Patch Notes (2 March 2020)|date=2 March 2020}}.
+** Trample/[[Stomp (ability)|Stomp]] [[abilities]] no longer appear in boss info entries for bosses that they have been removed from.
+
+* {{UL|type=patch|update=Patch Notes (3 June 2019)|date=3 June 2019}}
+** Boss loot interfaces have been centralised to maintain consistency.
+
+* {{UL|type=patch|update=Patch Notes (18 June 2018)|date=18 June 2018}}
+** Added boss tactics and information to [[The Magister]] section of the beasts tab.
+
+* {{UL|type=patch|update=Patch Notes (4 June 2018)|date=4 June 2018}}
+** The option to reset personal best hard mode times for bosses that don't have a hard mode has been removed.
+
+* {{UL|type=hotfix|update=Patch Notes (10 July 2017)|date=4 July 2017}}
+** A bug that was causing 3,100% enrage [[broadcast]]s to appear repeatedly has been fixed.
+
+* {{UL|type=patch|update=Patch Notes (12 December 2016)|date=12 December 2016}}
+** Boss rotations and D&D weekly and monthly resets are now auto-tweeted.
+
+* {{UL|type=patch|update=Patch Notes (12 September 2016)|date=12 September 2016}}
+** Bosses are no longer so friendly, and hence will no longer go for peaceful walks with you when you insist on walking with them. The following NPCs/Bosses are affected by this change to prevent "boss walking":
+*** [[Rise of the Six]]
+*** [[Dagannoth Kings]]
+*** [[Kalphite Queen]] (including [[Exiled Kalphite Queen|exiled]])
+*** [[Kalphite King]]
+*** [[Vorago]]
+*** [[Beastmaster Durzag]]
+*** [[Araxxor]]/[[Araxxi]]
+*** [[Nex]]
+*** [[Corporeal Beast]]
+** These bosses gained the ability to attack players, even if their main target was under them. This was to stop players from "walking" high-level bosses and making the fight significantly easier.
+
+* {{UL|type=patch|update=Patch Notes (27 July 2015)|date=27 July 2015}}
+** Several boss mechanics have been updated to work correctly with all current abilities that stun.
+
+* {{UL|type=patch|update=Patch Notes (6 May 2014)|date=6 May 2014}}
+** Creating an instance of a boss encounter - excluding the [[Kalphite King]] - now has a new option "Friends only" which will limit access to friends of the creator only.
+}}
+
+[[Category:Bosses| ]]

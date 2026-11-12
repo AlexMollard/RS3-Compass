@@ -1,0 +1,402 @@
+{{External|os=Giant Mole}}
+{{Otheruses|def=no|the achievement|Giant Mole (achievement)}}
+{{HasStrategy}}
+{{Infobox Monster
+|version1 = Normal
+|version2 = Hard Mode
+|name = Giant mole
+|image = [[File:Giant mole.png|160px]]
+|release1 = [[7 March]] [[2006]]
+|release2 = [[27 January]] [[2014]]
+|update1 = Canoeing, Zygomites and a Mole!
+|update2 = Holy Moley - Giant Mole Update
+|members = No
+|actions = Attack
+|race = Mole
+|examine = Holy mole-y!
+|level = 230
+|lifepoints = 78000
+|aggressive = No
+|poisonous = No
+|max_melee = 720
+|max_ranged = 0
+|max_magic = 0
+|max_spec = 4000
+|style = Melee
+|primarystyle = melee
+|speed1 = 4
+|speed2 = 3
+|attack = 65
+|ranged = 1
+|magic = 65
+|necromancy = 1
+|max_necromancy = 0
+|acc_necromancy = 0
+|acc_melee1 = 1299
+|acc_melee2 = 2178
+|acc_ranged = 0
+|acc_magic = 0
+|armour = 732
+|defence = 45
+|weakness = None
+|aff_weakness = 90
+|aff_melee = 55
+|aff_ranged = 45
+|aff_magic = 65
+|immune_to_poison = No
+|immune_to_deflect = Yes
+|immune_to_stun = Yes
+|immune_to_drain = No
+|dropversion1 = Normal, Normal F2P
+|dropversion2 = Hard Mode, Hard Mode F2P
+|leagueRegion = Asgarnia
+|id1 = 18932, 18933
+|id2 = 18934, 18935
+}}
+{{Map:Falador Mole Lair|align=right}}
+
+The '''giant mole''' (''Talpidae wysonian'') is a female mole found in the [[Falador Mole Lair]], just under [[Falador Park]]. While moles do not normally grow to such sizes naturally, they can do so when they ingest growth potions. During the [[Second Age]], many giant moles existed as a result of the [[Zarosian Empire]]'s experiments with agricultural potions. They were rendered mostly extinct, but a new giant mole appeared in the [[Fifth Age]] following "a slight accident involving a bottle of [[Malignius Mortifer]]'s-Super-Ultra-Flora-Growth-Potion" used by [[Wyson the gardener]].
+
+To get into its lair you have to crawl down the [[plant roots]] in the west of [[Falador Park]], and create an instance or join an existing one. You have the option to fight the mole in [[Hard mode#Giant Mole|hard mode]], in which she will use her special attacks more frequently.
+
+If a player is killed by the giant mole, their gravestone will appear outside her lair in Falador Park.
+
+Obtaining all unique drops will unlock the {{TitleAnchor|t=of the Underground|c=#7C5025|loc=s}} title.
+
+==Location==
+{{LocTableHead}}
+{{LocLine
+|loc=[[Falador Mole Lair]]
+|lvls=230
+|mem=no
+|mapID = 118
+|x:1757,y:5228
+|leagueRegion = Asgarnia
+}}
+{{LocTableBottom}}
+
+==Instance information==
+{{Infobox instance
+|name = Plant roots
+|boss = Giant mole
+|access = [[Plant roots]] ({{Maplink|x=2984|y=3383|text=Falador park|mtype=pin}})
+|grave = Outside the lair
+|timer = 1
+|notes = 
+}}
+
+==Strategy==
+{{main|Giant mole/Strategies}}
+
+==Drops==
+{{Listen|align=right|filename=Giant mole kill.ogg|title=You have defeated the giant mole.|desc=}}
+{{DropLogProject|jagex=yes}}
+After fighting the mole, it is decided if a rare unique item will be dropped, and what that item is, before attributing it to a player. The odds of any rare item dropping at all are 1/10. After it is determined that a rare item will drop, which specific item is to be dropped is determined using a 52-slot table. This rare item is then distributed to one of the top three players, or to the single player if fighting the mole solo.{{CiteForum|url=http://services.runescape.com/m=forum/forums.ws?74,75,52,65949497,goto,18#177|author=Mod Shauny|title=Dev Blog: Revealing Drop Rates|postdate=3 November 2017|forum=Existing Game Content|archiveurl=https://reldo.runescape.wiki/i/100602|archivedate=3 November 2017|name=revealed rates}} All of the mole's special drops ([[clingy mole]]s, [[numbing root]]s, [[dragon 2h sword]]s, and [[ultra-growth potion]]s) are tertiary drops. Whenever someone receives a special drop from the mole, it will be announced in the [[message box]].
+
+The drop mechanics for the mole function differently in a group than when fought solo. Namely, the player to deal the most damage will always receive [[big bones]] and a [[mole claw]] if on a members' world, or only big bones if on a F2P world; the three players to deal the most damage will receive three [[mole skin]]s, distributed equally (if the group is two players, there is a random chance for either player to receive two, and the other will receive one), all players who have completed the [[Falador achievements#Elite achievements|elite Falador achievement set]] will receive a [[mole nose]], and players doing the [[Fur 'n Seek]] wishlist will sometimes receive [[long, sharp claws]]. The regular item drops are then divided equally between the top 3 players; if the drop quantity does not divide equally, the remainder is given to a random player of the top three that did not receive a rare drop.
+
+In hard mode, rare unique drops are more common, while some items are dropped in larger quantities.
+
+Following the 27 January 2014 update, the giant mole no longer has access to the [[rare drop table]].
+
+===100%===
+{{DropsTableHead}}
+{{DropsLine|name=Big bones|quantity=1|rarity=Always|raritynotes={{DropNote|name=highest damage|In a group, the big bones and mole claw are received by the player that dealt the most damage.}}}}
+{{DropsLine|name=Mole claw|quantity=1|rarity=Always|raritynotes={{DropNote|name=highest damage}}|members=yes}}
+{{DropsLine|name=Mole skin|quantity=3|rarity=Always|raritynotes={{DropNote|In a group, the mole skins are distributed amongst the three players that dealt the most damage.}}}}
+{{DropsLine|name=Mole nose|quantity=1|rarity=Always|raritynotes={{DropNote|Mole nose is only dropped with [[Falador shield 4]] unlocked (does not have to be equipped).}}{{DropNote|In a group, a mole nose is received by all eligible players that participated in the kill.}}|members=yes}}
+{{DropsLine|name=Hideous moleskin|quantity=1|rarity=Always|members=yes|raritynotes={{DropNote|During [[Kili's Knowledge V (power)]] task. Only if the giant mole is fought and killed with [[necromancy]], and the player owns fewer than five hideous moleskins.}}|gemw=no}}
+{{DropsTableBottom}}
+
+===Drops - Normal mode, members===
+{{Average drop value|mob=Giant mole#Normal|mobname=members normal mode giant mole}}
+
+====Main====
+{{DropsTableHead|version=Normal}}
+{{DropsLine|name=Coins|quantity=12000-16000|rarity=18/128|members=yes}}
+{{DropsLine|name=Coins|quantity=18500-23500|rarity=12/128|members=yes}}
+{{DropsLine|name=Red dragonhide|quantity=3 (noted)|rarity=6/128|members=yes}}
+{{DropsLine|name=Ranarr seed|quantity=1|rarity=14/128|members=yes}}
+{{DropsLine|name=Grapevine seed|quantity=4|rarity=12/128|members=yes}}
+{{DropsLine|name=Yew logs|quantity=30 (noted)|rarity=10/128|members=yes}}
+{{DropsLine|name=Iron stone spirit|quantity=40|rarity=16/128|alch=no|members=yes}}
+{{DropsLine|name=Adamantite stone spirit|quantity=20|rarity=8/128|alch=no|members=yes}}
+{{DropsLine|name=Pure essence|quantity=600 (noted)|rarity=14/128|members=yes}}
+{{DropsLine|name=Blood rune|quantity=60|rarity=14/128|members=yes}}
+{{DropsLine|name=Mystic cloth|quantity=3 (noted)|rarity=4/128|members=yes}}
+{{DropsTableBottom}}
+
+====Unique====
+There is a 1/10 chance to roll onto the mole's unique items table (the chances below include this). If tier 1 or higher [[luck]] is active, this is improved to 1/9 (shown as the second rarity). Unique drops are tertiary, and are given to a random player of the top 3 contributors to the kill.
+
+{{DropsTableHead|version=Normal}}
+{{DropsLine|name=Numbing root|quantity=3-6|rarity=46/520|altrarity=46/468|citations={{NamedRef|revealed rates}}|members=yes}}
+{{DropsLine|name=Clingy mole|quantity=1|rarity=5/520|altrarity=5/468|citations={{NamedRef|revealed rates}}|members=yes}}
+{{DropsLine|name=Dragon 2h sword|quantity=1|rarity=1/520|altrarity=1/468|citations={{NamedRef|revealed rates}}|members=yes}}
+{{DropsTableBottom}}
+
+{{Bugged|The [[Long, sharp claws]] do not drop from Normal or Hard mode|minor|You may obtain them from a different monster at the expected 1/4 rate}}
+
+====Tertiary====
+{{DropsTableHead|version=Normal}}
+{{DropsLine|name=Long, sharp claws|quantity=1|rarity=1/4|raritynotes={{DropNote|Only during the [[Fur 'n Seek/Wish list|Fur 'n Seek wish list]].}}|gemw=no|members=yes}}
+{{DropsLine|name=Long bone|quantity=1|rarity=1/400|members=yes}}
+{{DropsLine|name=Curved bone|quantity=1|rarity=1/5000|members=yes}}
+{{DropsLine|name=Rotten fang|quantity=1|rarity=1/2500|altrarity=10/2500|altraritydash=yes|gemw=no|alch=no|raritynotes={{DropNote|name=threshold|Base drop rate of 1/2,500, with a [[Boss pets#Pets unlocked by drops|threshold of 500]].}}|citations={{CiteForum|author = Mod Ryan|url = http://services.runescape.com/m=forum/a=13/sl=0/forums.ws?373,374,807,65550979,goto,1|archivedate=9 February 2015|archiveurl=https://archive.ph/ZkWyc|title = Boss pets - Drop rates!|forum = Ninja Team|postdate = 9 January 2015|name = "pet drop rate"}}|members=yes}}
+{{DropsLine|name=Giant mole's head|quantity=1|rarity=1/500|alch=no|members=yes}}
+{{DropsTableBottom}}
+
+===Drops - Normal mode, free-to-play===
+{{Average drop value|mob=Giant mole#Normal F2P|mobname=free-to-play normal mode giant mole}}
+
+====Main====
+{{DropsTableHead|version=Normal F2P}}
+{{DropsLine|name=Coins|quantity=18500-23500|rarity=14/128|namenotes={{F2POnly}}}}
+{{DropsLine|name=Iron stone spirit|quantity=40|rarity=16/128|alch=no|namenotes={{F2POnly}}}}
+{{DropsLine|name=Coal stone spirit|quantity=40|rarity=16/128|namenotes={{F2POnly}}}}
+{{DropsLine|name=Adamantite stone spirit|quantity=30|rarity=8/128|alch=no|namenotes={{F2POnly}}}}
+{{DropsLine|name=Yew logs|quantity=30 (noted)|rarity=10/128|namenotes={{F2POnly}}}}
+{{DropsLine|name=Nature rune|quantity=40|rarity=14/128|namenotes={{F2POnly}}}}
+{{DropsLine|name=Pure essence|quantity=600 (noted)|rarity=14/128|namenotes={{F2POnly}}}}
+{{DropsLine|name=Limpwurt root|quantity=10 (noted)|rarity=12/128|namenotes={{F2POnly}}}}
+{{DropsLine|name=Uncut diamond|quantity=6|rarity=8/128|namenotes={{F2POnly}}}}
+{{DropsLine|name=Grapes|quantity=8 (noted)|rarity=12/128|namenotes={{F2POnly}}}}
+{{DropsLine|name=Mystic cloth|quantity=3 (noted)|rarity=4/128|namenotes={{F2POnly}}}}
+{{DropsTableBottom}}
+
+====Unique====
+There is a 1/10 chance to roll onto the mole's unique items table (the chances below include this). If tier 1 or higher [[luck]] is active, this is improved to 1/9 (shown as the second rarity). Unique drops are tertiary, and are given to a random player of the top 3 contributors to the kill.
+
+{{DropsTableHead|version=Normal F2P}}
+{{DropsLine|name=Numbing root|quantity=2-6|rarity=47/520|altrarity=47/468|citations={{NamedRef|revealed rates}}|namenotes={{F2POnly}}}}
+{{DropsLine|name=Clingy mole|quantity=1|rarity=5/520|altrarity=5/468|citations={{NamedRef|revealed rates}}|namenotes={{F2POnly}}}}
+{{DropsTableBottom}}
+
+====Tertiary====
+{{DropsTableHead|version=Normal F2P}}
+{{DropsLine|name=Rotten fang|quantity=1|rarity=1/2500|altrarity=10/2500|altraritydash=yes|gemw=no|alch=no|raritynotes={{DropNote|name=threshold|Base drop rate of 1/2500, with a [[Boss pets#Pets unlocked by drops|threshold of 500]].}}|citations={{CiteForum|author = Mod Ryan|url = http://services.runescape.com/m=forum/a=13/sl=0/forums.ws?373,374,807,65550979,goto,1|archivedate=9 February 2015|archiveurl=https://archive.ph/ZkWyc|title = Boss pets - Drop rates!|forum = Ninja Team|postdate = 9 January 2015|name = "pet drop rate"}}|namenotes={{F2POnly}}}}
+{{DropsTableBottom}}
+
+===Drops - Hard mode, members===
+{{Average drop value|mob=Giant mole#Hard Mode|mobname=members hard mode giant mole}}
+
+====Main====
+{{DropsTableHead|version=Hard Mode}}
+{{DropsLine|name=Coins|quantity=17500-22500|rarity=18/128|members=yes}}
+{{DropsLine|name=Coins|quantity=25000-31000|rarity=12/128|members=yes}}
+{{DropsLine|name=Red dragonhide|quantity=6 (noted)|rarity=6/128|members=yes}}
+{{DropsLine|name=Ranarr seed|quantity=2|rarity=14/128|members=yes}}
+{{DropsLine|name=Grapevine seed|quantity=8|rarity=12/128|members=yes}}
+{{DropsLine|name=Yew logs|quantity=40 (noted)|rarity=10/128|members=yes}}
+{{DropsLine|name=Iron stone spirit|quantity=55|rarity=16/128|alch=no|members=yes}}
+{{DropsLine|name=Adamantite stone spirit|quantity=40|rarity=8/128|alch=no|members=yes}}
+{{DropsLine|name=Pure essence|quantity=900 (noted)|rarity=14/128|members=yes}}
+{{DropsLine|name=Blood rune|quantity=90|rarity=14/128|members=yes}}
+{{DropsLine|name=Mystic cloth|quantity=3 (noted)|rarity=4/128|members=yes}}
+{{DropsTableBottom}}
+
+====Unique====
+There is a 1/10 chance to roll onto the mole's unique items table (the chances below include this). If tier 1 or higher [[luck]] is active, this is improved to 1/9 (shown as the second rarity). Unique drops are tertiary, and are given to a random player of the top 3 contributors to the kill.
+
+{{DropsTableHead|version=Hard Mode}}
+{{DropsLine|name=Ultra-growth potion (1)|quantity=1|rarity=30/520|altrarity=30/468|citations={{NamedRef|revealed rates}}|members=yes|gemw=no|alch=no}}
+{{DropsLine|name=Numbing root|quantity=8-12|rarity=10/520|altrarity=10/468|citations={{NamedRef|revealed rates}}|members=yes}}
+{{DropsLine|name=Clingy mole|quantity=1|rarity=10/520|altrarity=10/468|citations={{NamedRef|revealed rates}}|members=yes}}
+{{DropsLine|name=Dragon 2h sword|quantity=1|rarity=2/520|altrarity=2/468|citations={{NamedRef|revealed rates}}|members=yes}}
+{{DropsTableBottom}}
+
+{{Bugged|{{plink|Long, sharp claws|size=15px}} are not dropped in Hard mode|minor|Obtain them from a different monster}}
+====Tertiary====
+{{DropsTableHead|version=Hard Mode}}
+{{DropsLine|name=Long, sharp claws|quantity=1|rarity=1/4|raritynotes={{DropNote|Only during the [[Fur 'n Seek/Wish list|Fur 'n Seek wish list]].}}|gemw=no|members=yes}}
+{{DropsLine|name=Long bone|quantity=1|rarity=1/400|members=yes}}
+{{DropsLine|name=Curved bone|quantity=1|rarity=1/5000|members=yes}}
+{{DropsLine|name=Rotten fang|quantity=1|rarity=1/500|altrarity=10/500|altraritydash=yes|gemw=no|alch=no|raritynotes={{DropNote|name=threshold_hard|Base drop rate of 1/500, with a [[Boss pets#Pets unlocked by drops|threshold of 500]].}}|citations={{CiteForum|author = Mod Ryan|url = http://services.runescape.com/m=forum/a=13/sl=0/forums.ws?373,374,807,65550979,goto,1|archivedate=9 February 2015|archiveurl=https://archive.ph/ZkWyc|title = Boss pets - Drop rates!|forum = Ninja Team|postdate = 9 January 2015|name = "pet drop rate"}}|members=yes}}
+{{DropsLine|name=Giant mole's head|quantity=1|rarity=1/500|alch=no|members=yes}}
+{{DropsTableBottom}}
+
+===Drops - Hard mode, free-to-play===
+{{Average drop value|mob=Giant mole#Hard Mode F2P|mobname=free-to-play hard mode giant mole}}
+
+====Main====
+{{DropsTableHead|version=Hard Mode F2P}}
+{{DropsLine|name=Coins|quantity=2550-30500|rarity=14/128|namenotes={{F2POnly}}}}
+{{DropsLine|name=Iron stone spirit|quantity=60|rarity=16/128|alch=no|namenotes={{F2POnly}}}}
+{{DropsLine|name=Coal stone spirit|quantity=60|rarity=16/128|namenotes={{F2POnly}}}}
+{{DropsLine|name=Adamantite stone spirit|quantity=55|rarity=8/128|alch=no|namenotes={{F2POnly}}}}
+{{DropsLine|name=Yew logs|quantity=45 (noted)|rarity=10/128|namenotes={{F2POnly}}}}
+{{DropsLine|name=Nature rune|quantity=60|rarity=14/128|namenotes={{F2POnly}}}}
+{{DropsLine|name=Pure essence|quantity=900 (noted)|rarity=14/128|namenotes={{F2POnly}}}}
+{{DropsLine|name=Limpwurt root|quantity=20 (noted)|rarity=12/128|namenotes={{F2POnly}}}}
+{{DropsLine|name=Uncut diamond|quantity=9|rarity=8/128|namenotes={{F2POnly}}}}
+{{DropsLine|name=Grapes|quantity=14 (noted)|rarity=12/128|namenotes={{F2POnly}}}}
+{{DropsLine|name=Mystic cloth|quantity=3 (noted)|rarity=4/128|namenotes={{F2POnly}}}}
+{{DropsTableBottom}}
+
+====Unique====
+There is a 1/10 chance to roll onto the mole's unique items table (the chances below include this). If tier 1 or higher [[luck]] is active, this is improved to 1/9 (shown as the second rarity). Unique drops are tertiary, and are given to a random player of the top 3 contributors to the kill.
+{{DropsTableHead|version=Hard Mode F2P}}
+{{DropsLine|name=Numbing root|quantity=8-12|rarity=47/520|altrarity=47/468|citations={{NamedRef|revealed rates}}|namenotes={{F2POnly}}}}
+{{DropsLine|name=Clingy mole|quantity=2|rarity=5/520|altrarity=5/468|citations={{NamedRef|revealed rates}}|namenotes={{F2POnly}}}}
+{{DropsTableBottom}}
+
+====Tertiary====
+{{DropsTableHead|version=Hard Mode F2P}}
+{{DropsLine|name=Rotten fang|quantity=1|rarity=1/500|altrarity=10/500|altraritydash=yes|gemw=no|alch=no|raritynotes={{DropNote|name=threshold_hard|Base drop rate of 1/500, with a [[Boss pets#Pets unlocked by drops|threshold of 500]].}}|citations={{CiteForum|author = Mod Ryan|url = http://services.runescape.com/m=forum/a=13/sl=0/forums.ws?373,374,807,65550979,goto,1|archivedate=9 February 2015|archiveurl=https://archive.ph/ZkWyc|title = Boss pets - Drop rates!|forum = Ninja Team|postdate = 9 January 2015|name = "pet drop rate"}}|namenotes={{F2POnly}}}}
+{{DropsTableBottom}}
+
+==Achievements==
+===Giant Mole achievements===
+{{Main|Giant Mole achievements}}
+* {{Achievement|Giant Mole (achievement)}}
+* Mole Removal:
+** {{Achievement|Mole Removal I}}
+** {{Achievement|Mole Removal II}}
+** {{Achievement|Mole Removal III}}
+** {{Achievement|Mole Removal IV}}
+** {{Achievement|Mole Removal V}}
+** {{Achievement|Mole Removal VI}}
+* Whack a Mole:
+** {{Achievement|Whack a Mole I}}
+** {{Achievement|Whack a Mole II}}
+** {{Achievement|Whack a Mole III}}
+** {{Achievement|Whack a Mole IV}}
+** {{Achievement|Whack a Mole V}}
+** {{Achievement|Whack a Mole VI}}
+* {{Achievement|Giant Mole Novice Speed Killer}}
+* {{Achievement|Giant Mole Beginner Speed Killer}}
+* {{Achievement|Giant Mole (HM) Novice Speed Killer}}
+* {{Achievement|Giant Mole (HM) Beginner Speed Killer}}
+* {{Achievement|Stunned and Done}}
+
+===Boss Pet===
+{{Main|Boss Pets achievements}}
+* {{Achievement|Molly (achievement)}}
+
+===Boss Log===
+{{Main|Boss Logs achievements}}
+* {{Achievement|Can You Dig It?}}
+
+==Gallery==
+<gallery mode="packed" heights="200">
+Mole and basilisk concept remake.png|Concept art presented at [[RuneFest 3]] for an updated giant mole
+Giant Mole concept art.jpg|Additional concept art for the giant mole
+Giant mole (Christmas).png|Giant mole wearing a Santa hat during Christmas
+</gallery>
+
+==Graphical updates==
+{{GU|subject=npc
+|{{GUL|date=[[7 March]] [[2006]]|update=Canoeing, Zygomites and a Mole!|img=Giant mole (2006).png|name=Giant mole}}
+|{{GUL|date=[[1 July]] [[2008]]|update=RuneScape HD - Members-Only Beta Launch|img=Giant mole (2008).png|name=Giant mole}}
+|{{GUL|date=[[27 January]] [[2014]]|update=Holy Moley - Giant Mole Update|img=Giant mole.png|name=Giant mole}}
+}}
+
+==Update history==
+{{UH|
+* {{UL|type=patch|update=January Patch Week - This Week In RuneScape|date=20 January 2025}}
+** Fixed an issue where defeating the giant mole in a group rewarded some players the incorrect combat XP.
+
+* {{UL|type=patch|update=November PostJam Patch Week - This Week In RuneScape|date=25 November 2024}}
+** Increased the quantity of [[adamantite stone spirit]]s dropped from 4 or 6 to 20 or 30 (normal mode) and from 6 or 10 to 40 or 55 (hard mode).
+
+* {{UL|type=hidden|update=Necromancy Patch Week - This Week In RuneScape|date=11 September 2023}}
+** The 50% combat experience reduction on bosses has been removed. Bosses now give 50 combat experience per 1,000 life points, like most other monsters in the game.
+
+* {{UL|type=patch|update=Double XP & Retro Dragon Claws - This Week In RuneScape|date=20 February 2023}}
+** Gravestones will no longer spawn in an inaccessible area after dying inside the giant mole boss arena.
+
+* {{UL|type=patch|update=This Week In RuneScape: Celebration of Combat#Patch Notes|date=11 January 2021}}
+** Various bosses around RuneScape have taken their Santa Hats off for another year.
+
+* {{UL|type=patch|update=Patch Notes (8 June 2020)|date=8 June 2020}}
+** Giant mole minions now despawn on boss death.
+
+* {{UL|type=patch|update=Patch Notes (2 March 2020)|date=2 March 2020}}
+** Fixed a minor exploit when fighting the hardcore giant mole.
+
+* {{UL|type=patch|update=Patch Notes (14 October 2019)|date=14 October 2019}}
+** Fixed an issue causing giant mole killcount to be incorrect.
+
+* {{UL|type=patch|update=Double XP Weekend, Balthazar's Big Raffle and Patches Galore!|date=28 August 2018}}
+** Giant mole is now listed as F2P in the Grouping System.
+
+* {{UL|type=ninja|update=Patch Notes (3 April 2018)|date=3 April 2018}}
+** [[King Black Dragon]] and giant mole now have boss health bars during their encounters. The giant mole health bar will display after its tutorial is completed.
+
+* {{UL|type=hotfix|update=Patch Notes (16 October 2017)|date=9 October 2017}}
+** The giant mole now drops a minimum of three mystic cloth (to potentially be shared between three players).
+
+* {{UL|type=ninja|update=Patch Notes (9 October 2017)|date=9 October 2017}}
+** The boss pet for giant mole can now drop in free worlds.
+
+* {{UL|type=ninja|update=Patch Notes (17 October 2016)|date=17 October 2016}}
+** Non-members can now access the Giant Mole, [[King Black Dragon]], and the [[Games Room]] via the [[Grouping System]].
+
+* {{UL|type=patch|update=Patch Notes (8 August 2016)|date=8 August 2016}}
+** Loot from the giant mole is now correctly distributed while Group Lootshare is active.
+
+* {{UL|type=patch|update=Patch Notes (18 April 2016)|date=18 April 2016}}
+** The museum curators have received complaints and, as such, have updated their display of the giant mole.
+
+* {{UL|type=update|update=Free To Play Extravaganza - Prismania - Mammoth Outfits|date=29 February 2016}}
+** Giant Mole and hard-mode Giant Mole bosses in the Falador Mole Lair are also now available to battle in [[free-to-play]] worlds
+*** As the [[Agility]] requirement for the short cuts in these boss fights was higher than free-to-play characters could reach, the shortcuts have been removed from the lair in both members' and free-to-play worlds.
+
+* {{UL|type=patch|update=Patch Notes (30 March 2015)|date=30 March 2015}}
+** The giant mole once again remembers how to punish those who seek comfort in tight spaces.
+
+* {{UL|type=patch|update=Patch Notes (16 March 2015)|date=16 March 2015}}
+** Mini-moles in the giant mole encounter are now more aggressive.
+
+* {{UL|type=patch|update=Patch Notes (17 November 2014)|date=17 November 2014}}
+** You can no longer select a group size of 50 for the giant mole.
+
+* {{UL|type=patch|update=Patch Notes (24 March 2014)|date=24 March 2014}}
+** Players can no longer attack the giant mole from the far side of the agility shortcuts of the chamber it is currently in.
+** The giant mole will now correctly advance the fight when a [[familiar]] deals the most damage to it.
+
+* {{UL|type=patch|update=Patch Notes (17 February 2014)|date=17 February 2014}}
+** The giant mole can now be harmed by [[Summoning familiars|familiars]].
+** [[Ultra-growth potion]]s now drop from the giant mole correctly when in a [[LootShare]] group.
+** The trail left by the giant mole when it digs now always indicates the direction it is heading in.
+
+* {{UL|type=patch|update=Patch Notes (4 February 2014)|date=4 February 2014}}
+** The Elite Tasks reward listing for Falador now states the amended rewards, following the giant mole rework.
+** The butterfly that is part of the Guthix's Blessing ability now will follow players through shortcuts in the giant mole lair. As a result, the healing effect is no longer cut short.
+
+* {{UL|type=hidden|update=Holy Moley - Giant Mole Update|date=27 January 2014}}
+** The giant mole no longer has access to the [[rare drop table]].
+
+* {{UL|type=update|update=Holy Moley - Giant Mole Update|date=27 January 2014}}
+** The giant mole was graphically reworked, its arena updated and given an instance system, and new drops were added.
+
+* {{UL|type=patch|update=Patch Notes (20 December 2011)|date=20 December 2011}}
+** The giant mole now drops loot if it is killed whilst players are digging.
+
+* {{UL|type=patch|update=Patch Notes (8 February 2010)|date=8 February 2010}}
+** The mud thrown at you when the giant mole retreats now properly scales to cover your window.
+
+* {{UL|type=update|update=Canoeing, Zygomites and a Mole!|date=7 March 2006}}
+** Added to game.
+}}
+
+==Trivia==
+* The Giant Mole received a graphical and mechanical update on [[27 January]] [[2014]]. The same update also reduced the cavern size by half. Details about the mole before her update can be found [[Giant Mole (historical)|here]].
+* Sometimes, a glitch can occur where the giant mole may stay in one room for two phases rather than constantly moving around as her life points deplete. This only occurs when she first tunnels away to the first cavern.
+* The giant mole was made available to [[free-to-play]] players on [[29 February]] [[2016]]. The same update also removed the shortcut areas in the cavern into gaps wide enough for players to run through.
+* As of [[1 February]] [[2018]], the highest kill count for this boss was 2,775 kills for normal mode and 2,670 for hard mode.{{CiteReddit|author=Mod Shauny|url=https://www.reddit.com/r/runescape/comments/7uqej0/top_10_killers_per_boss/|title=Top 10 killers per Boss|quote=Here are the top 10 kills for each Boss in RuneScape, be aware that we've not listed display names for privacy purposes however if you wish to brag about one number being yours then we won't stop you!|date=2 February 2018|archiveurl=https://reldo.runescape.wiki/i/102945|archivedate=25 January 2019}}
+** This had increased to 5,000 for normal mode and 5,130 for hard mode by [[13 December]] [[2018]].{{CiteReddit|author=Mod Shauny|url=https://www.reddit.com/r/runescape/comments/adugze/top_20_boss_killers_by_monster_data_13th_december/|title=Top 20 Boss Killers by Monster (Data: 13th December 2018)|quote=[link to a spreadsheet]|date=8 January 2019|archiveurl=http://archive.is/ycOt4|archivedate=28 February 2020}}
+* The giant mole's scientific name, ''Talpidae wysonian'', is a reference to the real life {{WP|Talpidae}} family of moles.
+* The giant mole's carcass serves as the mining node for the [[Croesus]] boss encounter.
+* In a [[18 May]] [[2026]] blog post, a Giant Mole rework was joked about, renaming the boss '''Micro Mole''', along with other changes intended to make the encounter more annoying. The blog post ended with {{RSFont|*none of these changes are actually planned or will go live.}} written in small text.{{CiteNews|author=|url=https://secure.runescape.com/m=news/daemonheim-drift---hiscores-now-live|title= Daemonheim Drift - Hiscores now live!|newsdate=18 May 2026|notes=|name=}}
+
+==References==
+{{reflist}}
+
+{{Soul Reaper}}
+[[Category:Unique monsters]]
+[[Category:Falador]]
+[[Category:Bosses]]
+[[Category:Free-to-play bosses]]
+[[Category:Tier 1 luck]]
+[[pt:Toupeira Gigante]]
