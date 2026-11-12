@@ -1956,6 +1956,11 @@ textarea {
   max-width: 100%;
   line-height: inherit;
 }
+/* A link with no art is plain text: keep it on the sentence's baseline. */
+.wiki-ref:not(:has(img)) {
+  display: inline;
+  vertical-align: baseline;
+}
 .wiki-ref img {
   width: 22px;
   height: 22px;
