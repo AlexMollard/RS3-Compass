@@ -324,6 +324,17 @@
             <div class="pack-body">
               <div class="pack-list">
                 <ItemList items={quest.supplies} checked={packedItems} onToggle={toggleSupply} />
+                <div class="pack-summary">
+                  <p class="pack-stats">
+                    <span><strong>{Math.min(inventory.slots.length, INVENTORY_SIZE)}</strong> of {INVENTORY_SIZE} slots</span>
+                    <span><strong>{packedItems.length}</strong> of {quest.supplies.length} packed</span>
+                  </p>
+                  <p class="cap">
+                    {#if inventory.overflow}Needs {inventory.slots.length} slots, {inventory.overflow}
+                      more than one inventory holds, so plan extra trips.{/if} Stackable items share a slot.
+                    Packing checks are manual; they do not read your bank or inventory.
+                  </p>
+                </div>
               </div>
               <div
                 class="inv"
@@ -345,11 +356,6 @@
                 {#each { length: inventory.empty } as _}<span class="slot empty"></span>{/each}
               </div>
             </div>
-            <p class="cap pack-note">
-              {#if inventory.overflow}Needs {inventory.slots.length} slots, {inventory.overflow}
-                more than one inventory holds, so plan extra trips.{/if} Packing checks are
-              manual; they do not read your bank or inventory.
-            </p>
           {:else}
             <div class="pack-empty">
               <div class="inv inv-empty" aria-hidden="true">
@@ -924,7 +930,7 @@
   .pack-card {
     grid-column: 1;
     grid-row: 1 / span 2;
-    align-self: start;
+    container: pack / inline-size;
     display: flex;
     flex-direction: column;
   }
@@ -940,23 +946,43 @@
   .pack-short {
     color: var(--warn);
   }
+  /* The card matches the column beside it: the list fills the left, the backpack the right. */
   .pack-body {
+    flex: 1;
     display: flex;
     flex-wrap: wrap;
-    align-items: flex-start;
+    align-items: stretch;
     gap: 22px;
     padding: 16px;
   }
   .pack-list {
     flex: 1 1 220px;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
   }
   .pack-list :global(.pack-row:first-child) {
     padding-top: 0;
   }
-  .pack-note {
+  .pack-summary {
     margin-top: auto;
-    padding: 0 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+  }
+  .pack-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 24px;
+    margin: 0;
+    color: var(--muted);
+  }
+  .pack-stats strong {
+    font-size: 20px;
+    color: var(--heading);
   }
   /* No items: a faded empty inventory beside the message, centred in the card. */
   .pack-empty {
@@ -984,7 +1010,8 @@
     color: var(--heading);
   }
   .inv {
-    flex: 0 0 176px;
+    flex: 0 0 clamp(176px, 30cqi, 248px);
+    align-self: flex-start;
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 5px;
