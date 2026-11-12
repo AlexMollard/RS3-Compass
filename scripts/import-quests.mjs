@@ -17,7 +17,9 @@ import {
   parseQuestreq,
   plain,
   questSeries,
+  spriteFiles,
   templateParams,
+  wikiPage,
 } from "./questWikitext.mjs";
 
 const API = "https://runescape.wiki/api.php";
@@ -102,6 +104,32 @@ async function existingFiles(files) {
       if (!page.missing && page.imageinfo) found.add(fileName(page.title));
   }
   return found;
+}
+
+/**
+ * Each existing file → the file /images/ actually serves. A redirected file name ("Coins.png" →
+ * "Coins_10000.png") exists for the API but 404s as an image URL, so sprites store the target.
+ */
+async function servedFiles(files) {
+  const served = new Map();
+  for (const batch of chunks([...new Set(files)])) {
+    const json = await api({
+      action: "query",
+      prop: "imageinfo",
+      redirects: "1",
+      titles: batch.map((f) => "File:" + f).join("|"),
+    });
+    const resolve = new Map();
+    for (const n of json.query.normalized ?? []) resolve.set(n.from, n.to);
+    for (const r of json.query.redirects ?? []) resolve.set(r.from, r.to);
+    const found = new Set(json.query.pages.filter((p) => !p.missing && p.imageinfo).map((p) => p.title));
+    for (const file of batch) {
+      let title = "File:" + file;
+      for (let i = 0; i < 3 && resolve.has(title); i++) title = resolve.get(title);
+      if (found.has(title)) served.set(file, fileName(title));
+    }
+  }
+  return served;
 }
 
 async function pageImages(titles) {
@@ -242,6 +270,14 @@ function parseQuest(title, content, questreq, npcPins) {
     }
     rewards.push(line.text);
   }
+  // Nested items stay on their parent line: they are often alternatives ("one of the following:").
+  // Supply lines keep their Wiki links (by index into supplies, anchors kept) for item sprites.
+  const supplies = [];
+  const supplyLinks = {};
+  for (const line of linkedBullets(details.items, true)) {
+    if (Object.keys(line.links).length) supplyLinks[supplies.length] = line.links;
+    supplies.push(line.text);
+  }
   const image = (infobox.image ?? "").match(/\[\[File:([^|\]]+)/i)?.[1];
   // Required kills: "* 3 [[Ghast]]s (level 35)". Identity is the linked page plus the level.
   const required = [];
@@ -263,6 +299,7 @@ function parseQuest(title, content, questreq, npcPins) {
   }
   return {
     rewardLinks,
+    supplyLinks,
     titlePages,
     music: musicTracks(rewardsTemplate.music),
     combat: { required, hazards: [], notes: [] },
@@ -286,8 +323,7 @@ function parseQuest(title, content, questreq, npcPins) {
       requirements: [...skills].map(([skill, level]) => ({ skill, level })),
       questRequirementNames: questreq.get(title) ?? [],
       preparationNotes: notes,
-      // Nested items stay on their parent line: they are often alternatives ("one of the following:").
-      supplies: bullets(details.items, true),
+      supplies,
       rewards: rewards.length ? rewards : ["See the Wiki for rewards."],
       wiki: title.replaceAll(" ", "_"),
     },
@@ -354,6 +390,7 @@ for (const [npc, content] of npcPages) {
 const records = [];
 const combatPlans = {};
 const rewardLinks = {};
+const supplyLinks = {};
 const titlePages = new Set();
 const music = {};
 const skipped = [];
@@ -370,23 +407,31 @@ for (const title of titles) {
   records.push(record);
   combatPlans[record.id] = combat;
   if (Object.keys(result.rewardLinks).length) rewardLinks[record.id] = result.rewardLinks;
+  if (Object.keys(result.supplyLinks).length) supplyLinks[record.id] = result.supplyLinks;
   for (const page of result.titlePages) titlePages.add(page);
   if (result.music.length) music[record.id] = result.music;
 }
 
-// What each linked reward page is, and a sprite for items whose File:<page>.png exists.
+// What each page linked from a reward or supply line is, and a sprite for items whose File:<page>.png
+// exists (redirects resolved). An anchored supply link ("Antipoison#(3)") is its page's kind,
+// preferring File:<page> (<anchor>).png.
 const linkedPages = [
-  ...new Set(Object.values(rewardLinks).flatMap((lines) => Object.values(lines).flatMap(Object.values))),
+  ...new Set(
+    [rewardLinks, supplyLinks].flatMap((table) =>
+      Object.values(table).flatMap((lines) => Object.values(lines).flatMap(Object.values)),
+    ),
+  ),
 ].filter((page) => !titlePages.has(page));
-const kinds = await pageKinds(linkedPages);
-const sprites = await existingFiles(
-  [...kinds.values()].filter((k) => k.kind === "item").map((k) => fileName(k.title + ".png")),
-);
+const kinds = await pageKinds(linkedPages.map((page) => wikiPage(page)));
+const sprites = (page) => spriteFiles(kinds.get(wikiPage(page)).title, page);
+const items = linkedPages.filter((page) => kinds.get(wikiPage(page)).kind === "item");
+const served = await servedFiles(items.flatMap(sprites));
 const references = {};
 for (const page of linkedPages) {
-  const { kind, title } = kinds.get(page);
-  const image = fileName(title + ".png");
-  references[page] = kind === "item" && sprites.has(image) ? { kind, image } : { kind };
+  const { kind } = kinds.get(wikiPage(page));
+  const file = kind === "item" && sprites(page).find((file) => served.has(file));
+  const image = file && served.get(file);
+  references[page] = image ? { kind, image } : { kind };
 }
 for (const page of titlePages) references[page] = { kind: "title" };
 
@@ -523,7 +568,10 @@ export const QUICK_GUIDES: ReadonlySet<string> = new Set(${JSON.stringify(quickG
 /** Storyline series per quest wiki page (from the Wiki infobox main_series / series_nth). */
 export const QUEST_SERIES: Readonly<Record<string, { name: string; order: number }>> = ${JSON.stringify(sortedSeries, null, 2)};
 
-/** Wiki pages linked from imported item and unlock reward lines: kind, and the sprite of items that have File:<page>.png. */
+/**
+ * Wiki pages linked from imported item and unlock reward lines and from supply lines: kind, and the sprite
+ * of items that have File:<page>.png (anchored supply links: File:<page> (<anchor>).png first).
+ */
 export const REWARD_REFERENCES: Readonly<Record<string, RewardReference>> = {
 ${table(references)}
 };
@@ -531,6 +579,11 @@ ${table(references)}
 /** Per imported quest id: reward line index → linked label (as the line shows it) → REWARD_REFERENCES page. */
 export const REWARD_LINKS: Readonly<Record<string, Readonly<Record<number, Readonly<Record<string, string>>>>>> = {
 ${table(rewardLinks)}
+};
+
+/** Per imported quest id: supply line index → linked label (as the line shows it) → REWARD_REFERENCES page, anchor kept. */
+export const SUPPLY_LINKS: Readonly<Record<string, Readonly<Record<number, Readonly<Record<string, string>>>>>> = {
+${table(supplyLinks)}
 };
 
 /** Music tracks (Wiki pages) each quest unlocks, by quest id. */
@@ -544,6 +597,8 @@ const linkedLines = Object.values(rewardLinks).reduce((sum, lines) => sum + Obje
 const byKind = {};
 for (const { kind } of Object.values(references)) byKind[kind] = (byKind[kind] ?? 0) + 1;
 console.log(`Reward lines with links: ${linkedLines}; pages: ${JSON.stringify(byKind)}; item sprites: ${Object.values(references).filter((r) => r.image).length}.`);
+const supplyLines = Object.values(supplyLinks).reduce((sum, lines) => sum + Object.keys(lines).length, 0);
+console.log(`Supply lines with links: ${supplyLines}.`);
 console.log(`Music: ${Object.values(music).flat().length} tracks for ${Object.keys(music).length} quests.`);
 console.log(`Skipped ${skipped.length}:`);
 for (const line of skipped) console.log("  " + line);

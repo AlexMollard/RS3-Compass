@@ -5,6 +5,46 @@ import {
   type GameTextReference,
 } from "./gameText.ts";
 import { packKey } from "./packing.ts";
+import type { RewardReference } from "./questRewards.ts";
+
+type LineLinks = Readonly<Record<number, Readonly<Record<string, string>>>>;
+
+/** The catalogue's art for exactly this phrase ("food", "pickaxe"), for links whose page has no sprite. */
+function catalogueArt(phrase: string): Pick<GameTextReference, "image" | "imageUrl"> {
+  const [only, ...rest] = tokenizeGameText(phrase);
+  const art = !rest.length && !only?.reference?.search ? only?.reference : undefined;
+  return art?.image ? { image: art.image } : art?.imageUrl ? { imageUrl: art.imageUrl } : {};
+}
+
+/**
+ * Each supply line's Wiki links (SUPPLY_LINKS, keyed by line index) as GameText references by line
+ * text. Linked items carry their Wiki sprite, else the catalogue's art for the same phrase; an
+ * anchored page ("Antipoison#(3)") links to its page.
+ */
+export function supplyReferences(
+  quest: Pick<QuestRecord, "id" | "supplies">,
+  links: Readonly<Record<string, LineLinks>>,
+  pages: Readonly<Record<string, RewardReference>>,
+): Map<string, GameTextReference[]> {
+  const byLine = new Map<string, GameTextReference[]>();
+  for (const [index, lineLinks] of Object.entries(links[quest.id] ?? {})) {
+    const line = quest.supplies[Number(index)];
+    if (line === undefined) continue;
+    byLine.set(
+      line,
+      Object.entries(lineLinks).map(([name, page]) => {
+        const { kind, image } = pages[page] ?? {};
+        return {
+          name,
+          wiki: page.split("#")[0],
+          kind: kind === "item" || kind === "place" ? kind : "reference",
+          ...(image ? { image } : catalogueArt(name)),
+        };
+      }),
+    );
+  }
+  return byLine;
+}
 
 export interface InventorySlot {
   /** Unique per slot, for rendering. */
@@ -68,22 +108,36 @@ export function lineItems(line: string): LineItem[] {
   return items;
 }
 
-/** Lays a quest's supplies into backpack slots; `packed` holds packing keys. */
+const pageKey = (page: string) => page.replaceAll("_", " ").toLocaleLowerCase("en");
+
+/**
+ * Lays a quest's supplies into backpack slots; `packed` holds packing keys. Slots come from the
+ * catalogue; `references` (supplyReferences) only swap in a line's Wiki item sprites: a one-slot
+ * line shows its first item sprite, Wiki or catalogue, and a listed item the sprite of its linked page.
+ */
 export function inventorySlots(
   quest: Pick<QuestRecord, "id" | "supplies">,
   packed: readonly string[],
+  references?: ReadonlyMap<string, readonly GameTextReference[]>,
 ): { slots: InventorySlot[]; empty: number; overflow: number } {
   const slots: InventorySlot[] = [];
   for (const line of quest.supplies) {
     const key = packKey(quest.id, line);
     const isPacked = packed.includes(key);
     const items = lineItems(line);
+    const linked = references?.get(line);
     if (!items.length) {
-      slots.push({ id: key, line, key, packed: isPacked, art: lineArt(line), title: line });
+      slots.push({ id: key, line, key, packed: isPacked, art: lineArt(line, linked), title: line });
       continue;
     }
+    const sprites = (linked ?? []).filter((reference) => reference.kind === "item" && reference.image);
     items.forEach(({ reference, quantity, stackable }, index) => {
-      const base = { line, key, packed: isPacked, art: reference };
+      const names = [reference.name, ...(reference.aliases ?? [])].map(pageKey);
+      const art =
+        sprites.find(
+          (sprite) => pageKey(sprite.wiki) === pageKey(reference.wiki) || names.includes(pageKey(sprite.name)),
+        ) ?? reference;
+      const base = { line, key, packed: isPacked, art };
       if (stackable) {
         slots.push({
           ...base,

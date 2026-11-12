@@ -1,13 +1,17 @@
 <script lang="ts">
+  import type { GameTextReference } from "../gameText";
   import GameText from "./GameText.svelte";
   let {
     items,
     checked,
     onToggle,
+    references,
   }: {
     items: readonly string[];
     checked?: readonly string[];
     onToggle?: (item: string) => void;
+    /** Per item line, its Wiki links (with item sprites); the catalogue covers the rest. */
+    references?: ReadonlyMap<string, readonly GameTextReference[]>;
   } = $props();
   const id = $props.id();
 </script>
@@ -29,10 +33,10 @@
           for={id + "-" + index}
           aria-hidden="true"
           title={"Toggle packed: " + item}
-        ></label><span><GameText text={item} /></span>
+        ></label><span><GameText text={item} references={references?.get(item)} /></span>
       </div>{/each}
   </div>{:else}<ul class="plain-list">
     {#each items as item (item)}<li>
-        <span class="tiny-diamond"></span><GameText text={item} />
+        <span class="tiny-diamond"></span><GameText text={item} references={references?.get(item)} />
       </li>{/each}
   </ul>{/if}

@@ -8,6 +8,7 @@ import {
   parseQuestreq,
   plain,
   questSeries,
+  spriteFiles,
   templateParams,
 } from "../scripts/questWikitext.mjs";
 
@@ -39,6 +40,36 @@ test("piped links, link trails, anchors, plinks and joined children all land on 
     Prifddinas: "Prifddinas",
     "Ring of visibility": "Ring of visibility",
   });
+});
+
+test("supply lines keep their links with anchors, labels matching the joined bullets() text", () => {
+  const items =
+    "* 3 [[cadava berries]]\n* 10 [[fishing bait]]\n* [[Antipoison#(3)|Antipoison (3)]]\n" +
+    "* One of the following:\n** [[Rune_scimitar#Unfinished|a rune scimitar]]\n** [[Coal]]\n* Food\n* None";
+  const lines = linkedBullets(items, true);
+  assert.deepEqual(lines.map((line) => line.text), bullets(items, true));
+  assert.deepEqual(
+    lines.map((line) => line.links),
+    [
+      { "cadava berries": "Cadava berries" },
+      { "fishing bait": "Fishing bait" },
+      { "Antipoison (3)": "Antipoison#(3)" },
+      { "a rune scimitar": "Rune scimitar#Unfinished", Coal: "Coal" },
+      {},
+    ],
+  );
+  // Rewards still drop anchors.
+  assert.deepEqual(linkedBullets("* [[Antipoison#(3)|Antipoison (3)]]")[0].links, { "Antipoison (3)": "Antipoison" });
+});
+
+test("an anchored item link tries the variant sprite before the page's own", () => {
+  assert.deepEqual(spriteFiles("Antipoison", "Antipoison#(3)"), ["Antipoison_(3).png", "Antipoison.png"]);
+  assert.deepEqual(spriteFiles("Rune scimitar", "Rune scimitar#Unfinished"), [
+    "Rune_scimitar_(Unfinished).png",
+    "Rune_scimitar.png",
+  ]);
+  // The redirect target names the file; a plain link has one candidate.
+  assert.deepEqual(spriteFiles("Cadava berries", "Cadava berry"), ["Cadava_berries.png"]);
 });
 
 test("a label used for two pages is dropped rather than guessed", () => {

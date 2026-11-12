@@ -106,12 +106,30 @@ export function wikiPage(target = "") {
   return page.charAt(0).toUpperCase() + page.slice(1);
 }
 
+/** A link target as wikiPage() plus its anchor, if any: "antipoison#(3)" → "Antipoison#(3)". */
+export function wikiTarget(target = "") {
+  const anchor = target.split("#").slice(1).join("#").replaceAll("_", " ").trim();
+  const page = wikiPage(target);
+  return page && anchor ? page + "#" + anchor : page;
+}
+
+/**
+ * The sprite files to try for an item link, best first. `title` is its page after redirects; an
+ * anchored link ("Antipoison#(3)") tries the variant File:<title> (<anchor>).png before File:<title>.png.
+ */
+export function spriteFiles(title, target) {
+  const anchor = target.split("#").slice(1).join("#");
+  const variant = anchor && (/^\(.*\)$/.test(anchor) ? anchor : `(${anchor})`);
+  return [...(variant ? [`${title} ${variant}.png`] : []), `${title}.png`].map((file) => file.replaceAll(" ", "_"));
+}
+
 /**
  * The Wiki links in one line's wikitext as label → page, where the label is the text exactly as
  * plain() shows it in `text` (link trails included: "[[Bandos chronicle]]s"). Labels missing from
  * `text`, or used for two different pages, are dropped. `titles` are the pages TitleAnchors link to.
+ * With `anchors`, a [[link]] keeps its anchor ("Antipoison#(3)"), which picks a variant's sprite.
  */
-export function lineLinks(raw, text) {
+export function lineLinks(raw, text, anchors = false) {
   const source = raw
     .replace(/<ref[^>]*\/>/gi, "")
     .replace(/<ref[^>]*>[\s\S]*?<\/ref>/gi, "")
@@ -119,7 +137,7 @@ export function lineLinks(raw, text) {
   const found = [];
   for (const m of source.matchAll(/\[\[([^\]|]*)(?:\|([^\]]*))?\]\](\p{L}*)/gu)) {
     if (/^\s*(?::|File:|Image:|Category:|Media:)/i.test(m[1])) continue;
-    found.push({ label: plain(m[2] ?? m[1]) + m[3], target: wikiPage(m[1]) });
+    found.push({ label: plain(m[2] ?? m[1]) + m[3], target: anchors ? wikiTarget(m[1]) : wikiPage(m[1]) });
   }
   for (const m of source.matchAll(/\{\{\s*(?:plink|plinkp|plinkt)\s*\|([^|}]+)(?:\|[^}]*)?\}\}/gi))
     found.push({ label: plain(m[1]), target: wikiPage(m[1]) });
@@ -140,9 +158,12 @@ export function lineLinks(raw, text) {
   return { links, titles: [...new Set(titles)].filter((t) => Object.values(links).includes(t)) };
 }
 
-/** Reward bullets (children joined) with each line's Wiki links; see lineLinks(). */
-export function linkedBullets(text = "") {
-  return bulletEntries(text, true).map(({ text, raw }) => ({ text, ...lineLinks(raw, text) }));
+/**
+ * Bullets (children joined, so `text` is exactly bullets(text, true)) with each line's Wiki links;
+ * see lineLinks(). Supply lines pass `anchors` to keep link anchors.
+ */
+export function linkedBullets(text = "", anchors = false) {
+  return bulletEntries(text, true).map(({ text, raw }) => ({ text, ...lineLinks(raw, text, anchors) }));
 }
 
 /** The Quest rewards template's music list: each bullet's linked track page, or its plain name. */

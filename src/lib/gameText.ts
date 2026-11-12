@@ -302,9 +302,15 @@ const pattern = new RegExp(
 
 export type GameTextSegment = { text: string; reference?: GameTextReference };
 
-/** The first catalogue reference in a line that GameText would show art for, or undefined. */
-export function lineArt(text: string): GameTextReference | undefined {
-  return tokenizeGameText(text).find(
+/**
+ * The first reference in a line that GameText would show art for, or undefined. `extra` references
+ * (a line's Wiki links) win where they overlap a catalogue name.
+ */
+export function lineArt(
+  text: string,
+  extra?: readonly GameTextReference[],
+): GameTextReference | undefined {
+  return tokenizeGameText(text, extra).find(
     (segment) =>
       segment.reference &&
       !segment.reference.search &&

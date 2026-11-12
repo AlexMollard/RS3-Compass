@@ -22,10 +22,16 @@
     toggleItem,
   } from "../../data";
   import { QUEST_COMBAT } from "../../combatData";
-  import { QUEST_MUSIC, QUICK_GUIDES, REWARD_LINKS, REWARD_REFERENCES } from "../../questsImported";
+  import {
+    QUEST_MUSIC,
+    QUICK_GUIDES,
+    REWARD_LINKS,
+    REWARD_REFERENCES,
+    SUPPLY_LINKS,
+  } from "../../questsImported";
   import { wikiHref, wikiImage, wikiThumbnail } from "../../wiki";
   import { activeProfile, getCompass } from "../compassContext";
-  import { INVENTORY_SIZE, inventorySlots } from "../inventorySlots";
+  import { INVENTORY_SIZE, inventorySlots, supplyReferences } from "../inventorySlots";
   import { questPath, skillPath } from "../navigation";
   import { packKey } from "../packing";
   import { questLine } from "../questLine";
@@ -108,7 +114,9 @@
   let packedItems = $derived(
     quest.supplies.filter((item) => profile.packed.includes(packKey(quest.id, item))),
   );
-  let inventory = $derived(inventorySlots(quest, profile.packed));
+  // Imported supply lines' Wiki links, with item sprites, by line text.
+  let supplyLinks = $derived(supplyReferences(quest, SUPPLY_LINKS, REWARD_REFERENCES));
+  let inventory = $derived(inventorySlots(quest, profile.packed, supplyLinks));
   let readiness = $derived(questReadiness(quest, profile));
   let combat = $derived(QUEST_COMBAT[quest.id]);
   let prerequisites = $derived(
@@ -350,7 +358,12 @@
           {#if quest.supplies.length}
             <div class="pack-body">
               <div class="pack-list">
-                <ItemList items={quest.supplies} checked={packedItems} onToggle={toggleSupply} />
+                <ItemList
+                  items={quest.supplies}
+                  checked={packedItems}
+                  onToggle={toggleSupply}
+                  references={supplyLinks}
+                />
                 <div class="pack-summary">
                   <p class="pack-stats">
                     <span><strong>{Math.min(inventory.slots.length, INVENTORY_SIZE)}</strong> of {INVENTORY_SIZE} slots</span>
