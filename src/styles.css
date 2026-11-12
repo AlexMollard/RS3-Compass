@@ -1956,10 +1956,16 @@ textarea {
   max-width: 100%;
   line-height: inherit;
 }
-/* A link with no art is plain text: keep it on the sentence's baseline. */
-.wiki-ref:not(:has(img)) {
+/* Inside a sentence a link stays on the text's baseline; its art is centred on the line. */
+.wiki-ref:not(:has(img)),
+.game-text .wiki-ref {
   display: inline;
   vertical-align: baseline;
+}
+.game-text .wiki-ref img {
+  display: inline-block;
+  margin: -4px 4px 0 0;
+  vertical-align: middle;
 }
 .wiki-ref img {
   width: 22px;

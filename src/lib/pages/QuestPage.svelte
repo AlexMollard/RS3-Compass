@@ -924,6 +924,7 @@
   .pack-card {
     grid-column: 1;
     grid-row: 1 / span 2;
+    align-self: start;
     display: flex;
     flex-direction: column;
   }
@@ -1379,6 +1380,9 @@
     .pack-body {
       flex-direction: column;
       align-items: stretch;
+    }
+    .pack-list {
+      flex: none;
     }
     .inv {
       flex: none;
