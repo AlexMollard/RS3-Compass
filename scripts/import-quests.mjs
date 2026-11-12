@@ -390,6 +390,14 @@ for (const page of linkedPages) {
 }
 for (const page of titlePages) references[page] = { kind: "title" };
 
+// No infobox image: use the page's own lead picture (a quest screenshot), never an icon or chathead.
+const artless = records.filter((r) => r.artwork === "Quest.png");
+const leadImages = await pageImages(artless.map((r) => r.name));
+for (const r of artless) {
+  const lead = leadImages.get(r.name);
+  if (lead && !/(icon|chathead)\.png$|^Quest\.png$|\.svg$/i.test(lead)) r.artwork = fileName(lead);
+}
+
 const files = await existingFiles([
   ...records.flatMap((r) => [r.icon, r.artwork, r.start.image]),
   ...Object.values(combatPlans).flatMap((p) => p.required.map((e) => e.image)),

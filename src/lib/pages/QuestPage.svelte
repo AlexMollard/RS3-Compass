@@ -23,13 +23,13 @@
   } from "../../data";
   import { QUEST_COMBAT } from "../../combatData";
   import { QUEST_MUSIC, QUICK_GUIDES, REWARD_LINKS, REWARD_REFERENCES } from "../../questsImported";
-  import { wikiHref, wikiImage } from "../../wiki";
+  import { wikiHref, wikiImage, wikiThumbnail } from "../../wiki";
   import { activeProfile, getCompass } from "../compassContext";
   import { INVENTORY_SIZE, inventorySlots } from "../inventorySlots";
   import { questPath, skillPath } from "../navigation";
   import { packKey } from "../packing";
   import { questLine } from "../questLine";
-  import { earlierQuests } from "../questMap";
+  import { difficultyColor, earlierQuests } from "../questMap";
   import { questReadiness, questStartMessage } from "../questReadiness";
   import {
     experienceRewards,
@@ -92,6 +92,11 @@
   let quickGuide = $derived(QUICK_GUIDES.has(quest.wiki.replaceAll(" ", "_")));
   let walkthrough = $derived(quickGuide ? quest.wiki + "/Quick_guide" : quest.wiki);
   let start = $derived(quest.start);
+  // The hero falls back to a banner built from the quest's own icon and starting NPC.
+  let artFailedFor = $state<string>();
+  let hasArt = $derived(
+    quest.artwork !== "Quest.png" && quest.artwork !== quest.icon && artFailedFor !== quest.id,
+  );
   let startLocation = $derived(LOCATIONS[start.location]);
   // Jagex status: Hiscores players only; sample and hand-entered players have none.
   let jagex = $derived(
@@ -195,7 +200,29 @@
       target="_blank"
       rel="noopener noreferrer"
       aria-label={quest.name + " on RuneScape Wiki"}
-      ><GameArt file={quest.artwork} size={300} thumbnail /></a
+      style:--tint={difficultyColor(quest.difficulty)}
+      >{#if hasArt}<img
+          src={wikiThumbnail(quest.artwork)}
+          alt=""
+          width="300"
+          height="300"
+          decoding="async"
+          onerror={() => (artFailedFor = quest.id)}
+        />{:else}<span class="art-placeholder"
+          >{#if quest.icon !== "Quest.png"}<img
+              class="art-icon"
+              src={wikiImage(quest.icon)}
+              alt=""
+              width="56"
+              height="56"
+            />{/if}{#if start.image && start.image !== quest.icon}<img
+              class="art-npc"
+              src={wikiImage(start.image)}
+              alt=""
+              width="96"
+              height="96"
+            />{/if}<small>{start.npc ? "Starts with " + start.npc : quest.name}</small></span
+        >{/if}</a
     >
     <div class="quest-hero-copy">
       <span class="eyebrow"
@@ -660,12 +687,43 @@
     background: #0d161c;
     border-radius: 2px;
   }
-  .quest-hero-art :global(img) {
+  .quest-hero-art > img {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+  /* No Wiki artwork: the quest's icon and starting NPC on a banner tinted by difficulty. */
+  .art-placeholder {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: 1fr auto;
+    place-content: center;
+    align-items: end;
+    gap: 6px 18px;
+    padding: 18px;
+    background:
+      radial-gradient(circle at 30% 35%, color-mix(in srgb, var(--tint) 30%, transparent), transparent 65%),
+      linear-gradient(160deg, color-mix(in srgb, var(--tint) 14%, #13202a), #0b1217);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tint) 30%, transparent);
+  }
+  .art-placeholder .art-icon {
+    align-self: center;
+    filter: drop-shadow(0 2px 6px #000a);
+  }
+  .art-placeholder .art-npc {
+    object-fit: contain;
+    filter: drop-shadow(0 4px 10px #000c);
+  }
+  .art-placeholder small {
+    grid-column: 1 / -1;
+    justify-self: center;
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: 0.5px;
   }
   .quest-hero-copy {
     grid-area: copy;
