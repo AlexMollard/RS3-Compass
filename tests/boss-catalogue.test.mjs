@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { BOSSES, bossById } from "../src/bosses.ts";
+import { BOSSES, bossById, bossesUnlockedBy } from "../src/bosses.ts";
 import { QUESTS } from "../src/data.ts";
 
 // The Wiki table lists no signature drops for these, and no drop is rare enough to qualify.
@@ -27,6 +27,11 @@ test("quest requirements point at real quests", () => {
   for (const boss of BOSSES)
     for (const r of boss.requirements)
       if (r.kind === "quest") assert.ok(ids.has(r.quest), `${boss.name}: ${r.quest}`);
+});
+
+test("a quest that gates a boss lists it, and an unrelated quest lists none", () => {
+  assert.ok(bossesUnlockedBy("summers-end").some((boss) => boss.id === "corporeal-beast"));
+  assert.deepEqual(bossesUnlockedBy("no-such-quest"), []);
 });
 
 test("every boss has a collection log item, bar the known exceptions", () => {

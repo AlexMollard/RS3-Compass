@@ -8,6 +8,12 @@ const bossesById = new Map(BOSSES.map((boss) => [boss.id, boss]));
 
 export const bossById = (id: string): BossRecord | undefined => bossesById.get(id);
 
+/** The bosses whose requirements include this quest. */
+export const bossesUnlockedBy = (questId: string): BossRecord[] =>
+  BOSSES.filter((boss) =>
+    boss.requirements.some((req) => req.kind === "quest" && req.quest === questId),
+  );
+
 const GENERIC_UNIQUES = [
   /clue scroll/i,
   /casket/i,

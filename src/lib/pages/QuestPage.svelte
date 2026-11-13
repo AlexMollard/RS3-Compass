@@ -21,6 +21,7 @@
     skillByName,
     toggleItem,
   } from "../../data";
+  import { bossesUnlockedBy } from "../../bosses";
   import { QUEST_COMBAT } from "../../combatData";
   import {
     QUEST_MUSIC,
@@ -32,7 +33,7 @@
   import { wikiHref, wikiImage, wikiThumbnail } from "../../wiki";
   import { activeProfile, getCompass } from "../compassContext";
   import { INVENTORY_SIZE, inventorySlots, supplyReferences } from "../inventorySlots";
-  import { questPath, skillPath } from "../navigation";
+  import { bossPath, questPath, skillPath } from "../navigation";
   import { packKey } from "../packing";
   import { questLine } from "../questLine";
   import { difficultyColor, earlierQuests } from "../questMap";
@@ -144,6 +145,7 @@
     ),
   );
   let music = $derived(QUEST_MUSIC[quest.id] ?? []);
+  let unlockedBosses = $derived(bossesUnlockedBy(quest.id));
   let experience = $derived(experienceRewards(groups.experience));
   let fixedTotal = $derived([...experience.fixed.values()].reduce((sum, n) => sum + n, 0));
   let lampCount = $derived(experience.lamps.reduce((sum, lamp) => sum + lamp.count, 0));
@@ -542,7 +544,7 @@
               {#each groups.items as line}{@render rewardTile(line, "items")}{/each}
             </ul>
           </section>{/if}
-        {#if groups.unlocks.length || music.length}<section class="tool-window" aria-labelledby="r-unlocks">
+        {#if groups.unlocks.length || music.length || unlockedBosses.length}<section class="tool-window" aria-labelledby="r-unlocks">
             <header class="window-title">
               <h2 id="r-unlocks">Unlocks</h2>
               {#if groups.unlocks.length}<span>{groups.unlocks.length}</span>{/if}
@@ -550,6 +552,9 @@
             {#if groups.unlocks.length}<ul class="reward-tiles line-tiles">
                 {#each groups.unlocks as line}{@render rewardTile(line, "unlocks")}{/each}
               </ul>{/if}
+            {#each unlockedBosses as boss (boss.id)}<p class="boss-unlock">
+                Unlocks the <a href={bossPath(boss.id)}>{boss.name}</a> fight
+              </p>{/each}
             {#if music.length}<p class="music-row">
                 <span class="music-label"><EighthNotes size={14} aria-hidden="true" />Music</span>
                 <span
