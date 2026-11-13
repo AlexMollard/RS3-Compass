@@ -1,6 +1,6 @@
 <script lang="ts">
   import { untrack } from "svelte";
-  import { CircleAlert, CircleCheck, Info, Skull } from "@lucide/svelte";
+  import { CircleAlert, CircleCheck, Info } from "@lucide/svelte";
   import { BOSS_GUIDES } from "../../bossGuides";
   import { BOSSES, bossById, bossUniques } from "../../bosses";
   import type { BossRecord, BossTier } from "../../bossTypes";
@@ -26,7 +26,7 @@
   import { fetchPrices } from "../priceClient";
   import BossRow from "../components/BossRow.svelte";
   import ChoiceStrip from "../components/ChoiceStrip.svelte";
-  import GameArt from "../components/GameArt.svelte";
+  import FallbackArt from "../components/FallbackArt.svelte";
   import GameWindow from "../components/GameWindow.svelte";
   import PageHeading from "../components/PageHeading.svelte";
 
@@ -157,13 +157,6 @@
   }
 </script>
 
-{#snippet art(boss: BossRecord, size: number)}
-  {#if boss.image}<GameArt file={boss.image} {size} className="boss-art" />{:else}<span
-      class="boss-art art-fallback"
-      aria-hidden="true"><Skull size={Math.round(size / 3)} /></span
-    >{/if}
-{/snippet}
-
 {#snippet bossList(list: BossRecord[])}
   <ol class="boss-list">
     {#each list as boss (boss.id)}
@@ -218,7 +211,7 @@
     </div>{/if}
 
   {#if next && nextStatus && view !== "log"}<section class="next-card tool-window" aria-labelledby="next-boss">
-      <a class="next-art" href={bossPath(next.id)} tabindex="-1" aria-hidden="true">{@render art(next, 140)}</a>
+      <a class="next-art" href={bossPath(next.id)} tabindex="-1" aria-hidden="true"><FallbackArt file={next.image} size={140} className="boss-art" /></a>
       <div class="next-main">
         <span class="eyebrow">Your next boss</span>
         <h2 id="next-boss"><a href={bossPath(next.id)}>{next.name}</a></h2>
@@ -426,14 +419,6 @@
   .next-card :global(.boss-art) {
     width: 140px;
     height: 140px;
-  }
-  .art-fallback {
-    display: grid;
-    place-items: center;
-    background: var(--panel-raised);
-    border: 1px solid var(--frame-line);
-    border-radius: 3px;
-    color: var(--muted);
   }
   .next-main {
     display: flex;

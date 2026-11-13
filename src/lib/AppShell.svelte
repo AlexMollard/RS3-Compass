@@ -45,6 +45,7 @@
   import SourceBanner from "./components/SourceBanner.svelte";
   import FirstVisit from "./components/FirstVisit.svelte";
   import QuestBar from "./components/QuestBar.svelte";
+  import BossBar from "./components/BossBar.svelte";
   import { profileSourceNotice } from "./sourceStatus";
   import { startVisibleRefresh } from "./visibleRefresh";
   import IconButton from "./components/IconButton.svelte";
@@ -80,6 +81,9 @@
   // The quest bar belongs to a single quest; the quests home keeps the plain search.
   let questBar = $derived(
     route === "quests" && !!page.params.id && !page.error && !showFirstVisit && !!profile,
+  );
+  let bossBar = $derived(
+    route === "bossing" && !!page.params.id && !page.error && !showFirstVisit && !!profile,
   );
   let samples = $derived(
     $saved.profiles.filter((p) => SAMPLE_PROFILES.some((s) => s.id === p.id)),
@@ -411,10 +415,12 @@
       >
       {#if questBar && profile}<div class="topbar-quest">
           <QuestBar {profile} selectedId={page.params.id ?? ""} />
+        </div>{:else if bossBar && profile}<div class="topbar-quest">
+          <BossBar {profile} selectedId={page.params.id ?? ""} />
         </div>{/if}
       <button
         class="search-trigger"
-        class:has-quest-bar={questBar}
+        class:has-quest-bar={questBar || bossBar}
         aria-label="Search quests and skills"
         title="Search quests and skills"
         onclick={openSearch}

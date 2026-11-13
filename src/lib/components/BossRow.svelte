@@ -1,9 +1,8 @@
 <script lang="ts">
-  import { Skull } from "@lucide/svelte";
   import type { BossRecord } from "../../bossTypes";
   import type { BossStatus } from "../bossLadder";
   import { bossPath, questPath } from "../navigation";
-  import GameArt from "./GameArt.svelte";
+  import FallbackArt from "./FallbackArt.svelte";
   import StatusChip from "./StatusChip.svelte";
 
   let {
@@ -34,10 +33,7 @@
 
 <li class="boss-row" class:ready={status.kind === "ready"}>
   <span class="rank">{rank}</span>
-  {#if boss.image}<GameArt file={boss.image} size={40} className="boss-art" />{:else}<span
-      class="boss-art art-fallback"
-      aria-hidden="true"><Skull size={20} /></span
-    >{/if}
+  <FallbackArt file={boss.image} size={40} className="boss-art" />
   <span class="who">
     <a class="name" href={bossPath(boss.id)}>{boss.name}</a>
     <small>Level {boss.level} · {boss.team}</small>
@@ -83,14 +79,6 @@
   .boss-row :global(.boss-art) {
     width: 40px;
     height: 40px;
-  }
-  .art-fallback {
-    display: grid;
-    place-items: center;
-    background: var(--panel-raised);
-    border: 1px solid var(--frame-line);
-    border-radius: 3px;
-    color: var(--muted);
   }
   .who {
     display: flex;

@@ -1,0 +1,61 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import {
+  checkedLabel,
+  firstRarity,
+  guidePet,
+  setupGear,
+  statedTier,
+} from "../src/lib/bossPage.ts";
+
+test("checkedLabel formats a year-month stamp without timezone drift", () => {
+  assert.equal(checkedLabel("2026-11"), "Nov 2026");
+  assert.equal(checkedLabel("2026-01"), "Jan 2026");
+  assert.equal(checkedLabel("autumn"), "autumn");
+  assert.equal(checkedLabel("2026-13"), "2026-13");
+});
+
+test("firstRarity reads the first version that lists the item", () => {
+  const boss = {
+    drops: {
+      Normal: [{ item: "Bones", quantity: "1", rarity: "Always" }],
+      "Hard Mode": [
+        { item: "Head", quantity: "1", rarity: "1/500" },
+        { item: "Bones", quantity: "1", rarity: "1/2" },
+      ],
+    },
+  };
+  assert.equal(firstRarity(boss, "Bones"), "Always");
+  assert.equal(firstRarity(boss, "Head"), "1/500");
+  assert.equal(firstRarity(boss, "Pet"), undefined);
+  assert.equal(firstRarity({ drops: {} }, "Pet"), undefined);
+});
+
+test("guidePet takes the name after 'the pet' and nothing else", () => {
+  assert.equal(guidePet("Rotten fang unlocks the pet Molly."), "Molly");
+  assert.equal(
+    guidePet("Scale unlocks the pet King Black Dragonling (summoning it needs 99 Summoning)."),
+    "King Black Dragonling",
+  );
+  assert.equal(guidePet("Unlocks the pet Chick'arra"), "Chick'arra");
+  assert.equal(guidePet("Each has a pet: Rex, Prime and Supreme hatchlings."), undefined);
+  assert.equal(guidePet("No pets here."), undefined);
+});
+
+test("statedTier reads the first tier in a setup line", () => {
+  assert.equal(statedTier("Tier 70+ weapon, tier 65+ armour"), 70);
+  assert.equal(statedTier("Blue or green dragonhide with rune crossbows"), undefined);
+});
+
+test("setupGear picks the best core item per slot up to the stated tier", () => {
+  const melee = setupGear("melee", "Tier 50+ weapon and armour", true);
+  assert.ok(melee.length > 0);
+  assert.ok(melee.every((item) => item.from <= 50 && !item.optional));
+  assert.equal(new Set(melee.map((item) => item.slot)).size, melee.length);
+  assert.ok(melee.some((item) => item.slot === "melee weapon" && item.from === 50));
+  // No tier stated: no icons rather than a guess.
+  assert.deepEqual(setupGear("ranged", "Dragonhide and a crossbow", true), []);
+  // Free accounts never get members gear.
+  const f2p = setupGear("melee", "Tier 70+ weapon", false);
+  assert.ok(f2p.every((item) => !item.members));
+});
