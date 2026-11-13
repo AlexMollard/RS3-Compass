@@ -87,7 +87,7 @@ export const NAV_GROUPS: {
 
 export const PHONE_TABS: {
   id: RouteId;
-  label: "Home" | "Quests" | "Skills" | "People";
+  label: "Home" | "Quests" | "Skills" | "Bossing" | "People";
   href: string;
   image: string;
   matches: RouteId[];
@@ -112,6 +112,13 @@ export const PHONE_TABS: {
     href: "/skills",
     image: "Skills_icon.png",
     matches: ["skills"],
+  },
+  {
+    id: "bossing",
+    label: "Bossing",
+    href: "/bossing",
+    image: "Attack.png",
+    matches: ["bossing"],
   },
   {
     id: "players",

@@ -46,6 +46,14 @@ test("the People phone tab covers players, groups and activity", () => {
   assert.ok(people.matches.includes("players"));
 });
 
+test("the phone tabs are Home, Quests, Skills, Bossing, People in order", () => {
+  assert.deepEqual(
+    PHONE_TABS.map((tab) => tab.label),
+    ["Home", "Quests", "Skills", "Bossing", "People"],
+  );
+  assert.deepEqual(PHONE_TABS[3].matches, ["bossing"]);
+});
+
 test("the rail groups Plan and People in order", () => {
   assert.deepEqual(
     NAV_GROUPS.map((group) => group.label),

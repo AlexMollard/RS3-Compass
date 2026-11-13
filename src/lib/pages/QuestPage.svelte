@@ -549,12 +549,13 @@
               <h2 id="r-unlocks">Unlocks</h2>
               {#if groups.unlocks.length}<span>{groups.unlocks.length}</span>{/if}
             </header>
-            {#if groups.unlocks.length}<ul class="reward-tiles line-tiles">
+            {#if groups.unlocks.length || unlockedBosses.length}<ul class="reward-tiles line-tiles">
                 {#each groups.unlocks as line}{@render rewardTile(line, "unlocks")}{/each}
+                {#each unlockedBosses as boss (boss.id)}<li>
+                    <span class="reward-icon"><LockOpen size={18} aria-hidden="true" /></span>
+                    <span>Unlocks the <a href={bossPath(boss.id)}>{boss.name}</a> fight</span>
+                  </li>{/each}
               </ul>{/if}
-            {#each unlockedBosses as boss (boss.id)}<p class="boss-unlock">
-                Unlocks the <a href={bossPath(boss.id)}>{boss.name}</a> fight
-              </p>{/each}
             {#if music.length}<p class="music-row">
                 <span class="music-label"><EighthNotes size={14} aria-hidden="true" />Music</span>
                 <span
