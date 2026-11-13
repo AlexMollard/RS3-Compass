@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { BOSSES, bossById, bossesUnlockedBy } from "../src/bosses.ts";
+import { BOSSES, bossById, bossesUnlockedBy, itemImage } from "../src/bosses.ts";
 import { QUESTS } from "../src/data.ts";
 
 // The Wiki table lists no signature drops for these, and no drop is rare enough to qualify.
@@ -10,6 +10,18 @@ const NO_UNIQUES = ["crassian-leviathan", "the-sanctum-guardian"];
 test("the catalogue has every Combat bosses row, each once", () => {
   assert.equal(BOSSES.length, 56);
   assert.equal(new Set(BOSSES.map((b) => b.id)).size, BOSSES.length);
+});
+
+test("every boss has art, falling back to the Bosses table's picture", () => {
+  assert.deepEqual(BOSSES.filter((b) => !b.image).map((b) => b.name), []);
+  assert.equal(bossById("giant-mole")?.image, "Giant_mole.png");
+  assert.equal(bossById("the-barrows-brothers")?.image, "Dharok_the_Wretched.png");
+});
+
+test("item art uses the Wiki's real file where <item>.png is a redirect", () => {
+  assert.equal(itemImage("Coins"), "Coins_10000.png");
+  assert.equal(itemImage("Rune arrow"), "Rune_arrow_5.png");
+  assert.equal(itemImage("Mole claw"), "Mole claw.png");
 });
 
 test("Giant Mole is the Free-tier F2P boss, and the F2P set is exactly four", () => {

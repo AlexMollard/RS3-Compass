@@ -1,8 +1,11 @@
 import { BOSS_GUIDES, type BossGuide } from "./bossGuides.ts";
 import type { BossRecord } from "./bossTypes.ts";
-import { IMPORTED_BOSSES } from "./bossesImported.ts";
+import { BOSS_ITEM_IMAGES, IMPORTED_BOSSES } from "./bossesImported.ts";
 
 export const BOSSES: readonly BossRecord[] = IMPORTED_BOSSES;
+
+/** The Wiki sprite file for a drop or collection log item. */
+export const itemImage = (item: string): string => BOSS_ITEM_IMAGES[item] ?? `${item}.png`;
 
 const bossesById = new Map(BOSSES.map((boss) => [boss.id, boss]));
 

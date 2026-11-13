@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Package } from "@lucide/svelte";
-  import { bossUniques } from "../../bosses";
+  import { bossUniques, itemImage } from "../../bosses";
   import type { BossRecord } from "../../bossTypes";
   import type { Profile } from "../../data";
   import { wikiHref } from "../../wiki";
@@ -73,7 +73,7 @@
                 aria-label={tile.item}
                 checked={isCollected(profile, tile.key)}
                 onchange={() => onToggle(tile.key)}
-              /><FallbackArt file="{tile.item}.png" size={36} icon={Package} className="tile-art" /><strong
+              /><FallbackArt file={itemImage(tile.item)} size={36} icon={Package} className="tile-art" /><strong
                 >{tile.item}</strong
               ><span class="tile-meta"
                 >{tile.rarity}{#if tile.price !== undefined}{" · "}{gp(tile.price)}{/if}</span
@@ -145,10 +145,18 @@
           {#each shown as row, i (row.item + "|" + row.quantity + "|" + i)}<tr>
               <th scope="row"
                 ><span class="item"
-                  ><FallbackArt file="{row.item}.png" size={24} icon={Package} className="row-art" /><span
-                    >{row.item}{#if isCollected(profile, logKey(boss.id, row.item))}<span class="have"
-                        ><span aria-hidden="true"> ✓</span><span class="sr-only"> (in your collection log)</span></span
-                      >{/if}{#if row.note}<small>{row.note}</small>{/if}</span
+                  ><FallbackArt file={itemImage(row.item)} size={24} icon={Package} className="row-art" /><span
+                    ><span
+                      ><a
+                        class="wiki-ref"
+                        href={wikiHref(row.item)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title="{row.item} on RuneScape Wiki">{row.item}</a
+                      >{#if isCollected(profile, logKey(boss.id, row.item))}<span class="have"
+                          ><span aria-hidden="true">✓</span><span class="sr-only"> (in your collection log)</span></span
+                        >{/if}</span
+                    >{#if row.note}<small>{row.note}</small>{/if}</span
                   ></span
                 ></th
               >
@@ -252,9 +260,13 @@
     font-size: 11px;
     color: var(--green);
   }
+  /* Natural width: the title row wraps on narrow screens instead of the strip scrolling inside itself. */
   .window-title .versions {
     margin-left: auto;
-    min-width: 0;
+    flex: none;
+  }
+  .versions :global(.choice-strip) {
+    overflow: visible;
   }
   .versions :global(.choice-fieldset) {
     margin: 0;
@@ -347,9 +359,9 @@
     color: var(--muted);
   }
   .have {
+    margin-left: 6px;
     color: var(--green);
-  }
-  .per-kill {
+  }  .per-kill {
     display: flex;
     align-items: center;
     gap: 8px;
