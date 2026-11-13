@@ -71,11 +71,12 @@
   .boss-row:hover {
     background: var(--panel-raised);
   }
-  .boss-row:not(.ready) {
-    opacity: 0.86;
+  /* Ready rows get a green edge; nothing is dimmed, so text keeps full contrast. */
+  .boss-row.ready {
+    box-shadow: inset 3px 0 0 var(--green);
   }
   .rank {
-    color: #7f93a1;
+    color: var(--muted);
     font-weight: 700;
     text-align: right;
   }

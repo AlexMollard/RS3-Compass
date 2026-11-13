@@ -47,6 +47,8 @@
   let soloOnly = $state(false);
   let f2pOnly = $state(false);
   let missingOnly = $state(false);
+  // Tiles ticked while "Missing only" is on stay put (and keep focus) until the toggle or view changes.
+  let kept = $state<string[]>([]);
 
   let rows = $derived(
     visible.filter(
@@ -130,7 +132,10 @@
   let shownLog = $derived(
     missingOnly
       ? logBosses
-          .map((e) => ({ ...e, items: e.items.filter((i) => !isCollected(profile, i.key)) }))
+          .map((e) => ({
+            ...e,
+            items: e.items.filter((i) => !isCollected(profile, i.key) || kept.includes(i.key)),
+          }))
           .filter((e) => e.items.length)
       : logBosses,
   );
@@ -146,7 +151,10 @@
   );
   let ironList = $derived(visible.filter((b) => BOSS_GUIDES[b.id]?.ironman).slice(0, 4));
 
-  const toggle = (key: string) => compass.updateProfile((p) => toggleCollected(p, key));
+  function toggle(key: string) {
+    if (missingOnly && !kept.includes(key)) kept = [...kept, key];
+    compass.updateProfile((p) => toggleCollected(p, key));
+  }
 </script>
 
 {#snippet art(boss: BossRecord, size: number)}
@@ -189,7 +197,10 @@
         { value: "all", label: "All bosses" },
         { value: "log", label: "Collection log" },
       ]}
-      onChange={(v) => (view = v)}
+      onChange={(v) => {
+        view = v;
+        kept = [];
+      }}
     />
   </header>
 
@@ -266,7 +277,7 @@
     {#if view === "log"}<GameWindow title="Collection log" trailing="{logGot} of {logTotal} uniques">
         <div class="log-tools">
           <label class="missing-toggle"
-            ><input type="checkbox" bind:checked={missingOnly} />Missing only</label
+            ><input type="checkbox" bind:checked={missingOnly} onchange={() => (kept = [])} />Missing only</label
           >
         </div>
         {#if shownLog.length}<div class="log-groups">
@@ -292,7 +303,7 @@
                     </li>{/each}
                 </ul>
               </section>{/each}
-          </div>{:else}<p class="empty">Every unique is ticked.</p>{/if}
+          </div>{:else if missingOnly}<p class="empty">Every unique is ticked.</p>{/if}
       </GameWindow>{:else}<GameWindow title={view === "all" ? "All bosses" : "Boss ladder"} trailing="{rows.length} bosses">
         {#if !rows.length}<p class="empty">No bosses match these filters.</p>{:else if view === "all"}{@render bossList(
             rows,
