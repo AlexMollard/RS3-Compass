@@ -3,7 +3,6 @@ import test from "node:test";
 import {
   checkedLabel,
   firstRarity,
-  guidePet,
   setupGear,
   statedTier,
 } from "../src/lib/bossPage.ts";
@@ -29,17 +28,6 @@ test("firstRarity reads the first version that lists the item", () => {
   assert.equal(firstRarity(boss, "Head"), "1/500");
   assert.equal(firstRarity(boss, "Pet"), undefined);
   assert.equal(firstRarity({ drops: {} }, "Pet"), undefined);
-});
-
-test("guidePet takes the name after 'the pet' and nothing else", () => {
-  assert.equal(guidePet("Rotten fang unlocks the pet Molly."), "Molly");
-  assert.equal(
-    guidePet("Scale unlocks the pet King Black Dragonling (summoning it needs 99 Summoning)."),
-    "King Black Dragonling",
-  );
-  assert.equal(guidePet("Unlocks the pet Chick'arra"), "Chick'arra");
-  assert.equal(guidePet("Each has a pet: Rex, Prime and Supreme hatchlings."), undefined);
-  assert.equal(guidePet("No pets here."), undefined);
 });
 
 test("statedTier reads the first tier in a setup line", () => {

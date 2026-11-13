@@ -8,7 +8,6 @@
   import { wikiHref } from "../../wiki";
   import { TIER_STATS, bossStatus, defaultDropVersion, meetsTier, visibleBosses } from "../bossLadder";
   import { lootRows, lootSummary, type Prices } from "../bossLoot";
-  import { guidePet } from "../bossPage";
   import { bossLogProgress, toggleCollected } from "../collectionLog";
   import { activeProfile, getCompass } from "../compassContext";
   import { bossPath, questPath } from "../navigation";
@@ -48,7 +47,6 @@
   let recorded = $derived(Object.keys(profile.levels).length > 0);
   let levelsOk = $derived(recorded && meetsTier(profile.levels, boss.tier));
   let strategyHref = $derived(wikiHref(boss.strategyPage ?? boss.wiki));
-  let pet = $derived(guide ? guidePet(guide.why) : undefined);
   const questName = (id: string) => QUESTS.find((q) => q.id === id)?.name ?? id;
 
   // The drop-table version: the player's pick for this boss, else the default for their mode.
@@ -128,9 +126,6 @@
         {#if priceState === "ready" && rows.length}<li>
             <strong>~{compact.format(summary.average).toLowerCase()} average loot per kill</strong> at today's
             GE prices
-          </li>{/if}
-        {#if pet}<li>
-            Pet: <a href={wikiHref(pet)} target="_blank" rel="noopener noreferrer">{pet}</a>
           </li>{/if}
         {#if boss.achievements.length}<li>
             {boss.achievements.length}
@@ -327,9 +322,6 @@
     line-height: 21px;
   }
   .why strong {
-    color: var(--gold-bright);
-  }
-  .why a {
     color: var(--gold-bright);
   }
   .ready-card {

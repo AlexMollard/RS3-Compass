@@ -121,6 +121,6 @@ export function defaultDropVersion(
 ): string | undefined {
   const keys = Object.keys(boss.drops);
   if (keys.length === 0) return undefined;
-  const f2p = (k: string) => k.includes("F2P");
+  const f2p = (k: string) => /\bf2p\b|free-to-play/i.test(k);
   return (mode === "f2p" ? keys.find(f2p) : keys.find((k) => !f2p(k))) ?? keys[0];
 }

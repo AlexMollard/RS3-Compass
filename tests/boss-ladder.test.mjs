@@ -144,4 +144,8 @@ test("defaultDropVersion", () => {
     defaultDropVersion(boss("x", "Free", 1, { drops: { Hard: [] } }), "f2p"),
     "Hard",
   );
+  // Some tables name the free version "Free-to-play" rather than "F2P".
+  const named = { Members: [], "Free-to-play": [] };
+  assert.equal(defaultDropVersion(boss("x", "Free", 1, { drops: named }), "f2p"), "Free-to-play");
+  assert.equal(defaultDropVersion(boss("x", "Free", 1, { drops: named }), "members"), "Members");
 });

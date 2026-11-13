@@ -20,11 +20,6 @@ export function firstRarity(boss: BossRecord, item: string): string | undefined 
   return undefined;
 }
 
-/** The pet a guide's "why" sentence names ("… unlocks the pet Molly."), if it names one. */
-export function guidePet(why: string): string | undefined {
-  return /\bthe pet ([^.,;(]+?)\s*(?:[.,;(]|$)/.exec(why)?.[1];
-}
-
 /** The first "tier N" in a setup line, or undefined when the line states none. */
 export function statedTier(text: string): number | undefined {
   const match = /\btier (\d+)/i.exec(text);
