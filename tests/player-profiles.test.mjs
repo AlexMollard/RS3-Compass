@@ -540,7 +540,7 @@ test("Review Focus 4: a save without collection log fields loads, and a malforme
 
 test("A synced event log auto-ticks boss uniques once, and an untick survives the next sync", () => {
   const controller = createCompassController();
-  const key = "boss:giant-mole:Mole claw";
+  const key = "boss:giant-mole:Clingy mole";
   const withDrop = (fetchedAt) => ({
     ...player,
     fetchedAt,
@@ -551,7 +551,7 @@ test("A synced event log auto-ticks boss uniques once, and an untick survives th
         {
           type: "rs_plog_item_drop",
           date: "13-Nov-2026 10:00",
-          text: "I found a mole claw.",
+          text: "I found a clingy mole.",
           details: "",
         },
       ],

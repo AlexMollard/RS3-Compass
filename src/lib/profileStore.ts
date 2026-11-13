@@ -23,7 +23,7 @@ import { createPlayerSynchronizer, type SyncTarget } from "./playerSync.ts";
 import { snapshotFetchedAt } from "./sourceStatus.ts";
 import { isGroupLookup } from "./groupData.ts";
 import { isRecord, isSkillLevel, isSkillLevelMap } from "./guards.ts";
-import { BOSSES } from "../bosses.ts";
+import { BOSSES, bossUniques } from "../bosses.ts";
 import { mergeAutoTicks } from "./collectionLog.ts";
 
 const KEY = "rs3-compass-design-v1";
@@ -428,7 +428,7 @@ export function createCompassController(): CompassController {
           };
           profile.activeTask = nextQuest(profile)?.id ?? "train-Mining";
         }
-        if (sourceData.eventLog) profile = mergeAutoTicks(profile, BOSSES);
+        if (sourceData.eventLog) profile = mergeAutoTicks(profile, BOSSES, bossUniques);
         return {
           ...current,
           welcomed: options?.select !== false ? true : current.welcomed,

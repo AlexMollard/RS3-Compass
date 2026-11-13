@@ -176,8 +176,8 @@ interface BossGuide {
 - **Storage:** new optional fields `Profile.collected?: string[]` and `Profile.collectedAuto?: string[]`, with keys `boss:<bossId>:<item name>`. In `validProfile` (`profileStore.ts`) they use the optional-field shape already used for `statistics`: `p.collected === undefined || string array`. Old saves load with neither field, which reads as empty.
 - **Ticking by hand:** toggling a tile writes the key.
 - **Auto-ticks:** `activityPresentation.ts` already parses `I found …` events, `rs_plog_item_drop` and `rs_plog_item_found`. When an event's item name exactly matches a boss's unique, ignoring case:
-  - the tile shows as collected, labelled "auto from activity";
-  - nothing is written to `collected`, so auto-ticks are derived on every render;
+  - the match is persisted to `collected` and `collectedAuto` when the event log is synced (see the write-back below), not derived on render;
+  - the tile reads `isAutoCollected`: it shows as collected, labelled "auto from activity";
   - the subject is the item name from `activitySubject`, which strips "a/an/some" and the trailing full stop. It's compared to the unique's name ignoring case only, with no other normalisation.
 
   The activity log only holds recent events, so an auto-tick would vanish when its event rolls off. *(My call.)* The write-back runs in the profile store wherever a fresh event log is saved for a profile, so it doesn't depend on which page is open. Each new match is added to both `collected` and `collectedAuto`. From then on it's an ordinary tick labelled "auto from activity", and **the player can untick it**. Unticking removes the key from `collected` only. `collectedAuto` remembers every match already seen, so a match that's already in it is never re-added, even while its event is still in the log. That keeps a wrong match (for example a shared item name) correctable, which satisfies the anti-goal.
