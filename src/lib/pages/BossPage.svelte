@@ -6,7 +6,7 @@
   import { BOSSES, bossById, bossUniques } from "../../bosses";
   import { QUESTS } from "../../data";
   import { wikiHref } from "../../wiki";
-  import { TIER_STATS, bossStatus, defaultDropVersion, meetsTier, visibleBosses } from "../bossLadder";
+  import { TIER_STATS, bossStatus, defaultDropVersion, ladderPosition, meetsTier } from "../bossLadder";
   import { lootRows, lootSummary, type Prices } from "../bossLoot";
   import { bossLogProgress, toggleCollected } from "../collectionLog";
   import { activeProfile, getCompass } from "../compassContext";
@@ -39,9 +39,10 @@
     const t = page.url.searchParams.get("tab");
     return t === "guide" || t === "achievements" ? t : "loot";
   });
-  let visible = $derived(visibleBosses(profile, BOSSES));
-  let at = $derived(visible.findIndex((b) => b.id === boss.id));
-  let nextOnLadder = $derived(at >= 0 ? visible[at + 1] : undefined);
+  // Same ladder as the top bar's previous/next.
+  let position = $derived(ladderPosition(profile, BOSSES, boss.id));
+  let at = $derived(position.at);
+  let nextOnLadder = $derived(position.next);
   let status = $derived(bossStatus(profile, boss));
   let log = $derived(bossLogProgress(profile, boss, bossUniques));
   let recorded = $derived(Object.keys(profile.levels).length > 0);
@@ -105,11 +106,11 @@
       href={wikiHref(boss.wiki)}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={boss.name + " on RuneScape Wiki"}><FallbackArt file={boss.image} size={220} className="hero-art" /></a
+      aria-label={boss.name + " on RuneScape Wiki"}><FallbackArt file={boss.image} size={220} thumbnail className="hero-art" /></a
     >
     <div class="boss-hero-copy">
       <a class="crumb" href="/bossing"
-        >‹ Boss ladder{at >= 0 ? ` · step ${at + 1} of ${visible.length}` : ""}</a
+        >‹ Boss ladder{at >= 0 ? ` · step ${at + 1} of ${position.list.length}` : ""}</a
       >
       <h1 id="boss-title">{boss.name}</h1>
       <div class="tags">
@@ -154,7 +155,7 @@
                 (r.kind === "skill" && recorded && (profile.levels[r.skill] ?? 1) < r.level),
             )
               ? "warn"
-              : boss.requirements.some((r) => r.kind === "text")
+              : boss.requirements.some((r) => r.kind === "text" || (r.kind === "skill" && !recorded))
                 ? "info"
                 : "met",
           )}<span>Requirements</span>

@@ -110,7 +110,7 @@
         <div>
           <dt>Average per kill</dt>
           <dd class="gold">
-            {averageKnown ? gp(summary.average) : priceState === "failed" ? "Prices unavailable" : "—"}
+            {averageKnown ? gp(summary.average) : "—"}
           </dd>
         </div>
         <div>
@@ -142,9 +142,8 @@
               <th scope="row"
                 ><span class="item"
                   ><FallbackArt file="{row.item}.png" size={24} icon={Package} className="row-art" /><span
-                    >{row.item}{#if isCollected(profile, logKey(boss.id, row.item))}<span
-                        class="have"
-                        aria-label="in your collection log"> ✓</span
+                    >{row.item}{#if isCollected(profile, logKey(boss.id, row.item))}<span class="have"
+                        ><span aria-hidden="true"> ✓</span><span class="sr-only"> (in your collection log)</span></span
                       >{/if}{#if row.note}<small>{row.note}</small>{/if}</span
                   ></span
                 ></th

@@ -6,6 +6,7 @@ import {
   bossStatus,
   defaultDropVersion,
   ladder,
+  ladderPosition,
   meetsTier,
   nextBoss,
   stageOf,
@@ -59,6 +60,28 @@ test("f2p profiles hide members bosses", () => {
     ["f"],
   );
   assert.equal(visibleBosses(profile(), bosses).length, 2);
+});
+
+test("ladderPosition falls back to the full ladder for a boss off the player's ladder", () => {
+  const bosses = [
+    boss("f1", "Free", 1),
+    boss("m", "Free", 2, { members: true }),
+    boss("f2", "Free", 3),
+    boss("low", "Low", 1, { members: true }),
+  ];
+  const f2p = profile({ mode: "f2p" });
+  // On the F2P ladder: steps through F2P bosses only.
+  const onLadder = ladderPosition(f2p, bosses, "f1");
+  assert.deepEqual(onLadder.list.map((b) => b.id), ["f1", "f2"]);
+  assert.equal(onLadder.next?.id, "f2");
+  assert.equal(onLadder.previous, undefined);
+  // A members boss opened in F2P mode: the full ladder, so it still has neighbours.
+  const off = ladderPosition(f2p, bosses, "m");
+  assert.equal(off.at, 1);
+  assert.equal(off.previous?.id, "f1");
+  assert.equal(off.next?.id, "f2");
+  assert.equal(ladderPosition(f2p, bosses, "low").next, undefined);
+  assert.equal(ladderPosition(f2p, bosses, "nope").at, -1);
 });
 
 test("status rules in order", () => {

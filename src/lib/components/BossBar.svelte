@@ -3,20 +3,16 @@
   import { ChevronLeft, ChevronRight, Swords } from "@lucide/svelte";
   import { BOSSES, bossById } from "../../bosses";
   import type { Profile } from "../../data";
-  import { ladder, visibleBosses } from "../bossLadder";
+  import { ladderPosition } from "../bossLadder";
   import { bossPath } from "../navigation";
   import BossFinder from "./BossFinder.svelte";
   import FallbackArt from "./FallbackArt.svelte";
 
   let { profile, selectedId }: { profile: Profile; selectedId: string } = $props();
   let boss = $derived(bossById(selectedId));
-  // Previous and next follow the ladder the player sees (F2P bosses only in F2P mode); a
-  // members boss opened in F2P mode steps through the full ladder instead.
-  let visible = $derived(visibleBosses(profile, BOSSES));
-  let list = $derived(visible.some((b) => b.id === selectedId) ? visible : ladder(BOSSES));
-  let at = $derived(list.findIndex((b) => b.id === selectedId));
-  let previous = $derived(at > 0 ? list[at - 1] : undefined);
-  let next = $derived(at >= 0 ? list[at + 1] : undefined);
+  let position = $derived(ladderPosition(profile, BOSSES, selectedId));
+  let previous = $derived(position.previous);
+  let next = $derived(position.next);
 </script>
 
 <div class="boss-bar">

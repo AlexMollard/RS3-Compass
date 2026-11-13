@@ -48,6 +48,26 @@ export function visibleBosses(
   return profile.mode === "f2p" ? ordered.filter((b) => !b.members) : ordered;
 }
 
+/**
+ * Where a boss sits for previous/next: the ladder the player sees, or the full ladder
+ * when the boss isn't on it (a members boss opened in F2P mode).
+ */
+export function ladderPosition(
+  profile: Profile,
+  bosses: readonly BossRecord[],
+  id: string,
+): { list: BossRecord[]; at: number; previous?: BossRecord; next?: BossRecord } {
+  const visible = visibleBosses(profile, bosses);
+  const list = visible.some((b) => b.id === id) ? visible : ladder(bosses);
+  const at = list.findIndex((b) => b.id === id);
+  return {
+    list,
+    at,
+    previous: at > 0 ? list[at - 1] : undefined,
+    next: at >= 0 ? list[at + 1] : undefined,
+  };
+}
+
 export function meetsTier(
   levels: Record<string, number>,
   tier: BossTier,
