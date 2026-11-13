@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   checkedLabel,
+  displayRarity,
   firstRarity,
   setupGear,
   statedTier,
@@ -12,6 +13,17 @@ test("checkedLabel formats a year-month stamp without timezone drift", () => {
   assert.equal(checkedLabel("2026-01"), "Jan 2026");
   assert.equal(checkedLabel("autumn"), "autumn");
   assert.equal(checkedLabel("2026-13"), "2026-13");
+});
+
+test("displayRarity cleans broken wiki rarity text", () => {
+  assert.equal(displayRarity("1/"), "Unknown");
+  assert.equal(displayRarity(""), "Unknown");
+  assert.equal(displayRarity("Very rare<!--1/320"), "Very rare");
+  assert.equal(displayRarity("1/512"), "1/512");
+  assert.equal(
+    firstRarity({ drops: { Normal: [{ item: "Pet", quantity: "1", rarity: "1/" }] } }, "Pet"),
+    "Unknown",
+  );
 });
 
 test("firstRarity reads the first version that lists the item", () => {

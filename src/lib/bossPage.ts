@@ -11,11 +11,20 @@ export function checkedLabel(checked: string): string {
   return match && month ? `${month} ${match[1]}` : checked;
 }
 
+/**
+ * Rarity text fit to show: drops a leftover wiki `<!--` comment, and reads an empty or
+ * truncated "N/" rarity as "Unknown".
+ */
+export function displayRarity(rarity: string): string {
+  const text = rarity.split("<!--")[0].trim();
+  return !text || /^\d+\/$/.test(text) ? "Unknown" : text;
+}
+
 /** The item's rarity in the first drop-table version that lists it. */
 export function firstRarity(boss: BossRecord, item: string): string | undefined {
   for (const drops of Object.values(boss.drops)) {
     const drop = drops.find((d) => d.item === item);
-    if (drop) return drop.rarity;
+    if (drop) return displayRarity(drop.rarity);
   }
   return undefined;
 }

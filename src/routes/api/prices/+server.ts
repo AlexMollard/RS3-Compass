@@ -12,7 +12,7 @@ export const GET: RequestHandler = async ({ url, getClientAddress }) => {
     // See api/player/+server.ts: this throws when ADDRESS_HEADER does not match.
     client = getClientAddress();
   } catch {
-    // Without an address, only the cache and upstream timeout protect us.
+    // Without an address, only the cache and the shared upstream budget protect us.
   }
   const names = (url.searchParams.get("names") ?? "")
     .split("|")

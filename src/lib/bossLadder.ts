@@ -1,5 +1,6 @@
 import { QUESTS, type Profile } from "../data.ts";
 import type { BossRecord, BossTier } from "../bossTypes.ts";
+import { logKey } from "./collectionLog.ts";
 
 export const TIER_ORDER: Record<BossTier, number> = {
   Free: 0,
@@ -77,6 +78,7 @@ export function meetsTier(
     Math.min(lv("Attack"), lv("Strength")),
     lv("Ranged"),
     lv("Magic"),
+    lv("Necromancy"),
   );
   const need = TIER_STATS[tier];
   return best >= need && lv("Constitution") >= need && lv("Defence") >= need;
@@ -125,7 +127,7 @@ export function nextBoss(
   const logComplete = (b: BossRecord) => {
     const uniques = uniquesOf(b);
     return (
-      uniques.length > 0 && uniques.every((u) => collected.has(`boss:${b.id}:${u}`))
+      uniques.length > 0 && uniques.every((u) => collected.has(logKey(b.id, u)))
     );
   };
   return (

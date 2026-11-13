@@ -1,6 +1,6 @@
 import { isRecord } from "../guards.ts";
 import { LruMap } from "../lru.ts";
-import { createClientLimiter } from "./rateLimit.ts";
+import { createClientLimiter, createWindowLimiter } from "./rateLimit.ts";
 import { upstreamInit } from "./upstream.ts";
 
 const ENDPOINT = "https://api.weirdgloop.org/exchange/history/rs/latest";
@@ -10,6 +10,8 @@ export const MAX_PRICE_NAMES = 100;
 const MAX_CACHED_NAMES = 2000;
 // A boss page makes one request per drop-version switch.
 const PRICE_REQUESTS_PER_MINUTE = 30;
+// Shared across all callers, so requests without a client address are capped too.
+const UPSTREAM_PRICE_REQUESTS_PER_MINUTE = 60;
 
 export class PriceLookupError extends Error {
   readonly status: number;
@@ -35,6 +37,7 @@ export function createPriceLookup({
 }) {
   const cache = new LruMap<string, Entry>(MAX_CACHED_NAMES);
   const take = createClientLimiter(PRICE_REQUESTS_PER_MINUTE);
+  const takeUpstream = createWindowLimiter(UPSTREAM_PRICE_REQUESTS_PER_MINUTE);
 
   async function prices(
     names: string[],
@@ -57,6 +60,13 @@ export function createPriceLookup({
       return !entry || time - entry.fetchedAt > ttlMs;
     });
     if (stale.length) {
+      const wait = takeUpstream(time);
+      if (wait !== undefined)
+        throw new PriceLookupError(
+          "Too many price requests. Try again shortly.",
+          429,
+          wait,
+        );
       let body: unknown;
       try {
         const response = await fetch(

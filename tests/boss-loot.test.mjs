@@ -91,5 +91,19 @@ test("no prices: only Coins is priced", () => {
 
 test("empty input", () => {
   assert.deepEqual(lootRows([], {}), []);
-  assert.deepEqual(lootSummary([]), { average: 0, unpriced: 0, top: [] });
+  assert.deepEqual(lootSummary([]), {
+    average: 0,
+    unpriced: 0,
+    unrated: 0,
+    top: [],
+  });
+});
+
+test("a priced row without an exact rate is unrated, not unpriced", () => {
+  const s = lootSummary(
+    lootRows([{ item: "Bones", quantity: "1", rarity: "Common" }], { Bones: 50 }),
+  );
+  assert.equal(s.unrated, 1);
+  assert.equal(s.unpriced, 0);
+  assert.equal(s.average, 0);
 });

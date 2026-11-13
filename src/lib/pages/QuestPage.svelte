@@ -547,7 +547,7 @@
         {#if groups.unlocks.length || music.length || unlockedBosses.length}<section class="tool-window" aria-labelledby="r-unlocks">
             <header class="window-title">
               <h2 id="r-unlocks">Unlocks</h2>
-              {#if groups.unlocks.length}<span>{groups.unlocks.length}</span>{/if}
+              {#if groups.unlocks.length + unlockedBosses.length}<span>{groups.unlocks.length + unlockedBosses.length}</span>{/if}
             </header>
             {#if groups.unlocks.length || unlockedBosses.length}<ul class="reward-tiles line-tiles">
                 {#each groups.unlocks as line}{@render rewardTile(line, "unlocks")}{/each}

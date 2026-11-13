@@ -100,6 +100,11 @@ test("parseDrops merges identical rows within a version", () => {
   assert.equal(parseDrops(text).Hard.length, 2);
 });
 
+test("parseDrops ignores a | inside a comment", () => {
+  const text = "{{DropsLine|name=Pet|quantity=1|rarity=Very rare<!--1/320|altrarity=1/315-->}}";
+  assert.deepEqual(parseDrops(text).Normal, [{ item: "Pet", quantity: "1", rarity: "Very rare" }]);
+});
+
 test("parseAchievements strips the (achievement) suffix", () => {
   const list = parseAchievements(mole);
   assert.equal(list.length, 20);

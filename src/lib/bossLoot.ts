@@ -67,12 +67,16 @@ export function lootRows(
 export function lootSummary(rows: LootRow[]): {
   average: number;
   unpriced: number;
+  unrated: number;
   top: LootRow[];
 } {
   const priced = rows.filter((r) => r.perKill !== undefined);
+  const unpriced = rows.filter((r) => r.price === undefined).length;
   return {
     average: priced.reduce((sum, r) => sum + (r.perKill ?? 0), 0),
-    unpriced: rows.length - priced.length,
+    unpriced,
+    // Priced, but no exact rate or quantity: left out of the average.
+    unrated: rows.length - priced.length - unpriced,
     top: [...priced]
       .sort((a, b) => (b.perKill ?? 0) - (a.perKill ?? 0))
       .slice(0, 3),

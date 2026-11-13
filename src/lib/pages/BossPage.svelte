@@ -125,7 +125,7 @@
       <ul class="why">
         {#if guide}<li>{guide.why}</li>{/if}
         {#if priceState === "ready" && rows.length}<li>
-            <strong>~{compact.format(summary.average).toLowerCase()} average loot per kill</strong> at today's
+            <strong>{summary.unrated > 0 ? "at least " : ""}~{compact.format(summary.average).toLowerCase()} average loot per kill</strong> at today's
             GE prices
           </li>{/if}
         {#if boss.achievements.length}<li>
@@ -177,7 +177,7 @@
           </li>{/if}
       </ul>
       <a class="btn btn-primary strategy" href={strategyHref} target="_blank" rel="noopener noreferrer"
-        >Wiki strategy ↗</a
+        >{boss.strategyPage ? "Wiki strategy ↗" : "Boss page on the Wiki ↗"}</a
       >
     </aside>
   </section>

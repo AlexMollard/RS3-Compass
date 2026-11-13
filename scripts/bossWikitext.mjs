@@ -82,7 +82,9 @@ export function parseInfobox(wikitext) {
 }
 
 /** Drops by version: each {{DropsLine}} belongs to the {{DropsTableHead}} before it ("Normal" if unversioned). */
-export function parseDrops(wikitext) {
+export function parseDrops(source) {
+  // A "|" inside a comment would otherwise split a DropsLine's params.
+  const wikitext = source.replace(/<!--[\s\S]*?(?:-->|$)/g, "");
   const drops = {};
   let version = "Normal";
   for (const m of wikitext.matchAll(/\{\{\s*Drops(TableHead|Line)\s*[|}\n]/gi)) {

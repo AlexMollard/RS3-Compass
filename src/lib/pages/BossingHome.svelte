@@ -92,7 +92,9 @@
   });
 
   // Average loot for the next boss only: undefined while loading, null when prices failed.
-  let average = $state<{ key: string; value: number | null } | undefined>();
+  let average = $state<
+    { key: string; value: number | null; unrated: number } | undefined
+  >();
   $effect(() => {
     if (!next || !nextVersion) return;
     const key = `${next.id}|${nextVersion}`;
@@ -102,7 +104,8 @@
     average = undefined;
     const finish = (prices: Prices | undefined, failed: boolean) => {
       if (untrack(() => `${next?.id}|${nextVersion}`) !== key) return;
-      average = { key, value: failed ? null : lootSummary(lootRows(drops, prices)).average };
+      const summary = lootSummary(lootRows(drops, prices));
+      average = { key, value: failed ? null : summary.average, unrated: summary.unrated };
     };
     // Coins need no price; a coins-only table still has an average.
     if (!names.length) finish(undefined, false);
@@ -112,7 +115,7 @@
     if (!next || !nextVersion) return "No drop table";
     if (!average || average.key !== `${next.id}|${nextVersion}`) return "—";
     if (average.value === null) return "Prices unavailable";
-    return `~${new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 })
+    return `${average.unrated > 0 ? "at least " : ""}~${new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 })
       .format(average.value)
       .toLowerCase()} / kill`;
   });

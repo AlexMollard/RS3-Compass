@@ -167,7 +167,7 @@ interface BossGuide {
   - Mid 85
   - High 95
 
-  *(My call.)* "Meets the tier" uses raw skill levels, not combat level: the profile's **best style** must reach N, and so must **Constitution** and **Defence**. Best style means the highest of `min(Attack, Strength)`, `Ranged` and `Magic`. Prayer and Summoning don't count. A boss's guide `setup.minimum` text doesn't change status.
+  *(My call.)* "Meets the tier" uses raw skill levels, not combat level: the profile's **best style** must reach N, and so must **Constitution** and **Defence**. Best style means the highest of `min(Attack, Strength)`, `Ranged`, `Magic` and `Necromancy`. Prayer and Summoning don't count. A boss's guide `setup.minimum` text doesn't change status.
 - **"Your next boss"** is the first boss on the ladder that is Ready now and whose collection log isn't complete. If there isn't one, it's the first boss that isn't ready.
 - **Missing levels:** if the profile has no levels recorded, the status reads "Levels not recorded", the same as on quest pages.
 

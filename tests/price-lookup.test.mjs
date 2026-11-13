@@ -54,7 +54,25 @@ test("a non-number price counts as missing", async () => {
 
 test("an upstream failure rejects", async () => {
   const { service } = setup({}, false);
-  await assert.rejects(service.prices(["A"]), /Prices unavailable/);
+  await assert.rejects(
+    service.prices(["A"]),
+    (e) =>
+      e instanceof PriceLookupError &&
+      e.status === 502 &&
+      /Prices unavailable/.test(e.message),
+  );
+});
+
+test("requests without a client share one upstream budget", async () => {
+  const { urls, service } = setup({ Cached: { price: 1 } });
+  await service.prices(["Cached"]);
+  for (let i = 1; i < 60; i++) await service.prices([`Item ${i}`]);
+  await assert.rejects(
+    service.prices(["Item 60"]),
+    (e) => e instanceof PriceLookupError && e.status === 429 && e.retryAfter >= 1,
+  );
+  assert.equal(urls.length, 60);
+  assert.deepEqual(await service.prices(["Cached"]), { Cached: 1 });
 });
 
 test("101 names are trimmed to 100 in the upstream URL", async () => {

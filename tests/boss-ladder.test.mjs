@@ -138,6 +138,13 @@ test("meetsTier", () => {
   assert.equal(meetsTier({ Attack: 99, Strength: 10, Defence: 99, Constitution: 99 }, "Free"), false);
 });
 
+test("meetsTier counts a Necromancy main", () => {
+  const others = { Attack: 70, Strength: 70, Ranged: 70, Magic: 70 };
+  const tanky = { Defence: 99, Constitution: 99 };
+  assert.equal(meetsTier({ ...others, ...tanky, Necromancy: 99 }, "High"), true);
+  assert.equal(meetsTier({ ...others, ...tanky, Necromancy: 70 }, "High"), false);
+});
+
 test("nextBoss", () => {
   const a = boss("a", "Free", 1);
   const b = boss("b", "Free", 2);

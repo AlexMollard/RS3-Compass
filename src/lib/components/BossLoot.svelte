@@ -5,7 +5,7 @@
   import type { Profile } from "../../data";
   import { wikiHref } from "../../wiki";
   import type { LootRow, Prices } from "../bossLoot";
-  import { firstRarity } from "../bossPage";
+  import { displayRarity, firstRarity } from "../bossPage";
   import { isAutoCollected, isCollected, logKey } from "../collectionLog";
   import ChoiceStrip from "./ChoiceStrip.svelte";
   import FallbackArt from "./FallbackArt.svelte";
@@ -27,7 +27,7 @@
     version: string | undefined;
     onVersion: (version: string) => void;
     rows: LootRow[];
-    summary: { average: number; unpriced: number; top: LootRow[] };
+    summary: { average: number; unpriced: number; unrated: number; top: LootRow[] };
     prices: Prices | undefined;
     priceState: "loading" | "failed" | "ready";
     onToggle: (key: string) => void;
@@ -125,11 +125,15 @@
           </dd>
         </div>
       </dl>
-      {#if priceState === "failed"}<p class="note warn">Prices unavailable</p>{:else if priceState === "ready" && summary.unpriced > 0}<p
-          class="note"
-        >
-          {summary.unpriced} {summary.unpriced === 1 ? "drop" : "drops"} unpriced
-        </p>{/if}
+      {#if priceState === "failed"}<p class="note warn">Prices unavailable</p>{:else if priceState === "ready"}{#if summary.unpriced > 0}<p
+            class="note"
+          >
+            {summary.unpriced} {summary.unpriced === 1 ? "drop" : "drops"} unpriced
+          </p>{/if}{#if summary.unrated > 0}<p class="note">
+            {summary.unrated === 1
+              ? "1 drop has no exact drop rate, so the average leaves it out"
+              : `${summary.unrated} drops have no exact drop rate, so the average leaves them out`}
+          </p>{/if}{/if}
       <table class="drop-table">
         <thead>
           <tr><th scope="col">Item</th><th scope="col">Qty</th><th scope="col">Rarity</th><th scope="col"
@@ -149,7 +153,7 @@
                 ></th
               >
               <td data-label="Qty">{row.quantity}</td>
-              <td data-label="Rarity">{row.rarity}</td>
+              <td data-label="Rarity">{displayRarity(row.rarity)}</td>
               <td data-label="Price">{priceText(row)}</td>
               <td data-label="Per kill"
                 >{#if row.perKill !== undefined}<span class="per-kill"
