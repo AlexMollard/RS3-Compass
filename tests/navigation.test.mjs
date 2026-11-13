@@ -1,13 +1,22 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { NAV_GROUPS, PHONE_TABS, routeFor } from "../src/lib/navigation.ts";
+import { NAV_GROUPS, PHONE_TABS, bossPath, routeFor } from "../src/lib/navigation.ts";
 import { load as loadQuestRoute } from "../src/routes/quests/[[id]]/+page.ts";
+import { load as loadBossRoute } from "../src/routes/bossing/[[id]]/+page.ts";
 import { load as loadSkill } from "../src/routes/skills/[[name]]/+page.ts";
 
 test("an unknown quest id is a 404, not a different quest", () => {
   assert.throws(() => loadQuestRoute({ params: { id: "not-a-real-quest" } }), (e) => e.status === 404);
   assert.doesNotThrow(() => loadQuestRoute({ params: { id: "cooks-assistant" } }));
   assert.doesNotThrow(() => loadQuestRoute({ params: {} }));
+});
+
+test("bossing routes resolve and an unknown boss id is a 404", () => {
+  assert.equal(routeFor("/bossing/giant-mole"), "bossing");
+  assert.equal(bossPath("ivar-king-of-bones"), "/bossing/ivar-king-of-bones");
+  assert.throws(() => loadBossRoute({ params: { id: "nope" } }), (e) => e.status === 404);
+  assert.doesNotThrow(() => loadBossRoute({ params: { id: "giant-mole" } }));
+  assert.doesNotThrow(() => loadBossRoute({ params: {} }));
 });
 
 test("skill addresses redirect other cases and reject unknown skills", () => {
@@ -44,6 +53,6 @@ test("the rail groups Plan and People in order", () => {
   );
   assert.deepEqual(
     NAV_GROUPS[0].items.map((item) => item.label),
-    ["Home", "Quests", "Skills"],
+    ["Home", "Quests", "Skills", "Bossing"],
   );
 });

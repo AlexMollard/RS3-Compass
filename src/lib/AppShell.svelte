@@ -62,6 +62,7 @@
     home: "Your route",
     quests: "Quests",
     skills: "Skills",
+    bossing: "Bossing",
     players: "Players",
     groups: "Group Ironman",
     compare: "Compare players",

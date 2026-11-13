@@ -1,11 +1,13 @@
 export const questPath = (id: string) => `/quests/${encodeURIComponent(id)}`;
 export const skillPath = (name: string) =>
   `/skills/${encodeURIComponent(name)}`;
+export const bossPath = (id: string) => `/bossing/${encodeURIComponent(id)}`;
 
 export type RouteId =
   | "home"
   | "quests"
   | "skills"
+  | "bossing"
   | "players"
   | "groups"
   | "compare"
@@ -15,6 +17,7 @@ export type RouteId =
 const SECTIONS: RouteId[] = [
   "quests",
   "skills",
+  "bossing",
   "players",
   "groups",
   "compare",
@@ -42,6 +45,12 @@ export const NAV_GROUPS: {
         label: "Skills",
         href: "/skills",
         image: "Skills_icon.png",
+      },
+      {
+        id: "bossing",
+        label: "Bossing",
+        href: "/bossing",
+        image: "Attack.png",
       },
     ],
   },
