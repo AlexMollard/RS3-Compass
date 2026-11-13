@@ -14,7 +14,7 @@ export interface BossGuide {
 }
 
 const GWD_ENTRY =
-  "the God Wars Dungeon (Troll Stronghold, then 60 Strength or Agility to pass the boulder). You need 40 killcount of the boss's god to open the chamber, unless a Totem of Intimidation is active or you have War's Blessing 2.";
+  "the God Wars Dungeon. Complete the Troll Stronghold quest up to the point where it unlocks the dungeon entrance, then you need 60 Strength or Agility to pass the boulder. You need 40 killcount of the boss's god to open the chamber, unless a Totem of Intimidation is active or you have War's Blessing 2.";
 
 const warpriest = (god: string) =>
   ["helm", "cape", "cuirass", "greaves", "gauntlets", "boots"].map(
@@ -219,7 +219,7 @@ export const BOSS_GUIDES: Readonly<Record<string, BossGuide>> = {
   },
 
   "chaos-elemental": {
-    why: "The strongest free-to-play boss, known for the dragon 2h sword (members) and rare Ancient Warriors' and corrupt dragon gear; Ribs of chaos unlocks the pet Ellie.",
+    why: "The strongest free-to-play boss, known for the dragon 2h sword (members), rare corrupt dragon gear and rare Ancient Warriors' gear (members); Ribs of chaos unlocks the pet Ellie.",
     mechanics: [
       {
         title: "Discord",

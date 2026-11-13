@@ -45,6 +45,14 @@ test("every guide has setup for at least one style and no repeated bring lines",
   }
 });
 
+test("every guide's uniques.remove still names an imported, unfiltered unique", () => {
+  for (const [id, guide] of Object.entries(BOSS_GUIDES)) {
+    const filtered = filterUniques(bossById(id).uniques);
+    for (const item of guide.uniques?.remove ?? [])
+      assert.ok(filtered.includes(item), `${id}: ${item}`);
+  }
+});
+
 test("applyUniqueOverrides removes, then adds without duplicates", () => {
   const guides = { mole: { uniques: { remove: ["Mole skin"], add: ["Molly", "Rotten fang"] } } };
   assert.deepEqual(
