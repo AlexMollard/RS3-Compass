@@ -224,7 +224,7 @@ export const BOSS_GUIDES: Readonly<Record<string, BossGuide>> = {
       {
         title: "Discord",
         detail:
-          "A green projectile that deals random magic, ranged or melee damage, up to 1,104. Use Protect from Magic, since magic is its most accurate, or Soul Split.",
+          "A green projectile that deals random magic, ranged or melee damage, up to 1,104. Use Protect from Magic, since magic is its most accurate, or Soul Split (members).",
       },
       {
         title: "Confusion",
@@ -254,7 +254,7 @@ export const BOSS_GUIDES: Readonly<Record<string, BossGuide>> = {
       "Beast of burden for extra supplies (members)",
     ],
     getThere:
-      "West of Rogues' Castle in level 50-52 Wilderness. The Edgeville or Ardougne lever takes you to the nearby Deserted Keep, and a Wilderness obelisk is close. No boss portal can be attuned to it. Edward banks for free players outside the Dragonkin Laboratory.",
+      "West of Rogues' Castle in level 50-52 Wilderness. The Edgeville teleport lever takes you to the nearby Deserted Keep, and a Wilderness obelisk is close. No boss portal can be attuned to it. Edward banks for free players outside the Dragonkin Laboratory.",
     ironman: {
       before: [
         "Food that leaves a container (stew or bottle of wine in free-to-play) to keep your backpack full",
@@ -448,7 +448,7 @@ export const BOSS_GUIDES: Readonly<Record<string, BossGuide>> = {
   },
 
   "dagannoth-kings": {
-    why: "Each King drops its own ring, among the best damage bonuses for its style, and each has a pet: Rex, Prime and Supreme hatchlings.",
+    why: "Each King drops its own ring (Rex two), among the best damage bonuses for its style, and each has a pet: Rex, Prime and Supreme hatchlings.",
     mechanics: [
       {
         title: "Three Kings, three styles",
