@@ -297,6 +297,66 @@ test("a reward container's common roll doesn't make a rare boss material easy", 
   assert.equal(classifyRoute({ name: "Superior tetsu katana", members: true }, f).kind, "rare-drop");
 });
 
+test("a Divination swap cycle between boss parts is not a way around the drop", () => {
+  // Ek-ZekKil: each TzKal-Zuk part can be swapped for another with incandescent energy.
+  const f = facts(
+    {
+      "Ek-ZekKil": [{ materials: ["Obsidian blade", "Magma core"], skills: ["Smithing"] }],
+      "Obsidian blade": [{ materials: ["Incandescent energy", "Magma core"], skills: ["Divination"] }],
+      "Magma core": [{ materials: ["Incandescent energy", "Obsidian blade"], skills: ["Divination"] }],
+    },
+    {},
+    { "Obsidian blade": [{ page: "TzKal-Zuk", rarity: "1/90" }], "Magma core": [{ page: "TzKal-Zuk", rarity: "1/90" }] },
+  );
+  const route = classifyRoute({ name: "Ek-ZekKil", members: true }, f);
+  assert.equal(route.kind, "rare-drop");
+  assert.match(route.note, /TzKal-Zuk/);
+});
+
+test("a cycle with no drop at all blocks the recipe rather than making it easy", () => {
+  const f = facts({
+    Sword: [{ materials: ["Left half"], skills: ["Smithing"] }],
+    "Left half": [{ materials: ["Right half"], skills: ["Divination"] }],
+    "Right half": [{ materials: ["Left half"], skills: ["Divination"] }],
+  });
+  assert.equal(classifyRoute({ name: "Sword", members: true }, f), undefined);
+});
+
+test("materials past the importer's fetch cap block the recipe", () => {
+  const f = facts({ Sword: [{ materials: ["Deep part"], skills: ["Smithing"] }] });
+  f.unresolved = new Set(["Deep part"]);
+  assert.equal(classifyRoute({ name: "Sword", members: true }, f), undefined);
+});
+
+test("a boss drop is rare at any rate", () => {
+  const f = facts(
+    { "Royal crossbow": [{ materials: ["Royal frame"], skills: ["Smithing"] }] },
+    {},
+    { "Royal frame": [{ page: "Queen Black Dragon", rarity: "1/51" }] },
+  );
+  assert.equal(classifyRoute({ name: "Royal crossbow", members: true }, f).kind, "smith");
+  f.bosses = new Set(["Queen Black Dragon"]);
+  assert.equal(classifyRoute({ name: "Royal crossbow", members: true }, f).kind, "rare-drop");
+});
+
+test("a boss's reward-typed loot still counts as a boss drop", () => {
+  const f = facts(
+    {
+      "Cryptbloom top": [{ materials: ["Croesus flakes", "Cryptbloom top (incomplete)"], skills: ["Crafting"] }],
+      "Dracolich hauberk": [{ materials: ["Thread", "Vorkath's spike"], skills: ["Crafting"] }],
+    },
+    {},
+    {
+      "Croesus flakes": [{ page: "Croesus", rarity: "Always", types: ["reward"] }],
+      "Cryptbloom top (incomplete)": [{ page: "Croesus", rarity: "1/5,400", types: ["reward"] }],
+      "Vorkath's spike": [{ page: "Zemouregal & Vorkath loot (normal)", rarity: "1/45", types: ["reward"] }],
+    },
+  );
+  f.bosses = new Set(["Croesus", "Zemouregal & Vorkath"]);
+  assert.equal(classifyRoute({ name: "Cryptbloom top", members: true }, f).kind, "rare-drop");
+  assert.equal(classifyRoute({ name: "Dracolich hauberk", members: true }, f).kind, "rare-drop");
+});
+
 test("shops, reward shops and drops", () => {
   const f = facts(
     {},

@@ -122,25 +122,49 @@ const PROMOTIONS = ["sof", "th"];
 // Temple of Aminishi gives Tetsu kits at 25/1,000, though they are rare boss drops).
 const CONTAINERS = [...PROMOTIONS, "reward"];
 
-/** The pages that drop `name`, split by rarityBand, skipping drops of the `ignored` types. */
+/**
+ * The pages that drop `name`, split by rarityBand, skipping drops of the `ignored` types. A drop from a boss is
+ * rare at any rate (Queen Black Dragon's royal crossbow parts are about 1/51), and counts even when the Wiki
+ * types it as a reward (Croesus, The Barrows: Rise of the Six).
+ */
 function dropBands(name, facts, ignored = PROMOTIONS) {
   const bands = { common: [], rare: [], varies: [] };
   for (const d of facts.drops.get(name) ?? []) {
-    if ((d.types ?? []).some((t) => ignored.includes(t))) continue;
     const band = rarityBand(d.rarity);
-    if (band) bands[band].push(d.page);
+    const types = d.types ?? [];
+    if (!band || types.some((t) => PROMOTIONS.includes(t))) continue;
+    if (isBossPage(d.page, facts)) bands.rare.push(d.page);
+    else if (!types.some((t) => ignored.includes(t))) bands[band].push(d.page);
   }
   return bands;
 }
-const coinStores = (name, facts) => (facts.stores.get(name) ?? []).filter((s) => s.currency.includes("coins"));
 
 /**
- * The rare drop that `name` can only come from, if any: a material with a rare (or varying-rate) drop, no
- * common drop, no coin shop and no recipe that avoids a rare drop. Basic materials (ores, logs: no recipe, no
- * drop) are not gated.
+ * A boss's page, or its loot page ("Zemouregal & Vorkath loot (normal)"): `facts.bosses` holds boss names,
+ * matched on the page name without its #section, alone or followed by a space.
+ */
+function isBossPage(page, facts) {
+  const name = page.replace(/#.*$/, "");
+  if (!facts.bosses) return false;
+  if (facts.bosses.has(name)) return true;
+  for (let i = name.indexOf(" "); i !== -1; i = name.indexOf(" ", i + 1))
+    if (facts.bosses.has(name.slice(0, i))) return true;
+  return false;
+}
+const coinStores = (name, facts) => (facts.stores.get(name) ?? []).filter((s) => s.currency.includes("coins"));
+
+// No way out: a recipe chain that loops back on itself (Divination swaps: Obsidian blade + energy → Magma core,
+// Magma core + energy → Obsidian blade) or that runs past what the importer fetched (`facts.unresolved`).
+// Such a recipe is never an ungated path, but it isn't a drop source either.
+const BLOCKED = Object.freeze({ blocked: true });
+
+/**
+ * The rare drop that `name` can only come from, if any: a material with a rare (or varying-rate, or boss)
+ * drop, no common drop, no coin shop and no recipe that avoids a rare drop. Basic materials (ores, logs: no
+ * recipe, no drop) are not gated. BLOCKED when every recipe loops or is unresolved and there is no drop.
  */
 function rareGate(name, facts, seen = new Set()) {
-  if (seen.has(name)) return undefined;
+  if (seen.has(name) || facts.unresolved?.has(name)) return BLOCKED;
   seen.add(name);
   if (coinStores(name, facts).length) return undefined;
   const own = dropBands(name, facts, CONTAINERS);
@@ -148,12 +172,14 @@ function rareGate(name, facts, seen = new Set()) {
   const recipes = facts.recipes.get(name) ?? [];
   let gate;
   for (const r of recipes) {
-    const g = r.materials.map((m) => rareGate(m, facts, new Set(seen))).find(Boolean);
-    if (!g) return undefined;
-    gate ??= g;
+    const results = r.materials.map((m) => rareGate(m, facts, new Set(seen)));
+    if (results.every((g) => !g)) return undefined;
+    gate ??= results.find((g) => g?.material);
   }
   const sources = [...own.rare, ...own.varies];
-  return gate ?? (sources.length ? { material: name, sources } : undefined);
+  if (gate) return gate;
+  if (sources.length) return { material: name, sources };
+  return recipes.length ? BLOCKED : undefined;
 }
 
 /**
@@ -162,7 +188,8 @@ function rareGate(name, facts, seen = new Set()) {
  * 2. a coin shop → shop; another currency's shop → reward;
  * 3. a common drop of the item → common-drop; a rare drop of it or of a recipe material → rare-drop.
  * Undefined when none of these apply. `facts` maps names to recipes ({ materials, skills }),
- * stores ({ page, currency }) and drops ({ page, rarity }).
+ * stores ({ page, currency }) and drops ({ page, rarity, types }); `bosses` is a Set of boss page names and
+ * `unresolved` a Set of materials the importer didn't fetch.
  */
 export function classifyRoute(item, facts) {
   const recipes = facts.recipes.get(item.name) ?? [];
@@ -185,7 +212,7 @@ export function classifyRoute(item, facts) {
   if (own.rare.length) return { kind: "rare-drop", note: `Rare drop from ${list(own.rare)}.`, members };
   if (own.varies.length) return { kind: "rare-drop", note: `Dropped by ${list(own.varies)} (the rate varies).`, members };
   for (const r of recipes) {
-    const gate = r.materials.map((m) => rareGate(m, facts)).find(Boolean);
+    const gate = r.materials.map((m) => rareGate(m, facts)).find((g) => g?.material);
     if (gate)
       return { kind: "rare-drop", note: `Made from ${gate.material}, a rare drop from ${list(gate.sources)}.`, members };
   }

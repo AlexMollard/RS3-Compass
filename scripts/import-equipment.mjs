@@ -3,6 +3,7 @@
 // Prints one review line per item (name, class, slot, tier, wear, route kind) and the items with no route.
 // Exclusions and routes the Wiki data can't give go in src/equipmentCuration.ts so they survive re-imports.
 import { writeFileSync } from "node:fs";
+import { IMPORTED_BOSSES } from "../src/bossesImported.ts";
 import { EQUIPMENT_CURATION, routeFor } from "../src/equipmentCuration.ts";
 import { classifyRoute, parseItem } from "./equipmentWikitext.mjs";
 import { createWikiApi } from "./wikiApi.mjs";
@@ -93,12 +94,22 @@ const baseOf = (name) => {
 };
 const items = parsed.filter((i) => !baseOf(i.name));
 
-// 3. Routes from the Wiki's Bucket data: recipes, shops and drops, following recipe materials down the chain.
-const facts = { recipes: new Map(), stores: new Map(), drops: new Map() };
+// 3. Routes from the Wiki's Bucket data: recipes, shops and drops, following recipe materials down the chain
+// until no new material turns up. A drop from any boss counts as rare (Category:Bosses plus the boss importer's
+// names, e.g. "Giant Mole", which the category spells differently).
+const bosses = new Set([...(await categoryMembers("Bosses")), ...IMPORTED_BOSSES.map((b) => b.name)]);
+const facts = { recipes: new Map(), stores: new Map(), drops: new Map(), bosses, unresolved: new Set() };
 const push = (map, key, value) => map.set(key, [...(map.get(key) ?? []), value]);
 const fetched = new Set();
 let frontier = items.map((i) => i.name);
-for (let depth = 0; frontier.length && depth < 6; depth++) {
+const MAX_DEPTH = 30; // a safety cap; real chains are under 10 deep
+for (let depth = 0; frontier.length; depth++) {
+  if (depth === MAX_DEPTH) {
+    // Never guess past the cap: these materials block their recipes, so the items stay unknown.
+    for (const m of frontier) facts.unresolved.add(m);
+    console.error(`Recipe chains deeper than ${MAX_DEPTH} levels; unresolved materials: ${frontier.join(", ")}`);
+    break;
+  }
   for (const n of frontier) fetched.add(n);
   const wanted = new Set(frontier);
   const materials = new Set();

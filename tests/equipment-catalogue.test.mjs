@@ -78,6 +78,10 @@ test("routes come from Wiki recipe, shop and drop data", () => {
   assert.equal(routeFor(item("Bane 2h sword")).kind, "smith");
   // Crafted, but from Telos's dormant godsword, whose drop rate "Varies".
   assert.equal(routeFor(item("Zaros godsword")).kind, "rare-drop");
+  // Boss parts: Queen Black Dragon (about 1/51), TzKal-Zuk behind a Divination swap cycle, and Zamorak.
+  assert.equal(routeFor(item("Royal crossbow")).kind, "rare-drop");
+  assert.equal(routeFor(item("Ek-ZekKil")).kind, "rare-drop");
+  assert.equal(routeFor(item("Bow of the Last Guardian")).kind, "rare-drop");
   // Sold at Skulgrimen's Battle Gear; no recipe.
   assert.equal(routeFor(item("Berserker helm")).kind, "shop");
 });
