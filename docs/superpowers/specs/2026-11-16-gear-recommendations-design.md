@@ -95,7 +95,7 @@ The hand-written layer replaces most of today's per-item metadata in `equipmentC
 - A **line** is a ladder of imported items for one style, slot and setup, with an acquisition route per item. Weapons have two setups, each its own row (Alex's choice):
   - **2h**: one weapon row.
   - **Dual-wield**: a main-hand row and an off-hand row.
-- Armour lines are **power armour** for training (my call), so its extra Strength, Ranged or Magic requirement counts as a wear requirement. Tank and hybrid armour are left out of training picks.
+- Armour picks take the highest tier you can wear, and prefer **power** over tank armour when both exist at that tier (my call). The Wiki classes smithable metal armour (bronze to elder rune) as tank, and melee power armour only exists at higher tiers, so "power only" would leave low levels with no armour. A power piece's extra Strength, Ranged or Magic requirement counts as a wear requirement. Hybrid armour is left out.
 - Any quest, achievement or unlock needed to *wear* an item is written into its line as a wear requirement, because the infobox doesn't hold these reliably. "Best you can have" checks them (my call).
 - Each route carries:
   - its kind: smith, craft, shop, common drop, rare drop, reward or quest;
