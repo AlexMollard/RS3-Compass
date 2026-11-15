@@ -1,6 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { parseListPage, parseItem, parseRequirements } from "../scripts/equipmentWikitext.mjs";
+import {
+  classifyRoute,
+  parseListPage,
+  parseItem,
+  parseRequirements,
+  rarityBand,
+} from "../scripts/equipmentWikitext.mjs";
 
 // Trimmed from the RuneScape Wiki pages of the same names (fetched 2026-11-16).
 const scythe = `{{Infobox Item
@@ -222,4 +228,85 @@ test("parseListPage returns item names once, in page order", () => {
     "Goblin cower shield",
   ]);
   assert.ok(!names.some((n) => /dontaddtototal|totals/.test(n)));
+});
+
+test("a requirements field of None is no requirement; an absent field is unknown", () => {
+  // Bronze full helm writes "|requirements = None".
+  const helm = parseItem("Bronze full helm", "{{Infobox Bonuses\n|requirements = None\n|class = melee\n|slot = head\n|tier = 5\n}}");
+  assert.deepEqual(helm.wear, []);
+  const empty = parseItem("Blank helm", "{{Infobox Bonuses\n|requirements =\n|class = melee\n|slot = head\n|tier = 5\n}}");
+  assert.deepEqual(empty.wear, []);
+  const absent = parseItem("Odd helm", "{{Infobox Bonuses\n|class = melee\n|slot = head\n|tier = 5\n}}");
+  assert.equal(absent.wear, undefined);
+});
+
+test("rarityBand follows Module:DropsLine: below 1/64 is rare", () => {
+  assert.equal(rarityBand("1/240"), "rare");
+  assert.equal(rarityBand("1/64"), "common");
+  assert.equal(rarityBand("1/65"), "rare");
+  assert.equal(rarityBand("214/2,559"), "common");
+  assert.equal(rarityBand("Always"), "common");
+  assert.equal(rarityBand("Very rare"), "rare");
+  assert.equal(rarityBand("Varies"), "varies");
+  assert.equal(rarityBand("Once"), undefined);
+});
+
+// Facts as the importer reads them from the Wiki's recipe, storeline and dropsline Bucket tables.
+const facts = (recipes = {}, stores = {}, drops = {}) => ({
+  recipes: new Map(Object.entries(recipes)),
+  stores: new Map(Object.entries(stores)),
+  drops: new Map(Object.entries(drops)),
+});
+
+test("a recipe needing a rare-only drop is a rare drop, not a craft", () => {
+  const f = facts(
+    { "Noxious scythe": [{ materials: ["Araxxi's fang", "Spider leg"], skills: ["Crafting"] }] },
+    {},
+    { "Araxxi's fang": [{ page: "Araxxi#Solo", rarity: "1/240" }], "Spider leg": [{ page: "Araxxi", rarity: "Always" }] },
+  );
+  const route = classifyRoute({ name: "Noxious scythe", members: true, recipe: { skill: "Crafting", level: 90 } }, f);
+  assert.equal(route.kind, "rare-drop");
+  assert.match(route.note, /Araxxi's fang, a rare drop from Araxxi/);
+});
+
+test("a smithing chain down to basic materials is smith, despite a stray rare drop of the bar", () => {
+  const f = facts(
+    {
+      "Elder rune platebody": [{ materials: ["Elder rune bar"], skills: ["Smithing"] }],
+      "Elder rune bar": [{ materials: ["Rune bar", "Light animica"], skills: ["Smithing"] }],
+    },
+    {},
+    { "Elder rune bar": [{ page: "Some boss", rarity: "1/500" }], "Elder rune platebody": [{ page: "Some boss", rarity: "1/900" }] },
+  );
+  const route = classifyRoute({ name: "Elder rune platebody", members: true, recipe: { skill: "Smithing", level: 90 } }, f);
+  assert.deepEqual(route.levels, [{ skill: "Smithing", level: 90 }]);
+  assert.equal(route.kind, "smith");
+});
+
+test("a reward container's common roll doesn't make a rare boss material easy", () => {
+  const f = facts(
+    { "Superior tetsu katana": [{ materials: ["Tetsu katana", "Tetsu sword upgrade kit"], skills: ["Smithing"] }] },
+    {},
+    {
+      "Tetsu sword upgrade kit": [
+        { page: "Seiryu the Azure Serpent", rarity: "1/1,000", types: ["combat"] },
+        { page: "Lucky Charm (Temple of Aminishi)", rarity: "25/1,000", types: ["reward"] },
+      ],
+    },
+  );
+  assert.equal(classifyRoute({ name: "Superior tetsu katana", members: true }, f).kind, "rare-drop");
+});
+
+test("shops, reward shops and drops", () => {
+  const f = facts(
+    {},
+    { "Rune kiteshield": [{ page: "Armour Store", currency: ["coins"] }], "Chaotic rapier": [{ page: "Daemonheim Rewards", currency: ["dungeoneering tokens"] }] },
+    { "Torva platebody": [{ page: "Nex", rarity: "1/384" }], "Dragon platelegs": [{ page: "Nex", rarity: "1/300" }, { page: "Ork", rarity: "Common" }] },
+  );
+  const kind = (name) => classifyRoute({ name, members: true }, f)?.kind;
+  assert.equal(kind("Rune kiteshield"), "shop");
+  assert.equal(kind("Chaotic rapier"), "reward");
+  assert.equal(kind("Torva platebody"), "rare-drop");
+  assert.equal(kind("Dragon platelegs"), "common-drop");
+  assert.equal(kind("Mystery helm"), undefined);
 });

@@ -1,4 +1,5 @@
-// RuneScape Wiki API helpers shared by the importers (scripts/import-quests.mjs, scripts/import-bosses.mjs).
+// RuneScape Wiki API helpers shared by the importers (scripts/import-quests.mjs, scripts/import-bosses.mjs,
+// scripts/import-equipment.mjs).
 const API = "https://runescape.wiki/api.php";
 const BATCH = 50;
 
@@ -106,5 +107,28 @@ export function createWikiApi(userAgent) {
     return members;
   }
 
-  return { api, pageContents, servedFiles, categoryMembers };
+  /**
+   * Rows of a Bucket table (https://runescape.wiki/w/Special:Bucket) whose `key` field is one of `values`,
+   * with the given fields. Queries 50 values at a time and pages past the API's 5000-row limit.
+   */
+  async function bucketRows(bucket, fields, key, values) {
+    const lua = (s) => '"' + s.replaceAll("\\", "\\\\").replaceAll('"', '\\"') + '"';
+    const rows = [];
+    for (const batch of chunks([...new Set(values)])) {
+      const where = `bucket.Or(${batch.map((v) => `{'${key}',${lua(v)}}`).join(",")})`;
+      const select = [key, ...fields].map((f) => `'${f}'`).join(",");
+      for (let offset = 0; ; offset += 5000) {
+        const json = await api({
+          action: "bucket",
+          query: `bucket('${bucket}').select(${select}).where(${where}).limit(5000).offset(${offset}).run()`,
+        });
+        if (json.error) throw new Error(`Bucket ${bucket}: ${json.error}`);
+        rows.push(...json.bucket);
+        if (json.bucket.length < 5000) break;
+      }
+    }
+    return rows;
+  }
+
+  return { api, pageContents, servedFiles, categoryMembers, bucketRows };
 }
