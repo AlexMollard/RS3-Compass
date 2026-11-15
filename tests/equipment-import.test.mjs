@@ -158,6 +158,51 @@ test("a page without Infobox Bonuses is not equipment", () => {
   assert.equal(parseItem("Plain item", "{{Infobox Item|name=Plain}}"), undefined);
 });
 
+// Trimmed from the Globetrotter arm guards page: a numbered Bonuses infobox beside unnumbered fields.
+const globetrotter = `{{Infobox Item
+|version1 = 1
+|version2 = 25
+|name = Globetrotter arm guards
+|image1 = [[File:Globetrotter arm guards.png]]
+|members = Yes
+|tradeable = No
+}}
+{{Infobox Bonuses
+|version1 = 1
+|version2 = 25
+|requirements1 = None
+|requirements2 = {{sc|defence|25}}
+|class = hybrid
+|class1 = none
+|slot = hands
+|tier1 = 0
+|tier2 = 25
+|image = Globetrotter outfit equipped.png
+}}`;
+
+test("numbered Bonuses fields use version 1, falling back to the unnumbered field", () => {
+  const item = parseItem("Globetrotter arm guards", globetrotter);
+  assert.equal(item.class, "none");
+  assert.equal(item.tier, 0);
+  assert.equal(item.slot, "hands");
+  assert.deepEqual(item.wear, []);
+});
+
+test("missing or unrecognised class, slot and tier stay undefined", () => {
+  const item = parseItem("Odd", "{{Infobox Bonuses\n|class = hybrid\n|tier = n/a\n}}");
+  assert.equal(item.class, undefined);
+  assert.equal(item.slot, undefined);
+  assert.equal(item.tier, undefined);
+  assert.equal(parseItem("Blank", "{{Infobox Bonuses\n|tier =\n}}").tier, undefined);
+});
+
+test("parseListPage reads positional names and keys that are not first", () => {
+  const names = parseListPage(
+    "{{Eqinforow|Positional helm}}\n{{Eqinforow|dontaddtototal=y|ge=Late key helm}}\n{{Eqinforow|price={{x|1}}|name=[[Linked shield]]}}\n{{Eqinforow|totals=yes}}",
+  );
+  assert.deepEqual(names, ["Positional helm", "Late key helm", "Linked shield"]);
+});
+
 test("parseRequirements reads {{sc}} skills", () => {
   assert.deepEqual(parseRequirements("{{sc|attack|80}}{{sc|strength|80}}"), [
     { skill: "Attack", level: 80 },

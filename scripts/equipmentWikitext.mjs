@@ -3,7 +3,7 @@ import { plain, templateParams } from "./questWikitext.mjs";
 import { fileName } from "./wikiApi.mjs";
 import { canonicalSkillName } from "../src/skillNames.ts";
 
-const CLASSES = ["melee", "ranged", "magic", "necromancy"];
+const CLASSES = ["melee", "ranged", "magic", "necromancy", "none"];
 const ARMOUR_TYPES = ["power", "tank", "hybrid"];
 
 /**
@@ -13,11 +13,39 @@ const ARMOUR_TYPES = ["power", "tank", "hybrid"];
  */
 export function parseListPage(wikitext) {
   const names = [];
-  for (const m of wikitext.matchAll(/\{\{\s*Eqinforow\s*\|\s*(ge|name)\s*=\s*([^|{}]*(?:\[\[[^\]]*\]\][^|{}]*)*)/gi)) {
-    const name = plain(m[2]);
+  for (const row of eqinforows(wikitext)) {
+    // A first parameter that is not key=value is the name; otherwise ge= or name= anywhere in the row.
+    const first = row[0] ?? "";
+    const keyed = row.map((p) => p.match(/^\s*(ge|name)\s*=([\s\S]*)$/i)).find(Boolean);
+    const name = plain(/^[^=]*$/.test(first) ? first : (keyed?.[2] ?? ""));
     if (name && !names.includes(name)) names.push(name);
   }
   return names;
+}
+
+/** Each {{Eqinforow|...}} as its parameters, split at top-level pipes. */
+function eqinforows(text) {
+  const rows = [];
+  for (const start of text.matchAll(/\{\{\s*Eqinforow\s*\|/gi)) {
+    let depth = 0;
+    let link = 0;
+    let current = "";
+    const params = [];
+    for (let i = start.index + start[0].length; i < text.length; i++) {
+      const two = text.slice(i, i + 2);
+      if (two === "{{") { depth++; current += two; i++; continue; }
+      if (two === "[[") { link++; current += two; i++; continue; }
+      if (two === "]]") { link--; current += two; i++; continue; }
+      if (two === "}}") {
+        if (depth === 0) { params.push(current); break; }
+        depth--; current += two; i++; continue;
+      }
+      if (text[i] === "|" && depth === 0 && link === 0) { params.push(current); current = ""; continue; }
+      current += text[i];
+    }
+    rows.push(params);
+  }
+  return rows;
 }
 
 /** The skill levels in a requirements field, e.g. "{{sc|attack|80}}{{sc|strength|80}}". */
@@ -44,20 +72,22 @@ export function parseItem(name, wikitext) {
   const info = templateParams(wikitext, "Infobox Item");
   const recipe = templateParams(wikitext, "Infobox Recipe");
   const image = field(info, "image")?.match(/\[\[\s*(?:File|Image):([^\]|]+)/i)?.[1];
-  const className = (bonuses.class ?? "").toLowerCase();
-  const type = (bonuses.type ?? "").toLowerCase();
-  const tier = Number(bonuses.tier);
+  // No guessed defaults: a missing or unrecognised class, slot or tier stays undefined for the importer to reject.
+  const className = (field(bonuses, "class") ?? "").toLowerCase();
+  const type = (field(bonuses, "type") ?? "").toLowerCase();
+  const tierText = field(bonuses, "tier");
+  const tier = tierText !== undefined && /^\d+$/.test(tierText.trim()) ? Number(tierText) : undefined;
   const skill = canonicalSkillName(recipe?.skill1 ?? "");
   const skillLevel = Number(recipe?.skill1lvl);
   return {
     name,
     wiki: name,
     ...(image ? { image: fileName(image) } : {}),
-    slot: (bonuses.slot ?? "").toLowerCase(),
-    class: CLASSES.includes(className) ? className : "none",
-    tier: Number.isFinite(tier) ? tier : 0,
+    slot: field(bonuses, "slot")?.toLowerCase(),
+    class: CLASSES.includes(className) ? className : undefined,
+    tier,
     ...(ARMOUR_TYPES.includes(type) ? { armourType: type } : {}),
-    wear: parseRequirements(bonuses.requirements),
+    wear: parseRequirements(field(bonuses, "requirements")),
     members: yes(field(info, "members")),
     tradeable: yes(field(info, "tradeable")),
     ...(skill && Number.isFinite(skillLevel) ? { recipe: { skill, level: skillLevel } } : {}),
