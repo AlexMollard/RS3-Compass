@@ -81,6 +81,18 @@ test("Combat chips are unknown when combat can't be calculated, and Kuradal's te
   assert.equal(chips.find((c) => c.label === "Barbarian Training").status, "unknown");
 });
 
+test("Chips carry the Wiki's skill and combat icons, and quest chips their icon and Wiki page", () => {
+  const morvran = SLAYER_MASTERS.find((m) => m.id === "morvran");
+  const chips = masterRequirements(profile(), morvran);
+  assert.equal(chips.find((c) => c.label === "Slayer 85").icon, "Slayer-icon.png");
+  assert.equal(chips.find((c) => c.label === "Combat 120").icon, "Combat_swords.png");
+  const quest = chips.find((c) => c.label === "Plague's End");
+  assert.equal(quest.wiki, "Plague's End");
+  assert.ok(quest.icon.endsWith(".png"));
+  const edimmu = slayerTaskCard(profile(), "laniakea", "edimmu");
+  assert.equal(edimmu.requirements.find((c) => c.label.startsWith("Dungeoneering")).icon, "Dungeoneering-icon.png");
+});
+
 test("Grouped tasks put verdicts first and keep unverdicted tasks last, never hidden", () => {
   const groups = groupedTasks(profile(), "vannaka");
   const order = groups.map((g) => g.group);

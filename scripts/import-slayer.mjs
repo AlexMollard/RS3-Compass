@@ -5,11 +5,11 @@
 // unknown weight and the quest names that matched no quest. Exits non-zero, writing nothing, on any unexpected row.
 import { writeFileSync } from "node:fs";
 import { QUESTS } from "../src/data.ts";
-import { parseAssignments, parseDisambig, parseMastersTable } from "./slayerWikitext.mjs";
-import { createWikiApi } from "./wikiApi.mjs";
+import { parseAssignments, parseDisambig, parseMastersTable, representativeMonster } from "./slayerWikitext.mjs";
+import { chunks, createWikiApi, nameKey } from "./wikiApi.mjs";
 
 const USER_AGENT = "RS3 Compass Slayer import (https://github.com/AlexMollard/RS3-Compass)";
-const { api, pageContents, servedFiles } = createWikiApi(USER_AGENT);
+const { api, bucketRows, pageContents, servedFiles } = createWikiApi(USER_AGENT);
 const OUT = new URL("../src/slayerImported.ts", import.meta.url);
 const MASTERS_OUT = new URL("../src/slayerMastersImported.ts", import.meta.url);
 const TABLE = "Template:Slayer masters/table";
@@ -65,7 +65,45 @@ for (const master of masters) {
 }
 fail("Invalid assignment rows: fix the parser", invalid);
 
-// 3. Chathead art, resolved through Wiki file redirects.
+// 3. A picture per task: the lead image of the monster that represents its Slayer category in the Wiki's
+// infobox_monster Bucket (the data Module:Slayer Tasks by Master reads), skipping monsters the Wiki marks removed.
+// Pinned where the automatic choice lands on a minigame copy or an odd variant. Each page is in the category's own
+// infobox_monster rows and has a Wiki lead image (checked 2026-11-16); the importer fails if one stops qualifying.
+const PINNED_MONSTERS = { Demons: "Lesser demon", Kalphite: "Kalphite Worker", Dinosaurs: "Feral Dinosaur" };
+const categories = [...new Set(tasks.map((t) => t.name))];
+const monsterRows = (
+  await bucketRows("infobox_monster", ["page_name", "combat_level", "location_restriction"], "slayer_category", categories)
+).filter((r) => r.page_name && r.slayer_category && r.location_restriction !== "removed");
+const monsterFor = new Map();
+for (const category of categories) {
+  const rows = monsterRows.filter((r) => [r.slayer_category].flat().some((c) => nameKey(c) === nameKey(category)));
+  const pinned = PINNED_MONSTERS[category];
+  const monster = pinned && rows.some((r) => r.page_name === pinned) ? pinned : representativeMonster(category, rows);
+  if (monster) monsterFor.set(category, monster);
+}
+fail(
+  "Pinned monsters no longer in their category: update PINNED_MONSTERS",
+  Object.entries(PINNED_MONSTERS)
+    .filter(([category, page]) => categories.includes(category) && monsterFor.get(category) !== page)
+    .map(([category, page]) => `${category}: ${page}`),
+);
+const leadImage = new Map();
+for (const batch of chunks([...new Set(monsterFor.values())])) {
+  const json = await api({ action: "query", prop: "pageimages", piprop: "name", redirects: "1", titles: batch.join("|") });
+  const from = new Map();
+  for (const n of json.query.normalized ?? []) from.set(n.to, n.from);
+  for (const r of json.query.redirects ?? []) from.set(r.to, from.get(r.from) ?? r.from);
+  for (const p of json.query.pages) if (p.pageimage) leadImage.set(from.get(p.title) ?? p.title, p.pageimage);
+}
+const taskImages = await servedFiles([...leadImage.values()]);
+for (const t of tasks) {
+  const image = taskImages.get(leadImage.get(monsterFor.get(t.name)));
+  if (image) t.image = image;
+}
+const unpictured = categories.filter((c) => !taskImages.has(leadImage.get(monsterFor.get(c))));
+fail("Pinned monsters with no Wiki lead image: update PINNED_MONSTERS", unpictured.filter((c) => c in PINNED_MONSTERS));
+
+// 4. Chathead art, resolved through Wiki file redirects.
 const images = await servedFiles(masters.map((m) => m.image).filter(Boolean));
 const records = masters.map(({ image, ...m }) => {
   const served = image && images.get(image);
@@ -125,4 +163,5 @@ for (const t of tasks)
   console.log(`  ${t.master} | ${t.name} | ${t.amount.join("-")} | weight ${t.weight ?? "unknown"} | Slayer ${t.slayer} | ${t.members ? "members" : "free"} | ${reqs(t)}`);
 const unweighted = tasks.filter((t) => t.weight === undefined).map((t) => `${t.master}/${t.name}`);
 console.log(`Imported ${records.length} masters and ${tasks.length} tasks. Unknown weight: ${unweighted.join(", ") || "none"}.`);
+console.log(`Tasks with no picture (${unpictured.length}): ${unpictured.join(", ") || "none"}`);
 console.log(`Quest names with no QUESTS entry, kept as text (${unmatched.size}): ${[...unmatched].join(", ") || "none"}`);

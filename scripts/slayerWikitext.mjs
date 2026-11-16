@@ -211,6 +211,32 @@ export function parseAssignments(master, source, { quests = [], members, wikiPag
   return { tasks, invalid, unmatched };
 }
 
+/**
+ * The monster page that pictures a Slayer category, from its infobox_monster Bucket rows
+ * (`{ page_name, combat_level }`). The page named for the category in the singular wins ("Gargoyles" → Gargoyle,
+ * "Wolves" → Wolf, "Dagannoth" → Dagannoth); then the lowest-combat monster whose name has that word ("Elves" →
+ * Elf warrior); then the lowest-combat monster, the row the Wiki's own Slayer assignment tables list first.
+ * Undefined when the category has no rows.
+ */
+export function representativeMonster(category, rows) {
+  const word = nameKey(category);
+  const singular = new Set([
+    word,
+    word.replace(/ies$/, "y"),
+    word.replace(/ves$/, "f"),
+    word.replace(/ves$/, "fe"),
+    word.replace(/es$/, ""),
+    word.replace(/s$/, ""),
+    word.replace(/men$/, "man"),
+  ]);
+  const named = rows.find((r) => singular.has(nameKey(r.page_name)));
+  if (named) return named.page_name;
+  const level = (r) => (typeof r.combat_level === "number" ? r.combat_level : Infinity);
+  const lowest = (list) => [...list].sort((a, b) => level(a) - level(b))[0]?.page_name;
+  const mentions = rows.filter((r) => nameKey(r.page_name).split(/[\s-]+/).some((w) => singular.has(w)));
+  return lowest(mentions) ?? lowest(rows);
+}
+
 /** The lower-case task name → page overrides in Module:Slayer assignments/disambig's `p.data` table. */
 export function parseDisambig(source) {
   const block = /p\.data\s*=\s*(\{[\s\S]*?\n\})/.exec(source);

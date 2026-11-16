@@ -5,6 +5,7 @@ import {
   parseLuaTable,
   parseMastersTable,
   parseRequirements,
+  representativeMonster,
 } from "../scripts/slayerWikitext.mjs";
 
 // Trimmed from Module:Slayer assignments/Laniakea and /Kuradal (fetched 2026-11-16), the data that
@@ -306,4 +307,21 @@ test("a quest cell reads linked names joined by commas or and, and stops on any 
   assert.deepEqual(morvran.text, ["Barbarian Training"]);
   const partial = mastersTable.replace("| [[Plague's End]]", "| Partial completion of [[Plague's End]]");
   assert.throws(() => parseMastersTable(partial, QUESTS), /Morvran has unlinked quest text "Partial completion of"/);
+});
+
+test("a category is pictured by its singular monster, else its lowest-combat one", () => {
+  // Rows trimmed from the Wiki's infobox_monster Bucket (fetched 2026-11-16).
+  const birds = [
+    { page_name: "Terrorbird", combat_level: 42 },
+    { page_name: "Chicken", combat_level: 1 },
+    { page_name: "Evil Chicken" },
+  ];
+  assert.equal(representativeMonster("Birds", birds), "Chicken");
+  const wolves = [{ page_name: "Big wolf", combat_level: 1 }, { page_name: "Wolf", combat_level: 25 }];
+  assert.equal(representativeMonster("Wolves", wolves), "Wolf");
+  assert.equal(representativeMonster("Gargoyles", [{ page_name: "Gargoyle", combat_level: 90 }]), "Gargoyle");
+  assert.equal(representativeMonster("Dagannoth", [{ page_name: "Dagannoth", combat_level: 90 }]), "Dagannoth");
+  const elves = [{ page_name: "Unnatural Trahaearn titan", combat_level: 1 }, { page_name: "Elf warrior", combat_level: 90 }];
+  assert.equal(representativeMonster("Elves", elves), "Elf warrior");
+  assert.equal(representativeMonster("Elves", []), undefined);
 });

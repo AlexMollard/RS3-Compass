@@ -33,4 +33,6 @@ export type SlayerTask = {
   requirements: { levels: { skill: SkillName; level: number }[]; quests: string[]; text: string[] };
   weight?: number;
   members: boolean;
+  /** The Wiki's lead image of a monster from the task's Slayer category, absent when the Wiki has none. */
+  image?: string;
 };
