@@ -27,6 +27,26 @@ import { BOSSES, bossUniques } from "../bosses.ts";
 import { mergeAutoTicks } from "./collectionLog.ts";
 
 const KEY = "rs3-compass-design-v1";
+const MAX_SOULS = 1_000_000;
+
+function validNecromancy(n: unknown): boolean {
+  if (!isRecord(n)) return false;
+  const tier = (v: unknown) =>
+    v === undefined ||
+    (typeof v === "number" && Number.isInteger(v) && v >= 10 && v <= 90 && v % 10 === 0);
+  return (
+    tier(n.weaponTier) &&
+    tier(n.robeTier) &&
+    (n.robeLine === undefined ||
+      n.robeLine === "deathwarden" ||
+      n.robeLine === "deathdealer") &&
+    (n.souls === undefined ||
+      (typeof n.souls === "number" &&
+        Number.isInteger(n.souls) &&
+        n.souls >= 0 &&
+        n.souls <= MAX_SOULS))
+  );
+}
 
 function validProfile(value: unknown): value is Profile {
   if (!value || typeof value !== "object") return false;
@@ -77,6 +97,7 @@ function validProfile(value: unknown): value is Profile {
         [p.slayerTask.master, p.slayerTask.task].every(
           (id) => typeof id === "string" && id.length > 0 && id.length <= 128,
         ))) &&
+    (p.necromancy === undefined || validNecromancy(p.necromancy)) &&
     [p.collected, p.collectedAuto].every(
       (a) =>
         a === undefined ||
@@ -312,6 +333,19 @@ export function createCompassController(): CompassController {
     },
     setSlayerTask(pick) {
       controller.updateProfile((p) => ({ ...p, slayerTask: pick }));
+    },
+    setNecromancy(patch) {
+      controller.updateProfile((p) => {
+        const { necromancy: _old, ...rest } = p;
+        const merged = Object.fromEntries(
+          Object.entries({ ...p.necromancy, ...patch }).filter(
+            ([, v]) => v !== undefined,
+          ),
+        );
+        return Object.keys(merged).length
+          ? { ...rest, necromancy: merged }
+          : rest;
+      });
     },
     welcome() {
       state.update((current) =>

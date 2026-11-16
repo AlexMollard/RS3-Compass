@@ -56,6 +56,13 @@ export interface Profile {
   trainingMethods?: Record<string, string>;
   /** The Slayer task the player picked: a master's id and a task id from SLAYER_TASKS. */
   slayerTask?: { master: string; task: string };
+  /** Recorded Necromancy progress: gear tiers (10-90), the robe line and banked souls. */
+  necromancy?: {
+    weaponTier?: number;
+    robeTier?: number;
+    robeLine?: "deathwarden" | "deathdealer";
+    souls?: number;
+  };
   source?: "sample" | "hiscores";
   hiscoresFetchedAt?: number;
   hiscoresImportStatus?: HiscoresImportStatus;

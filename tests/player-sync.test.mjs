@@ -189,6 +189,7 @@ test("refreshing another player preserves selection, local plans and separate qu
     packed: ["quest::rope"],
     trainingMethods: { Mining: "iron" },
     slayerTask: { master: "kuradal", task: "abyssal-demons" },
+    necromancy: { weaponTier: 60, robeLine: "deathwarden", souls: 3200 },
   }));
   controller.addPlayer(snapshot("Bob", 1000), "Solo Ironman", "f2p");
   const before = structuredClone(get(controller.state));
@@ -222,6 +223,7 @@ test("refreshing another player preserves selection, local plans and separate qu
     "trainingMethods",
     "trainingRanges",
     "slayerTask",
+    "necromancy",
     "activeTask",
     "completedTasks",
     "kind",
