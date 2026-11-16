@@ -175,6 +175,36 @@ test("atLeast prefers an easy route at minTier", () => {
   assert.deepEqual(twoH.atLeast.missing, [{ skill: "Attack", level: 70, recorded: 65 }]);
 });
 
+test("at equal tier, easier and atLeast take the most ordinary route (smith > craft > shop > drop > quest > reward)", () => {
+  const kind = (k) => ({ route: { kind: k, note: k } });
+  const items = [
+    item("Test a reward 2h", "2h", 80, { Attack: 80 }, kind("reward")),
+    item("Test b quest 2h", "2h", 80, { Attack: 80 }, kind("quest")),
+    item("Test c shop 2h", "2h", 80, { Attack: 80 }, kind("shop")),
+    item("Test d smith 2h", "2h", 80, { Attack: 80 }, kind("smith")),
+    item("Test boss 2h", "2h", 80, { Attack: 80 }, drop),
+  ];
+  const twoH = row(selectGear({ class: "melee", profile: profile({ Attack: 85 }), items, minTier: 80, minReason: "r" }), "2h");
+  assert.equal(twoH.best.item.name, "Test boss 2h");
+  assert.equal(twoH.easier.item.name, "Test d smith 2h");
+  assert.equal(twoH.atLeast.item.name, "Test d smith 2h");
+  const noSmith = items.filter((i) => !/smith|shop/.test(i.name));
+  assert.equal(row(selectGear({ class: "melee", profile: profile({ Attack: 85 }), items: noSmith }), "2h").easier.item.name, "Test b quest 2h");
+});
+
+test("a curated tool level ranks a tool whose infobox lists only Attack", () => {
+  const hatchet = (name, attack) => ({
+    ...item(name, "weapon", attack, { Attack: attack }),
+    members: false,
+    tool: "hatchet",
+  });
+  const items = [hatchet("Bronze hatchet", 1), hatchet("Rune hatchet", 50), hatchet("Unknown hatchet", 30)];
+  const [r] = selectGear({ class: "tool", toolSlot: "hatchet", profile: profile({ Woodcutting: 50, Attack: 1 }), items });
+  assert.equal(r.best.item.name, "Rune hatchet");
+  assert.deepEqual(r.best.missing, []);
+  assert.equal(r.easier, undefined);
+});
+
 test("route gaps are exposed separately from wear gaps", () => {
   const items = [
     item("Test 2h", "2h", 70, { Attack: 70 }, { route: { kind: "smith", note: "", levels: [{ skill: "Smithing", level: 70 }] } }),

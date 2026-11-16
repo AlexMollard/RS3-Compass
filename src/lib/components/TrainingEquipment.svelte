@@ -6,15 +6,11 @@
     type TrainingOption,
   } from "../../data";
   import type { EquipmentRecommendation } from "../../equipmentTypes";
-  import type {
-    GearPick,
-    GearRow,
-    GearRowName,
-    LevelGap,
-  } from "../../gearSelection";
+  import type { GearPick, GearRowName, LevelGap } from "../../gearSelection";
   import {
     STYLE_SKILLS,
     equipmentLevels,
+    gearRowLabel,
     trainingGear,
     type CombatClass,
   } from "../../trainingEquipment";
@@ -54,21 +50,6 @@
       { label: "", rows: of(["tool"]) },
     ].filter((group) => group.rows.length);
   });
-  const ROW_LABEL: Record<GearRowName, string> = {
-    "2h": "Two-handed",
-    "main hand": "Main hand",
-    "off hand": "Off hand",
-    head: "Head",
-    body: "Body",
-    legs: "Legs",
-    hands: "Hands",
-    feet: "Feet",
-    tool: "Tool",
-  };
-  const rowLabel = (row: GearRow) =>
-    row.row === "tool" && row.best?.item.tool
-      ? row.best.item.tool[0].toUpperCase() + row.best.item.tool.slice(1)
-      : ROW_LABEL[row.row];
   const questTitle = (id: string) =>
     QUESTS.find((quest) => quest.id === id)?.name ?? id;
 </script>
@@ -150,7 +131,7 @@
                 >{/if}
               {#each group.rows as row (row.row)}
                 <tr>
-                  <th scope="row" class="slot">{rowLabel(row)}</th>
+                  <th scope="row" class="slot">{gearRowLabel(row.row, skill.name)}</th>
                   {#if row.unrecorded}
                     <td class="record" colspan={columns - 1}>
                       <a href="/levels">Record your {row.unrecorded} level</a>

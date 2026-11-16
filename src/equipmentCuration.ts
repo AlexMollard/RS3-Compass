@@ -98,6 +98,12 @@ export const EQUIPMENT_CURATION: GearCuration = {
     "Golden Karil's crossbow",
     "Golden Karil's skirt",
     "Golden Karil's top",
+    // A golden copy of Linza's armour from the September 2019 raffle; "You cannot obtain this armour again".
+    "Golden Linza's cuirass",
+    "Golden Linza's greaves",
+    "Golden Linza's hammer",
+    "Golden Linza's helmet",
+    "Golden Linza's shield",
     "Golden Torag's hammer",
     "Golden Torag's helm",
     "Golden Torag's platebody",
@@ -624,6 +630,27 @@ export const EQUIPMENT_CURATION: GearCuration = {
     "Helm of Neitiznot": { quests: ["the-fremennik-isles"], ...wiki("Helm of Neitiznot") },
     "Ancient mace": { quests: ["another-slice-of-ham"], ...wiki("Ancient mace") },
   },
+  // Tool infoboxes list only the level to wield (Attack for hatchets); the level to chop or mine is in the
+  // Hatchets table ("Woodcutting level" column) and the Inferno adze's own page.
+  toolLevels: [
+    ...(
+      [
+        ["^Bronze hatchet$", 1],
+        ["^Iron hatchet$", 10],
+        ["^Steel hatchet$", 20],
+        ["^Black hatchet$", 25],
+        ["^(Mithril|Blessed) hatchet$", 30],
+        ["^Adamant hatchet$", 40],
+        ["^Rune hatchet$", 50],
+        ["^(Orikalkum|Dragon) hatchet$", 60],
+        ["^Necronium hatchet$", 70],
+        ["^(Bane|Imcando) hatchet$", 80],
+        ["^(Elder rune hatchet|Hatchet of ember and glade)$", 90],
+        ["^(Primal hatchet|Hatchet of bloom and blight|Hawthorn's hatchet)$", 100],
+      ] as const
+    ).map(([match, level]) => ({ match, skill: "Woodcutting" as const, level, ...wiki("Hatchets") })),
+    { match: "^Inferno adze$", skill: "Mining", level: 50, ...wiki("Inferno adze") },
+  ],
   // Each page's Infobox Bonuses says "requirements = None" (checked 2026-11-16); an empty `wear` here is a fact.
   noWearRequirement: {
     "Ben's spare hat": wiki("Ben's spare hat"),
@@ -640,7 +667,8 @@ export const EQUIPMENT_CURATION: GearCuration = {
   },
 };
 
-export const EASY_KINDS: GearRouteKind[] = ["smith", "craft", "shop", "common-drop", "reward", "quest"];
+/** Easy routes, most ordinary first: at equal tier, Easier and Wear at least take the earlier kind. */
+export const EASY_KINDS: GearRouteKind[] = ["smith", "craft", "shop", "common-drop", "quest", "reward"];
 
 const UNKNOWN: GearRoute = { kind: "unknown", note: "See the Wiki for how to get it." };
 

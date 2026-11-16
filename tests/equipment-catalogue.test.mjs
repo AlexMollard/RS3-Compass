@@ -42,6 +42,7 @@ test("every curated entry is dated 2026-11-16 with a Wiki source", () => {
     ...EQUIPMENT_CURATION.families.map((f) => [f.match, f.route]),
     ...Object.entries(EQUIPMENT_CURATION.wearQuests),
     ...Object.entries(EQUIPMENT_CURATION.noWearRequirement),
+    ...EQUIPMENT_CURATION.toolLevels.map((t) => [t.match, t]),
   ];
   const bad = entries.filter(
     ([, e]) => e.checked !== "2026-11-16" || !e.sources.some((s) => s.startsWith("https://runescape.wiki/w/")),

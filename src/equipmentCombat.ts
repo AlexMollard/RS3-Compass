@@ -981,7 +981,13 @@ const styleExtras = { items: [dragonShield, gargoyleHammer] };
 export const COMBAT_EXTRAS: Partial<Record<SkillName, EquipmentGuide>> = {
   Attack: styleExtras,
   Strength: styleExtras,
-  Ranged: styleExtras,
+  Ranged: {
+    items: [
+      ...styleExtras.items,
+      // shortcut: hand-written ammo ladder; import an ammo slot when ammo needs tiers beyond it
+      ...rangedWeapons.filter((item) => item.slot === "ranged ammunition"),
+    ],
+  },
   Magic: styleExtras,
   Necromancy: {
     items: COMBAT_EQUIPMENT.Necromancy!.items.filter(

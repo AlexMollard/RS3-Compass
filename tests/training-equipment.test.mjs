@@ -8,7 +8,7 @@ import {
 } from "../src/data.ts";
 import { EQUIPMENT_IMPORTED } from "../src/equipmentImported.ts";
 import { EQUIPMENT_ITEMS } from "../src/equipmentExtras.ts";
-import { gearClass, trainingGear } from "../src/trainingEquipment.ts";
+import { gearClass, gearRowLabel, trainingGear } from "../src/trainingEquipment.ts";
 import { tokenizeGameText } from "../src/lib/gameText.ts";
 
 const character = (levels = {}, mode = "members", kind = "Solo Ironman") => ({
@@ -169,20 +169,54 @@ test("Tool skills show the tool row with no invented minimum", () => {
   assert.equal(trainingGear("Archaeology", archaeology, character({ Archaeology: 50 })).rows[0].best.item.tool, "mattock");
 });
 
-test(
-  "Woodcutting picks a hatchet by Woodcutting level",
-  { todo: "metal hatchets import only their Attack requirement, so selectGear can't rank them" },
-  () => {
-    const method = skillOf("Woodcutting").stages[0].options[0];
-    assert.equal(trainingGear("Woodcutting", method, character({ Woodcutting: 50 })).rows[0].best.item.name, "Rune hatchet");
-  },
-);
+test("Woodcutting picks a hatchet by its curated Woodcutting level", () => {
+  const method = skillOf("Woodcutting").stages[0].options[0];
+  const best = (level, mode) => trainingGear("Woodcutting", method, character({ Woodcutting: level }, mode)).rows[0];
+  assert.equal(best(1, "f2p").best.item.name, "Bronze hatchet");
+  assert.equal(best(50, "f2p").best.item.name, "Rune hatchet");
+  assert.equal(best(50, "members").best.item.name, "Rune hatchet");
+  assert.deepEqual(best(50, "members").best.missing, []);
+  assert.equal(best(60, "members").best.item.name, "Dragon hatchet");
+});
+
+test("The tool row is named after the skill's tool, with or without a pick", () => {
+  assert.equal(gearRowLabel("tool", "Woodcutting"), "Hatchet");
+  assert.equal(gearRowLabel("tool", "Mining"), "Pickaxe");
+  assert.equal(gearRowLabel("tool", "Archaeology"), "Mattock");
+  assert.equal(gearRowLabel("2h", "Attack"), "Two-handed");
+  const { rows } = trainingGear("Woodcutting", skillOf("Woodcutting").stages[0].options[0], character({}));
+  assert.equal(rows[0].unrecorded, "Woodcutting");
+});
+
+test("Ranged lists ammunition for its level, with Lowe's arrows on F2P", () => {
+  const ankou = methodOf("Ranged", "ankou");
+  const ammo = (profile, method = ankou, skill = "Ranged", style) =>
+    trainingGear(skill, method, profile, style).extras.filter((item) => /arrow|bolts/i.test(item.name));
+  assert.equal(ammo(character({ Ranged: 80 })).length, 1);
+  assert.equal(ammo(character({ Ranged: 80 }))[0].name, "Bane arrow");
+  const free = ammo(character({ Ranged: 45 }, "f2p"));
+  assert.equal(free[0].name, "Adamant arrow");
+  assert.match(free[0].acquisition[0].note, /Lowe/);
+  assert.equal(ammo(character({ Ranged: 60 }), methodOf("Ranged", "blue-dragons"))[0].name, "Rune bolts");
+  assert.ok(ammo(character({ Ranged: 70, Slayer: 80 }), methodOf("Slayer", "sumona"), "Slayer", "ranged").length);
+  assert.equal(ammo(character({ Attack: 80 }), methodOf("Attack", "ankou"), "Attack").length, 0);
+});
+
+test("At equal tier the more ordinary route is easier and the minimum", () => {
+  const profile = character({ Attack: 85, Defence: 82 });
+  const { rows } = trainingGear("Attack", methodOf("Attack", "ankou"), profile);
+  const hands = rows.find((row) => row.row === "hands");
+  assert.notEqual(hands.atLeast.item.name, "Penance gloves");
+  for (const row of rows)
+    for (const pick of [row.easier, row.atLeast].filter(Boolean))
+      assert.ok(!/^Golden Linza/.test(pick.item.name), pick.item.name);
+});
 
 test("Ore-box planning follows Mining progression without inventing a Mining use requirement", () => {
   const method = skillOf("Mining").stages[0].options[0];
   const box = (levels) => trainingGear("Mining", method, character(levels)).extras.find((item) => item.slot === "ore box");
   assert.equal(box({ Mining: 12, Smithing: 8 }).name, "Iron ore box");
-  assert.equal(box({}).name, "Bronze ore box");
+  assert.equal(box({}), undefined, "an unrecorded Mining level shows no ore box rather than bronze");
 });
 
 test("Inside-floor equipment follows recorded combat level without pretending dungeon level grants weapon access", () => {

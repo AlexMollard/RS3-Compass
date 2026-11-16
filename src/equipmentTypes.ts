@@ -90,6 +90,8 @@ export interface GearCuration {
   noWearRequirement: Record<string, Checked>;
   /** Quests needed to equip an item. */
   wearQuests: Record<string, { quests: string[] } & Checked>;
+  /** Gathering levels to use tools whose Wiki infobox lists only the wield requirement (`match` is a RegExp source). */
+  toolLevels: ({ match: string; skill: SkillName; level: number } & Checked)[];
   checked: string;
 }
 

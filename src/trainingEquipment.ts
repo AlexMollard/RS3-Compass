@@ -1,7 +1,7 @@
 import type { Profile, TrainingOption } from "./data.ts";
 import type { EquipmentRecommendation, GearTool } from "./equipmentTypes.ts";
 import { EQUIPMENT_EXTRAS } from "./equipmentExtras.ts";
-import { selectGear, type GearRow, type GearStyle } from "./gearSelection.ts";
+import { selectGear, type GearRow, type GearRowName, type GearStyle } from "./gearSelection.ts";
 import { levelStatus } from "./lib/levelStatus.ts";
 import type { SkillName } from "./skillNames.ts";
 
@@ -29,6 +29,7 @@ const STYLE_EXTRAS: Record<CombatClass, SkillName> = {
   necromancy: "Necromancy",
 };
 const DRAGONS = ["blue-dragons", "wilderness-blue-dragons"];
+const SLAYER_MASTERS = ["jacquelyn", "vannaka", "sumona", "kuradal", "laniakea"];
 
 /** The gear class a skill page shows; `style` applies to Defence, Constitution and Slayer. */
 export function gearClass(skill: SkillName, style: CombatClass = "melee"): GearStyle | undefined {
@@ -36,13 +37,31 @@ export function gearClass(skill: SkillName, style: CombatClass = "melee"): GearS
   return OWN_CLASS[skill] ?? (TOOLS[skill] ? "tool" : undefined);
 }
 
+const ROW_LABEL: Record<GearRowName, string> = {
+  "2h": "Two-handed",
+  "main hand": "Main hand",
+  "off hand": "Off hand",
+  head: "Head",
+  body: "Body",
+  legs: "Legs",
+  hands: "Hands",
+  feet: "Feet",
+  tool: "Tool",
+};
+/** A row's slot label; the tool row is named after the skill's tool (Hatchet), even with no pick. */
+export function gearRowLabel(row: GearRowName, skill: SkillName): string {
+  const tool = row === "tool" ? TOOLS[skill] : undefined;
+  return tool ? tool[0].toUpperCase() + tool.slice(1) : ROW_LABEL[row];
+}
+
 const usable = (item: EquipmentRecommendation, profile: Profile) =>
-  (!item.planningSkill || item.from <= (profile.levels[item.planningSkill] ?? 1)) &&
+  (!item.planningSkill || levelStatus(profile.levels[item.planningSkill], item.from) === "met") &&
   (item.levels ?? []).every(({ skill, level }) => levelStatus(profile.levels[skill], level) === "met");
 
 /**
  * A guide's items for the method: per slot (or condition), the furthest step the recorded levels reach,
- * or the first step when none is reached; then optional items.
+ * or the first step when none is reached; then optional items. A ladder planned on an unrecorded skill
+ * (ore boxes on Mining) is left out rather than shown at its first step.
  */
 function pickExtras(items: EquipmentRecommendation[], methodId: string, profile: Profile) {
   const available = items.filter(
@@ -56,11 +75,11 @@ function pickExtras(items: EquipmentRecommendation[], methodId: string, profile:
     const key = item.condition ? `${item.slot}:${item.condition}` : item.slot;
     slots.set(key, [...(slots.get(key) ?? []), item]);
   }
-  const picked = [...slots.values()].map((group) => {
+  const picked = [...slots.values()].flatMap((group) => {
     const reached = group.filter((item) => usable(item, profile));
-    return reached.length
-      ? reached.reduce((best, item) => (item.from > best.from ? item : best))
-      : group.reduce((low, item) => (item.from < low.from ? item : low));
+    if (reached.length) return [reached.reduce((best, item) => (item.from > best.from ? item : best))];
+    if (group.some((item) => item.planningSkill && profile.levels[item.planningSkill] == null)) return [];
+    return [group.reduce((low, item) => (item.from < low.from ? item : low))];
   });
   return [...picked, ...available.filter((item) => item.optional)];
 }
@@ -90,13 +109,16 @@ export function trainingGear(
       : gearStyle && method.gear
         ? selectGear({ class: gearStyle, profile, minTier: method.gear.minTier, minReason: method.gear.reason })
         : [];
-  // Necromancy extras are keyed by the Necromancy page's own method ids.
+  // Style extras are keyed by the combat pages' method ids: Necromancy has its own, and a Slayer master's
+  // assignment counts as the combat pages' "slayer-assignment" (so ranged gets its ammunition).
   const styleMethod =
     style === "necromancy" && DRAGONS.includes(method.id)
       ? "necro-blue-dragons"
       : style === "necromancy" && method.id === "gargoyles"
         ? "necro-gargoyles"
-        : method.id;
+        : SLAYER_MASTERS.includes(method.id)
+          ? "slayer-assignment"
+          : method.id;
   const sources: [EquipmentRecommendation[], string][] = chooseStyle
     ? [
         [EQUIPMENT_EXTRAS[STYLE_EXTRAS[style]]?.items ?? [], styleMethod],

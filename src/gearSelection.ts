@@ -58,6 +58,17 @@ const ROW_ORDER: GearRowName[] = ["2h", "main hand", "off hand", "head", "body",
 // The gathering skill a tool's strength follows; other wear skills (Firemaking on an adze) are extra gates.
 const TOOL_SKILL: Record<GearTool, SkillName> = { pickaxe: "Mining", hatchet: "Woodcutting", mattock: "Archaeology" };
 
+const TOOL_LEVELS = EQUIPMENT_CURATION.toolLevels.map((t) => ({ ...t, re: new RegExp(t.match) }));
+/** A tool's use levels: its imported wear without Attack, plus a curated gathering level the infobox lacks. */
+function toolWear(item: ImportedItem) {
+  // Tools ignore Attack: it's the requirement to wield them as a weapon, not to use them.
+  const wear = item.wear.filter((w) => w.skill !== "Attack");
+  const skill = TOOL_SKILL[item.tool!];
+  if (wear.some((w) => w.skill === skill)) return wear;
+  const curated = TOOL_LEVELS.find((t) => t.skill === skill && t.re.test(item.name));
+  return curated ? [...wear, { skill: curated.skill, level: curated.level }] : wear;
+}
+
 // routeFor tests every curated family RegExp; cache it per item since selection runs on each render.
 const routes = new WeakMap<ImportedItem, GearRoute>();
 const routeOf = (item: ImportedItem): GearRoute => {
@@ -75,9 +86,28 @@ interface Candidate {
 }
 
 const armourOrder = (c: Candidate) => (c.item.armourType === "power" ? 0 : 1);
+/** How ordinary the route is: its place in EASY_KINDS (smith first), other kinds last. */
+const ease = (c: Candidate) => {
+  const i = EASY_KINDS.indexOf(c.route.kind);
+  return i < 0 ? EASY_KINDS.length : i;
+};
 /** Weakest first: rank, then power before tank, then name. */
 const weakestFirst = (a: Candidate, b: Candidate) =>
   a.rank - b.rank || a.item.tier - b.item.tier || armourOrder(a) - armourOrder(b) || a.item.name.localeCompare(b.item.name);
+// Easier and Wear at least break a tier tie on the more ordinary route first, so a smithed tank piece beats
+// a minigame power piece (Penance gloves) of the same tier.
+const minimumFirst = (a: Candidate, b: Candidate) =>
+  a.rank - b.rank ||
+  a.item.tier - b.item.tier ||
+  ease(a) - ease(b) ||
+  armourOrder(a) - armourOrder(b) ||
+  a.item.name.localeCompare(b.item.name);
+const easiestStrongest = (a: Candidate, b: Candidate) =>
+  b.rank - a.rank ||
+  b.item.tier - a.item.tier ||
+  ease(a) - ease(b) ||
+  armourOrder(a) - armourOrder(b) ||
+  a.item.name.localeCompare(b.item.name);
 
 /**
  * For each gear row, the best item the player can wear, an easier one to get, a minimum and the next upgrade.
@@ -100,9 +130,8 @@ export function selectGear(options: SelectGearOptions): GearRow[] {
     if (!row) continue;
     const route = routeOf(item);
     if (!members && (item.members || route.members)) continue;
-    // Tools ignore Attack: it's the requirement to wield them as a weapon, not to use them.
-    const wear = tools ? item.wear.filter((w) => w.skill !== "Attack") : item.wear;
-    // A tool without a gathering-skill requirement can't be ranked (Inferno adze imports only Firemaking 92).
+    const wear = tools ? toolWear(item) : item.wear;
+    // A tool without a gathering level, imported or curated (toolLevels), can't be ranked.
     const rank = tools ? wear.find((w) => w.skill === TOOL_SKILL[item.tool!])?.level : item.tier;
     if (rank === undefined) continue;
     if (maxTier !== undefined && rank > maxTier) continue;
@@ -156,14 +185,14 @@ export function selectGear(options: SelectGearOptions): GearRow[] {
     if (unrecorded) row.unrecorded = unrecorded;
     else {
       if (best) row.best = pick(best);
-      const easier = candidates.find((c) => easy(c) && wearable(c));
+      const easier = candidates.filter((c) => easy(c) && wearable(c)).sort(easiestStrongest)[0];
       if (easier && easier !== best) row.easier = pick(easier);
       if (next) row.next = pick(next);
     }
     if (minTier !== undefined) {
       const eligible = candidates.filter((c) => c.rank >= minTier);
       const preferred = eligible.some(easy) ? eligible.filter(easy) : eligible;
-      const atLeast = preferred.sort(weakestFirst)[0];
+      const atLeast = preferred.sort(minimumFirst)[0];
       if (atLeast) row.atLeast = { ...pick(atLeast), reason: options.minReason ?? "" };
     }
     rows.push(row);
