@@ -30,9 +30,7 @@ export type RunecraftingKit = {
   attuner?: boolean;
   stock?: StockTarget[];
 };
-// Compile-time check: the structural kit saved on Profile stays assignable to RunecraftingKit.
-export const savedKitFits = (kit: NonNullable<Profile["runecrafting"]>): RunecraftingKit => kit;
-export type ReqState ="met" | "unmet" | "unknown" | "check";
+export type ReqState = "met" | "unmet" | "unknown" | "check";
 export type Req = { text: string; state: ReqState };
 
 export const isIronman = (kind: AccountKind): boolean => kind !== "Regular account";
