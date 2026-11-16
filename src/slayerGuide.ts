@@ -1,6 +1,6 @@
 // Hand-judged Slayer advice, written for an Ironman (spec: docs/superpowers/specs/2026-11-16-slayer-combat-guides-design.md).
 // Verdicts follow the Assignment summary on https://runescape.wiki/w/Slayer_training. Where the Ironman table on
-// https://runescape.wiki/w/Ironman_Mode/Strategies/Slayer rates a task higher for its drops, the Ironman call wins and
+// https://runescape.wiki/w/Ironman_Mode/Guide/Slayer rates a task higher for its drops, the Ironman call wins and
 // the regular-account call goes in `mainNote`. Tasks neither guide rates say so in their reason. Every entry also
 // cites its "<task> (Slayer assignment)" page, and map tiles are spawn points from the LocLine tables on the
 // monster's own Wiki page (or an existing combat site at the same spot). Checked 2026-11-16.
@@ -30,6 +30,8 @@ export type TaskVerdict = {
 export type MasterBlocks = {
   block: { task: string; reason: string }[];
   skip: { task: string; reason: string }[];
+  /** Ranked, best first: what to spend this master's prefer slots on (eight at most per account). */
+  prefer: { task: string; reason: string }[];
   checked: string;
   sources: string[];
 };
@@ -38,7 +40,7 @@ const CHECKED = "2026-11-16";
 const W = "https://runescape.wiki/w/";
 const page = (title: string) => W + title.replaceAll(" ", "_");
 const TRAINING = page("Slayer training");
-const IRONMAN = page("Ironman Mode/Strategies/Slayer");
+const IRONMAN = page("Ironman Mode/Guide/Slayer");
 const ASSIGNMENT = page("Slayer assignment");
 const NOT_RATED = "Not rated by the Wiki's Slayer guides";
 
@@ -1638,7 +1640,7 @@ const DRAFTS: Record<string, Draft> = {
   Nechryael: {
     verdict: "do",
     reason: "The Ironman guide says Do: fast, with herb seeds, infernal ashes and rune salvage.",
-    mainNote: "The Wiki's XP table rates nechryael Skip (about 240k XP/hr).",
+    mainNote: "The Wiki's XP table rates nechryael Block / Skip (about 240k XP/hr).",
     feeds: ["Farming", "Prayer"],
     fastest: {
       where: "Slayer Tower top floor, or the Chaos Tunnels",
@@ -1717,7 +1719,7 @@ const DRAFTS: Record<string, Draft> = {
   "Desert strykewyrms": {
     verdict: "do",
     reason: "The Ironman guide says Do: focus sights drop far more often on task, for the full Slayer helmet.",
-    mainNote: "The Wiki's XP table rates it Skip (about 80k XP/hr); skip rather than block, as Laniakea never assigns it.",
+    mainNote: "The Wiki's XP table rates it Block / Skip (about 80k XP/hr); skip rather than block, as Laniakea never assigns it.",
     feeds: ["Herblore"],
     fastest: {
       where: "East of Al Kharid",
@@ -1823,23 +1825,48 @@ const SKIP = {
   Aquanites: "Leave it toggled off; it's off unless you paid 50 points.",
   "Mithril dragons": "Low XP but fast: just do it when you're low on points.",
 };
-const blocks = (block: (keyof typeof BLOCK)[], skip: (keyof typeof SKIP)[]): MasterBlocks => ({
+// Prefer slots: 100 points each, one per 50 quest points, eight at most (https://runescape.wiki/w/Slayer_assignment).
+// Ranked by the Assignment summary's XP rate; where a master has more than eight candidates, the last slot goes to
+// abyssal demons for the Ironman guide's uniques (at Laniakea the Demons cluster, ranked third, already covers them).
+// Tasks above your Slayer level never come up, so pass over them in the list.
+const PREFER = {
+  "Gemstone dragons": "The Wiki's fastest task: about 1.4M XP/hr at hydrix dragons (95 Slayer).",
+  "Ripper demons": "About 700k XP/hr, with ripper claws and binding contracts (96 Slayer).",
+  Demons: "From 96 Slayer the Wiki says to prefer it as an extra ripper demon roll.",
+  "Soul devourers": "About 680k XP/hr with laid-back loot and vital sparks (105 Slayer).",
+  "Shadow creatures": "About 680k XP/hr at manifest shadows.",
+  "Nightmare creatures": "About 650k XP/hr, and nightmare gauntlets drop 5x more often on task; toggle it on first.",
+  "Creatures of the Lost Grove": "About 610k XP/hr; cinderbane gloves and ritual shards drop far more often on task.",
+  "Acheron mammoths": "About 600k XP/hr and profitable (96 Slayer).",
+  "Corrupted creatures": "About 580k XP/hr; corrupted gems drop only on task (88 Slayer).",
+  Elves: "About 560k XP/hr at Iorwerth elves in Prifddinas (Plague's End).",
+  "Abyssal demons": "The Ironman guide's Prefer: the whip, wand, orb and scourge, and fast at demons (85 Slayer).",
+  Vyrewatch: "The Ironman guide's Prefer: herbs, seeds and Sunspear Prayer XP.",
+  "Greater demons": "Only if you kill berserker demons, ash lords or K'ril; otherwise leave it.",
+};
+const blocks = (
+  block: (keyof typeof BLOCK)[],
+  skip: (keyof typeof SKIP)[],
+  prefer: (keyof typeof PREFER)[],
+): MasterBlocks => ({
   block: block.map((task) => ({ task, reason: BLOCK[task] })),
   skip: skip.map((task) => ({ task, reason: SKIP[task] })),
+  prefer: prefer.map((task) => ({ task, reason: PREFER[task] })),
   checked: CHECKED,
-  sources: [TRAINING, ASSIGNMENT],
+  sources: [TRAINING, IRONMAN, ASSIGNMENT],
 });
 
 /**
- * Per members master: the tasks to block first, then the ones to cancel when you have points. Neither Vannaka nor
- * Chaeldar assigns a task the Wiki says to block, and Vannaka pays 2 points a task, so a 30-point cancel isn't worth it.
+ * Per members master: the tasks to block first, the ones to cancel when you have points, and the ranked prefers.
+ * Neither Vannaka nor Chaeldar assigns a task the Wiki says to block.
  */
 export const SLAYER_BLOCKS: Readonly<Record<string, MasterBlocks>> = {
-  vannaka: blocks([], []),
-  chaeldar: blocks([], ["Gargoyles", "Grotworms", "Dagannoth"]),
+  vannaka: blocks([], ["Grotworms"], []),
+  chaeldar: blocks([], ["Gargoyles", "Grotworms", "Dagannoth"], ["Elves", "Vyrewatch"]),
   sumona: blocks(
     ["Aquanites", "Black demons", "Mutated jadinkos"],
     ["Grotworms", "Gargoyles", "Dagannoth", "Iron dragons", "Aviansies"],
+    ["Soul devourers", "Corrupted creatures", "Elves", "Abyssal demons", "Vyrewatch", "Greater demons"],
   ),
   duradel: blocks(
     ["Black demons", "Aquanites", "Mutated jadinkos"],
@@ -1852,8 +1879,10 @@ export const SLAYER_BLOCKS: Readonly<Record<string, MasterBlocks>> = {
       "Black dragons",
       "Steel dragons",
       "Iron dragons",
+      "Mithril dragons",
       "Aviansies",
     ],
+    ["Abyssal demons", "Vyrewatch", "Greater demons"],
   ),
   kuradal: blocks(
     ["Black demons", "Lava strykewyrms", "Mutated jadinkos"],
@@ -1873,6 +1902,16 @@ export const SLAYER_BLOCKS: Readonly<Record<string, MasterBlocks>> = {
       "Nihil",
       "Glacors",
       "Aquanites",
+    ],
+    [
+      "Gemstone dragons",
+      "Ripper demons",
+      "Soul devourers",
+      "Nightmare creatures",
+      "Acheron mammoths",
+      "Corrupted creatures",
+      "Elves",
+      "Abyssal demons",
     ],
   ),
   morvran: blocks(
@@ -1895,6 +1934,16 @@ export const SLAYER_BLOCKS: Readonly<Record<string, MasterBlocks>> = {
       "Glacors",
       "Aquanites",
     ],
+    [
+      "Gemstone dragons",
+      "Ripper demons",
+      "Soul devourers",
+      "Shadow creatures",
+      "Nightmare creatures",
+      "Creatures of the Lost Grove",
+      "Acheron mammoths",
+      "Abyssal demons",
+    ],
   ),
   laniakea: blocks(
     ["Black demons", "Lava strykewyrms", "Mutated jadinkos"],
@@ -1912,6 +1961,16 @@ export const SLAYER_BLOCKS: Readonly<Record<string, MasterBlocks>> = {
       "Nihil",
       "Glacors",
       "Aquanites",
+    ],
+    [
+      "Gemstone dragons",
+      "Ripper demons",
+      "Demons",
+      "Soul devourers",
+      "Shadow creatures",
+      "Nightmare creatures",
+      "Creatures of the Lost Grove",
+      "Acheron mammoths",
     ],
   ),
 };
