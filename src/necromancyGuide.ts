@@ -78,8 +78,13 @@ export type EndgameTarget = Checked & {
   drops: { item: string; rate: string; image?: string }[];
   quests: string[];
   skills: { skill: SkillName; level: number }[];
+  /** The Necromancy level to wield its drop, when that is above the level to fight it. Offered only from there. */
+  wield?: number;
   note: string;
 };
+
+/** The quest that unlocks a ritual, keyed by ritual name. Rituals not listed need only Necromancy! and their level. */
+export type RitualQuest = Checked & { quest: string };
 
 /** Necromancy weapons bought with Dungeoneering tokens: a side note on the weapon path, not a step. */
 export type DungeoneeringWeapon = Checked & {
@@ -196,6 +201,18 @@ export const NECRO_STORY: StoryStep[] = [
     ...dated(page("Alpha vs Omega"), WELL),
   },
 ];
+
+const KILI_ROW = dated(page("Kili Row"));
+const RUNE_MYTHOS = dated(page("Rune Mythos"));
+/** Kili Row unlocks the ensoul rituals and Rune Mythos the essence rituals, per the quests' rewards. */
+export const RITUAL_QUESTS: Record<string, RitualQuest> = {
+  "Lesser ensoul material": { quest: "kili-row", ...KILI_ROW },
+  "Ensoul material": { quest: "kili-row", ...KILI_ROW },
+  "Greater ensoul material": { quest: "kili-row", ...KILI_ROW },
+  "Lesser essence": { quest: "rune-mythos", ...RUNE_MYTHOS },
+  "Greater essence": { quest: "rune-mythos", ...RUNE_MYTHOS },
+  "Powerful essence": { quest: "rune-mythos", ...RUNE_MYTHOS },
+};
 
 export const SOUL_GATES: SoulGate[] = [
   {
@@ -635,6 +652,7 @@ export const ENDGAME_TARGETS: EndgameTarget[] = [
       { skill: "Agility", level: 65 },
       { skill: "Necromancy", level: 90 },
     ],
+    wield: 95,
     note: "A boss for teams of up to five. Eclipse of the Heart opens it, and that quest's own tree runs through the Desert quests, Requiem for a Dragon and Tomes of the Warlock. Devourer's Guard is a main-hand guard with no off-hand, and needs 95 Necromancy to wield.",
     ...dated(page("Amascut, the Devourer"), page("Eclipse of the Heart"), page("Devourer's Guard")),
   },

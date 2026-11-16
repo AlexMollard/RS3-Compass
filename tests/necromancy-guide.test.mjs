@@ -7,11 +7,12 @@ import {
   ENDGAME_TARGETS,
   NECRO_STORY,
   PROGRESS_TARGETS,
+  RITUAL_QUESTS,
   SOUL_GATES,
   XP_TARGETS,
   progressKey,
 } from "../src/necromancyGuide.ts";
-import { NECRO_UPGRADES } from "../src/necromancyImported.ts";
+import { NECRO_RITUALS, NECRO_UPGRADES } from "../src/necromancyImported.ts";
 import { isSkillName } from "../src/skillNames.ts";
 
 // Hand-judged Necromancy data (spec: docs/superpowers/specs/2026-11-16-necromancy-guide-design.md), checked on the Wiki.
@@ -211,6 +212,21 @@ test("the tier 95 bosses carry their requirements", () => {
   }
   // Devourer's Guard is a main-hand weapon, so Amascut only moves the weapon line.
   assert.deepEqual(ENDGAME_TARGETS[1].lines, ["weapon"]);
+  // It needs 95 Necromancy to wield, above the 90 to fight Amascut, so the guide offers it only from 95.
+  assert.equal(ENDGAME_TARGETS[1].wield, 95);
+  for (const boss of ENDGAME_TARGETS) {
+    if (boss.wield !== undefined) assert.ok(Number.isInteger(boss.wield) && boss.wield > 0, `${boss.boss} wield`);
+  }
+});
+
+test("ritual quest gates name real rituals and quests", () => {
+  const names = new Set(NECRO_RITUALS.map((r) => r.name));
+  assert.ok(Object.keys(RITUAL_QUESTS).length > 0);
+  for (const [name, gate] of Object.entries(RITUAL_QUESTS)) {
+    assert.ok(names.has(name), `${name} is a ritual`);
+    assert.ok(quests.has(gate.quest), `${name} quest ${gate.quest}`);
+    dated(gate, name);
+  }
 });
 
 test("the Dungeoneering weapons are cited, in level order", () => {

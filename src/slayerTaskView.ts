@@ -27,7 +27,7 @@ export const ALTERNATIVE_TRADEOFFS: Readonly<Record<string, string>> = {
  * A quest requirement. Done quests are met. Anything else is unknown while the account's quest list can't be trusted
  * (a Hiscores player whose quest import is private or missing); otherwise it is below.
  */
-function questStatus(profile: Profile, id: string): LevelStatus {
+export function questStatus(profile: Profile, id: string): LevelStatus {
   if (profile.completedQuests.includes(id)) return "met";
   return profile.source === "hiscores" && profile.questImportStatus !== "available" ? "unknown" : "below";
 }
