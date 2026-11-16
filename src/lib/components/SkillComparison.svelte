@@ -679,17 +679,19 @@
   .skill-table .skill-title > span:first-of-type {
     white-space: nowrap;
   }
+  /* Unboxed, as in the design: only the leader's level is gold, and the
+     player's colour lives in the thin XP bar alone. */
   .cell {
-    position: relative;
-    overflow: hidden;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
     width: 100%;
     min-height: 40px;
-    padding: 0 8px 3px;
+    padding: 4px 6px;
     color: var(--text);
-    background: #0b1318;
-    border: 1px solid #33434d;
+    background: none;
+    border: 1px solid transparent;
     border-radius: 3px;
     font: inherit;
     text-align: left;
@@ -697,17 +699,26 @@
   button.cell {
     cursor: pointer;
   }
-  button.cell:hover {
-    border-color: #8fa3b1;
+  button.cell:hover,
+  button.cell:focus-visible {
+    background: rgb(255 255 255 / 0.04);
+    border-color: #4b5e6a;
   }
-  .cell.top {
-    color: #f0e2c2;
-    border-color: var(--gold);
-    background: #2a2418;
+  .cell.top strong {
+    color: var(--gold-bright);
   }
   .cell.unk {
     color: var(--muted);
-    border-style: dashed;
+  }
+  .cell .xp-bar {
+    position: static;
+    display: block;
+    height: 4px;
+    border-radius: 2px;
+    background: #0f1a21;
+  }
+  .cell .xp-bar span {
+    border-radius: 2px;
   }
   .cell-line {
     display: flex;
@@ -724,6 +735,7 @@
   }
   .cell .xp {
     font-size: 0.75rem;
+    color: var(--muted);
     font-variant-numeric: tabular-nums;
   }
   .cell .behind {

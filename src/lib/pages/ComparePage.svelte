@@ -2,7 +2,9 @@
   import { onMount, untrack } from "svelte";
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
-  import { accountBadge, type Profile } from "../../data";
+  import { QUESTS, accountBadge, type Profile } from "../../data";
+  import { QUICK_GUIDES } from "../../questsImported";
+  import { questTitleKey } from "../playerProgress";
   import { getCompass } from "../compassContext";
   import { fetchPlayer } from "../playerClient";
   import {
@@ -30,6 +32,16 @@
   import Button from "../components/Button.svelte";
 
   const QUEST_LIST_LIMIT = 10;
+  const QUEST_PAGES = new Map(QUESTS.map((q) => [questTitleKey(q.name), q.wiki]));
+  /** A Hiscores quest title's Wiki quick guide, or its Wiki page when it has none. */
+  function questGuide(title: string) {
+    const page = QUEST_PAGES.get(questTitleKey(title)) ?? title;
+    return wikiHref(
+      QUICK_GUIDES.has(page.replaceAll(" ", "_")) ? page + "/Quick guide" : page,
+    );
+  }
+  /** Players whose quest list is shown in full. */
+  let showAllQuests = $state<Record<string, boolean>>({});
   const controller = getCompass();
   const saved = controller.state;
   const sync = controller.syncState;
@@ -62,7 +74,7 @@
   let questColumns = $derived(
     compared.flatMap((profile, i) => {
       const titles = quests?.[i];
-      return titles ? [{ profile, titles }] : [];
+      return titles ? [{ profile, titles, colour: playerColour(i) }] : [];
     }),
   );
   let withoutQuests = $derived(
@@ -253,28 +265,38 @@
         : "Higher published level"}
       sourceNote="Each player's last check is shown under their name in Head to head."
     />
-    <GameWindow title="Quest differences" icon="Quest.png">
+    <GameWindow
+      title={compared.length > 2 ? "Quests only one player has done" : "Quests only one of you has done"}
+      icon="Quest.png"
+      trailing={quests ? "Each opens its Wiki quick guide" : undefined}
+    >
       {#if quests}
         <div class="quest-columns">
           {#each questColumns as column (column.profile.id)}
+            {@const all = showAllQuests[column.profile.id]}
             <section aria-label={"Quests only " + column.profile.name + " has done"}>
-              <h3>
+              <h3 style:--player={column.colour}>
                 Only {column.profile.name}
                 <span class="caption">{column.titles.length}</span>
               </h3>
               {#if column.titles.length}
-                <ul>
-                  {#each column.titles.slice(0, QUEST_LIST_LIMIT) as title (title)}
+                <ul id={"quests-" + column.profile.id}>
+                  {#each all ? column.titles : column.titles.slice(0, QUEST_LIST_LIMIT) as title (title)}
                     <li>
-                      <a href={wikiHref(title)} target="_blank" rel="noopener noreferrer"
+                      <a href={questGuide(title)} target="_blank" rel="noopener noreferrer"
                         >{title} ↗</a
                       >
                     </li>
                   {/each}
                 </ul>
-                {#if column.titles.length > QUEST_LIST_LIMIT}<p class="caption">
-                    and {column.titles.length - QUEST_LIST_LIMIT} more
-                  </p>{/if}
+                {#if column.titles.length > QUEST_LIST_LIMIT}<button
+                    type="button"
+                    class="show-all"
+                    aria-expanded={!!all}
+                    aria-controls={"quests-" + column.profile.id}
+                    onclick={() => (showAllQuests[column.profile.id] = !all)}
+                    >{all ? "Show fewer" : `Show all ${column.titles.length}`}</button
+                  >{/if}
               {:else}<p class="caption">
                   {compared.length > 2
                     ? "Nothing the other players haven't also completed."
@@ -435,6 +457,22 @@
     font-family: "Cinzel", serif;
     font-size: 1.05rem;
     color: var(--heading);
+    padding-left: 10px;
+    border-left: 3px solid var(--player);
+  }
+  .show-all {
+    min-height: 32px;
+    padding: 0;
+    color: var(--gold-bright);
+    background: none;
+    border: 0;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .show-all:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
   }
   .quest-columns ul {
     list-style: none;
