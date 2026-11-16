@@ -591,22 +591,6 @@
     width: 100%;
     min-width: 0;
     min-height: 44px;
-    padding: 0 12px;
-    border: 1px solid #4b5e6a;
-    border-radius: 4px;
-    background: var(--well);
-    color: var(--text);
-    font-weight: 600;
-    box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.35);
-  }
-  .picker select:hover {
-    border-color: var(--gold);
-  }
-  .picker select:focus-visible {
-    border-color: var(--gold);
-  }
-  .picker select:has(option[value=""]:checked) {
-    color: var(--muted);
   }
   .card {
     display: flex;
