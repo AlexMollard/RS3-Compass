@@ -313,3 +313,25 @@ test("A stored member method survives mode changes without being recommended in 
   assert.equal(skillNeedsMembership(skill, { ...p, mode: "f2p" }), true);
   assert.equal(trainingStage(skill, p).from, 13);
 });
+
+test("Runecrafting ranges follow the members guide and keep a free route", () => {
+  const rc = skillByName("Runecrafting");
+  assert.equal(rc.trainingWiki, "Pay-to-play_Runecrafting_training");
+  assert.ok(!rc.membersNote.includes("Free players can train to 110"));
+  assert.deepEqual(
+    rc.stages.map((stage) => [stage.from, stage.to]),
+    [[1, 33], [33, 66], [66, 90], [90, 105], [105, 110]],
+  );
+  for (const stage of rc.stages) {
+    const context = "Runecrafting " + stage.from;
+    const members = availableTrainingOptions(stage, "members");
+    assert.ok(members.some((o) => o.wiki === "Runespan" || o.wiki === "Fleshy growth"), context + " has no Runespan");
+    assert.ok(members.some((o) => /altar|abyss/i.test(o.wiki)), context + " has no altar");
+    assert.ok(availableTrainingOptions(stage, "f2p").length > 0, context + " has no free route");
+  }
+  for (const stage of rc.stages.filter((s) => s.from >= 90)) {
+    const soul = stage.options.find((o) => o.id === "soul-altar");
+    assert.ok(soul?.requirements.some((r) => r.includes("'Phite Club")), "Soul altar needs 'Phite Club");
+  }
+  assert.ok(rc.stages.at(-1).options.some((o) => o.id === "runic-attuner"));
+});

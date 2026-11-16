@@ -617,6 +617,14 @@ const locationNotes: Record<string, string> = {
     "The pin is a recorded air essling spawn; creatures and siphoning nodes move or respawn.",
   "members-runespan":
     "The pin is a recorded air essling spawn; creatures and siphoning nodes move or respawn.",
+  "abyss-low":
+    "No pin: the Abyss is entered from the Wilderness and the altar rifts are inside it.",
+  "abyss-mid":
+    "No pin: the Abyss is entered from the Wilderness and the altar rifts are inside it.",
+  "abyss-high":
+    "No pin: the Abyss is entered from the Wilderness and the altar rifts are inside it.",
+  "soul-altar": "No pin: reach the Soul altar by fairy ring.",
+  "runic-attuner": "No pin: the attuner works at any altar you stand at.",
   "invention-tutorial":
     "Use the workbench inside the Invention Guild after speaking to Doc.",
   "augment-disassemble":
@@ -1134,6 +1142,78 @@ const blood: Option = {
     },
   ],
 };
+// Rates and levels follow src/runecraftingGuide.ts (Pay-to-play Runecrafting training, checked 2026-11-17).
+const abyssRunes = (
+  id: string,
+  title: string,
+  altar: string,
+  levels: string,
+  rate: string,
+  requirements: string[],
+) =>
+  opt(
+    id,
+    title,
+    "Abyss",
+    "Enter_the_Abyss_(miniquest).png",
+    "Abyss",
+    `Craft ${levels} runes by entering the Abyss, clearing the obstacle and using the ${altar} altar rift. About ${rate} XP an hour.`,
+    "Steady rune XP and the runes themselves; faster than a single free altar once the better altars unlock.",
+    true,
+    ["Enter the Abyss (miniquest)", "5 Runecrafting", ...requirements],
+    "The Abyss is in the Wilderness and abyssal creatures attack.",
+    ["Pure essence", "Essence pouches"],
+  );
+const abyssLow = abyssRunes(
+  "abyss-low",
+  "Abyss: body to nature runes",
+  "Body, Cosmic or Nature",
+  "body, cosmic or nature",
+  "12k-118k",
+  ["25 Runecrafting for Cosmic (Lost City)", "35 Runecrafting for Nature"],
+);
+const abyssMid = abyssRunes(
+  "abyss-mid",
+  "Abyss: law and death runes",
+  "Law or Death",
+  "law or death",
+  "91k-207k",
+  ["50 Runecrafting for Law", "60 Runecrafting for Death (Mourning's End Part II)"],
+);
+const abyssHigh = abyssRunes(
+  "abyss-high",
+  "Abyss: death and blood runes",
+  "Death or Blood",
+  "death or blood",
+  "135k-254k",
+  ["75 Runecrafting for Blood (Legacy of Seergaze)"],
+);
+const soul = opt(
+  "soul-altar",
+  "Soul altar",
+  "Soul altar",
+  "Soul_rune.png",
+  "Varrock",
+  "Reach the Soul altar by fairy ring and craft essence into soul runes. About 364k XP an hour at 90, rising to about 465k from 105.",
+  "The AFK members route to 110; the runes are worth keeping or selling.",
+  true,
+  ["90 Runecrafting", "'Phite Club"],
+  "Banking and essence supply limit the rate.",
+  ["Pure essence", "Essence pouches"],
+);
+const attuner = opt(
+  "runic-attuner",
+  "Runic attuner",
+  "Runic attuner",
+  "Runic_attuner.png",
+  "Varrock",
+  "Use the attuner at any altar it picks. Rates are provisional until the Wiki updates them, around 900k-1.1m XP an hour.",
+  "The fastest route to 110, but you need the item first.",
+  true,
+  ["80 Runecrafting to use", "Runic attuner (rare drop from The Gate of Elidinis)"],
+  "The attuner is a rare drop, so it is not a plan for most players.",
+  ["Pure essence"],
+);
 const oakTrial: Option = { ...oak, members: false };
 const teak: Option = {
   ...oak,
@@ -1381,15 +1461,31 @@ export const SUPPORT_SKILLS: SkillRecord[] = [
     maxLevel: 110,
     payoff: "Unlock rune recipes and Runespan nodes.",
     wiki: "Runecrafting",
-    trainingWiki: "Free-to-play_Runecrafting_training",
+    trainingWiki: "Pay-to-play_Runecrafting_training",
     membersNote:
-      "Free players can train to 110; some altars and Runespan areas require membership.",
+      "Members unlock the Abyss, members altars and the full Runespan; free players can still train to 110 with the free altars and lower Runespan.",
     stages: [
-      stage(1, 20, "Lower Runespan and air runes", [span, altars]),
-      stage(20, 33, "Body runes and lower nodes", [body, span]),
-      stage(33, 66, "Middle Runespan", [middle, body, spanMember]),
-      stage(66, 77, "Upper Runespan access", [middle, body, spanMember]),
-      stage(77, 110, "Blood pools or free alternatives", [middle, body, blood]),
+      stage(1, 33, "Runespan and early altars", [span, abyssLow, altars, body]),
+      stage(33, 66, "Middle Runespan and the Abyss", [
+        abyssMid,
+        middle,
+        spanMember,
+        body,
+      ]),
+      stage(66, 90, "Upper Runespan and blood runes", [
+        abyssHigh,
+        spanMember,
+        middle,
+        body,
+      ]),
+      stage(90, 105, "Soul altar and blood pools", [soul, blood, middle, body]),
+      stage(105, 110, "Soul runes and the attuner", [
+        attuner,
+        soul,
+        blood,
+        middle,
+        body,
+      ]),
     ],
   },
   {
