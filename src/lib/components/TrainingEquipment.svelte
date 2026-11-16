@@ -23,12 +23,16 @@
     skill,
     method,
     profile,
+    defaultStyle = "melee",
   }: {
     skill: SkillRecord;
     method: TrainingOption;
     profile: Profile;
+    /** The style shown until the player picks one (a Slayer task's fastest style). */
+    defaultStyle?: CombatClass;
   } = $props();
-  let style = $state<CombatClass>("melee");
+  let picked = $state<CombatClass>();
+  const style = $derived(picked ?? defaultStyle);
   const styleChoices = [
     { value: "melee", label: "Melee" },
     { value: "ranged", label: "Ranged" },
@@ -101,7 +105,7 @@
           value={style}
           choices={styleChoices}
           onChange={(value) => {
-            style = value as CombatClass;
+            picked = value as CombatClass;
           }}
         />
       {/if}

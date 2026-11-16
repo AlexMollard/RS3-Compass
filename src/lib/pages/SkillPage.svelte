@@ -40,6 +40,7 @@
   const saveError = controller.storageError;
   let profile = $derived(activeProfile($saved));
   let skill = $derived(skillByName(selectedSkill) ?? SKILLS[0]);
+  let isSlayer = $derived(skill.name === "Slayer");
   let search = $state("");
   let level = $state("");
   let message = $state("");
@@ -169,6 +170,26 @@
   }
 </script>
 
+{#snippet rangeStrip(range: NonNullable<typeof stage>)}
+  <div class="skill-range">
+    <ChoiceStrip
+      variant="joined"
+      label={isSlayer ? "Training range (generic level methods)" : "Training range"}
+      name={`training-range-${skill.name}`}
+      value={String(range.from)}
+      choices={stages.map((entry) => ({
+        value: String(entry.from),
+        label: trainingRangeLabel(skill, entry, profile.mode).replace(
+          /^Levels? /,
+          "",
+        ),
+        description: trainingRangeLabel(skill, entry, profile.mode),
+      }))}
+      onChange={(value) => selectTraining(Number(value))}
+    />
+  </div>
+{/snippet}
+
 <div class="skill-page page-enter">
   <div class="skill-toolbar">
     <Button
@@ -274,26 +295,21 @@
             </details>
           </div>
         </div>
-        {#if stage && method}
-          <div class="skill-range">
-            <ChoiceStrip
-              variant="joined"
-              label="Training range"
-              name={`training-range-${skill.name}`}
-              value={String(stage.from)}
-              choices={stages.map((range) => ({
-                value: String(range.from),
-                label: trainingRangeLabel(skill, range, profile.mode).replace(
-                  /^Levels? /,
-                  "",
-                ),
-                description: trainingRangeLabel(skill, range, profile.mode),
-              }))}
-              onChange={(value) => selectTraining(Number(value))}
-            />
-          </div>
+        {#if stage && method && !isSlayer}
+          {@render rangeStrip(stage)}
         {/if}
       </section>
+
+      {#if isSlayer}
+        {#await import("../components/SlayerGuide.svelte") then { default: SlayerGuide }}
+          <SlayerGuide {profile} />
+        {/await}
+        {#if stage && method}
+          <section class="tool-window skill-hero" aria-label="Level-range methods">
+            {@render rangeStrip(stage)}
+          </section>
+        {/if}
+      {/if}
 
       {#if stage && method}
         <TrainingMethods

@@ -577,3 +577,46 @@ test("A synced event log auto-ticks boss uniques once, and an untick survives th
   );
   controller.destroy();
 });
+
+test("A saved Slayer task loads, an old save without one loads, and a malformed one is rejected", (t) => {
+  const descriptor = Object.getOwnPropertyDescriptor(globalThis, "localStorage");
+  const storage = new Map();
+  Object.defineProperty(globalThis, "localStorage", {
+    configurable: true,
+    value: {
+      getItem: (key) => storage.get(key) ?? null,
+      setItem: (key, value) => storage.set(key, value),
+    },
+  });
+  const controllers = [];
+  t.after(() => {
+    controllers.forEach((c) => c.destroy());
+    if (descriptor) Object.defineProperty(globalThis, "localStorage", descriptor);
+    else delete globalThis.localStorage;
+  });
+  const load = () => {
+    const c = createCompassController();
+    controllers.push(c);
+    c.initialize();
+    return c;
+  };
+  const first = load();
+  assert.equal(current(first).slayerTask, undefined);
+  first.setSlayerTask({ master: "kuradal", task: "abyssal-demons" });
+  assert.deepEqual(current(load()).slayerTask, { master: "kuradal", task: "abyssal-demons" });
+
+  const raw = JSON.parse(storage.get(KEY));
+  const withTask = (slayerTask) =>
+    JSON.stringify({
+      ...raw,
+      profiles: raw.profiles.map((p) => ({ ...p, slayerTask })),
+    });
+  for (const bad of [{ master: "kuradal" }, { master: 1, task: "x" }, "kuradal", { master: "", task: "x" }]) {
+    storage.set(KEY, withTask(bad));
+    // A rejected save falls back to the samples, which carry no Slayer task.
+    assert.equal(current(load()).slayerTask, undefined, JSON.stringify(bad));
+  }
+  const old = { ...raw, profiles: raw.profiles.map(({ slayerTask, ...rest }) => rest) };
+  storage.set(KEY, JSON.stringify(old));
+  assert.equal(current(load()).slayerTask, undefined);
+});

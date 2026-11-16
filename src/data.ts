@@ -54,6 +54,8 @@ export interface Profile {
   notes: Record<string, string>;
   trainingRanges?: Record<string, number>;
   trainingMethods?: Record<string, string>;
+  /** The Slayer task the player picked: a master's id and a task id from SLAYER_TASKS. */
+  slayerTask?: { master: string; task: string };
   source?: "sample" | "hiscores";
   hiscoresFetchedAt?: number;
   hiscoresImportStatus?: HiscoresImportStatus;

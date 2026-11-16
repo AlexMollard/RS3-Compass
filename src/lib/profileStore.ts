@@ -72,6 +72,11 @@ function validProfile(value: unknown): value is Profile {
         Object.values(p.trainingMethods).every(
           (id) => typeof id === "string" && id.length > 0 && id.length <= 128,
         ))) &&
+    (p.slayerTask === undefined ||
+      (isRecord(p.slayerTask) &&
+        [p.slayerTask.master, p.slayerTask.task].every(
+          (id) => typeof id === "string" && id.length > 0 && id.length <= 128,
+        ))) &&
     [p.collected, p.collectedAuto].every(
       (a) =>
         a === undefined ||
@@ -304,6 +309,9 @@ export function createCompassController(): CompassController {
           p.id === current.activeId ? update(p) : p,
         ),
       }));
+    },
+    setSlayerTask(pick) {
+      controller.updateProfile((p) => ({ ...p, slayerTask: pick }));
     },
     welcome() {
       state.update((current) =>

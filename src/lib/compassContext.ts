@@ -46,6 +46,7 @@ export interface CompassController {
   initialize(): void;
   destroy(): void;
   updateProfile(update: (profile: Profile) => Profile): void;
+  setSlayerTask(pick: { master: string; task: string }): void;
   welcome(): void;
   selectProfile(id: string): void;
   addPlayer(
