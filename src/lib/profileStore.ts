@@ -27,7 +27,7 @@ import { BOSSES, bossUniques } from "../bosses.ts";
 import { mergeAutoTicks } from "./collectionLog.ts";
 
 const KEY = "rs3-compass-design-v1";
-const MAX_SOULS = 1_000_000;
+export const MAX_SOULS = 1_000_000;
 
 function validNecromancy(n: unknown): boolean {
   if (!isRecord(n)) return false;

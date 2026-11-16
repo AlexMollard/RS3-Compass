@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import { QUESTS, availableTrainingOptions, skillByName, trainingStage } from "../src/data.ts";
 import {
+  DISTURBANCES,
   DUNGEONEERING_WEAPONS,
   ENDGAME_TARGETS,
   NECRO_STORY,
@@ -227,6 +228,11 @@ test("ritual quest gates name real rituals and quests", () => {
     assert.ok(quests.has(gate.quest), `${name} quest ${gate.quest}`);
     dated(gate, name);
   }
+});
+
+test("the disturbances line is cited", () => {
+  text(DISTURBANCES.note, "disturbances");
+  dated(DISTURBANCES, "disturbances");
 });
 
 test("the Dungeoneering weapons are cited, in level order", () => {

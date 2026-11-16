@@ -204,6 +204,8 @@ export type GearPath = {
   /** True when the tier isn't recorded and is worked out from levels and quests. */
   assumed: boolean;
   robeLine: RobeLine;
+  /** The line's ladder for this profile, in tier order: Deathdealer branches in, free-to-play stops at tier 10. */
+  steps: UpgradeStep[];
   next?: { step: UpgradeStep; reqs: Req[] };
   endgame?: Endgame;
 };
@@ -217,7 +219,7 @@ export function gearPath(profile: Profile, line: GearLine): GearPath {
   const steps = ladder(line, robeLine).filter((s) => !isFree(profile) || !s.members);
   const recorded = line === "weapon" ? profile.necromancy?.weaponTier : profile.necromancy?.robeTier;
   const current = recorded === undefined ? assumedTier(profile, steps) : Math.min(recorded, steps.at(-1)!.tier);
-  const path: GearPath = { current, assumed: recorded === undefined, robeLine };
+  const path: GearPath = { current, assumed: recorded === undefined, robeLine, steps };
   const step = steps.find((s) => s.tier > current);
   if (step) return { ...path, next: { step, reqs: stepReqs(profile, step, steps) } };
   const endgame = isFree(profile) ? undefined : endgameFor(profile, line);

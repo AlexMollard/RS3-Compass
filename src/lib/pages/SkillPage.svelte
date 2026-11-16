@@ -313,6 +313,19 @@
         {/await}
       {/if}
 
+      {#if skill.name === "Necromancy"}
+        <!-- The level-range methods stay below: they don't contradict the Necromancy guide. -->
+        {#await import("../components/NecromancyGuide.svelte")}
+          <p class="cap" role="status">Loading the Necromancy guide…</p>
+        {:then { default: NecromancyGuide }}
+          <NecromancyGuide {profile} />
+        {:catch}
+          <p class="cap" role="alert">
+            Couldn't load the Necromancy guide — reload the page.
+          </p>
+        {/await}
+      {/if}
+
       {#if isSlayer && !needsMembership}
         <!-- The Slayer guide replaces the level-range methods, which can't follow the player's own master (Ruling 3). -->
       {:else if stage && method}

@@ -208,6 +208,8 @@ test("Review Focus 5: free-to-play at Necromancy 40 stays at tier 10 with free r
   assert.equal(gearPath(p, "robe").current, 10);
   // A tier recorded while a member doesn't show members gear in free-to-play.
   assert.equal(gearPath({ ...p, necromancy: { weaponTier: 50 } }, "weapon").current, 10);
+  // The ladder the page draws and offers in its tier pickers stops at tier 10 too.
+  assert.deepEqual(gearPath(p, "weapon").steps.map((s) => s.tier), [10]);
   const rituals = ritualsFor(p);
   assert.ok(rituals.now.every((r) => !r.members && r.level <= 20));
   // Lesser ensoul material is free in the data but needs Kili Row, a members quest.
@@ -295,6 +297,10 @@ test("Ruling 2: Deathdealer branches from Deathwarden tier 60", () => {
   // Below the branch, the next step is still Deathwarden.
   assert.equal(line(50).next.step.line, "deathwarden");
   assert.equal(line(50).robeLine, "deathdealer");
+  assert.deepEqual(
+    line(50).steps.map((s) => `${s.line} ${s.tier}`),
+    [10, 20, 30, 40, 50, 60].map((t) => `deathwarden ${t}`).concat([70, 80, 90].map((t) => `deathdealer ${t}`)),
+  );
   const branch = line(60).next;
   assert.equal(branch.step.line, "deathdealer");
   assert.equal(branch.step.tier, 70);

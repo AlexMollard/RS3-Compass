@@ -214,6 +214,12 @@ export const RITUAL_QUESTS: Record<string, RitualQuest> = {
   "Powerful essence": { quest: "rune-mythos", ...RUNE_MYTHOS },
 };
 
+/** The Rituals window's one line on disturbances and soul attraction, from the Wiki's Rituals page. */
+export const DISTURBANCES: Checked & { note: string } = {
+  note: "Disturbances spawn while a ritual runs: tend them for extra XP and loot such as mementos, bones and necroplasm, or ignore them at no cost. Soul attraction sets how often they spawn, and Attraction and Speed glyphs raise it.",
+  ...dated(page("Rituals")),
+};
+
 export const SOUL_GATES: SoulGate[] = [
   {
     souls: 3000,
