@@ -5,7 +5,7 @@
 import { writeFileSync } from "node:fs";
 import { IMPORTED_BOSSES } from "../src/bossesImported.ts";
 import { EQUIPMENT_CURATION, routeFor } from "../src/equipmentCuration.ts";
-import { classifyRoute, parseItem } from "./equipmentWikitext.mjs";
+import { classifyRoute, goneSource, parseItem } from "./equipmentWikitext.mjs";
 import { createWikiApi } from "./wikiApi.mjs";
 import { canonicalSkillName } from "../src/skillNames.ts";
 
@@ -59,8 +59,13 @@ for (const category of [...CLASS_CATEGORIES, ...Object.keys(TOOL_CATEGORIES)]) {
 const stale = EQUIPMENT_CURATION.exclude.filter((n) => !names.has(n));
 if (stale.length) fail("Excluded names no equipment category lists: remove them from src/equipmentCuration.ts", stale);
 const excluded = new Set(EQUIPMENT_CURATION.exclude);
+// Holiday and removed pages; a container among them (a Christmas present) is not a route.
+const goneCategories = new Set();
 for (const category of Object.keys(EQUIPMENT_CURATION.excludeCategories))
-  for (const name of await categoryMembers(category)) excluded.add(name);
+  for (const name of await categoryMembers(category)) {
+    excluded.add(name);
+    if (category === "Holiday items" || category === "Removed content") goneCategories.add(name);
+  }
 
 // 2. Item facts from each page, in the gear slots only.
 const contents = await pageContents([...names].filter((n) => !excluded.has(n)));
@@ -80,6 +85,7 @@ for (const name of [...names].sort((a, b) => a.localeCompare(b))) {
     !item.class && "no class",
     item.tier === undefined && "no tier",
     !item.wear && "no requirements field",
+    item.unknownSkills && `unknown skill in requirements ${item.unknownSkills.join(" ")}`,
   ].filter(Boolean);
   if (problems.length) invalid.push(`${name}: ${problems.join(", ")}`);
   else parsed.push({ ...item, slot: SLOTS[item.slot], ...(tools.has(name) ? { tool: tools.get(name) } : {}) });
@@ -87,12 +93,15 @@ for (const name of [...names].sort((a, b) => a.localeCompare(b))) {
 if (invalid.length) fail("Items with missing facts: exclude them in src/equipmentCuration.ts with a reason", invalid);
 
 // Variants ("Torva platebody (broken)", "Sunspear (melee)", "Augmented masterwork magic robe top") count as
-// their base item when it is imported too. Necromancy weapons are named "(tier N)" and are separate items.
+// their base item when it is imported too, and go with it when it is excluded ("Lucky Armadyl godsword
+// (passive)"). Necromancy weapons are named "(tier N)" and are separate items.
 const parsedNames = new Set(parsed.map((i) => i.name.toLowerCase()));
+const excludedNames = new Set([...excluded].map((n) => n.toLowerCase()));
 const baseOf = (name) => {
   const m = name.match(/^(.*) \(([^)]+)\)$/);
   const base = m && !/^tier \d+$/.test(m[2]) ? m[1] : name.match(/^Augmented (.*)$/)?.[1];
-  return base && parsedNames.has(base.toLowerCase()) ? base : undefined;
+  const key = base?.toLowerCase();
+  return key && (parsedNames.has(key) || excludedNames.has(key)) ? base : undefined;
 };
 const items = parsed.filter((i) => !baseOf(i.name));
 
@@ -136,6 +145,16 @@ for (let depth = 0; frontier.length; depth++) {
   }
   frontier = [...materials].filter((m) => !fetched.has(m));
 }
+// Containers ("reward" drops) of the items themselves: one that is unobtainable, a promotion or a holiday
+// gift is not a route (see goneSource). A container without a page can't be checked, so it doesn't count either.
+const containers = new Set();
+for (const item of items)
+  for (const d of facts.drops.get(item.name) ?? []) if (d.types.includes("reward")) containers.add(d.page.replace(/#.*$/, ""));
+const containerPages = await pageContents([...containers]);
+facts.gone = new Set(
+  [...containers].filter((p) => goneCategories.has(p) || !containerPages.has(p) || goneSource(containerPages.get(p))),
+);
+console.error(`Reward containers: ${containers.size}, ${facts.gone.size} unobtainable or promotional.`);
 for (const item of items) {
   const route = classifyRoute(item, facts);
   if (route) item.route = route;

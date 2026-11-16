@@ -1,5 +1,5 @@
 // Pure wikitext helpers for the equipment importer; tested in tests/equipment-import.test.mjs.
-import { plain, templateParams } from "./questWikitext.mjs";
+import { templateParams } from "./questWikitext.mjs";
 import { fileName } from "./wikiApi.mjs";
 import { canonicalSkillName } from "../src/skillNames.ts";
 
@@ -7,58 +7,18 @@ const CLASSES = ["melee", "ranged", "magic", "necromancy", "none"];
 const ARMOUR_TYPES = ["power", "tank", "hybrid"];
 
 /**
- * The item names a list page links to: {{Eqinforow|ge=Name}} rows and {{Eqinforow|name=[[Name]]}}
- * rows (items without a Grand Exchange entry), without repeats, in page order. The rows' other
- * parameters (dontaddtototal, price, ...) and the totals rows are not names.
- */
-export function parseListPage(wikitext) {
-  const names = [];
-  for (const row of eqinforows(wikitext)) {
-    // A first parameter that is not key=value is the name; otherwise ge= or name= anywhere in the row.
-    const first = row[0] ?? "";
-    const keyed = row.map((p) => p.match(/^\s*(ge|name)\s*=([\s\S]*)$/i)).find(Boolean);
-    const name = plain(/^[^=]*$/.test(first) ? first : (keyed?.[2] ?? ""));
-    if (name && !names.includes(name)) names.push(name);
-  }
-  return names;
-}
-
-/** Each {{Eqinforow|...}} as its parameters, split at top-level pipes. */
-function eqinforows(text) {
-  const rows = [];
-  for (const start of text.matchAll(/\{\{\s*Eqinforow\s*\|/gi)) {
-    let depth = 0;
-    let link = 0;
-    let current = "";
-    const params = [];
-    for (let i = start.index + start[0].length; i < text.length; i++) {
-      const two = text.slice(i, i + 2);
-      if (two === "{{") { depth++; current += two; i++; continue; }
-      if (two === "[[") { link++; current += two; i++; continue; }
-      if (two === "]]") { link--; current += two; i++; continue; }
-      if (two === "}}") {
-        if (depth === 0) { params.push(current); break; }
-        depth--; current += two; i++; continue;
-      }
-      if (text[i] === "|" && depth === 0 && link === 0) { params.push(current); current = ""; continue; }
-      current += text[i];
-    }
-    rows.push(params);
-  }
-  return rows;
-}
-
-/**
  * The skill levels in a requirements field: "{{sc|attack|80}}{{sc|strength|80}}", "{{Skill clickpic|Attack|80}}"
- * (any case) or the level before the template, "60 {{Skill clickpic|Attack}}".
+ * (any case) or the level before the template, "60 {{Skill clickpic|Attack}}". A template naming no known skill
+ * is never dropped silently: its raw text goes into `unknown` for the importer to reject.
  */
-export function parseRequirements(text = "") {
+export function parseRequirements(text = "", unknown = []) {
   const wear = [];
   const template = /(?:(\d+)\s*)?\{\{\s*(?:sc|skill[ _]clickpic)\s*\|\s*([^|}]+?)\s*(?:\|\s*(\d+)[^}]*)?\}\}/gi;
   for (const m of text.matchAll(template)) {
     const skill = canonicalSkillName(m[2]);
     const level = m[3] ?? m[1];
-    if (skill && level) wear.push({ skill, level: Number(level) });
+    if (!skill) unknown.push(m[0].trim());
+    else if (level) wear.push({ skill, level: Number(level) });
   }
   return wear;
 }
@@ -86,6 +46,8 @@ export function parseItem(name, wikitext) {
   const skillLevel = Number(recipe?.skill1lvl);
   // "requirements = None" (Bronze full helm) or an empty field means no requirement: []. An absent field stays undefined.
   const requirements = bonuses.requirements1 ?? bonuses.requirements;
+  const unknownSkills = [];
+  const wear = requirements === undefined ? undefined : parseRequirements(requirements, unknownSkills);
   return {
     name,
     wiki: name,
@@ -94,10 +56,12 @@ export function parseItem(name, wikitext) {
     class: CLASSES.includes(className) ? className : undefined,
     tier,
     ...(ARMOUR_TYPES.includes(type) ? { armourType: type } : {}),
-    wear: requirements === undefined ? undefined : parseRequirements(requirements),
+    wear,
     members: yes(field(info, "members")),
     tradeable: yes(field(info, "tradeable")),
     ...(skill && Number.isFinite(skillLevel) ? { recipe: { skill, level: skillLevel } } : {}),
+    // Requirement templates that name no known skill; the importer rejects the item rather than drop them.
+    ...(unknownSkills.length ? { unknownSkills } : {}),
   };
 }
 
@@ -123,23 +87,43 @@ const list = (pages) => [...new Set(pages.map((p) => p.replace(/#.*$/, "")))].sl
 
 // Drop types (drop_json "Drop type") that never count: Squeal of Fortune and Treasure Hunter promotions.
 const PROMOTIONS = ["sof", "th"];
-// Also ignored when deciding whether a material is rare-only: reward containers (Lucky Charm from the
-// Temple of Aminishi gives Tetsu kits at 25/1,000, though they are rare boss drops).
+// A "reward" drop comes out of a container or a reward roll (a clue casket, Raptor's chest of slaying, a holiday
+// present), not off a monster. It is never a common drop, and it is ignored when deciding whether a material is
+// rare-only (Lucky Charm from the Temple of Aminishi gives Tetsu kits at 25/1,000, though they are rare boss drops).
 const CONTAINERS = [...PROMOTIONS, "reward"];
+
+/**
+ * Whether a drop source's own page marks it as gone or a promotion: a page-top {{Currently unobtainable item}},
+ * {{Discontinued content}}, {{Discontinued item}} or {{Removed content}} banner, a microtransaction page
+ * ({{R2Rbox/mtx}}, "restriction = th"), or an event page ({{Infobox Event}}: Balthazar's Big Raffle,
+ * Frank's Free Chest, a Halloween event). Banners further down (a section about a removed reward) don't count.
+ */
+export function goneSource(wikitext = "") {
+  const lead = wikitext.split(/\{\{\s*Infobox/i)[0];
+  return (
+    /\{\{\s*(Currently unobtainable|Discontinued|Removed content|R2Rbox\/mtx)/i.test(lead) ||
+    /\{\{\s*Infobox Event\b/i.test(wikitext) ||
+    /\|\s*restriction\s*=\s*(th|sof)\s*[|}\n]/i.test(wikitext)
+  );
+}
 
 /**
  * The pages that drop `name`, split by rarityBand, skipping drops of the `ignored` types. A drop from a boss is
  * rare at any rate (Queen Black Dragon's royal crossbow parts are about 1/51), and counts even when the Wiki
- * types it as a reward (Croesus, The Barrows: Rise of the Six).
+ * types it as a reward (Croesus, The Barrows: Rise of the Six). Other reward drops (containers) go in
+ * `reward` (a common roll) or `rewardRare`, unless their source is in `facts.gone` (see goneSource).
  */
 function dropBands(name, facts, ignored = PROMOTIONS) {
-  const bands = { common: [], rare: [], varies: [] };
+  const bands = { common: [], rare: [], varies: [], reward: [], rewardRare: [] };
   for (const d of facts.drops.get(name) ?? []) {
     const band = rarityBand(d.rarity);
     const types = d.types ?? [];
     if (!band || types.some((t) => PROMOTIONS.includes(t))) continue;
     if (isBossPage(d.page, facts)) bands.rare.push(d.page);
-    else if (!types.some((t) => ignored.includes(t))) bands[band].push(d.page);
+    else if (types.some((t) => ignored.includes(t))) continue;
+    else if (types.includes("reward")) {
+      if (!facts.gone?.has(d.page.replace(/#.*$/, ""))) bands[band === "common" ? "reward" : "rewardRare"].push(d.page);
+    } else bands[band].push(d.page);
   }
   return bands;
 }
@@ -191,10 +175,15 @@ function rareGate(name, facts, seen = new Set()) {
  * How to get an item, from Wiki facts alone:
  * 1. a Smithing or crafting recipe whose chain never needs a rare-only drop → smith / craft;
  * 2. a coin shop → shop; another currency's shop → reward;
- * 3. a common drop of the item → common-drop; a rare drop of it or of a recipe material → rare-drop.
+ * 3. a common drop of the item → common-drop; a rare drop of it → rare-drop;
+ * 4. a container (a "reward" drop) still obtainable: Rare or Very rare in it → rare-drop, else → reward.
+ *    A rare direct drop wins over a container's common roll: Raptor's chest of slaying gives the Wyvern crossbow
+ *    at 1/50, but opening it needs a key built from four 1/256 Slayer drops;
+ * 5. a rare drop of a recipe material → rare-drop.
  * Undefined when none of these apply. `facts` maps names to recipes ({ materials, skills }),
- * stores ({ page, currency }) and drops ({ page, rarity, types }); `bosses` is a Set of boss page names and
- * `unresolved` a Set of materials the importer didn't fetch.
+ * stores ({ page, currency }) and drops ({ page, rarity, types }); `bosses` is a Set of boss page names,
+ * `gone` a Set of container pages that are unobtainable or promotional, and `unresolved` a Set of materials
+ * the importer didn't fetch.
  */
 export function classifyRoute(item, facts) {
   const recipes = facts.recipes.get(item.name) ?? [];
@@ -216,6 +205,8 @@ export function classifyRoute(item, facts) {
   if (own.common.length) return { kind: "common-drop", note: `Dropped by ${list(own.common)}.`, members };
   if (own.rare.length) return { kind: "rare-drop", note: `Rare drop from ${list(own.rare)}.`, members };
   if (own.varies.length) return { kind: "rare-drop", note: `Dropped by ${list(own.varies)} (the rate varies).`, members };
+  if (own.reward.length) return { kind: "reward", note: `Found in ${list(own.reward)}.`, members };
+  if (own.rewardRare.length) return { kind: "rare-drop", note: `A rare find in ${list(own.rewardRare)}.`, members };
   for (const r of recipes) {
     const gate = r.materials.map((m) => rareGate(m, facts)).find((g) => g?.material);
     if (gate)

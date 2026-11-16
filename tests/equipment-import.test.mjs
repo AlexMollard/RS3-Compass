@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   classifyRoute,
-  parseListPage,
+  goneSource,
   parseItem,
   parseRequirements,
   rarityBand,
@@ -108,26 +108,6 @@ const elderPlus5 = `{{Infobox Item
 |armour = 500.9
 }}`;
 
-const meleeArmourExcerpt = `==Tank armours==
-{{Armour tile|title=Bronze equipment|def=1|tier=5|members=no|nohr=y|tradeable=yes}}
-Bronze armour can be smithed from [[bronze bar]]s at level 1 Smithing, or purchased from stores.
-{{Eq infotable|class=Melee|price=yes|noweapon=yes
-|{{Eqinforow|ge=Bronze full helm}}
-|{{Eqinforow|ge=Bronze med helm|dontaddtototal=y}}
-|{{Eqinforow|ge=Bronze platebody}}
-|{{Eqinforow|ge=Bronze chainbody|dontaddtototal=y}}
-|{{Eqinforow|totals=yes}}
-|maleimage=Bronze armour (heavy) equipped (male).png
-}}
-
-{{Armour tile|title=Sacred clay equipment|def=1|tier=5|members=yes|tradeable=no}}
-{{Eq infotable|class=Melee|price=yes|noweapon=yes
-|{{Eqinforow|ge=Sacred clay helm|price={{currencies|stealing creation points|24}}}}
-|{{Eqinforow|name=[[Goblin cower shield]]|image=Goblin cower shield (bonus).png|bucketname=Goblin cower shield#bonus}}
-|{{Eqinforow|ge=Bronze platebody}}
-|{{Eqinforow|totals=yes}}
-}}`;
-
 test("Noxious scythe", () => {
   assert.deepEqual(parseItem("Noxious scythe", scythe), {
     name: "Noxious scythe",
@@ -202,13 +182,6 @@ test("missing or unrecognised class, slot and tier stay undefined", () => {
   assert.equal(parseItem("Blank", "{{Infobox Bonuses\n|tier =\n}}").tier, undefined);
 });
 
-test("parseListPage reads positional names and keys that are not first", () => {
-  const names = parseListPage(
-    "{{Eqinforow|Positional helm}}\n{{Eqinforow|dontaddtototal=y|ge=Late key helm}}\n{{Eqinforow|price={{x|1}}|name=[[Linked shield]]}}\n{{Eqinforow|totals=yes}}",
-  );
-  assert.deepEqual(names, ["Positional helm", "Late key helm", "Linked shield"]);
-});
-
 test("parseRequirements reads {{sc}} skills", () => {
   assert.deepEqual(parseRequirements("{{sc|attack|80}}{{sc|strength|80}}"), [
     { skill: "Attack", level: 80 },
@@ -217,17 +190,13 @@ test("parseRequirements reads {{sc}} skills", () => {
   assert.deepEqual(parseRequirements("None"), []);
 });
 
-test("parseListPage returns item names once, in page order", () => {
-  const names = parseListPage(meleeArmourExcerpt);
-  assert.deepEqual(names, [
-    "Bronze full helm",
-    "Bronze med helm",
-    "Bronze platebody",
-    "Bronze chainbody",
-    "Sacred clay helm",
-    "Goblin cower shield",
-  ]);
-  assert.ok(!names.some((n) => /dontaddtototal|totals/.test(n)));
+test("an unknown skill in the requirements is reported, not dropped", () => {
+  const unknown = [];
+  assert.deepEqual(parseRequirements("{{sc|attack|80}}{{sc|sailing|50}}", unknown), [{ skill: "Attack", level: 80 }]);
+  assert.deepEqual(unknown, ["{{sc|sailing|50}}"]);
+  const item = parseItem("Odd sword", "{{Infobox Bonuses\n|requirements = {{sc|sailing|50}}\n|class = melee\n|slot = weapon\n|tier = 50\n}}");
+  assert.deepEqual(item.unknownSkills, ["{{sc|sailing|50}}"]);
+  assert.equal(parseItem("Bronze full helm", "{{Infobox Bonuses\n|requirements = None\n}}").unknownSkills, undefined);
 });
 
 test("a requirements field of None is no requirement; an absent field is unknown", () => {
@@ -369,6 +338,43 @@ test("shops, reward shops and drops", () => {
   assert.equal(kind("Torva platebody"), "rare-drop");
   assert.equal(kind("Dragon platelegs"), "common-drop");
   assert.equal(kind("Mystery helm"), undefined);
+});
+
+test("a container is never a common drop", () => {
+  // Rates from the Wiki's dropsline Bucket rows (fetched 2026-11-16).
+  const f = facts({}, {}, {
+    // Raptor's chest of slaying gives it at 1/50, but its key is built from four 1/256 Slayer drops.
+    "Wyvern crossbow": [
+      { page: "Wyvern", rarity: "1/10,000", types: ["combat", "slayer"] },
+      { page: "Raptor's chest of slaying", rarity: "1/50", types: ["reward"] },
+    ],
+    "Magic composite bow": [{ page: "Reward casket (hard)", rarity: "1/40", types: ["reward"] }],
+    "Elemental battlestaff": [{ page: "Reward casket (master)", rarity: "1/591", types: ["reward"] }],
+    "Lucky chaotic maul": [{ page: "Umbral chest", rarity: "Uncommon", types: ["reward"] }],
+    "Dragon platelegs": [
+      { page: "Umbral chest", rarity: "Uncommon", types: ["reward"] },
+      { page: "Ork", rarity: "Common", types: ["combat"] },
+    ],
+  });
+  f.gone = new Set(["Umbral chest"]);
+  const kind = (name) => classifyRoute({ name, members: true }, f)?.kind;
+  assert.equal(kind("Wyvern crossbow"), "rare-drop");
+  assert.equal(kind("Magic composite bow"), "reward");
+  assert.equal(kind("Elemental battlestaff"), "rare-drop");
+  assert.equal(kind("Lucky chaotic maul"), undefined);
+  assert.equal(kind("Dragon platelegs"), "common-drop");
+});
+
+test("goneSource reads page-top unobtainable, promotion and event markers", () => {
+  // Lead lines of the Wiki pages of the same names (fetched 2026-11-16).
+  assert.ok(goneSource("{{Currently unobtainable item|rereleased=yes}}\n{{Infobox Item\n|name = Umbral chest\n}}"));
+  assert.ok(goneSource("{{R2Rbox/mtx}}\n{{Infobox Item\n|name = Antique chest\n|restriction = th\n}}"));
+  assert.ok(goneSource("{{Discontinued content}}\n{{Infobox Item\n|name = Santa's Christmas Present (2024)\n}}"));
+  assert.ok(goneSource("{{Infobox Event\n|name = Frank's Free Chest\n}}"));
+  assert.ok(!goneSource("{{Infobox Scenery\n|name = Raptor's chest of slaying\n}}"));
+  assert.ok(!goneSource("{{Infobox Item\n|name = Reward casket (hard)\n}}"));
+  // A banner on one section further down (Wythien's removed shard drop) doesn't make the source gone.
+  assert.ok(!goneSource("{{Infobox NPC\n|name = Wythien\n}}\n==Drops==\n{{Discontinued content|Crystal motherlode shards}}"));
 });
 
 // Trimmed from the Wiki pages of the same names (fetched 2026-11-16): requirements as {{Skill clickpic}}.
