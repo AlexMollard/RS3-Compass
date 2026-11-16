@@ -164,6 +164,53 @@ test("widest gaps rank a skill by level gap after the XP gaps when a player has 
   ]);
 });
 
+test("skill sorts keep game order, put the widest gaps first, or put a player's deepest deficits first", async () => {
+  const { sortSkills } = await import("../src/lib/groupProgress.ts");
+  const trio = {
+    members: [{ name: "Alice" }, { name: "Bob" }, { name: "Cara" }],
+  };
+  const rows = groupPlayers(trio, [
+    withXp(
+      "Alice",
+      { Attack: 99, Mining: 90, Cooking: 50, Fishing: 40 },
+      { Attack: 200_000_000, Mining: 5_346_332, Cooking: 101_333, Fishing: 37_224 },
+    ),
+    withXp(
+      "Bob",
+      { Attack: 99, Mining: 99, Cooking: 10, Fishing: 40 },
+      { Attack: 13_034_431, Mining: 13_034_431, Cooking: 1_154, Fishing: 37_224 },
+    ),
+    // Cara has no published Cooking XP, so her Cooking deficit counts in levels.
+    withXp(
+      "Cara",
+      { Attack: 99, Mining: 70, Cooking: 30 },
+      { Attack: 13_034_431, Mining: 737_627 },
+    ),
+  ]);
+  const order = ["Fishing", "Cooking", "Mining", "Attack"];
+  assert.deepEqual(sortSkills(rows, order, "game"), order);
+  assert.deepEqual(sortSkills(rows, order, "gap"), [
+    "Attack",
+    "Mining",
+    "Cooking",
+    "Fishing",
+  ]);
+  // Bob trails in Attack and Cooking; he leads Mining and ties Fishing.
+  assert.deepEqual(sortSkills(rows, order, "trails:1"), [
+    "Attack",
+    "Cooking",
+    "Fishing",
+    "Mining",
+  ]);
+  // Cara's XP deficits come first; Cooking (level only) follows; no Fishing level.
+  assert.deepEqual(sortSkills(rows, order, "trails:2"), [
+    "Attack",
+    "Mining",
+    "Cooking",
+    "Fishing",
+  ]);
+});
+
 test("widest gaps break ties by skill order and honour the limit", () => {
   const rows = groupPlayers(group, [
     player("Alice", { Mining: 30, Smithing: 30, Cooking: 50 }),

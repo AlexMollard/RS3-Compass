@@ -27,7 +27,7 @@
   import SourceBanner from "../components/SourceBanner.svelte";
   import StatusChip from "../components/StatusChip.svelte";
   import SkillComparison from "../components/SkillComparison.svelte";
-  import SkillGaps from "../components/SkillGaps.svelte";
+  import { playerColour } from "../playerColours";
   import Button from "../components/Button.svelte";
 
   const QUEST_LIST_LIMIT = 10;
@@ -240,7 +240,10 @@
             class="vs"
             aria-hidden="true">VS</span
           >{/if}
-        <article class="player-card game-surface">
+        <article
+          class="player-card game-surface"
+          style:--player={playerColour(index)}
+        >
           <div class="player-heading">
             <PlayerPortrait name={profile.name} size={72} />
             <div>
@@ -302,19 +305,14 @@
         </article>
       {/each}
     </section>
-    <div class="two">
-      <SkillComparison
-        {players}
-        id="compare"
-        highestLabel={compared.length > 2
-          ? "Highest published level"
-          : "Higher published level"}
-        sourceNote="Each player's last check is shown on their card."
-      />
-      <aside class="side-panels">
-        <SkillGaps {players} />
-      </aside>
-    </div>
+    <SkillComparison
+      {players}
+      id="compare"
+      highestLabel={compared.length > 2
+        ? "Highest published level"
+        : "Higher published level"}
+      sourceNote="Each player's last check is shown on their card."
+    />
     <GameWindow title="Quest differences" icon="Quest.png">
       {#if quests}
         <div class="quest-columns">
@@ -444,6 +442,7 @@
     padding: 16px;
     min-width: 0;
     height: 100%;
+    border-top: 3px solid var(--player);
   }
   .player-heading {
     display: flex;
@@ -473,18 +472,6 @@
     color: var(--muted);
     font-size: var(--font-caption);
     margin: 0;
-  }
-  .two {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 300px;
-    gap: 24px;
-    align-items: start;
-  }
-  .side-panels {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    min-width: 0;
   }
   .quest-columns {
     display: grid;
@@ -522,11 +509,6 @@
   .empty-state {
     margin: 0;
     color: var(--muted);
-  }
-  @media (max-width: 980px) {
-    .two {
-      grid-template-columns: minmax(0, 1fr);
-    }
   }
   @media (max-width: 760px) {
     .lookup-form {

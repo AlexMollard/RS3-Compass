@@ -1,12 +1,16 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import { SKILLS } from "../../data";
+  import { SKILLS, skillByName } from "../../data";
   import { getCompass } from "../compassContext";
   import {
+    publishedIn,
     shortLabels,
     skillStandings,
+    sortSkills,
     type ComparedPlayer,
+    type SkillSort,
   } from "../groupProgress";
+  import { playerColour } from "../playerColours";
   import { skillPath } from "../navigation";
   import { wikiHref } from "../../wiki";
   import GameWindow from "./GameWindow.svelte";
@@ -28,23 +32,55 @@
   } = $props();
 
   const controller = getCompass();
-  const prepSkills = new Set([
-    "Mining",
-    "Smithing",
-    "Crafting",
-    "Fletching",
-    "Herblore",
-    "Cooking",
-    "Fishing",
-    "Runecrafting",
+  const compactFormat = new Intl.NumberFormat("en", {
+    notation: "compact",
+    maximumFractionDigits: 1,
+  });
+  const fullFormat = new Intl.NumberFormat("en");
+  const compact = (n: number) => compactFormat.format(n).toLowerCase();
+
+  let sort = $state<SkillSort>("game");
+  let sortChoices = $derived([
+    { value: "game", label: "Game order" },
+    { value: "gap", label: "Widest gap" },
+    ...players.flatMap((p, i) =>
+      p.profile?.hiscoresLevels
+        ? [{ value: `trails:${i}`, label: `${p.member.name} trails` }]
+        : [],
+    ),
   ]);
-  let comparison = $state("prep");
+  // A sort for a player who has since left the comparison falls back to game order.
+  let activeSort = $derived<SkillSort>(
+    sortChoices.some((c) => c.value === sort) ? sort : "game",
+  );
   let skills = $derived(
-    comparison === "all"
-      ? SKILLS
-      : SKILLS.filter((s) => prepSkills.has(s.name)),
+    sortSkills(
+      players,
+      SKILLS.map((s) => s.name),
+      activeSort,
+    ).map((name) => skillByName(name)!),
   );
   let labels = $derived(shortLabels(players.map((p) => p.member.name)));
+
+  /** Per player XP and its share of the top XP; the XP spread when every listed player publishes XP. */
+  function xpView(skill: string) {
+    const published = publishedIn(players, skill);
+    const xps = published.flatMap((p) => (p?.xp === undefined ? [] : [p.xp]));
+    const top = Math.max(0, ...xps);
+    const known = published.filter((p) => p);
+    const gap =
+      known.length >= 2 && known.every((p) => p!.xp !== undefined)
+        ? top - Math.min(...xps)
+        : undefined;
+    return {
+      gap,
+      players: published.map((p) =>
+        p?.xp === undefined
+          ? undefined
+          : { xp: p.xp, share: top ? (p.xp / top) * 100 : 0 },
+      ),
+    };
+  }
 </script>
 
 <GameWindow
@@ -55,55 +91,70 @@
   <div class="comparisons">
     <div class="comparison-toolbar">
       <ChoiceStrip
-        label="Compare skills"
-        name={id + "-skills"}
-        value={comparison}
-        choices={[
-          { value: "prep", label: "Gathering and crafting" },
-          { value: "all", label: "All 29 skills" },
-        ]}
-        onChange={(value) => (comparison = value)}
+        label="Sort skills"
+        name={id + "-sort"}
+        value={activeSort}
+        choices={sortChoices}
+        onChange={(value) => (sort = value as SkillSort)}
       />
       <p class="caption">Each level opens that skill's guide as that player.</p>
     </div>
     <div class="skill-comparisons">
       {#each skills as skill (skill.name)}
         {@const standings = skillStandings(players, skill.name)}
+        {@const xp = xpView(skill.name)}
         <section
           class="comparison-card"
           aria-label={skill.name + " comparison"}
         >
-          <a
-            class="skill-title"
-            href={wikiHref(skill.wiki)}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <GameArt file={skill.icon} size={22} />
-            <span>{skill.name}</span><span class="wiki-arrow" aria-hidden="true"
-              >↗</span
+          <div class="skill-head">
+            <a
+              class="skill-title"
+              href={wikiHref(skill.wiki)}
+              target="_blank"
+              rel="noopener noreferrer"
             >
-          </a>
+              <GameArt file={skill.icon} size={22} />
+              <span>{skill.name}</span><span
+                class="wiki-arrow"
+                aria-hidden="true">↗</span
+              >
+            </a>
+            {#if xp.gap}<span
+                class="xp-gap"
+                title={fullFormat.format(xp.gap) + " XP between highest and lowest"}
+                >{compact(xp.gap)} gap</span
+              >{/if}
+          </div>
           <div
             class="member-levels"
             style:--cols={Math.min(players.length, 4)}
           >
             {#each players as player, index (player.member.name)}
               {@const { level, top, behind } = standings[index]}
+              {@const mine = xp.players[index]}
               {#if level !== undefined}
                 <button
                   class="lv"
                   class:top
-                  aria-label={`${player.member.name}: ${skill.name} ${level}. ${top ? highestLabel + ". " : behind ? behind + " behind the leader. " : ""}Open training as this player`}
+                  style:--player={playerColour(index)}
+                  title={mine
+                    ? `${player.member.name}: ${fullFormat.format(mine.xp)} XP`
+                    : undefined}
+                  aria-label={`${player.member.name}: ${skill.name} ${level}${mine ? `, ${fullFormat.format(mine.xp)} XP` : ""}. ${top ? highestLabel + ". " : behind ? behind + " behind the leader. " : ""}Open training as this player`}
                   onclick={() => {
                     controller.selectProfile(player.profile!.id);
                     void goto(skillPath(skill.name));
                   }}
                 >
-                  <strong>{level}</strong><small aria-hidden="true"
-                    >{labels[index]}</small
+                  <strong>{level}</strong>{#if mine}<span
+                      class="xp"
+                      aria-hidden="true">{compact(mine.xp)}</span
+                    >{/if}<small aria-hidden="true">{labels[index]}</small
                   >{#if behind}<em class="behind" aria-hidden="true"
                       >−{behind}</em
+                    >{/if}{#if mine}<span class="xp-bar" aria-hidden="true"
+                      ><span style:width="{mine.share}%"></span></span
                     >{/if}
                 </button>
               {:else}
@@ -131,8 +182,10 @@
         Published Hiscores levels only; manual Compass edits are excluded. Gold
         marks the highest published level, shared on a tie, not item ownership
         or every required unlock. A minus figure is how many levels that player
-        is behind the leader. Each character still needs their own use levels
-        and quest requirements. {sourceNote}
+        is behind the leader. The figure under each level is that player's XP
+        in the skill (hover for the exact number), and the bar along the bottom
+        fills to their share of the highest XP. Each character still needs
+        their own use levels and quest requirements. {sourceNote}
       </p>
     </details>
   </div>
@@ -170,6 +223,24 @@
     border: 1px solid #2f3e48;
     border-radius: 3px;
   }
+  .skill-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2px 8px;
+    min-width: 0;
+  }
+  /* A long skill name pushes the gap figure onto its own line rather than under it. */
+  .skill-head .skill-title {
+    min-width: auto;
+  }
+  .xp-gap {
+    flex: none;
+    color: var(--muted);
+    font-size: 0.6875rem;
+    font-variant-numeric: tabular-nums;
+  }
   .skill-title {
     display: flex;
     align-items: center;
@@ -193,13 +264,15 @@
     gap: 4px;
   }
   .lv {
+    position: relative;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     min-height: 44px;
     min-width: 0;
-    padding: 2px;
+    padding: 2px 2px 6px;
     color: var(--text);
     background: #0b1318;
     border: 1px solid #33434d;
@@ -216,6 +289,24 @@
     font-weight: 500;
     color: var(--muted);
     letter-spacing: 0.5px;
+  }
+  .lv .xp {
+    font-size: 0.6875rem;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+  .xp-bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 3px;
+    background: #1d2a33;
+  }
+  .xp-bar span {
+    display: block;
+    height: 100%;
+    background: var(--player);
   }
   .lv .behind {
     font-size: 0.6875rem;

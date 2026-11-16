@@ -15,7 +15,7 @@
   } from "../sourceStatus";
   import { startVisibleRefresh } from "../visibleRefresh";
   import SkillComparison from "../components/SkillComparison.svelte";
-  import SkillGaps from "../components/SkillGaps.svelte";
+  import { playerColour } from "../playerColours";
   import { RefreshCw } from "@lucide/svelte";
   import PageHeading from "../components/PageHeading.svelte";
   import ChoiceStrip from "../components/ChoiceStrip.svelte";
@@ -372,6 +372,7 @@
         <article
           class="member-card game-surface"
           class:selected={active}
+          style:--player={playerColour(index)}
           role="listitem"
           aria-label={member.member.name}
         >
@@ -475,7 +476,6 @@
         sourceNote="Individual source times are shown under each member."
       />
       <aside class="side-panels">
-        <SkillGaps players={members} />
         <GameWindow title="Latest from the group">
           <p class="side-copy">
             Recent levels and quest completions for each member are on the
@@ -668,9 +668,11 @@
     flex-direction: column;
     gap: 14px;
     min-width: 0;
+    border-top: 3px solid var(--player);
   }
   .member-card.selected {
     border-color: var(--gold);
+    border-top-color: var(--player);
   }
   .member-heading {
     display: flex;

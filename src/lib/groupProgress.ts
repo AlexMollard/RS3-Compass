@@ -167,6 +167,58 @@ export interface SkillGap {
 
 const spread = (values: number[]) => Math.max(...values) - Math.min(...values);
 
+/** Each player's published level and XP in a skill, in player order; undefined without a level. */
+export function publishedIn(
+  players: readonly ComparedPlayer[],
+  skill: string,
+): (GapPlayer | undefined)[] {
+  return players.map(({ member, profile }) => {
+    const level = profile?.hiscoresLevels?.[skill];
+    if (level === undefined) return undefined;
+    const xp = profile?.statistics?.skills?.[skill]?.xp;
+    return { name: member.name, level, ...(xp === undefined ? {} : { xp }) };
+  });
+}
+
+/** "game" order, widest "gap" first, or `trails:<index>` for that player's deepest deficits first. */
+export type SkillSort = "game" | "gap" | `trails:${number}`;
+
+/**
+ * Skill names in the chosen order. Deficits count in XP when every player with
+ * a level publishes XP, else in levels after the XP deficits; skills where the
+ * player leads, ties or has no level keep game order at the end.
+ */
+export function sortSkills(
+  players: readonly ComparedPlayer[],
+  skills: readonly string[],
+  sort: SkillSort,
+): string[] {
+  if (sort === "game") return [...skills];
+  if (sort === "gap") {
+    const first = widestGaps(players, skills).map((g) => g.skill);
+    return [...first, ...skills.filter((s) => !first.includes(s))];
+  }
+  const index = Number(sort.slice("trails:".length));
+  const deficit = (skill: string) => {
+    const all = publishedIn(players, skill);
+    const mine = all[index];
+    const known = all.flatMap((p) => (p ? [p] : []));
+    if (!mine) return { xp: -1, level: -1 };
+    if (known.every((k) => k.xp !== undefined))
+      return { xp: Math.max(...known.map((k) => k.xp!)) - mine.xp!, level: -1 };
+    return { xp: -1, level: Math.max(...known.map((k) => k.level)) - mine.level };
+  };
+  const keyed = skills.map((skill) => ({ skill, ...deficit(skill) }));
+  // Array.sort is stable, so equal deficits keep the in-game order.
+  return keyed
+    .sort(
+      (a, b) =>
+        (b.xp > 0 ? b.xp : -1) - (a.xp > 0 ? a.xp : -1) ||
+        (b.level > 0 ? b.level : -1) - (a.level > 0 ? a.level : -1),
+    )
+    .map((k) => k.skill);
+}
+
 /**
  * Published spreads, widest XP gap first, then skills missing someone's XP by
  * level gap. `skills` order is the in-game tie-break.
@@ -178,12 +230,7 @@ export function widestGaps(
 ): SkillGap[] {
   const gaps: SkillGap[] = [];
   for (const skill of skills) {
-    const known = players.flatMap(({ member, profile }): GapPlayer[] => {
-      const level = profile?.hiscoresLevels?.[skill];
-      if (level === undefined) return [];
-      const xp = profile?.statistics?.skills?.[skill]?.xp;
-      return [{ name: member.name, level, ...(xp === undefined ? {} : { xp }) }];
-    });
+    const known = publishedIn(players, skill).flatMap((p) => (p ? [p] : []));
     if (known.length < 2) continue;
     const levelGap = spread(known.map((k) => k.level));
     const xpGap = known.every((k) => k.xp !== undefined)
