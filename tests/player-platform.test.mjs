@@ -92,6 +92,7 @@ test("independent Platform refresh failures preserve last good snapshots and loc
     activeTask: "train-Mining",
     trainingRanges: { Mining: 30 },
     trainingMethods: { Mining: "mithril" },
+    slayerTask: { master: "kuradal", task: "abyssal-demons" },
   }));
   const before = structuredClone(current(controller));
   const others = structuredClone(
@@ -123,10 +124,12 @@ test("independent Platform refresh failures preserve last good snapshots and loc
     "activeTask",
     "trainingRanges",
     "trainingMethods",
+    "slayerTask",
     "kind",
     "mode",
   ])
     assert.deepEqual(after[field], before[field], field);
+  assert.deepEqual(after.slayerTask, { master: "kuradal", task: "abyssal-demons" });
   assert.deepEqual(
     get(controller.state).profiles.filter((p) => p.id !== before.id),
     others,

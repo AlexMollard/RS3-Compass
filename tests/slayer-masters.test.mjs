@@ -1,11 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { combatLevel, COMBAT_SKILLS } from "../src/lib/combatLevel.ts";
+import { combatLevel, COMBAT_LEVEL_SKILLS } from "../src/lib/combatLevel.ts";
 import { skillByName, trainingMethod } from "../src/data.ts";
 import { efficientSlayerRoute, masterFor } from "../src/slayerMasters.ts";
 
 const levels = (over = {}) => ({
-  ...Object.fromEntries(COMBAT_SKILLS.map((skill) => [skill, 1])),
+  ...Object.fromEntries(COMBAT_LEVEL_SKILLS.map((skill) => [skill, 1])),
   Constitution: 10,
   Slayer: 1,
   ...over,
@@ -23,7 +23,7 @@ const ids = (list) => list.map((m) => m.id);
 test("combatLevel matches the Wiki's worked values", () => {
   // https://runescape.wiki/w/Combat_level
   assert.equal(combatLevel(levels()), 3);
-  const max = Object.fromEntries(COMBAT_SKILLS.map((s) => [s, 120]));
+  const max = Object.fromEntries(COMBAT_LEVEL_SKILLS.map((s) => [s, 120]));
   assert.equal(combatLevel({ ...max, Defence: 99, Constitution: 99, Prayer: 99, Summoning: 99 }), 152);
   assert.equal(combatLevel(levels(C110)), 110);
   assert.equal(combatLevel(levels(C120)), 120);
@@ -34,7 +34,7 @@ test("combatLevel takes the best of melee, Ranged, Magic and Necromancy, and rou
 });
 
 test("combatLevel is undefined while a skill the formula reads is unrecorded", () => {
-  for (const skill of COMBAT_SKILLS) {
+  for (const skill of COMBAT_LEVEL_SKILLS) {
     const l = levels();
     delete l[skill];
     assert.equal(combatLevel(l), undefined, skill);

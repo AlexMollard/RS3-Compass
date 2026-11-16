@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { COMBAT_SKILLS } from "../src/lib/combatLevel.ts";
+import { COMBAT_LEVEL_SKILLS } from "../src/lib/combatLevel.ts";
 import { SLAYER_MASTERS, SLAYER_TASKS } from "../src/slayerImported.ts";
 import { SLAYER_TASK_EXTRAS, slayerGearMethod } from "../src/slayerGear.ts";
 import { ALTERNATIVE_IDS, canUseMaster, masterFor } from "../src/slayerMasters.ts";
@@ -19,7 +19,7 @@ const profile = (over = {}, extra = {}) => ({
   mode: "members",
   completedQuests: [],
   levels: {
-    ...Object.fromEntries(COMBAT_SKILLS.map((skill) => [skill, 99])),
+    ...Object.fromEntries(COMBAT_LEVEL_SKILLS.map((skill) => [skill, 99])),
     Slayer: 85,
     ...over,
   },

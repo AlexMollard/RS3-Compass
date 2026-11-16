@@ -137,10 +137,6 @@ export interface TrainingOption {
    * minimum means anything.
    */
   gear?: { minTier: number; reason: string; checked: string };
-  /** "focused" trains this skill; "efficient" trains several at once. No route counts as focused. */
-  route?: "focused" | "efficient";
-  /** The other skills an efficient method trains. */
-  feeds?: SkillName[];
   /** The date the method was last checked against `sources`, its RuneScape Wiki training guides. */
   checked?: string;
   sources?: string[];

@@ -1,9 +1,9 @@
 // What a Slayer task card hands to the gear window: a method built from the master's own Slayer option (so the
 // "wear at least" tier comes from that master's assignment table), and the few items a task needs on top.
 import { skillByName, type TrainingOption } from "./data.ts";
-import type { CombatClass } from "./trainingEquipment.ts";
+import { SLAYER_MASTER_OPTIONS, type CombatClass } from "./trainingEquipment.ts";
 import type { TaskVerdict } from "./slayerGuide.ts";
-import { SLAYER_MASTERS } from "./slayerImported.ts";
+import { SLAYER_MASTERS } from "./slayerMastersImported.ts";
 import { byLadder } from "./slayerMasters.ts";
 import type { SlayerMaster, SlayerTask } from "./slayerTypes.ts";
 
@@ -43,9 +43,6 @@ export const SLAYER_TASK_EXTRAS: Readonly<
 export const gearStyleFor = (style: NonNullable<TaskVerdict["fastest"]>["style"]): CombatClass =>
   style === "any" ? "melee" : style;
 
-/** The Slayer options that carry a "wear at least" tier, lowest master first (their ids are master ids). */
-const TIERED = ["jacquelyn", "vannaka", "sumona", "kuradal", "laniakea"];
-
 /**
  * A training method for the gear window: the task's name and map site over the master's Slayer option. Masters with
  * no option of their own (Chaeldar, Duradel, Morvran...) borrow the tier of the nearest master strictly below them on
@@ -59,7 +56,7 @@ export function slayerGearMethod(
   const options = skillByName("Slayer")?.stages.flatMap((stage) => stage.options) ?? [];
   const own = options.find((option) => option.id === master.id && option.gear);
   const borrowed = SLAYER_MASTERS
-    .filter((m) => TIERED.includes(m.id) && byLadder(m, master) < 0)
+    .filter((m) => SLAYER_MASTER_OPTIONS.includes(m.id) && byLadder(m, master) < 0)
     .sort(byLadder)
     .at(-1);
   const base = own ?? options.find((option) => option.id === borrowed?.id && option.gear);

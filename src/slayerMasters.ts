@@ -1,6 +1,6 @@
 // Master choice only: this module may be loaded by every skill page, so it imports no task, verdict or quest data.
 import type { Profile } from "./data.ts";
-import { COMBAT_SKILLS, combatLevel } from "./lib/combatLevel.ts";
+import { COMBAT_LEVEL_SKILLS, combatLevel } from "./lib/combatLevel.ts";
 import { levelStatus } from "./lib/levelStatus.ts";
 import type { SkillName } from "./skillNames.ts";
 import { SLAYER_MASTERS } from "./slayerMastersImported.ts";
@@ -50,7 +50,7 @@ export function masterFor(profile: Profile): MasterChoice {
   const combat = combatLevel(profile.levels);
   const slayer = profile.levels.Slayer;
   const unrecorded: SkillName[] = [
-    ...(combat === undefined ? COMBAT_SKILLS.filter((skill) => profile.levels[skill] == null) : []),
+    ...(combat === undefined ? COMBAT_LEVEL_SKILLS.filter((skill) => profile.levels[skill] == null) : []),
     ...(slayer == null ? (["Slayer"] as const) : []),
   ];
   if (slayer == null) return { alternatives: [], unrecorded };

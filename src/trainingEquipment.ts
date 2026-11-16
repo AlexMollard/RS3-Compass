@@ -29,7 +29,11 @@ const STYLE_EXTRAS: Record<CombatClass, SkillName> = {
   necromancy: "Necromancy",
 };
 const DRAGONS = ["blue-dragons"];
-const SLAYER_MASTERS = ["jacquelyn", "vannaka", "sumona", "kuradal", "laniakea"];
+/**
+ * The Slayer skill's master options, lowest master first. Their ids are master ids, and each carries a "wear at
+ * least" tier that a Slayer task card borrows (see slayerGear.ts).
+ */
+export const SLAYER_MASTER_OPTIONS = ["jacquelyn", "vannaka", "sumona", "kuradal", "laniakea"];
 
 /** The gear class a skill page shows; `style` applies to Defence, Constitution and Slayer. */
 export function gearClass(skill: SkillName, style: CombatClass = "melee"): GearStyle | undefined {
@@ -110,7 +114,7 @@ export function trainingGear(
       ? "necro-blue-dragons"
       : style === "necromancy" && method.id === "gargoyles"
         ? "necro-gargoyles"
-        : SLAYER_MASTERS.includes(method.id)
+        : SLAYER_MASTER_OPTIONS.includes(method.id)
           ? "slayer-assignment"
           : method.id;
   const sources: [EquipmentRecommendation[], string][] = chooseStyle

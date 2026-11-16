@@ -1,5 +1,5 @@
 /** Every skill the combat level formula reads. Necromancy and Summoning are both in the current Wiki formula. */
-export const COMBAT_SKILLS = [
+export const COMBAT_LEVEL_SKILLS = [
   "Attack",
   "Strength",
   "Ranged",
@@ -18,7 +18,7 @@ export const COMBAT_SKILLS = [
  * and Necromancy with 99 in the other four is 152. It is undefined while any skill the formula reads is unrecorded.
  */
 export function combatLevel(levels: Record<string, number>): number | undefined {
-  if (COMBAT_SKILLS.some((skill) => levels[skill] == null)) return undefined;
+  if (COMBAT_LEVEL_SKILLS.some((skill) => levels[skill] == null)) return undefined;
   const l = levels;
   const offence = Math.max(
     l.Attack + l.Strength,

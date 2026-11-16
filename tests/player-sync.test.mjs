@@ -188,6 +188,7 @@ test("refreshing another player preserves selection, local plans and separate qu
     notes: { quest: "Keep this" },
     packed: ["quest::rope"],
     trainingMethods: { Mining: "iron" },
+    slayerTask: { master: "kuradal", task: "abyssal-demons" },
   }));
   controller.addPlayer(snapshot("Bob", 1000), "Solo Ironman", "f2p");
   const before = structuredClone(get(controller.state));
@@ -220,12 +221,14 @@ test("refreshing another player preserves selection, local plans and separate qu
     "packed",
     "trainingMethods",
     "trainingRanges",
+    "slayerTask",
     "activeTask",
     "completedTasks",
     "kind",
     "mode",
   ])
     assert.deepEqual(alice[field], previousAlice[field], field);
+  assert.deepEqual(alice.slayerTask, { master: "kuradal", task: "abyssal-demons" });
   assert.ok(alice.completedQuests.includes("dragon-slayer"));
   assert.ok(alice.completedQuests.includes("cooks-assistant"));
   assert.ok(
