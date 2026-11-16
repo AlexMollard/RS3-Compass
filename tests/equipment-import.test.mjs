@@ -370,3 +370,63 @@ test("shops, reward shops and drops", () => {
   assert.equal(kind("Dragon platelegs"), "common-drop");
   assert.equal(kind("Mystery helm"), undefined);
 });
+
+// Trimmed from the Wiki pages of the same names (fetched 2026-11-16): requirements as {{Skill clickpic}}.
+const goliathGloves = `{{Infobox Item
+|name = Goliath gloves (black)
+|members = Yes
+|tradeable = No
+}}
+==Combat stats==
+{{Switch infobox
+|text1 = with weapon
+|item1 =
+{{Infobox Bonuses
+|bucketname = with weapon
+|type = tank
+|requirements = {{Skill clickpic|Attack|80}}, {{Skill clickpic|Defence|80}}
+|class = melee
+|slot = hands
+|tier = 80
+}}
+|text2 = unarmed
+|item2 =
+{{Infobox Bonuses
+|bucketname = unarmed
+|type = tank
+|requirements = {{Skill clickpic|Attack|80}}, {{Skill clickpic|Defence|80}}
+|class = melee
+|slot = 2h
+|tier = 80
+}}
+}}`;
+const pernixBody = `{{Infobox Item
+|name = Pernix body
+|members = Yes
+|tradeable = Yes
+}}
+==Combat stats==
+{{Infobox Bonuses
+|bucketname = new
+|requirements = {{skill clickpic|defence|80}}, {{skill clickpic|constitution|80}}
+|class = ranged
+|slot = body
+|tier = 80
+|type = power
+}}`;
+
+test("requirements in a Switch infobox or in {{skill clickpic}} are read", () => {
+  assert.deepEqual(parseItem("Goliath gloves (black)", goliathGloves).wear, [
+    { skill: "Attack", level: 80 },
+    { skill: "Defence", level: 80 },
+  ]);
+  assert.deepEqual(parseItem("Pernix body", pernixBody).wear, [
+    { skill: "Defence", level: 80 },
+    { skill: "Constitution", level: 80 },
+  ]);
+  // The level can come before the template (Barrelchest anchor).
+  assert.deepEqual(parseRequirements("60 {{Skill clickpic|Attack}}, 40 {{Skill clickpic|Strength}}"), [
+    { skill: "Attack", level: 60 },
+    { skill: "Strength", level: 40 },
+  ]);
+});

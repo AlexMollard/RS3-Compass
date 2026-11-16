@@ -41,6 +41,7 @@ test("every curated entry is dated 2026-11-16 with a Wiki source", () => {
     ...Object.entries(EQUIPMENT_CURATION.routes),
     ...EQUIPMENT_CURATION.families.map((f) => [f.match, f.route]),
     ...Object.entries(EQUIPMENT_CURATION.wearQuests),
+    ...Object.entries(EQUIPMENT_CURATION.noWearRequirement),
   ];
   const bad = entries.filter(
     ([, e]) => e.checked !== "2026-11-16" || !e.sources.some((s) => s.startsWith("https://runescape.wiki/w/")),
@@ -50,9 +51,11 @@ test("every curated entry is dated 2026-11-16 with a Wiki source", () => {
 
 test("every curated route and wear quest names an imported item, and every family matches one", () => {
   const names = new Set(EQUIPMENT_IMPORTED.map((i) => i.name));
-  const missing = [...Object.keys(EQUIPMENT_CURATION.routes), ...Object.keys(EQUIPMENT_CURATION.wearQuests)].filter(
-    (n) => !names.has(n),
-  );
+  const missing = [
+    ...Object.keys(EQUIPMENT_CURATION.routes),
+    ...Object.keys(EQUIPMENT_CURATION.wearQuests),
+    ...Object.keys(EQUIPMENT_CURATION.noWearRequirement),
+  ].filter((n) => !names.has(n));
   assert.deepEqual(missing, []);
   const idle = EQUIPMENT_CURATION.families.filter((f) => !EQUIPMENT_IMPORTED.some((i) => new RegExp(f.match).test(i.name)));
   assert.deepEqual(idle.map((f) => f.match), []);
@@ -104,6 +107,24 @@ test("curated quests exist, and curated names are neither stale nor repeated", (
   const { exclude, routes, wearQuests } = EQUIPMENT_CURATION;
   assert.equal(new Set(exclude).size, exclude.length);
   assert.deepEqual(exclude.filter((n) => n in routes || n in wearQuests), []);
+});
+
+test("every item at tier 20 or higher with no wear requirement is on the verified allowlist", () => {
+  const allowed = new Set(Object.keys(EQUIPMENT_CURATION.noWearRequirement));
+  const empty = EQUIPMENT_IMPORTED.filter((i) => i.tier >= 20 && !i.wear.length);
+  assert.deepEqual(empty.filter((i) => !allowed.has(i.name)).map((i) => i.name), []);
+  // An allowlisted item that now has requirements is stale.
+  assert.deepEqual(EQUIPMENT_IMPORTED.filter((i) => allowed.has(i.name) && i.wear.length).map((i) => i.name), []);
+});
+
+test("Dominion Tower gloves carry their stated prerequisites", () => {
+  for (const name of ["Goliath gloves (black)", "Spellcaster gloves", "Swift gloves"]) {
+    const route = routeFor(item(name));
+    assert.equal(route.kind, "reward", name);
+    assert.ok(route.quests?.length && route.levels?.length && route.unlocks?.length, name);
+  }
+  assert.deepEqual(item("Goliath gloves (black)").wear.map((w) => `${w.skill} ${w.level}`), ["Attack 80", "Defence 80"]);
+  assert.deepEqual(item("Pernix body").wear.map((w) => `${w.skill} ${w.level}`), ["Defence 80", "Constitution 80"]);
 });
 
 test("port-resource gear names the player-owned port", () => {

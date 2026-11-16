@@ -86,6 +86,8 @@ export interface GearCuration {
   routes: Record<string, GearRoute & Checked>;
   /** Routes for every item whose name matches `match` (a RegExp source). */
   families: { match: string; route: GearRoute & Checked }[];
+  /** Items whose Wiki page lists no requirement to wear them, so an empty `wear` is a fact, not a parse gap. */
+  noWearRequirement: Record<string, Checked>;
   /** Quests needed to equip an item. */
   wearQuests: Record<string, { quests: string[] } & Checked>;
   checked: string;
