@@ -549,14 +549,20 @@ export function availableTrainingOptions(
   );
 }
 
+/** The selected method: the saved pick, else `fallbackId` (the Slayer page passes the player's master), else the first. */
 export function trainingMethod(
   skill: SkillRecord,
   profile: Profile,
   stage = trainingStage(skill, profile),
   selectedId = profile.trainingMethods?.[skill.name],
+  fallbackId?: string,
 ) {
   const options = stage ? availableTrainingOptions(stage, profile.mode) : [];
-  return options.find((option) => option.id === selectedId) ?? options[0];
+  return (
+    options.find((option) => option.id === selectedId) ??
+    options.find((option) => option.id === fallbackId) ??
+    options[0]
+  );
 }
 
 export function trainingSupplies(

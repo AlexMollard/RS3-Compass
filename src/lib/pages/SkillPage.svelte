@@ -13,6 +13,7 @@
     trainingSupplies,
     trainingRangeLabel,
   } from "../../data";
+  import { masterFor } from "../../slayerMasters";
   import { wikiHref } from "../../wiki";
   import { activeProfile, getCompass } from "../compassContext";
   import { parseLevel } from "../levelChanges";
@@ -62,7 +63,13 @@
   let stage = $derived(
     needsMembership ? undefined : trainingStage(skill, profile),
   );
-  let method = $derived(trainingMethod(skill, profile, stage));
+  // With no saved Slayer pick, the level methods open on the player's own master, matching the Slayer guide.
+  let fallbackMethod = $derived(
+    isSlayer ? masterFor(profile).master?.id : undefined,
+  );
+  let method = $derived(
+    trainingMethod(skill, profile, stage, undefined, fallbackMethod),
+  );
   let supplies = $derived(
     stage && method ? trainingSupplies(stage, method) : [],
   );
@@ -108,13 +115,20 @@
   function selectTraining(from: number, selectedId?: string) {
     const range = stages.find((entry) => entry.from === from);
     if (!range || needsMembership) return;
-    const selected = trainingMethod(skill, profile, range, selectedId);
+    const selected = trainingMethod(
+      skill,
+      profile,
+      range,
+      selectedId,
+      fallbackMethod,
+    );
     if (!selected) return;
     controller.updateProfile((p) => {
       const previousRange =
         p.trainingRanges?.[skill.name] ?? trainingStage(skill, p)?.from;
       const previousMethod =
-        p.trainingMethods?.[skill.name] ?? trainingMethod(skill, p, range)?.id;
+        p.trainingMethods?.[skill.name] ??
+        trainingMethod(skill, p, range, undefined, fallbackMethod)?.id;
       const changed =
         previousRange !== range.from || previousMethod !== selected.id;
       return {
