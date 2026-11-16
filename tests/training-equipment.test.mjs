@@ -148,8 +148,23 @@ test("F2P hides members gear and every combat row has a reachable minimum", () =
           for (const row of rows) {
             for (const pick of [row.best, row.easier, row.atLeast, row.next].filter(Boolean))
               if (mode === "f2p") assert.equal(pick.item.members, false, context + " " + pick.item.name);
-            if (row.best) assert.ok(row.atLeast, `${context} ${row.row} has no minimum`);
+            // A minimum of tier 1 means any item will do, so there is no pick to show.
+            if (row.best && option.gear.minTier > 1) assert.ok(row.atLeast, `${context} ${row.row} has no minimum`);
           }
+        }
+    }
+});
+
+test("A tier-1 minimum (chickens, cows) shows no Wear at least item", () => {
+  for (const skill of ["Attack", "Strength", "Defence", "Constitution", "Ranged", "Magic"])
+    for (const id of ["chickens", "cows"]) {
+      const method = methodOf(skill, id);
+      if (!method) continue;
+      assert.ok(method.gear.minTier <= 1, `${skill} ${id}`);
+      for (const mode of ["members", "f2p"])
+        for (const style of ["melee", "ranged", "magic"]) {
+          const { rows } = trainingGear(skill, method, character({ Attack: 5, Defence: 5, Ranged: 5, Magic: 5 }, mode), style);
+          assert.deepEqual(rows.filter((row) => row.atLeast).map((row) => `${row.row}: ${row.atLeast.item.name}`), [], `${skill} ${id} ${mode}`);
         }
     }
 });

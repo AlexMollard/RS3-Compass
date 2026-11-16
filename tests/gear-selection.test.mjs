@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { routeFor } from "../src/equipmentCuration.ts";
+import { EQUIPMENT_IMPORTED } from "../src/equipmentImported.ts";
 import { selectGear } from "../src/gearSelection.ts";
+import { RS3_SKILL_NAMES } from "../src/skillNames.ts";
 
 const item = (name, slot, tier, wear = {}, extra = {}) => ({
   name,
@@ -241,8 +244,66 @@ test("an unrecorded extra skill does not hide a real best", () => {
   const [r] = selectGear({ class: "tool", toolSlot: "pickaxe", profile: profile({ Mining: 61 }), items });
   assert.equal(r.unrecorded, undefined);
   assert.equal(r.best.item.name, "Test dragon pickaxe");
-  assert.equal(r.next.item.name, "Test adze");
-  assert.deepEqual(r.next.missing, [{ skill: "Firemaking", level: 92 }]);
+  // Next is the closest upgrade: Mining 90 is nearer than the adze's Firemaking 92.
+  assert.equal(r.next.item.name, "Test elder pickaxe");
+  assert.deepEqual(r.next.missing, [{ skill: "Mining", level: 90, recorded: 61 }]);
+});
+
+test("next is ordered by the highest level still needed, then tier, then route", () => {
+  const items = [
+    item("Test best 2h", "2h", 85, { Attack: 85 }, drop),
+    item("Test far 2h", "2h", 86, { Attack: 99 }),
+    item("Test near 2h", "2h", 87, { Attack: 87 }, drop),
+    item("Test strong 2h", "2h", 90, { Attack: 90 }, drop),
+    item("Test b smith 2h", "2h", 88, { Attack: 87 }),
+    item("Test a reward 2h", "2h", 88, { Attack: 87 }, { route: { kind: "reward", note: "" } }),
+  ];
+  const twoH = row(selectGear({ class: "melee", profile: profile({ Attack: 85 }), items }), "2h");
+  assert.equal(twoH.best.item.name, "Test best 2h");
+  // Attack 87 beats 90 and 99; at Attack 87 the tier-88 items beat tier 87, and smith beats reward.
+  assert.equal(twoH.next.item.name, "Test b smith 2h");
+});
+
+test("a row asks for its primary skill only", () => {
+  const items = [
+    item("Test sword", "weapon", 10, { Attack: 10 }),
+    item("Test sword 20", "weapon", 20, { Attack: 20 }),
+    item("Test ranged body", "body", 40, { Ranged: 40 }, { class: "ranged" }),
+    item("Test ranged body 50", "body", 50, { Defence: 50, Ranged: 50 }, { class: "ranged" }),
+    item("Test bow", "2h", 70, { Ranged: 70 }, { class: "ranged" }),
+  ];
+  // Melee with Attack unrecorded: the weapon row prompts for Attack, even with requirement-free items around.
+  const melee = selectGear({ class: "melee", profile: profile({ Defence: 99 }), items });
+  assert.equal(row(melee, "main hand").unrecorded, "Attack");
+  assert.equal(row(melee, "main hand").best, undefined);
+  // Ranged 70 with Defence unrecorded: armour prompts for Defence rather than showing a Ranged-only body.
+  const ranged = selectGear({ class: "ranged", profile: profile({ Ranged: 70 }), items });
+  assert.equal(row(ranged, "body").unrecorded, "Defence");
+  assert.equal(row(ranged, "body").best, undefined);
+  assert.equal(row(ranged, "2h").best.item.name, "Test bow");
+  // Attack recorded, Defence not: the weapon row still picks.
+  const low = row(selectGear({ class: "melee", profile: profile({ Attack: 10 }), items }), "main hand");
+  assert.equal(low.unrecorded, undefined);
+  assert.equal(low.best.item.name, "Test sword");
+  assert.equal(low.next.item.name, "Test sword 20");
+});
+
+test("at equal tier, best takes a known hard route, then easy routes, and an unknown route last", () => {
+  const kind = (k) => ({ route: { kind: k, note: k } });
+  const items = [
+    item("Test a unknown 2h", "2h", 80, { Attack: 80 }, kind("unknown")),
+    item("Test b smith 2h", "2h", 80, { Attack: 80 }),
+    item("Test c drop 2h", "2h", 80, { Attack: 80 }, drop),
+  ];
+  const best = (list, extra) => row(selectGear({ class: "melee", profile: profile({ Attack: 80 }, extra), items: list }), "2h").best.item.name;
+  assert.equal(best(items), "Test c drop 2h");
+  assert.equal(best(items.slice(0, 2)), "Test b smith 2h");
+  // A regular account's tie is not broken by tradeability.
+  const traded = [
+    item("Test a smith 2h", "2h", 80, { Attack: 80 }, { tradeable: true }),
+    item("Test c drop 2h", "2h", 80, { Attack: 80 }, { ...drop, tradeable: true }),
+  ];
+  assert.equal(best(traded, { kind: "Regular account" }), "Test c drop 2h");
 });
 
 test("dual wield rows stay separate and shields are not a row", () => {
@@ -252,7 +313,7 @@ test("dual wield rows stay separate and shields are not a row", () => {
     item("Test offhand sword", "off-hand weapon", 60),
     item("Test shield", "off-hand", 60),
   ];
-  const rows = selectGear({ class: "melee", profile: profile({}), items });
+  const rows = selectGear({ class: "melee", profile: profile({ Attack: 1 }), items });
   assert.deepEqual(
     rows.map((r) => [r.row, r.best?.item.name]),
     [
@@ -265,7 +326,82 @@ test("dual wield rows stay separate and shields are not a row", () => {
 
 test("maxTier caps candidates", () => {
   const items = [item("Test 2h 60", "2h", 60), item("Test 2h 80", "2h", 80)];
-  const twoH = row(selectGear({ class: "melee", profile: profile({}), items, maxTier: 70 }), "2h");
+  const twoH = row(selectGear({ class: "melee", profile: profile({ Attack: 1 }), items, maxTier: 70 }), "2h");
   assert.equal(twoH.best.item.name, "Test 2h 60");
   assert.equal(twoH.next, undefined);
+});
+
+// The real catalogue (src/equipmentImported.ts): these pin symptoms found by probing it.
+const levels = (n, omit = []) => Object.fromEntries(RS3_SKILL_NAMES.filter((s) => !omit.includes(s)).map((s) => [s, n]));
+const real = (style, levels, extra) => selectGear({ class: style, profile: profile(levels, extra) });
+const ARMOUR = ["head", "body", "legs", "hands", "feet"];
+const WEAPONS = ["2h", "main hand", "off hand"];
+
+test("real catalogue: Ranged 70 with Defence unrecorded asks for Defence on every armour row", () => {
+  const rows = real("ranged", levels(70, ["Defence"]));
+  for (const name of ARMOUR) {
+    assert.equal(row(rows, name).unrecorded, "Defence", name);
+    assert.equal(row(rows, name).best, undefined, name);
+    assert.equal(row(rows, name).easier, undefined, name);
+  }
+  for (const name of WEAPONS) assert.ok(row(rows, name).best, name);
+});
+
+test("real catalogue: Attack unrecorded asks for Attack on the melee weapon rows", () => {
+  const rows = real("melee", levels(70, ["Attack"]));
+  for (const name of WEAPONS) {
+    assert.equal(row(rows, name).unrecorded, "Attack", name);
+    assert.equal(row(rows, name).best, undefined, name);
+  }
+  for (const name of ARMOUR) assert.ok(row(rows, name).best, name);
+});
+
+test("real catalogue: Attack 1 with nothing else recorded still picks the weapon rows", () => {
+  const rows = real("melee", { Attack: 1 });
+  for (const name of WEAPONS) {
+    assert.equal(row(rows, name).unrecorded, undefined, name);
+    assert.ok(row(rows, name).best, name);
+    assert.ok(row(rows, name).next, name);
+  }
+  for (const name of ARMOUR) assert.equal(row(rows, name).unrecorded, "Defence", name);
+});
+
+test("real catalogue: holiday, quest-stage and novelty items are never Best at Ranged 10 or Magic 10", () => {
+  const banned = /^(Snowball|Lunar staff - pt\d|Rubber turkey|Off-hand rubber turkey|Mouse toy|Two-handed swordfish|Relomia's wand|Starfury .*|Lucky .*|Golden .*)$/;
+  for (const style of ["ranged", "magic"])
+    for (const mode of ["members", "f2p"]) {
+      const picks = real(style, levels(10), { mode }).flatMap((r) => [r.best, r.easier]).filter(Boolean);
+      assert.ok(picks.length > 0, `${style} ${mode}`);
+      assert.deepEqual(picks.filter((p) => banned.test(p.item.name)).map((p) => p.item.name), [], `${style} ${mode}`);
+    }
+});
+
+test("real catalogue: at Attack 85 the next 2h upgrade needs at most Attack 90", () => {
+  const next = row(real("melee", levels(85)), "2h").next;
+  assert.ok(next, "a next 2h");
+  const attack = next.item.wear.find((w) => w.skill === "Attack")?.level ?? 0;
+  assert.ok(attack > 85 && attack <= 90, `${next.item.name} needs Attack ${attack}`);
+});
+
+test("real catalogue: on F2P Attack 1, no unknown route is Best when a known item ties its tier", () => {
+  const rows = real("melee", levels(1), { mode: "f2p" });
+  for (const r of rows.filter((r) => r.best?.route.kind === "unknown")) {
+    // An unknown-route Best is fine only when no wearable known-route item shares its slot, tier and armour type.
+    const known = EQUIPMENT_IMPORTED.filter(
+      (i) =>
+        i.class === "melee" &&
+        !i.tool &&
+        !i.members &&
+        i.tier === r.best.item.tier &&
+        i.armourType === r.best.item.armourType &&
+        i.slot === r.best.item.slot &&
+        i.wear.every((w) => w.level <= 1) &&
+        routeFor(i).kind !== "unknown" &&
+        !routeFor(i).members,
+    );
+    assert.deepEqual(known.map((i) => i.name), [], `${r.row}: ${r.best.item.name}`);
+  }
+  // Mining 1: the Dwarven army axe (route unknown) ties the bronze pickaxe and must not beat it.
+  const [pickaxe] = selectGear({ class: "tool", toolSlot: "pickaxe", profile: profile(levels(1)) });
+  assert.notEqual(pickaxe.best.route.kind, "unknown", pickaxe.best.item.name);
 });
