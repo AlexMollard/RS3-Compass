@@ -1,0 +1,124 @@
+// Generates src/slayerImported.ts from the RuneScape Wiki's Slayer masters table and each master's assignments.
+// Run locally: node --experimental-strip-types scripts/import-slayer.mjs
+// Prints one review line per master and per task (amount, weight, Slayer level, requirements), the rows left out
+// and the quest names that matched no quest. Exits non-zero, writing nothing, on any unexpected row.
+import { writeFileSync } from "node:fs";
+import { QUESTS } from "../src/data.ts";
+import { parseAssignments, parseDisambig, parseMastersTable } from "./slayerWikitext.mjs";
+import { createWikiApi } from "./wikiApi.mjs";
+
+const USER_AGENT = "RS3 Compass Slayer import (https://github.com/AlexMollard/RS3-Compass)";
+const { api, pageContents, servedFiles } = createWikiApi(USER_AGENT);
+const OUT = new URL("../src/slayerImported.ts", import.meta.url);
+const TABLE = "Template:Slayer masters/table";
+const MODULE = "Module:Slayer assignments/";
+const DISAMBIG = MODULE + "disambig";
+const HELPERS = new Set(["disambig", "disambig/doc", "normalise"]);
+
+// The Wiki's free-to-play masters; every other master is members-only. The table has no members column.
+// Sources (checked 2026-11-16): https://runescape.wiki/w/Turael (members1 = No, the Slayer Master version) and
+// https://runescape.wiki/w/Jacquelyn ("more advanced Slayer Masters which are all available only to members").
+const FREE_MASTERS = new Set(["Turael", "Jacquelyn"]);
+
+// Rows whose weight is nil in the master's module (the rendered table shows "?"). They are left out rather than
+// given an invented weight. Checked 2026-11-16 on https://runescape.wiki/w/Module:Slayer_assignments/<Master>.
+const NO_WEIGHT = [
+  { master: "Kuradal", task: "Ravenous strigoi" },
+  { master: "Kuradal", task: "Sanguine werewolves" },
+  { master: "Morvran", task: "Ravenous strigoi" },
+  { master: "Morvran", task: "Sanguine werewolves" },
+  { master: "Laniakea", task: "Sanguine werewolves" },
+];
+
+const fail = (title, lines) => {
+  if (!lines.length) return;
+  console.error(`${title} (${lines.length}):\n  ${lines.join("\n  ")}`);
+  process.exitCode = 1;
+};
+
+// 1. Masters from the Wiki's table; every one must have an assignment module, and every module a master.
+const table = (await pageContents([TABLE])).get(TABLE);
+if (!table) throw new Error(`${TABLE} is missing`);
+const masters = parseMastersTable(table, QUESTS);
+const listed = await api({ action: "query", list: "allpages", apnamespace: "828", apprefix: "Slayer assignments/", aplimit: "500" });
+const modules = listed.query.allpages.map((p) => p.title.slice(MODULE.length)).filter((n) => !HELPERS.has(n));
+const tableNames = new Set(masters.map((m) => m.wiki));
+fail("Assignment modules with no row in the masters table", modules.filter((n) => !tableNames.has(n)));
+fail("Masters with no assignment module", masters.map((m) => m.wiki).filter((n) => !modules.includes(n)));
+fail("Free masters missing from the table: update FREE_MASTERS", [...FREE_MASTERS].filter((n) => !tableNames.has(n)));
+
+// 2. Each master's tasks.
+const sources = await pageContents([DISAMBIG, ...masters.map((m) => MODULE + m.wiki)]);
+const wikiPages = parseDisambig(sources.get(DISAMBIG) ?? "");
+const tasks = [];
+const invalid = [];
+const unmatched = new Set();
+const skipped = new Set(NO_WEIGHT.map((r) => `${r.master}|${r.task}`));
+const seenSkipped = new Set();
+for (const master of masters) {
+  const source = sources.get(MODULE + master.wiki);
+  if (!source) continue; // reported above
+  for (const q of master.unmatched) unmatched.add(`${q} (master ${master.wiki})`);
+  const members = !FREE_MASTERS.has(master.wiki);
+  const result = parseAssignments(master.id, source, { quests: QUESTS, members, wikiPages });
+  tasks.push(...result.tasks);
+  for (const q of result.unmatched) unmatched.add(`${q} (${master.wiki} task)`);
+  for (const row of result.invalid) {
+    const key = `${master.wiki}|${row.name}`;
+    if (skipped.has(key) && row.problems.join() === "no weight") seenSkipped.add(key);
+    else invalid.push(`${master.wiki}: ${row.name}: ${row.problems.join(", ")}`);
+  }
+}
+fail("Invalid assignment rows: fix the parser or add them to NO_WEIGHT with a reason", invalid);
+const stale = [...skipped].filter((k) => !seenSkipped.has(k));
+fail("NO_WEIGHT rows the Wiki now weights or no longer lists: remove them", stale);
+
+// 3. Chathead art, resolved through Wiki file redirects.
+const images = await servedFiles(masters.map((m) => m.image).filter(Boolean));
+const records = masters.map(({ unmatched: _, image, ...m }) => {
+  const served = image && images.get(image);
+  return {
+    id: m.id,
+    name: m.name,
+    wiki: m.wiki,
+    ...(served ? { image: served } : {}),
+    members: !FREE_MASTERS.has(m.wiki),
+    combat: m.combat,
+    slayer: m.slayer,
+    quests: m.quests,
+    ...(m.location ? { location: m.location } : {}),
+  };
+});
+
+const today = new Date().toLocaleDateString("en-CA"); // the local date, as YYYY-MM-DD
+const source = `// Generated by scripts/import-slayer.mjs on ${today}. Do not edit by hand: rerun the script.
+// Source: RuneScape Wiki (CC BY-NC-SA 3.0) — Template:Slayer masters/table and each master's
+// Module:Slayer assignments/<Master>, the data behind the Slayer assignment/<Master> tables.
+import type { SlayerMaster, SlayerTask } from "./slayerTypes";
+
+const task = (t: SlayerTask) => t;
+
+export const SLAYER_MASTERS: SlayerMaster[] = [
+${records.map((r) => `  ${JSON.stringify(r)}`).join(",\n")}
+];
+
+export const SLAYER_TASKS: SlayerTask[] = [
+${tasks.map((t) => `  task(${JSON.stringify(t)})`).join(",\n")}
+];
+`;
+if (!process.exitCode) writeFileSync(OUT, source.replace(/\r?\n/g, "\r\n"));
+
+for (const m of records)
+  console.log(
+    `${m.name} | ${m.members ? "members" : "free"} | combat ${m.combat} | Slayer ${m.slayer} | quests ${m.quests.join(" ") || "none"} | ${m.location ?? "no location"} | ${m.image ?? "no image"} | ${tasks.filter((t) => t.master === m.id).length} tasks`,
+  );
+const reqs = (t) =>
+  [
+    ...t.requirements.levels.map((l) => `${l.skill} ${l.level}`),
+    ...t.requirements.quests,
+    ...t.requirements.text,
+  ].join("; ") || "none";
+for (const t of tasks)
+  console.log(`  ${t.master} | ${t.name} | ${t.amount.join("-")} | weight ${t.weight} | Slayer ${t.slayer} | ${t.members ? "members" : "free"} | ${reqs(t)}`);
+console.log(`Imported ${records.length} masters and ${tasks.length} tasks. Left out (no weight): ${[...seenSkipped].join(", ") || "none"}.`);
+console.log(`Quest names with no QUESTS entry, kept as text (${unmatched.size}): ${[...unmatched].join(", ") || "none"}`);
