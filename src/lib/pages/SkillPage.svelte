@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import {
     SKILLS,
@@ -44,6 +45,17 @@
   let isRunecraftingGuide = $derived(
     skill.name === "Runecrafting" && profile.mode === "members",
   );
+  // The Runecrafting kit sits in the aside only while the aside is a column
+  // beside the centre; until mounted (SSR) it takes the narrow slot.
+  let wide = $state(false);
+  onMount(() => {
+    const query = window.matchMedia("(min-width: 1200px)");
+    const update = () => (wide = query.matches);
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  });
+  let kitInAside = $derived(wide && !$compact);
   let search = $state("");
   let level = $state("");
   let message = $state("");
@@ -320,6 +332,7 @@
         {#await import("../components/RunecraftingGuide.svelte")}
           <p class="cap" role="status">Loading the Runecrafting guide…</p>
         {:then { default: RunecraftingGuide }}
+          {#if !kitInAside}<RunecraftingGuide {profile} part="kit" />{/if}
           <RunecraftingGuide {profile} />
         {:catch}
           <p class="cap" role="alert">
@@ -364,7 +377,7 @@
     </div>
 
     <aside class="skill-aside" aria-label="Training preparation">
-      {#if isRunecraftingGuide}
+      {#if isRunecraftingGuide && kitInAside}
         <!-- The kit half of the same lazy module; the centre mount shows its loading and error copy. -->
         {#await import("../components/RunecraftingGuide.svelte") then { default: RunecraftingGuide }}
           <RunecraftingGuide {profile} part="kit" />
