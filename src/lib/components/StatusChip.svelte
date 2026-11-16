@@ -1,11 +1,15 @@
 <script lang="ts">
   import { Check, CircleAlert, Info, Minus, TriangleAlert } from "@lucide/svelte";
+  import GameArt from "./GameArt.svelte";
   let {
     tone = "neutral",
     label,
+    image,
   }: {
     tone?: "ok" | "warn" | "bad" | "info" | "neutral";
     label: string;
+    /** A decorative Wiki icon shown before the label (a skill or quest icon). */
+    image?: string;
   } = $props();
   const icons = {
     ok: Check,
@@ -17,7 +21,9 @@
   const Icon = $derived(icons[tone]);
 </script>
 
-<span class="status-chip status-{tone}"><Icon size={14} aria-hidden="true" />{label}</span>
+<span class="status-chip status-{tone}"
+  ><Icon size={14} aria-hidden="true" />{#if image}<GameArt file={image} size={16} />{/if}{label}</span
+>
 
 <style>
   .status-chip {

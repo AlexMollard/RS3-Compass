@@ -1,7 +1,19 @@
 <script lang="ts">
+  import {
+    Ban,
+    Check,
+    CircleQuestionMark,
+    Dices,
+    Hash,
+    MapPin,
+    Radius,
+    SkipForward,
+    Star,
+  } from "@lucide/svelte";
   import { skillByName, type Profile } from "../../data";
   import { SLAYER_BLOCKS } from "../../slayerGuide";
   import {
+    SLAYER_HELMET_IMAGE,
     SLAYER_TASK_EXTRAS,
     gearStyleFor,
     slayerGearMethod,
@@ -12,7 +24,9 @@
     groupedTasks,
     masterGaps,
     masterRequirements,
+    skillIcon,
     slayerTaskCard,
+    taskNamed,
     type RequirementChip,
     type VerdictGroup,
   } from "../../slayerTaskView";
@@ -20,6 +34,8 @@
   import { getCompass } from "../compassContext";
   import CheckedSources from "./CheckedSources.svelte";
   import ChoiceStrip from "./ChoiceStrip.svelte";
+  import FallbackArt from "./FallbackArt.svelte";
+  import GameArt from "./GameArt.svelte";
   import GameText from "./GameText.svelte";
   import GameWindow from "./GameWindow.svelte";
   import StatusChip from "./StatusChip.svelte";
@@ -38,6 +54,20 @@
     block: "Block",
     none: "No verdict yet",
   };
+  const VERDICT_ICON = {
+    prefer: Star,
+    do: Check,
+    skip: SkipForward,
+    block: Ban,
+    none: CircleQuestionMark,
+  } satisfies Record<VerdictGroup, typeof Star>;
+  // The skill icon for each combat style; "any" gets none.
+  const STYLE_SKILL = {
+    melee: "Attack",
+    ranged: "Ranged",
+    magic: "Magic",
+    necromancy: "Necromancy",
+  } as const;
   const TONE = { met: "ok", below: "bad", unknown: "warn" } as const;
   const SUFFIX = { met: "met", below: "not met", unknown: "unknown" } as const;
 
@@ -89,15 +119,30 @@
   }
 </script>
 
+{#snippet newTab()}<span aria-hidden="true">↗</span><span class="sr-only">
+    (opens a new tab)</span
+  >{/snippet}
+
 {#snippet chipRow(chips: RequirementChip[])}
   {#if chips.length}
     <ul class="chips">
       {#each chips as chip (chip.label)}
         <li>
-          <StatusChip
-            tone={TONE[chip.status]}
-            label={`${chip.label} · ${SUFFIX[chip.status]}`}
-          />
+          {#if chip.wiki}<a
+              class="chip-link"
+              href={wikiHref(chip.wiki)}
+              target="_blank"
+              rel="noopener noreferrer"
+              ><StatusChip
+                tone={TONE[chip.status]}
+                image={chip.icon}
+                label={`${chip.label} · ${SUFFIX[chip.status]}`}
+              /><span class="sr-only"> (opens a new tab)</span></a
+            >{:else}<StatusChip
+              tone={TONE[chip.status]}
+              image={chip.icon}
+              label={`${chip.label} · ${SUFFIX[chip.status]}`}
+            />{/if}
         </li>
       {/each}
     </ul>
@@ -106,13 +151,42 @@
   {/if}
 {/snippet}
 
-{#snippet entries(list: { task: string; reason: string }[], empty: string)}
+{#snippet verdictBadge(group: VerdictGroup)}
+  {@const Icon = VERDICT_ICON[group]}
+  <span class="verdict v-{group}"
+    ><Icon size={15} aria-hidden="true" />{GROUP_LABEL[group]}</span
+  >
+{/snippet}
+
+{#snippet listHeading(group: VerdictGroup, text: string)}
+  {@const Icon = VERDICT_ICON[group]}
+  <h4 class="list-heading v-{group}"><Icon size={15} aria-hidden="true" />{text}</h4>
+{/snippet}
+
+{#snippet entries(
+  masterId: string,
+  list: { task: string; reason: string }[],
+  empty: string,
+  ordered = false,
+)}
   {#if list.length}
-    <ul class="entries">
+    <svelte:element this={ordered ? "ol" : "ul"} class="entries art-entries">
       {#each list as entry (entry.task)}
-        <li><b>{entry.task}</b><span>{entry.reason}</span></li>
+        {@const task = taskNamed(masterId, entry.task)}
+        <li>
+          <FallbackArt file={task?.image} size={40} thumbnail className="entry-art" />
+          <div class="entry-copy">
+            <b
+              >{#if task}<a
+                  href={wikiHref(task.wiki)}
+                  target="_blank"
+                  rel="noopener noreferrer">{entry.task}{@render newTab()}</a
+                >{:else}{entry.task}{/if}</b
+            ><span>{entry.reason}</span>
+          </div>
+        </li>
       {/each}
-    </ul>
+    </svelte:element>
   {:else}
     <p class="cap">{empty}</p>
   {/if}
@@ -131,16 +205,21 @@
         {/if}
         {#if choice.master}
           <div class="master">
-            <a
-              class="name"
-              href={wikiHref(choice.master.wiki)}
-              target="_blank"
-              rel="noopener noreferrer"
-              >{choice.master.name} <span aria-hidden="true">↗</span><span
-                class="sr-only"> (opens a new tab)</span
-              ></a
-            >
-            <span class="cap">{choice.master.location ?? ""}</span>
+            <FallbackArt file={choice.master.image} size={64} className="chathead" />
+            <div class="master-copy">
+              <a
+                class="name"
+                href={wikiHref(choice.master.wiki)}
+                target="_blank"
+                rel="noopener noreferrer"
+                >{choice.master.name} {@render newTab()}</a
+              >
+              {#if choice.master.location}
+                <span class="cap place"
+                  ><MapPin size={14} aria-hidden="true" />{choice.master.location}</span
+                >
+              {/if}
+            </div>
           </div>
           {@render chipRow(masterRequirements(profile, choice.master))}
         {:else if !choice.unrecorded}
@@ -149,33 +228,35 @@
         {#if choice.next}
           <p class="next">
             <span class="label">Next</span>
-            <a
-              href={wikiHref(choice.next.wiki)}
-              target="_blank"
-              rel="noopener noreferrer"
-              >{choice.next.name}<span class="sr-only"> (opens a new tab)</span
-              ></a
-            >{#if nextMissing.length}, once you have:{:else}: you meet every requirement we can check.{/if}
+            <FallbackArt file={choice.next.image} size={32} className="chathead" />
+            <span
+              ><a
+                href={wikiHref(choice.next.wiki)}
+                target="_blank"
+                rel="noopener noreferrer">{choice.next.name}{@render newTab()}</a
+              >{#if nextMissing.length}, once you have:{:else}: you meet every requirement we can check.{/if}</span
+            >
           </p>
           {#if nextMissing.length}{@render chipRow(nextMissing)}{/if}
         {/if}
         {#if choice.alternatives.length}
           <h4>Wilderness alternatives</h4>
           <p class="cap">Open to you, but never the default.</p>
-          <ul class="entries">
+          <ul class="entries art-entries">
             {#each choice.alternatives as alt (alt.id)}
               <li>
-                <b
-                  ><a
-                    href={wikiHref(alt.wiki)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    >{alt.name}<span class="sr-only"> (opens a new tab)</span
-                    ></a
-                  ></b
-                >
-                {@render chipRow(masterRequirements(profile, alt))}
-                <span>{ALTERNATIVE_TRADEOFFS[alt.id] ?? ""}</span>
+                <FallbackArt file={alt.image} size={40} className="entry-art chathead" />
+                <div class="entry-copy">
+                  <b
+                    ><a
+                      href={wikiHref(alt.wiki)}
+                      target="_blank"
+                      rel="noopener noreferrer">{alt.name}{@render newTab()}</a
+                    ></b
+                  >
+                  {@render chipRow(masterRequirements(profile, alt))}
+                  <span>{ALTERNATIVE_TRADEOFFS[alt.id] ?? ""}</span>
+                </div>
               </li>
             {/each}
           </ul>
@@ -187,6 +268,7 @@
           choices={masters.map((m) => ({
             value: m.id,
             label: m.name,
+            image: m.image,
             detail: canUseMaster(profile, m) ? undefined : "locked",
             description:
               m.name +
@@ -231,27 +313,49 @@
           {@const { task, verdict } = card}
           <article class="card" aria-label={task.name}>
             <header>
-              <h3>{task.name}</h3>
-              <span class="verdict v-{verdict?.verdict ?? 'none'}"
-                >{GROUP_LABEL[verdict?.verdict ?? "none"]}</span
-              >
+              <FallbackArt file={task.image} size={72} thumbnail className="monster" />
+              <h3>
+                <a
+                  href={wikiHref(task.wiki)}
+                  target="_blank"
+                  rel="noopener noreferrer">{task.name} {@render newTab()}</a
+                >
+              </h3>
+              {@render verdictBadge(verdict?.verdict ?? "none")}
             </header>
             {#if verdict}
               <p><GameText text={verdict.reason} /></p>
               {#if verdict.feeds.length}
-                <p class="cap">Feeds {verdict.feeds.join(", ")} as well as Slayer and combat.</p>
+                <div class="feeds">
+                  <span class="label">Feeds</span>
+                  <ul class="tags">
+                    {#each verdict.feeds as skill (skill)}
+                      <li>
+                        <a class="tag" href={"/skills/" + encodeURIComponent(skill)}
+                          ><GameArt file={skillIcon(skill)} size={18} />{skill}</a
+                        >
+                      </li>
+                    {/each}
+                  </ul>
+                  <span class="cap">as well as Slayer and combat.</span>
+                </div>
               {/if}
               {#if card.showMainNote && verdict.mainNote}
                 <p class="main-note"><b>On a regular account:</b> <GameText text={verdict.mainNote} /></p>
               {/if}
               <h4>Fastest way</h4>
-              <p>
-                {verdict.fastest.where}. {verdict.fastest.style === "any"
-                  ? "Any combat style works"
-                  : "Use " + verdict.fastest.style}{verdict.fastest.aoe
-                  ? ", with area attacks"
-                  : ""}.
-              </p>
+              <ul class="tags">
+                <li class="tag"><MapPin size={16} aria-hidden="true" />{verdict.fastest.where}</li>
+                <li class="tag">
+                  {#if verdict.fastest.style === "any"}Any combat style works{:else}<GameArt
+                      file={skillIcon(STYLE_SKILL[verdict.fastest.style])}
+                      size={18}
+                    />Use {verdict.fastest.style}{/if}
+                </li>
+                {#if verdict.fastest.aoe}
+                  <li class="tag"><Radius size={16} aria-hidden="true" />Area attacks</li>
+                {/if}
+              </ul>
               <p class="cap"><GameText text={verdict.fastest.notes} /></p>
               {#if gearMethod?.sites.length}
                 <div class="map"><TrainingMap method={gearMethod} {profile} /></div>
@@ -264,39 +368,47 @@
             {@render chipRow(card.requirements)}
 
             <h4>Task facts</h4>
-            <ul class="facts">
-              <li>Amount {task.amount[0]}–{task.amount[1]}</li>
-              <li>Weighting {task.weight ?? "unknown"}</li>
-              {#if task.members}<li>Members only</li>{/if}
+            <ul class="tags">
+              <li class="tag"><Hash size={16} aria-hidden="true" />Amount {task.amount[0]}–{task.amount[1]}</li>
+              <li class="tag"><Dices size={16} aria-hidden="true" />Weighting {task.weight ?? "unknown"}</li>
+              {#if task.members}<li class="tag"><GameArt file="P2P_icon.png" size={16} />Members only</li>{/if}
             </ul>
 
             {#if extras.length}
               <h4>Bring for this task</h4>
-              <ul class="entries">
+              <ul class="entries art-entries">
                 {#each extras as extra (extra.item)}
                   <li>
-                    <b
-                      ><a
-                        href={wikiHref(extra.item)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        >{extra.item}<span class="sr-only">
-                          (opens a new tab)</span
-                        ></a
-                      ></b
-                    ><span
-                      >{extra.why}{extra.helmet
-                        ? " A Slayer helmet covers it."
-                        : ""}
-                      <a
-                        href={wikiHref(extra.source)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        >Wiki<span class="sr-only"
-                          >: {extra.source} on RuneScape Wiki (opens a new tab)</span
-                        ></a
-                      ></span
-                    >
+                    <GameArt file={extra.image} size={36} className="entry-art" />
+                    <div class="entry-copy">
+                      <b
+                        ><a
+                          href={wikiHref(extra.item)}
+                          target="_blank"
+                          rel="noopener noreferrer">{extra.item}{@render newTab()}</a
+                        ></b
+                      ><span
+                        >{extra.why}
+                        {#if extra.helmet}
+                          <span class="helmet"
+                            ><GameArt file={SLAYER_HELMET_IMAGE} size={16} />A
+                            <a
+                              href={wikiHref("Slayer helmet")}
+                              target="_blank"
+                              rel="noopener noreferrer">Slayer helmet{@render newTab()}</a
+                            > covers it.</span
+                          >
+                        {/if}
+                        <a
+                          href={wikiHref(extra.source)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          >Wiki<span class="sr-only"
+                            >: {extra.source} on RuneScape Wiki (opens a new tab)</span
+                          ></a
+                        ></span
+                      >
+                    </div>
                   </li>
                 {/each}
               </ul>
@@ -334,21 +446,13 @@
     <GameWindow title="Block, skip and prefer" trailing={viewed.name}>
       <div class="body">
         {#if lists}
-          <h4>Prefer, best first</h4>
+          {@render listHeading("prefer", "Prefer, best first")}
           <p class="cap">You have up to 8 prefer slots; spend them in this order.</p>
-          {#if lists.prefer.length}
-            <ol class="entries">
-              {#each lists.prefer as entry (entry.task)}
-                <li><b>{entry.task}</b><span>{entry.reason}</span></li>
-              {/each}
-            </ol>
-          {:else}
-            <p class="cap">Nothing here is worth a prefer slot.</p>
-          {/if}
-          <h4>Block first</h4>
-          {@render entries(lists.block, "This master assigns nothing worth a block.")}
-          <h4>Skip if you have points</h4>
-          {@render entries(lists.skip, "This master assigns nothing worth a skip.")}
+          {@render entries(viewed.id, lists.prefer, "Nothing here is worth a prefer slot.", true)}
+          {@render listHeading("block", "Block first")}
+          {@render entries(viewed.id, lists.block, "This master assigns nothing worth a block.")}
+          {@render listHeading("skip", "Skip if you have points")}
+          {@render entries(viewed.id, lists.skip, "This master assigns nothing worth a skip.")}
           <p class="cap">
             <CheckedSources checked={lists.checked} sources={lists.sources} />
           </p>
@@ -389,9 +493,45 @@
   }
   .master {
     display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+  .master-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .place,
+  .tag,
+  .list-heading,
+  .helmet {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  /* Chatheads and monster art are tall or wide; keep each in a square box. */
+  .body :global(:is(.chathead, .monster, .entry-art)) {
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+  }
+  .body :global(.chathead) {
+    border: 1px solid var(--frame-line);
+    border-radius: 4px;
+    background: var(--panel-raised);
+  }
+  .next {
+    display: flex;
     flex-wrap: wrap;
-    align-items: baseline;
-    gap: 4px 12px;
+    align-items: center;
+    gap: 6px 8px;
+  }
+  .chip-link {
+    text-decoration: none !important;
+  }
+  .chip-link:hover :global(.status-chip) {
+    background: var(--panel-raised);
   }
   .name {
     font:
@@ -463,14 +603,66 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: space-between;
-    gap: 8px;
+    gap: 8px 12px;
+  }
+  .card header h3 {
+    flex: 1 1 140px;
+    min-width: 0;
+  }
+  .card :global(.monster) {
+    padding: 4px;
+    border: 1px solid #33434d;
+    border-radius: 4px;
+    background: var(--panel);
   }
   .verdict {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     padding: 2px 10px;
     border: 1px solid currentColor;
     border-radius: 4px;
     font-weight: 700;
+  }
+  .list-heading.v-prefer,
+  .list-heading.v-block,
+  .list-heading.v-skip {
+    margin-top: 10px;
+  }
+  .feeds {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 8px;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .tag {
+    min-height: 28px;
+    padding: 2px 9px;
+    border: 1px solid #33434d;
+    border-radius: 4px;
+    background: var(--panel);
+    font-size: var(--font-caption);
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+  .body a.tag {
+    color: var(--text);
+    text-decoration: none;
+  }
+  .body a.tag:hover {
+    border-color: var(--gold);
+  }
+  .tag :global(svg) {
+    flex: none;
+    color: var(--muted);
   }
   .v-prefer,
   .v-do {
@@ -492,14 +684,6 @@
   .map {
     min-width: 0;
   }
-  .facts {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px 16px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
   .entries {
     display: flex;
     flex-direction: column;
@@ -509,8 +693,17 @@
     list-style: none;
   }
   ol.entries {
-    padding-left: 22px;
-    list-style: decimal;
+    counter-reset: rank;
+  }
+  ol.entries li::before {
+    counter-increment: rank;
+    content: counter(rank);
+    flex: none;
+    width: 1.6em;
+    padding-top: 10px;
+    color: var(--gold-bright);
+    font-weight: 700;
+    text-align: right;
   }
   .entries li {
     display: flex;
@@ -519,10 +712,27 @@
     min-width: 0;
     overflow-wrap: anywhere;
   }
-  .entries li > span {
+  .entries li > span,
+  .entry-copy > span {
     color: var(--muted);
     font-size: var(--font-caption);
     line-height: 1.5;
+  }
+  .art-entries li {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .entry-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+  .art-entries :global(.entry-art) {
+    border: 1px solid #33434d;
+    border-radius: 4px;
+    background: var(--panel);
   }
   .links {
     display: flex;

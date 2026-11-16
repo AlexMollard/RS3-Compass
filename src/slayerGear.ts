@@ -10,34 +10,88 @@ import type { SlayerMaster, SlayerTask } from "./slayerTypes.ts";
 /**
  * Items a task needs, named on the Wiki's Slayer equipment page
  * (https://runescape.wiki/w/Slayer_equipment, read 2026-11-16) and on the monster page each verdict already cites.
- * `helmet` is true where the Wiki says a Slayer helmet (or its parts) covers the item.
+ * `helmet` is true where the Wiki says a Slayer helmet (or its parts) covers the item. `image` is the item's Wiki
+ * inventory icon (file names checked against the Wiki's API, 2026-11-16).
  */
 export const SLAYER_TASK_EXTRAS: Readonly<
-  Record<string, { item: string; why: string; helmet: boolean; source: string }[]>
+  Record<string, { item: string; image: string; why: string; helmet: boolean; source: string }[]>
 > = {
   Gargoyles: [
-    { item: "Rock hammer", why: "Finishes gargoyles; a normal hammer won't do.", helmet: false, source: "Gargoyle" },
+    {
+      item: "Rock hammer",
+      image: "Rock_hammer.png",
+      why: "Finishes gargoyles; a normal hammer won't do.",
+      helmet: false,
+      source: "Gargoyle",
+    },
   ],
-  Banshees: [{ item: "Earmuffs", why: "Protect against the banshee's screech.", helmet: true, source: "Banshee" }],
+  Banshees: [
+    {
+      item: "Earmuffs",
+      image: "Earmuffs.png",
+      why: "Protect against the banshee's screech.",
+      helmet: true,
+      source: "Banshee",
+    },
+  ],
   "Wall beasts": [
-    { item: "Spiny helmet", why: "Protects against wall beasts' grabs.", helmet: true, source: "Wall beast" },
+    {
+      item: "Spiny helmet",
+      image: "Spiny_helmet.png",
+      why: "Protects against wall beasts' grabs.",
+      helmet: true,
+      source: "Wall beast",
+    },
   ],
   "Aberrant spectres": [
-    { item: "Nose peg", why: "Blocks the aberrant spectre's stench.", helmet: true, source: "Aberrant spectre" },
+    {
+      item: "Nose peg",
+      image: "Nose_peg.png",
+      why: "Blocks the aberrant spectre's stench.",
+      helmet: true,
+      source: "Aberrant spectre",
+    },
   ],
   "Dust devils": [
-    { item: "Face mask", why: "Blocks the dust devil's choking dust.", helmet: true, source: "Dust devil" },
+    {
+      item: "Face mask",
+      image: "Face_mask.png",
+      why: "Blocks the dust devil's choking dust.",
+      helmet: true,
+      source: "Dust devil",
+    },
   ],
   Basilisks: [
-    { item: "Mirror shield", why: "Reflects the basilisk's gaze.", helmet: false, source: "Basilisk" },
+    {
+      item: "Mirror shield",
+      image: "Mirror_shield.png",
+      why: "Reflects the basilisk's gaze.",
+      helmet: false,
+      source: "Basilisk",
+    },
   ],
   "Mutated zygomites": [
-    { item: "Fungicide spray", why: "Finishes mutated zygomites.", helmet: false, source: "Mutated zygomite" },
+    {
+      item: "Fungicide spray",
+      image: "Fungicide_spray_10.png",
+      why: "Finishes mutated zygomites.",
+      helmet: false,
+      source: "Mutated zygomite",
+    },
   ],
   Bloodveld: [
-    { item: "Witchwood icon", why: "Needed for the cave horrors of Mos Le'Harmless.", helmet: false, source: "Cave horror" },
+    {
+      item: "Witchwood icon",
+      image: "Witchwood_icon.png",
+      why: "Needed for the cave horrors of Mos Le'Harmless.",
+      helmet: false,
+      source: "Cave horror",
+    },
   ],
 };
+
+/** The Slayer helmet's Wiki inventory icon (checked 2026-11-16), shown where it covers a task's item. */
+export const SLAYER_HELMET_IMAGE = "Slayer_helmet.png";
 
 /** The gear style the gear window opens on. "any" means melee; the window still lets the player switch. */
 export const gearStyleFor = (style: NonNullable<TaskVerdict["fastest"]>["style"]): CombatClass =>
