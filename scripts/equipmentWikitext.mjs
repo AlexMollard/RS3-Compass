@@ -48,12 +48,17 @@ function eqinforows(text) {
   return rows;
 }
 
-/** The skill levels in a requirements field, e.g. "{{sc|attack|80}}{{sc|strength|80}}". */
+/**
+ * The skill levels in a requirements field: "{{sc|attack|80}}{{sc|strength|80}}", "{{Skill clickpic|Attack|80}}"
+ * (any case) or the level before the template, "60 {{Skill clickpic|Attack}}".
+ */
 export function parseRequirements(text = "") {
   const wear = [];
-  for (const m of text.matchAll(/\{\{\s*sc\s*\|\s*([^|}]+?)\s*\|\s*(\d+)/gi)) {
-    const skill = canonicalSkillName(m[1]);
-    if (skill) wear.push({ skill, level: Number(m[2]) });
+  const template = /(?:(\d+)\s*)?\{\{\s*(?:sc|skill[ _]clickpic)\s*\|\s*([^|}]+?)\s*(?:\|\s*(\d+)[^}]*)?\}\}/gi;
+  for (const m of text.matchAll(template)) {
+    const skill = canonicalSkillName(m[2]);
+    const level = m[3] ?? m[1];
+    if (skill && level) wear.push({ skill, level: Number(level) });
   }
   return wear;
 }
