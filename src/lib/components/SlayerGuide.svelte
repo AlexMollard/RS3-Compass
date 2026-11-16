@@ -18,6 +18,7 @@
   } from "../../slayerTaskView";
   import { wikiHref } from "../../wiki";
   import { getCompass } from "../compassContext";
+  import CheckedSources from "./CheckedSources.svelte";
   import ChoiceStrip from "./ChoiceStrip.svelte";
   import GameText from "./GameText.svelte";
   import GameWindow from "./GameWindow.svelte";
@@ -134,7 +135,10 @@
               class="name"
               href={wikiHref(choice.master.wiki)}
               target="_blank"
-              rel="noopener noreferrer">{choice.master.name} ↗</a
+              rel="noopener noreferrer"
+              >{choice.master.name} <span aria-hidden="true">↗</span><span
+                class="sr-only"> (opens a new tab)</span
+              ></a
             >
             <span class="cap">{choice.master.location ?? ""}</span>
           </div>
@@ -148,7 +152,9 @@
             <a
               href={wikiHref(choice.next.wiki)}
               target="_blank"
-              rel="noopener noreferrer">{choice.next.name}</a
+              rel="noopener noreferrer"
+              >{choice.next.name}<span class="sr-only"> (opens a new tab)</span
+              ></a
             >{#if nextMissing.length}, once you have:{:else}: you meet every requirement we can check.{/if}
           </p>
           {#if nextMissing.length}{@render chipRow(nextMissing)}{/if}
@@ -163,7 +169,9 @@
                   ><a
                     href={wikiHref(alt.wiki)}
                     target="_blank"
-                    rel="noopener noreferrer">{alt.name}</a
+                    rel="noopener noreferrer"
+                    >{alt.name}<span class="sr-only"> (opens a new tab)</span
+                    ></a
                   ></b
                 >
                 {@render chipRow(masterRequirements(profile, alt))}
@@ -271,7 +279,10 @@
                       ><a
                         href={wikiHref(extra.item)}
                         target="_blank"
-                        rel="noopener noreferrer">{extra.item}</a
+                        rel="noopener noreferrer"
+                        >{extra.item}<span class="sr-only">
+                          (opens a new tab)</span
+                        ></a
                       ></b
                     ><span
                       >{extra.why}{extra.helmet
@@ -280,7 +291,10 @@
                       <a
                         href={wikiHref(extra.source)}
                         target="_blank"
-                        rel="noopener noreferrer">Wiki</a
+                        rel="noopener noreferrer"
+                        >Wiki<span class="sr-only"
+                          >: {extra.source} on RuneScape Wiki (opens a new tab)</span
+                        ></a
                       ></span
                     >
                   </li>
@@ -291,12 +305,11 @@
             <p class="cap links">
               <WikiAction page={task.wiki} label="Task on the Wiki" />
               {#if verdict}
-                · Checked {verdict.checked} ·
-                {#each verdict.sources as source, i (source)}{i ? " · " : ""}<a
-                    href={source}
-                    target="_blank"
-                    rel="noopener noreferrer">source {i + 1}</a
-                  >{/each}
+                ·
+                <CheckedSources
+                  checked={verdict.checked}
+                  sources={verdict.sources}
+                />
               {/if}
             </p>
           </article>
@@ -336,7 +349,9 @@
           {@render entries(lists.block, "This master assigns nothing worth a block.")}
           <h4>Skip if you have points</h4>
           {@render entries(lists.skip, "This master assigns nothing worth a skip.")}
-          <p class="cap">Checked {lists.checked}.</p>
+          <p class="cap">
+            <CheckedSources checked={lists.checked} sources={lists.sources} />
+          </p>
         {:else}
           <p class="cap">No block, skip or prefer list for {viewed.name} yet.</p>
         {/if}

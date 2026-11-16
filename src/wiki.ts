@@ -1,7 +1,11 @@
 export const wikiHref = (page: string) =>
   "https://runescape.wiki/w/" + encodeURIComponent(page.replaceAll(" ", "_"));
 
-export const wikiImage = (filename: string) =>
+/** The page title a RuneScape Wiki URL points at ("https://runescape.wiki/w/Slayer_training" → "Slayer training"). */
+export const wikiTitle = (url: string) =>
+  decodeURIComponent(url.replace(/^https:\/\/runescape\.wiki\/w\//, "")).replaceAll("_", " ");
+
+export const wikiImage =(filename: string) =>
   "https://runescape.wiki/images/" +
   encodeURIComponent(filename.replaceAll(" ", "_"));
 

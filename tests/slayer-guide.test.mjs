@@ -3,6 +3,7 @@ import test from "node:test";
 import { isSkillName } from "../src/skillNames.ts";
 import { SLAYER_BLOCKS, SLAYER_VERDICTS } from "../src/slayerGuide.ts";
 import { SLAYER_MASTERS, SLAYER_TASKS } from "../src/slayerImported.ts";
+import { wikiHref, wikiTitle } from "../src/wiki.ts";
 
 // The masters a member trains with, plus the free ones (spec "Coverage"). Every one of their tasks needs a verdict.
 // Mazchna is covered because masterFor picks him for members at combat 50-74.
@@ -29,6 +30,11 @@ const dated = (entry, label) => {
   assert.ok(entry.sources.length > 0, `${label} has sources`);
   for (const url of entry.sources) assert.match(url, WIKI, `${label} source ${url}`);
 };
+
+test("a source link's accessible name is its Wiki page title", () => {
+  assert.equal(wikiTitle("https://runescape.wiki/w/Ironman_Mode/Guide/Slayer"), "Ironman Mode/Guide/Slayer");
+  assert.equal(wikiTitle(wikiHref("Ravenous strigoi (Slayer assignment)")), "Ravenous strigoi (Slayer assignment)");
+});
 
 test("the covered masters exist in the import", () => {
   const ids = SLAYER_MASTERS.map((m) => m.id);

@@ -13,5 +13,7 @@
   target="_blank"
   rel="noopener noreferrer"
   class={primary ? "btn btn-primary" : "text-link"}
-  >{label}<ExternalLink size={primary ? 15 : 13} /></a
+  >{label}<span class="sr-only"> (opens a new tab)</span><ExternalLink
+    size={primary ? 15 : 13}
+  /></a
 >

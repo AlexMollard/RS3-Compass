@@ -9,6 +9,7 @@
   import { efficientSlayerRoute } from "../../slayerMasters";
   import { wikiHref } from "../../wiki";
   import { skillPath } from "../navigation";
+  import CheckedSources from "./CheckedSources.svelte";
   import GameArt from "./GameArt.svelte";
   import GameText from "./GameText.svelte";
   import GameWindow from "./GameWindow.svelte";
@@ -123,6 +124,14 @@
             (opens a new tab)</span
           ></a
         >
+        {#if selected.checked && selected.sources?.length}
+          <p class="method-checked">
+            <CheckedSources
+              checked={selected.checked}
+              sources={selected.sources}
+            />
+          </p>
+        {/if}
         {#if route}
           <section
             class="efficient-route"
@@ -147,6 +156,9 @@
                 <span class="route-link">Open the Slayer guide →</span>
               </span>
             </a>
+            <p class="method-checked">
+              <CheckedSources checked={route.checked} sources={route.sources} />
+            </p>
           </section>
         {/if}
       </div>
@@ -330,6 +342,13 @@
   .training-guidance p {
     color: var(--muted);
     line-height: 1.6;
+  }
+  .method-checked {
+    margin: 0;
+    font-size: var(--font-caption);
+    line-height: 1.5;
+    color: var(--muted);
+    overflow-wrap: anywhere;
   }
   .method-wiki {
     align-self: flex-start;
