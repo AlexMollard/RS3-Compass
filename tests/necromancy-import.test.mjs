@@ -85,13 +85,20 @@ test("glyphs keep their tier, kind and highest ink", () => {
   assert.equal(multiply.ink, "Regular ghostly ink");
 });
 
+test("only top-level glyphs and rituals tables count, not a nested key of the same name that comes first", () => {
+  const decoy = lua.replace("return {", 'return {\n\t["other"] = { ["glyphs"] = { ["Bogus"] = 5 }, ["rituals"] = { ["Bogus"] = 5 } },');
+  assert.deepEqual(parseGlyphs(decoy), parseGlyphs(lua));
+  assert.deepEqual(parseRituals(decoy), parseRituals(lua));
+  assert.throws(() => parseGlyphs('return { ["other"] = { ["glyphs"] = {} } }'), /no top-level "glyphs" table/);
+});
+
 test("a ritual row with an unknown field or shape throws", () => {
   assert.throws(() => parseRituals(lua.replace('["xp"] = 1480', '["xp"] = 1480, ["bonus"] = 2')), /unknown fields: bonus/);
   assert.throws(() => parseRituals(lua.replace('["xp"] = 1480', '["xp"] = "lots"')), /XP/);
   assert.throws(() => parseRituals(lua.replace('["Lesser necroplasm"] = 200', '["Lesser necroplasm"] = { 200 }')), /inputs/);
   assert.throws(() => parseRituals(lua.replace('["lvl"] = 60', '["lvl"] = 60, ["tier"] = 4')), /tier is not 1-3/);
   assert.throws(() => parseGlyphs(lua.replace('["Basic ghostly ink"] = 3', '["Murky ink"] = 3')), /unknown ink/);
-  assert.throws(() => parseRituals("return { glyphs = {} }"), /no "rituals" table/);
+  assert.throws(() => parseRituals("return { glyphs = {} }"), /no top-level "rituals" table/);
 });
 
 // Trimmed from Template:Death Skull upgrades (https://runescape.wiki/w/Template:Death_Skull_upgrades, fetched 2026-11-16).

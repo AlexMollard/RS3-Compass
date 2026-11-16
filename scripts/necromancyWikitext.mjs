@@ -27,22 +27,29 @@ const items = (map, what) => {
 /**
  * The source of the module's top-level `["key"] = { ... }` table, found by matching braces (skipping strings and
  * comments). The module's other tables (disturbances, tome XP) hold fractions and "2,367.6", which parseLuaTable
- * rightly refuses, so each table the importer needs is cut out and parsed alone.
+ * rightly refuses, so each table the importer needs is cut out and parsed alone. Only a key directly inside the
+ * module's returned table counts: `["glyphs"]` also appears nested inside each ritual.
  */
+// shortcut: this scanner knows "..." and '...' strings without escaped quotes and -- line comments only. It does not
+// handle escaped quotes, [[ ]] long strings or --[[ ]] block comments; if the module adopts them, reuse parseLuaTable's
+// lexer (export it from slayerWikitext.mjs) instead of extending this loop.
 function tableSource(lua, key) {
-  const start = new RegExp(`\\[\\s*["']${key}["']\\s*\\]\\s*=\\s*\\{`).exec(lua);
-  if (!start) fail(`the module has no "${key}" table`);
+  const keyAt = new RegExp(`\\[\\s*["']${key}["']\\s*\\]\\s*=\\s*\\{`, "y");
   let depth = 0;
-  for (let i = start.index + start[0].length - 1; i < lua.length; i++) {
+  let from = -1;
+  for (let i = 0; i < lua.length; i++) {
     const c = lua[i];
     if (c === '"' || c === "'") {
-      for (i++; lua[i] !== c; i++) if (i >= lua.length || lua[i] === "\n") fail(`unclosed string in "${key}"`);
+      for (i++; lua[i] !== c; i++) if (i >= lua.length || lua[i] === "\n") fail(`unclosed string in the module`);
     } else if (lua.startsWith("--", i)) {
       while (i < lua.length && lua[i] !== "\n") i++;
+    } else if (c === "[" && depth === 1 && from < 0 && (keyAt.lastIndex = i, keyAt.test(lua))) {
+      from = keyAt.lastIndex - 1;
+      i = from - 1; // the loop's next step reads the table's opening brace
     } else if (c === "{") depth++;
-    else if (c === "}" && --depth === 0) return lua.slice(start.index + start[0].length - 1, i + 1);
+    else if (c === "}" && --depth === 1 && from >= 0) return lua.slice(from, i + 1);
   }
-  return fail(`the "${key}" table is not closed`);
+  return fail(from < 0 ? `the module has no top-level "${key}" table` : `the "${key}" table is not closed`);
 }
 const section = (lua, key) => {
   const data = parseLuaTable(`return ${tableSource(lua, key)}`);

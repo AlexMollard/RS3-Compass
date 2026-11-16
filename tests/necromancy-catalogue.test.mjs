@@ -42,12 +42,13 @@ test("Kili's task per tier: Kili Row at 20, then Kili's Knowledge I to VII, powe
   assert.deepEqual(line("deathdealer").map((s) => s.task), ["V", "VI", "VII"].map((n) => `Kili's Knowledge ${n} (power)`));
 });
 
-test("wear level equals the tier, on Necromancy for weapons and Defence for robes", () => {
+test("wear level equals the tier: Necromancy for weapons, Defence for deathwarden, both for deathdealer", () => {
+  // Infoboxes of Deathwarden hood/robe top (tier 70) and Deathdealer hood (tier 70), checked 2026-11-16.
+  const skills = { weapon: ["Necromancy"], deathwarden: ["Defence"], deathdealer: ["Defence", "Necromancy"] };
   for (const step of NECRO_UPGRADES) {
-    assert.equal(step.wear.length, 1);
-    assert.ok(isSkillName(step.wear[0].skill));
-    assert.equal(step.wear[0].skill, step.line === "weapon" ? "Necromancy" : "Defence");
-    assert.equal(step.wear[0].level, step.tier === 10 ? 1 : step.tier);
+    for (const w of step.wear) assert.ok(isSkillName(w.skill));
+    assert.deepEqual(step.wear.map((w) => w.skill), skills[step.line], `${step.line} T${step.tier}`);
+    for (const w of step.wear) assert.equal(w.level, step.tier === 10 ? 1 : step.tier);
   }
 });
 

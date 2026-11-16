@@ -28,7 +28,9 @@ const task = (line, tier) =>
 // Quests a tier needs: Necromancy! for the free tier-10 gear, Kili Row to start Kili's tasks, and The Spirit of War
 // before Kili gives the tier 70 task of any line (Kili's Knowledge V and V (power) both list it).
 const questNames = (tier) => (tier === FREE_TIER ? ["Necromancy!"] : tier === 20 ? ["Kili Row"] : tier >= 70 ? ["The Spirit of War"] : []);
-const WEAR = { weapon: "Necromancy", deathwarden: "Defence", deathdealer: "Defence" };
+// The skills a tier needs to wear, from each piece's infobox (checked 2026-11-16): Deathwarden hood and robe top (tier 70)
+// need Defence only, Deathdealer hood (tier 70) needs Defence and Necromancy.
+const WEAR = { weapon: ["Necromancy"], deathwarden: ["Defence"], deathdealer: ["Defence", "Necromancy"] };
 const LINE_ORDER = { weapon: 0, deathwarden: 1, deathdealer: 2 };
 
 const pages = await pageContents(SOURCES);
@@ -63,7 +65,7 @@ for (const [line, { source, from, tiers }] of Object.entries(tables)) {
     steps.push({
       line,
       tier,
-      wear: [{ skill: WEAR[line], level: tier === FREE_TIER ? 1 : tier }],
+      wear: WEAR[line].map((skill) => ({ skill, level: tier === FREE_TIER ? 1 : tier })),
       ...(task(line, tier) ? { task: task(line, tier) } : {}),
       quests: questIds(questNames(tier)),
       materials: materials.get(tier) ?? [],
