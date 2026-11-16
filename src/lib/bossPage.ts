@@ -1,6 +1,8 @@
 import type { BossRecord } from "../bossTypes.ts";
-import { COMBAT_EQUIPMENT } from "../equipmentCombat.ts";
-import type { EquipmentRecommendation } from "../equipmentTypes.ts";
+import { QUESTS, type Profile } from "../data.ts";
+import type { ImportedItem } from "../equipmentTypes.ts";
+import { selectGear } from "../gearSelection.ts";
+import { RS3_SKILL_NAMES } from "../skillNames.ts";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -35,28 +37,36 @@ export function statedTier(text: string): number | undefined {
   return match ? Number(match[1]) : undefined;
 }
 
-const STYLE_SKILL = { melee: "Attack", ranged: "Ranged", magic: "Magic" } as const;
-const GEAR_SLOT = /^(melee|ranged|magic) (weapon|off hand|body|ammunition)$/;
+// A boss kit is a reference, not a player check: every level at 120 and every quest done, so only the
+// stated tier and free-to-play limit what is shown.
+const REFERENCE_QUESTS = QUESTS.map((quest) => quest.id);
+const referenceProfile = (members: boolean): Profile => ({
+  id: "boss-reference",
+  name: "Reference",
+  kind: "Regular account",
+  mode: members ? "members" : "f2p",
+  levels: Object.fromEntries(RS3_SKILL_NAMES.map((skill) => [skill, 120])),
+  completedQuests: REFERENCE_QUESTS,
+  packed: [],
+  completedTasks: [],
+  activeTask: "",
+  notes: {},
+});
 
 /**
- * Example gear for a guide's setup line: the best item per core slot from the Skills page's
- * equipment tables, up to the line's stated tier. No stated tier means no icons, never a guess.
+ * Example gear for a guide's setup line: the best imported item per slot up to the line's stated tier,
+ * as a player with every level and quest would wear it. No stated tier means no icons, never a guess.
  */
 export function setupGear(
-  style: keyof typeof STYLE_SKILL,
+  style: "melee" | "ranged" | "magic",
   text: string,
   members: boolean,
-): EquipmentRecommendation[] {
+): ImportedItem[] {
   const tier = statedTier(text);
   if (tier === undefined) return [];
-  const best = new Map<string, EquipmentRecommendation>();
-  for (const item of COMBAT_EQUIPMENT[STYLE_SKILL[style]]?.items ?? []) {
-    if (item.optional || !GEAR_SLOT.test(item.slot) || item.from > tier) continue;
-    if (item.members && !members) continue;
-    const held = best.get(item.slot);
-    if (!held || item.from > held.from) best.set(item.slot, item);
-  }
-  const weapon = best.get(`${style} weapon`);
-  if (weapon?.twoHanded) best.delete(`${style} off hand`);
-  return [...best.values()];
+  const rows = selectGear({ class: style, profile: referenceProfile(members), maxTier: tier });
+  const twoHanded = rows.some((row) => row.row === "2h" && row.best);
+  return rows
+    .filter((row) => !(twoHanded && (row.row === "main hand" || row.row === "off hand")))
+    .flatMap((row) => (row.best ? [row.best.item] : []));
 }

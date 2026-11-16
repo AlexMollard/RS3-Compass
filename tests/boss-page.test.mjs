@@ -47,15 +47,43 @@ test("statedTier reads the first tier in a setup line", () => {
   assert.equal(statedTier("Blue or green dragonhide with rune crossbows"), undefined);
 });
 
-test("setupGear picks the best core item per slot up to the stated tier", () => {
+test("setupGear picks the best imported item per slot up to the stated tier", () => {
   const melee = setupGear("melee", "Tier 50+ weapon and armour", true);
   assert.ok(melee.length > 0);
-  assert.ok(melee.every((item) => item.from <= 50 && !item.optional));
+  assert.ok(melee.every((item) => item.tier <= 50 && item.class === "melee"));
   assert.equal(new Set(melee.map((item) => item.slot)).size, melee.length);
-  assert.ok(melee.some((item) => item.slot === "melee weapon" && item.from === 50));
-  // No tier stated: no icons rather than a guess.
+  assert.ok(melee.some((item) => item.slot === "2h" && item.tier === 50));
+  // Weapons and armour both appear.
+  assert.ok(melee.some((item) => item.slot === "body"));
+});
+
+test("setupGear still builds a kit at the top tier", () => {
+  for (const style of ["melee", "ranged", "magic"]) {
+    const kit = setupGear(style, "Tier 99 weapon and armour", true);
+    assert.ok(kit.length > 0, style);
+    assert.ok(kit.some((item) => item.tier >= 90), style);
+  }
+});
+
+test("setupGear never exceeds a lower stated tier", () => {
+  const kit = setupGear("melee", "Tier 80 weapon", true);
+  assert.ok(kit.length > 0);
+  assert.ok(kit.every((item) => item.tier <= 80));
+  assert.ok(kit.some((item) => item.tier === 80));
+});
+
+test("setupGear shows no hand items beside a two-handed weapon", () => {
+  const kit = setupGear("melee", "Tier 70 weapon", true);
+  assert.ok(kit.some((item) => item.slot === "2h"));
+  assert.ok(!kit.some((item) => item.slot === "weapon" || item.slot === "off-hand weapon"));
+});
+
+test("setupGear gives no icons when the line states no tier", () => {
   assert.deepEqual(setupGear("ranged", "Dragonhide and a crossbow", true), []);
-  // Free accounts never get members gear.
+});
+
+test("setupGear never gives free accounts members gear", () => {
   const f2p = setupGear("melee", "Tier 70+ weapon", false);
+  assert.ok(f2p.length > 0);
   assert.ok(f2p.every((item) => !item.members));
 });
