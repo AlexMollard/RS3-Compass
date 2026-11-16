@@ -12,42 +12,107 @@ export interface GroupPlayer extends ComparedPlayer {
   member: GroupMember;
 }
 
-/** Skills where each player's published level is higher; skills either lacks are left out. */
-export function headToHead(
-  a: Profile | undefined,
-  b: Profile | undefined,
+/**
+ * Per player, skills they lead alone and skills they share the lead in. Only
+ * skills every player with published levels publishes count; a player without
+ * published levels gets undefined, never 0.
+ */
+export function leadCounts(
+  profiles: readonly Profile[],
   skills: readonly string[],
-): { aAhead: number; bAhead: number; level: number } {
-  const result = { aAhead: 0, bAhead: 0, level: 0 };
-  for (const skill of skills) {
-    const x = a?.hiscoresLevels?.[skill],
-      y = b?.hiscoresLevels?.[skill];
-    if (x === undefined || y === undefined) continue;
-    if (x > y) result.aAhead++;
-    else if (y > x) result.bAhead++;
-    else result.level++;
-  }
-  return result;
+): ({ led: number; shared: number } | undefined)[] {
+  const ranked = profiles.filter((p) => p.hiscoresLevels);
+  const counts = new Map(ranked.map((p) => [p, { led: 0, shared: 0 }]));
+  if (ranked.length >= 2)
+    for (const skill of skills) {
+      const levels = ranked.map((p) => p.hiscoresLevels![skill]);
+      if (levels.some((level) => level === undefined)) continue;
+      const highest = Math.max(...(levels as number[]));
+      const leaders = ranked.filter((_, i) => levels[i] === highest);
+      for (const p of leaders)
+        counts.get(p)![leaders.length === 1 ? "led" : "shared"]++;
+    }
+  return profiles.map((p) => counts.get(p));
 }
 
-/** Quest titles one player completed and the other did not, from public quest data. */
+/**
+ * Quest titles each player completed that none of the others did. Players
+ * without public quest data get undefined and are left out of everyone
+ * else's comparison; fewer than two with data gives undefined.
+ */
 export function questDifference(
-  a: Profile | undefined,
-  b: Profile | undefined,
-): { onlyA: string[]; onlyB: string[] } | undefined {
-  const done = (p: Profile | undefined) =>
-    p?.questProgress &&
-    new Map(
-      p.questProgress.records
-        .filter((r) => r.status === "COMPLETED")
-        .map((r) => [r.title.toLocaleLowerCase("en"), r.title]),
-    );
-  const left = done(a),
-    right = done(b);
-  if (!left || !right) return undefined;
-  const only = (x: Map<string, string>, y: Map<string, string>) =>
-    [...x].filter(([key]) => !y.has(key)).map(([, title]) => title).sort();
-  return { onlyA: only(left, right), onlyB: only(right, left) };
+  profiles: readonly (Profile | undefined)[],
+): (string[] | undefined)[] | undefined {
+  const done = profiles.map(
+    (p) =>
+      p?.questProgress &&
+      new Map(
+        p.questProgress.records
+          .filter((r) => r.status === "COMPLETED")
+          .map((r) => [r.title.toLocaleLowerCase("en"), r.title]),
+      ),
+  );
+  if (done.filter(Boolean).length < 2) return undefined;
+  return done.map(
+    (mine, i) =>
+      mine &&
+      [...mine]
+        .filter(([key]) => !done.some((other, j) => j !== i && other?.has(key)))
+        .map(([, title]) => title)
+        .sort(),
+  );
+}
+
+export interface SkillStanding {
+  name: string;
+  /** Published level; undefined when unrecorded, never 0. */
+  level: number | undefined;
+  /** Holds the highest published level; ties all hold it. */
+  top: boolean;
+  /** Levels below the highest; undefined unless two players publish the skill. */
+  behind: number | undefined;
+}
+
+/** Each player's published level in a skill, the shared highlight and how far each trails the leader. */
+export function skillStandings(
+  players: readonly ComparedPlayer[],
+  skill: string,
+): SkillStanding[] {
+  const { highest, known } = groupSkillSummary(players, skill);
+  return players.map(({ member, profile }) => {
+    const level = profile?.hiscoresLevels?.[skill];
+    return {
+      name: member.name,
+      level,
+      top: level !== undefined && level === highest,
+      behind:
+        level !== undefined && highest !== undefined && known >= 2
+          ? highest - level
+          : undefined,
+    };
+  });
+}
+
+/**
+ * Four-letter column labels. Names that would share one drop the prefix
+ * they have in common, so "GIM Alba" and "GIM Bran" read ALBA and BRAN.
+ */
+export function shortLabels(names: readonly string[]): string[] {
+  const four = (name: string) => name.trim().slice(0, 4).toUpperCase();
+  return names.map((name) => {
+    const clashes = names.filter((other) => four(other) === four(name));
+    if (clashes.length < 2) return four(name);
+    let common = 0;
+    while (
+      clashes.every(
+        (other) =>
+          other.length > common &&
+          other[common].toLowerCase() === clashes[0][common].toLowerCase(),
+      )
+    )
+      common++;
+    return four(name.slice(common)) || four(name);
+  });
 }
 
 export function groupPlayers(

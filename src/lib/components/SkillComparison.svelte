@@ -2,7 +2,11 @@
   import { goto } from "$app/navigation";
   import { SKILLS } from "../../data";
   import { getCompass } from "../compassContext";
-  import { groupSkillSummary, type ComparedPlayer } from "../groupProgress";
+  import {
+    shortLabels,
+    skillStandings,
+    type ComparedPlayer,
+  } from "../groupProgress";
   import { skillPath } from "../navigation";
   import { wikiHref } from "../../wiki";
   import GameWindow from "./GameWindow.svelte";
@@ -40,7 +44,7 @@
       ? SKILLS
       : SKILLS.filter((s) => prepSkills.has(s.name)),
   );
-  const shortName = (value: string) => value.slice(0, 4).toUpperCase();
+  let labels = $derived(shortLabels(players.map((p) => p.member.name)));
 </script>
 
 <GameWindow
@@ -64,7 +68,7 @@
     </div>
     <div class="skill-comparisons">
       {#each skills as skill (skill.name)}
-        {@const summary = groupSkillSummary(players, skill.name)}
+        {@const standings = skillStandings(players, skill.name)}
         <section
           class="comparison-card"
           aria-label={skill.name + " comparison"}
@@ -84,23 +88,23 @@
             class="member-levels"
             style:--cols={Math.min(players.length, 4)}
           >
-            {#each players as player (player.member.name)}
-              {@const level = player.profile?.hiscoresLevels?.[skill.name]}
-              {@const highest =
-                level !== undefined && level === summary.highest}
+            {#each players as player, index (player.member.name)}
+              {@const { level, top, behind } = standings[index]}
               {#if level !== undefined}
                 <button
                   class="lv"
-                  class:top={highest}
-                  aria-label={`${player.member.name}: ${skill.name} ${level}. ${highest ? highestLabel + ". " : ""}Open training as this player`}
+                  class:top
+                  aria-label={`${player.member.name}: ${skill.name} ${level}. ${top ? highestLabel + ". " : behind ? behind + " behind the leader. " : ""}Open training as this player`}
                   onclick={() => {
                     controller.selectProfile(player.profile!.id);
                     void goto(skillPath(skill.name));
                   }}
                 >
                   <strong>{level}</strong><small aria-hidden="true"
-                    >{shortName(player.member.name)}</small
-                  >
+                    >{labels[index]}</small
+                  >{#if behind}<em class="behind" aria-hidden="true"
+                      >−{behind}</em
+                    >{/if}
                 </button>
               {:else}
                 <div
@@ -112,7 +116,7 @@
                     " unrecorded"}
                 >
                   <strong>?</strong><small aria-hidden="true"
-                    >{shortName(player.member.name)}</small
+                    >{labels[index]}</small
                   >
                 </div>
               {/if}
@@ -125,9 +129,10 @@
       <summary>About these levels</summary>
       <p>
         Published Hiscores levels only; manual Compass edits are excluded. Gold
-        marks the highest published level, not item ownership or every required
-        unlock. Each character still needs their own use levels and quest
-        requirements. {sourceNote}
+        marks the highest published level, shared on a tie, not item ownership
+        or every required unlock. A minus figure is how many levels that player
+        is behind the leader. Each character still needs their own use levels
+        and quest requirements. {sourceNote}
       </p>
     </details>
   </div>
@@ -211,6 +216,12 @@
     font-weight: 500;
     color: var(--muted);
     letter-spacing: 0.5px;
+  }
+  .lv .behind {
+    font-size: 0.6875rem;
+    font-style: normal;
+    font-weight: 600;
+    color: #e0a36b;
   }
   button.lv:hover {
     border-color: #8fa3b1;
