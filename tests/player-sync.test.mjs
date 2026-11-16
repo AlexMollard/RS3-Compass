@@ -282,6 +282,41 @@ test("removing a group cancels pending new members but keeps existing players", 
   assert.deepEqual(get(controller.state).groups, []);
 });
 
+test("a group snapshot under a new id replaces the saved group in place", (t) => {
+  const controller = createCompassController();
+  t.after(() => controller.destroy());
+  const base = {
+    name: "Example",
+    size: 2,
+    isCompetitive: false,
+    founder: false,
+    totalLevel: 10,
+    totalXp: 0,
+    members: [{ name: "Alice" }, { name: "Bob" }],
+    fetchedAt: 1000,
+  };
+  controller.saveGroup({ ...base, id: 12 });
+  controller.saveGroup({ ...base, id: 13, name: "Other" });
+  controller.saveGroup(
+    {
+      ...base,
+      id: 20,
+      size: 3,
+      members: [...base.members, { name: "Cara" }],
+      fetchedAt: 2000,
+    },
+    12,
+  );
+  const groups = get(controller.state).groups;
+  assert.deepEqual(
+    groups.map((g) => [g.id, g.size, g.members.length]),
+    [
+      [20, 3, 3],
+      [13, 2, 2],
+    ],
+  );
+});
+
 test("leaving an automatic scope withdraws queued work but preserves other scopes and explicit refreshes", async (t) => {
   let visible = true;
   const calls = [];

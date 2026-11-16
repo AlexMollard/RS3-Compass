@@ -1,6 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { isGroupLookup, normalizeGroupQuery } from "../src/lib/groupData.ts";
+import {
+  continuesGroup,
+  isGroupLookup,
+  normalizeGroupQuery,
+} from "../src/lib/groupData.ts";
 
 const group = () => ({
   id: 123,
@@ -70,4 +74,27 @@ test("group snapshots reject duplicate members, unknown skills and unsafe intege
     mutate(value);
     assert.equal(isGroupLookup(value), false);
   }
+});
+
+test("a group that changed size under a new id continues the saved group only when it shares a member", () => {
+  const old = group();
+  const grown = {
+    ...group(),
+    id: 456,
+    name: "example group",
+    size: 3,
+    members: [...group().members, { name: "Charlie" }],
+  };
+  assert.equal(continuesGroup(old, old), true);
+  assert.equal(continuesGroup(old, grown), true);
+  assert.equal(
+    continuesGroup(old, { ...grown, members: [{ name: " bob " }] }),
+    true,
+  );
+  assert.equal(
+    continuesGroup(old, { ...grown, members: [{ name: "Dave" }] }),
+    false,
+  );
+  assert.equal(continuesGroup(old, { ...grown, name: "Other" }), false);
+  assert.equal(continuesGroup(old, { ...grown, isCompetitive: false }), false);
 });

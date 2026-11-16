@@ -228,16 +228,19 @@ export function createCompassController(): CompassController {
         }),
       );
     },
-    saveGroup(group) {
+    saveGroup(group, replaces = group.id) {
       if (!isGroupLookup(group)) return;
       state.update((current) => {
         const old = current.groups?.find((g) => g.id === group.id);
         if (old && old.fetchedAt > group.fetchedAt) return current;
+        const groups = (current.groups ?? []).filter(
+          (g) => g.id !== group.id || g.id === replaces,
+        );
         return {
           ...current,
-          groups: old
-            ? current.groups!.map((g) => (g.id === group.id ? group : g))
-            : [...(current.groups ?? []), group],
+          groups: groups.some((g) => g.id === replaces)
+            ? groups.map((g) => (g.id === replaces ? group : g))
+            : [...groups, group],
         };
       });
     },

@@ -19,7 +19,7 @@ const entry = {
   groupTotalXp: 25446861,
   toHighlight: true,
 };
-function listing(content = [entry], totalPages = 1) {
+function listing(content = [entry], totalPages = 1, groupSize = 3) {
   const groups = {
     content,
     empty: !content.length,
@@ -31,7 +31,7 @@ function listing(content = [entry], totalPages = 1) {
     totalElements: content.length,
     totalPages,
   };
-  const flight = `34:${JSON.stringify(["$", "$L4c", null, { data: { groups }, groupSize: 3, mode: "competitive" }])}\n`;
+  const flight = `34:${JSON.stringify(["$", "$L4c", null, { data: { groups }, groupSize, mode: "competitive" }])}\n`;
   return `<script>self.__next_f.push(${JSON.stringify([1, flight])})</script>`;
 }
 function detail(names = ["Warmiar", "Ariatsa", "sunakyu"]) {
@@ -117,6 +117,30 @@ test("coalesces aliases, caches successes and does not cache failed source data"
   broken = false;
   await service.lookup(query);
   assert.equal(calls, 5);
+});
+
+test("a group that changed size is found under its current size", async () => {
+  // RuneScape's name search at the old size answers with the page from the group's current size.
+  const moved = listing([entry], 1, 2);
+  const stale = { ...query, size: 2 };
+  assert.equal(parseGroupListing(moved, stale).size, 3);
+  for (const size of [1, 6, "3"])
+    assert.throws(
+      () => parseGroupListing(listing([{ ...entry, size }], 1, 2), stale),
+      (error) => error instanceof GroupLookupError && error.status === 502,
+    );
+  const urls = [];
+  const service = createGroupLookupService(async (url) => {
+    urls.push(url.pathname);
+    return response(url.searchParams.has("name") ? moved : detail());
+  });
+  const found = await service.lookup(stale);
+  assert.equal(found.size, 3);
+  assert.equal(found.members.length, 3);
+  assert.deepEqual(urls, [
+    "/hiscores/group-ironman/competitive/2",
+    "/hiscores/group-ironman/competitive/3/ironmanies",
+  ]);
 });
 
 test("every group request names its source and carries its own timeout", async () => {

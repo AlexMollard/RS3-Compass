@@ -30,6 +30,18 @@ export function normalizeGroupQuery(value: unknown): GroupQuery {
   };
 }
 
+/** RuneScape issues a new id when a group changes size; same name, type and a shared member mean the same group. */
+export function continuesGroup(old: GroupLookup, next: GroupLookup): boolean {
+  if (old.id === next.id) return true;
+  if (
+    old.isCompetitive !== next.isCompetitive ||
+    old.name.toLocaleLowerCase("en") !== next.name.toLocaleLowerCase("en")
+  )
+    return false;
+  const names = new Set(old.members.map((m) => playerKey(m.name)));
+  return next.members.some((m) => names.has(playerKey(m.name)));
+}
+
 export function isGroupLookup(value: unknown): value is GroupLookup {
   if (!isRecord(value)) return false;
   try {

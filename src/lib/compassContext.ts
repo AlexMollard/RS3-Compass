@@ -40,7 +40,8 @@ export interface CompassController {
   ): Promise<void>;
   cancelRefreshScope(scope: string): void;
   importGroupMembers(id: number): Promise<void>;
-  saveGroup(group: GroupLookup): void;
+  /** `replaces` names a saved group this snapshot supersedes under a new id. */
+  saveGroup(group: GroupLookup, replaces?: number): void;
   removeGroup(id: number): void;
   updatePlayer(id: string, settings: Pick<Profile, "kind" | "mode">): void;
   initialize(): void;

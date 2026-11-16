@@ -27,7 +27,7 @@ export async function fetchGroup(
     !isGroupLookup(data) ||
     normalizeGroupQuery(data).name.toLocaleLowerCase("en") !==
       normalized.name.toLocaleLowerCase("en") ||
-    data.size !== normalized.size ||
+    // Size is not checked: a group that gains or loses members moves to its new size.
     data.isCompetitive !== normalized.isCompetitive
   ) {
     throw new Error(

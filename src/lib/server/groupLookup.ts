@@ -168,7 +168,8 @@ export function parseGroupListing(
   if (
     !isSafeInteger(group.id, 1) ||
     typeof group.name !== "string" ||
-    group.size !== query.size ||
+    // A group that gained or lost members moves size; the search then answers with its current size.
+    ![2, 3, 4, 5].includes(group.size as number) ||
     group.isCompetitive !== query.isCompetitive ||
     typeof group.founder !== "boolean" ||
     !isSafeInteger(group.groupTotalLevel, 1) ||
@@ -182,7 +183,7 @@ export function parseGroupListing(
   return {
     id: group.id,
     name: group.name,
-    size: query.size,
+    size: group.size as GroupQuery["size"],
     isCompetitive: query.isCompetitive,
     founder: group.founder,
     totalLevel: group.groupTotalLevel,
@@ -334,13 +335,13 @@ export function createGroupLookupService(
     const task = (async () => {
       try {
         const mode = query.isCompetitive ? "competitive" : "regular";
-        const base = `https://rs.runescape.com/hiscores/group-ironman/${mode}/${query.size}`;
-        const listingUrl = new URL(base);
+        const base = `https://rs.runescape.com/hiscores/group-ironman/${mode}`;
+        const listingUrl = new URL(`${base}/${query.size}`);
         listingUrl.searchParams.set("name", query.name);
         listingUrl.searchParams.set("page", "1");
         const listing = parseGroupListing(await request(listingUrl), query);
         const detailUrl = new URL(
-          `${base}/${encodeURIComponent(listing.name)}`,
+          `${base}/${listing.size}/${encodeURIComponent(listing.name)}`,
         );
         const members = parseGroupRoster(
           await request(detailUrl),

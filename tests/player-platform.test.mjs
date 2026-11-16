@@ -304,6 +304,37 @@ test("non-JSON error pages give friendly lookup errors and keep Retry-After", as
   );
 });
 
+test("a group lookup accepts the group's current size when it differs from the saved one", async (t) => {
+  const original = globalThis.fetch;
+  t.after(() => {
+    globalThis.fetch = original;
+  });
+  const moved = {
+    id: 20,
+    name: "ironmanies",
+    size: 3,
+    isCompetitive: true,
+    founder: false,
+    totalLevel: 10,
+    totalXp: 0,
+    members: [{ name: "A" }, { name: "B" }, { name: "C" }],
+    fetchedAt: Date.now(),
+  };
+  globalThis.fetch = async () => new Response(JSON.stringify(moved));
+  const found = await fetchGroup({
+    name: "ironmanies",
+    size: 2,
+    isCompetitive: true,
+  });
+  assert.equal(found.size, 3);
+  globalThis.fetch = async () =>
+    new Response(JSON.stringify({ ...moved, isCompetitive: false }));
+  await assert.rejects(
+    fetchGroup({ name: "ironmanies", size: 2, isCompetitive: true }),
+    /invalid group data/,
+  );
+});
+
 test("lookup validation accepts independent available sources and rejects conflicting or empty primary data", () => {
   const emptyStatistics = () => ({ overall: {}, skills: {}, activities: [] });
   const partial = platformPlayer({

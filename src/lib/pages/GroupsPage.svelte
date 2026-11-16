@@ -3,9 +3,10 @@
   import { SKILLS } from "../../data";
   import { getCompass } from "../compassContext";
   import { fetchGroup } from "../groupClient";
+  import { continuesGroup } from "../groupData";
   import type { GroupLookup, GroupSize } from "../groupTypes";
   import { groupPlayers, groupSkillSummary } from "../groupProgress";
-  import { publicProfileId } from "../playerName";
+  import { playerKey, publicProfileId } from "../playerName";
   import { relativeTime } from "../relativeTime";
   import {
     isSnapshotStale,
@@ -142,13 +143,17 @@
         !$saved.groups?.some((g) => g.id === target.id)
       )
         return;
-      if (found.id !== target.id)
+      if (!continuesGroup(target, found))
         throw new Error(
           "This name now identifies a different group. Add it separately to keep the old snapshot distinct.",
         );
-      controller.saveGroup(found);
-      failures[target.id] = "";
-      messages[target.id] = "Group snapshot loaded.";
+      controller.saveGroup(found, target.id);
+      if (selectedId === String(target.id)) selectedId = String(found.id);
+      failures[found.id] = "";
+      messages[found.id] = "Group snapshot loaded.";
+      const known = new Set(target.members.map((m) => playerKey(m.name)));
+      if (found.members.some((m) => !known.has(playerKey(m.name))))
+        void controller.importGroupMembers(found.id);
     } catch (error) {
       if (!current.signal.aborted && request === current)
         failures[target.id] =
