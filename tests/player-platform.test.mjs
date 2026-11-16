@@ -93,6 +93,7 @@ test("independent Platform refresh failures preserve last good snapshots and loc
     trainingRanges: { Mining: 30 },
     trainingMethods: { Mining: "mithril" },
     slayerTask: { master: "kuradal", task: "abyssal-demons" },
+    necromancy: { weaponTier: 60, robeLine: "deathwarden", souls: 3200 },
   }));
   const before = structuredClone(current(controller));
   const others = structuredClone(
@@ -125,6 +126,7 @@ test("independent Platform refresh failures preserve last good snapshots and loc
     "trainingRanges",
     "trainingMethods",
     "slayerTask",
+    "necromancy",
     "kind",
     "mode",
   ])

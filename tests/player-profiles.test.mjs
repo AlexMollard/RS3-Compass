@@ -620,3 +620,76 @@ test("A saved Slayer task loads, an old save without one loads, and a malformed 
   storage.set(KEY, JSON.stringify(old));
   assert.equal(current(load()).slayerTask, undefined);
 });
+
+test("Necromancy progress validates, merges and clears", (t) => {
+  const storage = new Map();
+  const descriptor = Object.getOwnPropertyDescriptor(globalThis, "localStorage");
+  Object.defineProperty(globalThis, "localStorage", {
+    configurable: true,
+    value: {
+      getItem: (k) => storage.get(k) ?? null,
+      setItem: (k, v) => storage.set(k, String(v)),
+      removeItem: (k) => storage.delete(k),
+    },
+  });
+  const controllers = [];
+  t.after(() => {
+    controllers.forEach((c) => c.destroy());
+    if (descriptor) Object.defineProperty(globalThis, "localStorage", descriptor);
+    else delete globalThis.localStorage;
+  });
+  const load = () => {
+    const c = createCompassController();
+    controllers.push(c);
+    c.initialize();
+    return c;
+  };
+  const first = load();
+  assert.equal(current(first).necromancy, undefined);
+  first.setNecromancy({ weaponTier: 60, souls: 3200 });
+  first.setNecromancy({ robeLine: "deathwarden" });
+  assert.deepEqual(current(load()).necromancy, {
+    weaponTier: 60,
+    souls: 3200,
+    robeLine: "deathwarden",
+  });
+  first.setNecromancy({ weaponTier: undefined, souls: undefined });
+  assert.deepEqual(current(first).necromancy, { robeLine: "deathwarden" });
+  first.setNecromancy({ robeLine: undefined });
+  assert.ok(!("necromancy" in current(first)));
+  assert.ok(!("necromancy" in current(load())));
+  // 0 souls is a recorded value, not "not recorded": the setter keeps it and it survives a reload.
+  first.setNecromancy({ souls: 0 });
+  assert.deepEqual(current(first).necromancy, { souls: 0 });
+  assert.deepEqual(current(load()).necromancy, { souls: 0 });
+  first.setNecromancy({ souls: undefined });
+  assert.ok(!("necromancy" in current(first)));
+
+  const raw = JSON.parse(storage.get(KEY));
+  const withProgress = (necromancy) =>
+    JSON.stringify({
+      ...raw,
+      profiles: raw.profiles.map((p) => ({ ...p, necromancy })),
+    });
+  for (const ok of [{}, { weaponTier: 10, robeTier: 90, souls: 0 }, { souls: 1000000 }]) {
+    storage.set(KEY, withProgress(ok));
+    assert.deepEqual(current(load()).necromancy, ok, JSON.stringify(ok));
+  }
+  for (const bad of [
+    { weaponTier: 35 },
+    { robeTier: 100 },
+    { weaponTier: 0 },
+    { souls: -1 },
+    { souls: 1.5 },
+    { souls: 1000001 },
+    { robeLine: "chaotic" },
+    "deathwarden",
+  ]) {
+    storage.set(KEY, withProgress(bad));
+    // A rejected save falls back to the samples, which carry no progress.
+    assert.equal(current(load()).necromancy, undefined, JSON.stringify(bad));
+  }
+  const old = { ...raw, profiles: raw.profiles.map(({ necromancy, ...rest }) => rest) };
+  storage.set(KEY, JSON.stringify(old));
+  assert.equal(current(load()).necromancy, undefined);
+});
