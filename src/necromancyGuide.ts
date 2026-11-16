@@ -22,10 +22,22 @@ export type StoryStep = Checked & {
   optional?: true;
   /** Shown on regular-account profiles only. */
   mainNote?: string;
+  /** Appended to `unlocks` on members profiles only: a clause that names members content. */
+  membersNote?: string;
 };
 
-/** A Well of Souls threshold. `unlocks` names the levels and quests that also gate what it opens. */
-export type SoulGate = Checked & { souls: number; unlocks: string };
+/**
+ * A Well of Souls threshold. `unlocks` names the levels and quests that also gate what it opens. `quest` is the QUESTS
+ * id it starts, when it starts one: the gate stays next until that quest is done.
+ */
+export type SoulGate = Checked & { souls: number; unlocks: string; quest?: string };
+
+/**
+ * Free-to-play limits the import can't show, because it marks membership per ritual, not per recipe or ink.
+ * `membersRecipes` are NECRO_RITUALS ids of members-only recipes in free rituals; `freeInks` are the ghostly inks
+ * free-to-play can use.
+ */
+export type F2pLimits = Checked & { membersRecipes: string[]; freeInks: string[] };
 
 /**
  * The method to train at Necromancy levels [from, to). `optionId` is a training option id in skillsCombat.ts's
@@ -112,7 +124,8 @@ export const NECRO_STORY: StoryStep[] = [
     quest: "necromancy",
     level: 1,
     unlocks:
-      "Necromancy itself: the tier 10 death guard and skull lantern, Necromancy abilities, the Well of Souls and rituals at the Um ritual site. Claim the free Deathwarden robes from Sostratus afterwards; Kili Row needs them.",
+      "Necromancy itself: the tier 10 death guard and skull lantern, Necromancy abilities, the Well of Souls and rituals at the Um ritual site. Claim the free Deathwarden robes from Sostratus afterwards.",
+    membersNote: "Kili Row needs them.",
     members: false,
     ...dated(page("Necromancy!")),
   },
@@ -240,9 +253,30 @@ export const DISTURBANCES: Checked & { note: string } = {
   ...dated(page("Rituals")),
 };
 
+/**
+ * Checked 2026-11-17 against each page's infobox through the Wiki API: Lesser communion's wyvern bones, broken memento
+ * and fragile memento are members items, so those recipes are members-only; lesser necroplasm and the other bones are
+ * free. Basic ghostly ink is free; regular, greater and powerful ghostly ink are members items.
+ */
+export const F2P_LIMITS: F2pLimits = {
+  membersRecipes: ["lesser-communion-wyvern-bones", "lesser-communion-broken-memento", "lesser-communion-fragile-memento"],
+  freeInks: ["Basic ghostly ink"],
+  checked: "2026-11-17",
+  sources: [
+    page("Lesser communion"),
+    page("Wyvern bones"),
+    page("Broken memento"),
+    page("Fragile memento"),
+    page("Lesser necroplasm"),
+    page("Basic ghostly ink"),
+    page("Regular ghostly ink"),
+  ],
+};
+
 export const SOUL_GATES: SoulGate[] = [
   {
     souls: 3000,
+    quest: "the-spirit-of-war",
     unlocks: "Starts The Spirit of War (65 Necromancy), which opens Kili's tier 70 to 90 upgrades.",
     ...dated(WELL, TRAINING),
   },
@@ -260,6 +294,7 @@ export const SOUL_GATES: SoulGate[] = [
   },
   {
     souls: 30000,
+    quest: "alpha-vs-omega",
     unlocks: "Starts Alpha vs Omega (95 Necromancy), which opens the Rasial boss fight.",
     ...dated(WELL, TRAINING),
   },

@@ -658,6 +658,12 @@ test("Necromancy progress validates, merges and clears", (t) => {
   first.setNecromancy({ robeLine: undefined });
   assert.ok(!("necromancy" in current(first)));
   assert.ok(!("necromancy" in current(load())));
+  // 0 souls is a recorded value, not "not recorded": the setter keeps it and it survives a reload.
+  first.setNecromancy({ souls: 0 });
+  assert.deepEqual(current(first).necromancy, { souls: 0 });
+  assert.deepEqual(current(load()).necromancy, { souls: 0 });
+  first.setNecromancy({ souls: undefined });
+  assert.ok(!("necromancy" in current(first)));
 
   const raw = JSON.parse(storage.get(KEY));
   const withProgress = (necromancy) =>

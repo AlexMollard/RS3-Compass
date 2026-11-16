@@ -5,6 +5,7 @@ import { QUESTS, availableTrainingOptions, skillByName, trainingStage, type Prof
 import { levelStatus, type LevelStatus } from "./lib/levelStatus.ts";
 import {
   ENDGAME_TARGETS,
+  F2P_LIMITS,
   NECRO_STORY,
   PROGRESS_TARGETS,
   RITUAL_QUESTS,
@@ -30,6 +31,9 @@ const isFree = (profile: Profile) => profile.mode === "f2p";
 /** The Necromancy level the guide plans for: free-to-play stops at the free cap. */
 const plannedLevel = (profile: Profile) =>
   Math.min(profile.levels.Necromancy ?? 1, isFree(profile) ? FREE_CAP : NECROMANCY.maxLevel);
+
+/** Regular-account notes (`mainNote`) are members advice: shown on members regular accounts only. */
+export const showsMainNote = (profile: Profile) => profile.kind === "Regular account" && !isFree(profile);
 
 const questsById = new Map(QUESTS.map((q) => [q.id, q]));
 const questName = (id: string) => questsById.get(id)?.name ?? id;
@@ -96,15 +100,24 @@ function firstOpenQuest(profile: Profile, quests: string[]): string | undefined 
   return undefined;
 }
 
-export type StoryRow = { quest: StoryStep; state: "done" | "next" | "locked"; reqs: Req[] };
+export type StoryRow = { quest: StoryStep; state: "done" | "next" | "locked" | "unknown"; reqs: Req[] };
 
-/** The storyline in order. "next" is the first required quest not done; optional quests are never next. */
+/**
+ * The storyline in order. "next" is the first required quest known not done; optional quests are never next. A quest
+ * of unknown status (a private quest import) is "unknown", never next or locked.
+ */
 export function storyProgress(profile: Profile): StoryRow[] {
   const steps = NECRO_STORY.filter((s) => !isFree(profile) || !s.members);
-  const next = steps.find((s) => !s.optional && !done(profile, s.quest));
+  const next = steps.find((s) => !s.optional && knownUndone(profile, s.quest));
   return steps.map((step) => ({
     quest: step,
-    state: done(profile, step.quest) ? "done" : step === next ? "next" : "locked",
+    state: done(profile, step.quest)
+      ? "done"
+      : step === next
+        ? "next"
+        : knownUndone(profile, step.quest)
+          ? "locked"
+          : "unknown",
     reqs: questReqs(profile, step.quest),
   }));
 }
@@ -115,16 +128,19 @@ export type SoulLine = {
 };
 
 /**
- * Recorded souls against the next soul gate. A gate that starts a storyline quest stays next until that quest is done,
- * so 3,200 souls before The Spirit of War show the 3,000 gate met. Other gates are next while the souls are below them
- * or unrecorded. Unrecorded souls are unknown, never 0. Free-to-play has no souls line.
+ * Recorded souls against the next soul gate. A gate that starts a quest stays next until that quest is done, so 3,200
+ * souls before The Spirit of War show the 3,000 gate met. Other gates, and quest gates whose quest status is unknown,
+ * are next while the souls are below them or unrecorded. Unrecorded souls are unknown, never 0. Free-to-play has no
+ * souls line.
  */
 export function soulStatus(profile: Profile): SoulLine | undefined {
   if (isFree(profile)) return undefined;
   const souls = profile.necromancy?.souls;
+  const below = (g: (typeof SOUL_GATES)[number]) => souls === undefined || souls < g.souls;
   const gate = SOUL_GATES.find((g) => {
-    const quest = NECRO_STORY.find((s) => s.souls === g.souls)?.quest;
-    return quest ? !done(profile, quest) : souls === undefined || souls < g.souls;
+    if (!g.quest) return below(g);
+    if (done(profile, g.quest)) return false;
+    return knownUndone(profile, g.quest) || below(g);
   });
   return {
     souls,
@@ -181,21 +197,35 @@ function stepReqs(profile: Profile, step: UpgradeStep, steps: UpgradeStep[]): Re
 
 export type Endgame = { boss: string; target: EndgameTarget; reqs: Req[] };
 
+/** A tier 95 boss with its requirement chips: quests, skills, then the level to wield its drop when that is higher. */
+const bossEntry = (profile: Profile, target: EndgameTarget): Endgame => ({
+  boss: target.boss,
+  target,
+  reqs: [
+    ...target.quests.map((q) => questReq(profile, q)),
+    ...target.skills.map((s) => skillReq(profile, s.skill, s.level)),
+    ...(target.wield === undefined
+      ? []
+      : [{ label: `Necromancy ${target.wield} to wield`, status: levelStatus(profile.levels.Necromancy, target.wield) }]),
+  ],
+});
+
 /**
- * The tier 95 boss for a finished line: of the bosses whose drop the player can wield, the first whose requirements are
- * all met, else the first.
+ * Every tier 95 boss, for the Gear path's shared tier 95 section: shown at every tier, whatever the player can wield
+ * yet. Free-to-play has none.
+ */
+export function tier95(profile: Profile): Endgame[] {
+  return isFree(profile) ? [] : ENDGAME_TARGETS.map((t) => bossEntry(profile, t));
+}
+
+/**
+ * The tier 95 boss for a line: of the bosses whose drop the player can wield, the first whose requirements are all
+ * met, else the first.
  */
 function endgameFor(profile: Profile, line: GearLine): Endgame | undefined {
   const bosses = ENDGAME_TARGETS.filter(
     (t) => t.lines.includes(line) && (t.wield === undefined || levelStatus(profile.levels.Necromancy, t.wield) === "met"),
-  ).map((target) => ({
-    boss: target.boss,
-    target,
-    reqs: [
-      ...target.quests.map((q) => questReq(profile, q)),
-      ...target.skills.map((s) => skillReq(profile, s.skill, s.level)),
-    ],
-  }));
+  ).map((t) => bossEntry(profile, t));
   return bosses.find((b) => b.reqs.every((r) => r.status === "met")) ?? bosses[0];
 }
 
@@ -308,7 +338,7 @@ export type Rituals = {
 
 /**
  * Rituals the player can run now (level reached and unlocking quest done) and the next one to unlock. Free-to-play sees
- * only free rituals up to the free cap whose quest is free too.
+ * only free recipes of free rituals up to the free cap whose quest is free too, and only the free inks.
  */
 export function ritualsFor(profile: Profile): Rituals {
   const level = plannedLevel(profile);
@@ -316,13 +346,18 @@ export function ritualsFor(profile: Profile): Rituals {
   const shown = NECRO_RITUALS.filter((r) => {
     if (!isFree(profile)) return true;
     const quest = gate(r);
-    return !r.members && r.level <= FREE_CAP && !(quest && questsById.get(quest)?.members);
+    return (
+      !r.members &&
+      !F2P_LIMITS.membersRecipes.includes(r.id) &&
+      r.level <= FREE_CAP &&
+      !(quest && questsById.get(quest)?.members)
+    );
   });
   const runnable = (r: Ritual) => r.level <= level && (gate(r) === undefined || !knownUndone(profile, gate(r)!));
   const now = shown.filter(runnable);
   const next = shown.filter((r) => !runnable(r)).sort((a, b) => a.level - b.level)[0];
   const inks = [...NECRO_GLYPHS]
-    .filter((g) => g.level <= level)
+    .filter((g) => g.level <= level && (!isFree(profile) || F2P_LIMITS.freeInks.includes(g.ink)))
     .sort((a, b) => a.level - b.level)
     .map((g) => g.ink);
   const upgrade = isFree(profile) ? undefined : gearPath(profile, "weapon").next?.step;

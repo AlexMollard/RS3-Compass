@@ -20,7 +20,9 @@
     killNext,
     ritualsFor,
     soulStatus,
+    showsMainNote,
     storyProgress,
+    tier95,
     type GearLine,
     type GearPath,
     type Req,
@@ -49,6 +51,7 @@
     done: { tone: "ok", label: "Done" },
     next: { tone: "info", label: "Next" },
     locked: { tone: "neutral", label: "Locked" },
+    unknown: { tone: "warn", label: "Unknown" },
   } as const;
   const LINE_PAGE: Record<UpgradeStep["line"], string> = {
     weapon: "Death Skull equipment",
@@ -69,7 +72,8 @@
   const ritualByName = new Map(NECRO_RITUALS.map((r) => [r.name, r]));
 
   const free = $derived(profile.mode === "f2p");
-  const regular = $derived(profile.kind === "Regular account");
+  const regular = $derived(showsMainNote(profile));
+  const bosses = $derived(tier95(profile));
   const story = $derived(storyProgress(profile));
   const souls = $derived(soulStatus(profile));
   const soulGate = $derived(SOUL_GATES.find((g) => g.souls === souls?.next?.souls));
@@ -124,6 +128,11 @@
     story.find((r) => questsById.get(r.quest.quest)?.name === kill.progress?.target)?.quest ??
       (weapon.next ? stepTarget(weapon.next.step) : weapon.endgame?.target),
   );
+  // The Kili task the progress row names, for what it needs beyond the step's own chips.
+  const progressTask = $derived.by(() => {
+    const step = weapon.next && stepTarget(weapon.next.step);
+    return step && step.task === kill.progress?.target ? step : undefined;
+  });
   // The next weapon step's unmet or unknown chips that the progress row doesn't already show (an unknown quest).
   const weaponBlockers = $derived(
     weapon.next?.reqs.filter(
@@ -329,35 +338,6 @@
       {/if}
     </section>
   {/if}
-  {#if path.endgame}
-    {@const end = path.endgame}
-    <section
-      class="next-step endgame"
-      id={`necro-endgame-${line}`}
-      aria-label={`Tier 95 ${line === "weapon" ? "weapons" : "robes"}`}
-    >
-      <header>
-        {#if end.target.image}<GameArt file={end.target.image} size={56} />{/if}
-        <span class="target-copy">
-          <span class="label">Tier 95: the end of the path</span>
-          <b>{@render wikiLink(end.target.wiki, end.boss)}</b>
-        </span>
-      </header>
-      <ul class="targets">
-        {#each end.target.drops as d (d.item)}
-          <li>
-            {#if d.image}<GameArt file={d.image} size={32} />{/if}
-            <span class="target-copy"
-              ><b>{@render wikiLink(d.item, d.item)}</b><span class="cap">{d.rate}</span></span
-            >
-          </li>
-        {/each}
-      </ul>
-      {@render chipRow(end.reqs)}
-      <p class="cap"><GameText text={end.target.note} /></p>
-      <p class="cap"><CheckedSources checked={end.target.checked} sources={end.target.sources} /></p>
-    </section>
-  {/if}
 {/snippet}
 
 {#snippet ladder(line: GearLine, path: GearPath)}
@@ -379,9 +359,9 @@
     {#if path.endgame}
       {@const end = path.endgame}
       <li class="destination">
-        <a href={wikiHref(end.target.wiki)} target="_blank" rel="noopener noreferrer" title={`Tier 95: ${end.boss}`}>
-          {#if end.target.image}<GameArt file={end.target.image} size={32} alt={end.boss} />{/if}
-          <span>T95</span><span class="sr-only"> (opens a new tab)</span>
+        <a href="#necro-tier-95" title="Tier 95: the end of the path">
+          {#if end.target.image}<GameArt file={end.target.image} size={32} alt="" />{/if}
+          <span>T95</span><span class="sr-only">: the tier 95 bosses, below</span>
         </a>
       </li>
     {/if}
@@ -416,7 +396,11 @@
               <StatusChip tone={STATE[row.state].tone} label={STATE[row.state].label} />
               {#if row.quest.optional}<span class="cap">Optional</span>{/if}
             </div>
-            <p class="cap"><GameText text={row.quest.unlocks} /></p>
+            <p class="cap">
+              <GameText
+                text={row.quest.unlocks + (!free && row.quest.membersNote ? ` ${row.quest.membersNote}` : "")}
+              />
+            </p>
             {#if row.state !== "done"}{@render chipRow(row.reqs)}{/if}
             {#if regular && row.quest.mainNote}
               <p class="main-note"><b>On a regular account:</b> <GameText text={row.quest.mainNote} /></p>
@@ -473,7 +457,7 @@
   <GameWindow
     title="Gear path"
     icon={weapon.steps.find((s) => s.tier === weapon.current)?.image}
-    trailing={`Weapon T${weapon.current} · Robes T${robe.current}`}
+    trailing={`Weapon T${weapon.current}${weapon.assumed ? " (assumed)" : ""} · Robes T${robe.current}${robe.assumed ? " (assumed)" : ""}`}
   >
     <div class="body">
       <h4>Weapons: {@render wikiLink(LINE_PAGE.weapon, "death guard and skull lantern")}</h4>
@@ -551,6 +535,37 @@
         onChange={(v) => pickTier("robe", v)}
       />
       {@render nextStep("robe", robe)}
+      {#if bosses.length}
+        <section class="next-step endgame" id="necro-tier-95" aria-label="Tier 95">
+          <span class="label">Tier 95: the end of the path</span>
+          {#each bosses as end (end.boss)}
+            <article class="boss">
+              <header>
+                {#if end.target.image}<GameArt file={end.target.image} size={56} />{/if}
+                <span class="target-copy">
+                  <b>{@render wikiLink(end.target.wiki, end.boss)}</b>
+                  <span class="cap"
+                    >Drops tier 95 {end.target.lines.includes("robe") ? "weapons and robes" : "weapons"}</span
+                  >
+                </span>
+              </header>
+              <ul class="targets">
+                {#each end.target.drops as d (d.item)}
+                  <li>
+                    {#if d.image}<GameArt file={d.image} size={32} />{/if}
+                    <span class="target-copy"
+                      ><b>{@render wikiLink(d.item, d.item)}</b><span class="cap">{d.rate}</span></span
+                    >
+                  </li>
+                {/each}
+              </ul>
+              {@render chipRow(end.reqs)}
+              <p class="cap"><GameText text={end.target.note} /></p>
+              <p class="cap"><CheckedSources checked={end.target.checked} sources={end.target.sources} /></p>
+            </article>
+          {/each}
+        </section>
+      {/if}
       <p class="cap">
         Tiers, wear levels and upgrade materials: <CheckedSources
           checked={NECRO_IMPORT.checked}
@@ -607,6 +622,9 @@
           </p>
           {#if progressArt.length}{@render targets(progressArt)}{/if}
           {@render chipRow(progress.reqs)}
+          {#if progressTask?.requires}
+            <p class="cap"><b>Also needs:</b> <GameText text={progressTask.requires} /></p>
+          {/if}
           {#if weapon.next && weaponBlockers.length}
             <p class="cap">
               <a href="#necro-next-weapon">The tier {weapon.next.step.tier} weapon step</a> also needs:
@@ -649,7 +667,9 @@
           {#each groups as recipes (recipes[0].name)}{@render ritualCard(recipes)}{/each}
         </div>
       {:else}
-        <p class="cap">No rituals yet: Necromancy! opens them.</p>
+        <p class="cap">
+          No rituals yet{#if rituals.next}: the first opens at Necromancy {rituals.next.level}{/if}.
+        </p>
       {/if}
 
       {#snippet lockedRitual(heading: string, ritual: Ritual)}
@@ -860,6 +880,23 @@
     border: 1px solid #33434d;
     border-radius: 3px;
     background: var(--well);
+  }
+  .boss {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+  }
+  .boss + .boss {
+    padding-top: 10px;
+    border-top: 1px solid #33434d;
+  }
+  .boss header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    min-width: 0;
   }
   .next-step:target {
     border-color: var(--gold-bright);

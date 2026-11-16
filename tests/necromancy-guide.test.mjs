@@ -6,6 +6,7 @@ import {
   DISTURBANCES,
   DUNGEONEERING_WEAPONS,
   ENDGAME_TARGETS,
+  F2P_LIMITS,
   NECRO_IMPORT,
   NECRO_STORY,
   PROGRESS_TARGETS,
@@ -15,7 +16,7 @@ import {
   XP_TARGETS,
   progressKey,
 } from "../src/necromancyGuide.ts";
-import { NECRO_RITUALS, NECRO_UPGRADES } from "../src/necromancyImported.ts";
+import { NECRO_GLYPHS, NECRO_RITUALS, NECRO_UPGRADES } from "../src/necromancyImported.ts";
 import { isSkillName } from "../src/skillNames.ts";
 
 // Hand-judged Necromancy data (spec: docs/superpowers/specs/2026-11-16-necromancy-guide-design.md), checked on the Wiki.
@@ -235,6 +236,24 @@ test("ritual quest gates name real rituals and quests", () => {
 test("the disturbances line is cited", () => {
   text(DISTURBANCES.note, "disturbances");
   dated(DISTURBANCES, "disturbances");
+});
+
+test("soul gates name the storyline quest they start, with the same souls", () => {
+  const tied = SOUL_GATES.filter((g) => g.quest);
+  assert.deepEqual(tied.map((g) => g.quest), ["the-spirit-of-war", "alpha-vs-omega"]);
+  for (const g of tied) assert.equal(NECRO_STORY.find((s) => s.quest === g.quest)?.souls, g.souls, g.quest);
+  // Every storyline quest that needs souls has its gate.
+  for (const s of NECRO_STORY.filter((s) => s.souls)) assert.ok(tied.some((g) => g.quest === s.quest), s.quest);
+});
+
+test("the free-to-play limits name real free recipes and inks, checked on the Wiki", () => {
+  assert.equal(F2P_LIMITS.checked, "2026-11-17");
+  assert.equal(new Set(F2P_LIMITS.sources).size, F2P_LIMITS.sources.length);
+  for (const url of F2P_LIMITS.sources) assert.match(url, WIKI, url);
+  const rituals = new Map(NECRO_RITUALS.map((r) => [r.id, r]));
+  for (const id of F2P_LIMITS.membersRecipes) assert.equal(rituals.get(id)?.members, false, `${id} is a recipe of a free ritual`);
+  const inks = new Set(NECRO_GLYPHS.map((g) => g.ink));
+  for (const ink of F2P_LIMITS.freeInks) assert.ok(inks.has(ink), ink);
 });
 
 test("the ritual site levels are cited", () => {

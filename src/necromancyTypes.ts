@@ -43,7 +43,7 @@ export type UpgradeStep = {
   wear: { skill: SkillName; level: number }[];
   task?: string;
   quests: string[];
-  materials: { item: string; qty: number; per: "weapon" | "slot" | "set"; image?: string }[];
+  materials: { item: string; qty: number; per: "weapon" | "set"; image?: string }[];
   members: boolean;
   image?: string;
 };

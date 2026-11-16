@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { gearPath, killNext, ritualsFor, soulStatus, storyProgress } from "../src/necromancyView.ts";
+import { gearPath, killNext, ritualsFor, showsMainNote, soulStatus, storyProgress, tier95 } from "../src/necromancyView.ts";
 
 // What the Necromancy guide shows for a profile (spec: docs/superpowers/specs/2026-11-16-necromancy-guide-design.md,
 // worked examples and Review Focus). Example 1 follows Ruling 3: Vessel of the Harbinger comes before The Spirit of War.
@@ -119,6 +119,46 @@ test("Example 2: weapon tier 50 recorded with 3,200 souls", () => {
   assert.equal(souls.next.souls, 3000);
   assert.equal(souls.next.status, "met");
   assert.equal(status(storyProgress(p).find((s) => s.quest.quest === "the-spirit-of-war").reqs, "3,000 souls"), "met");
+});
+
+test("Ruling 12: tier 95 lists both bosses at every tier, but progress offers Amascut only at 95", () => {
+  const low = profile({ Necromancy: 50, Agility: 70 }, { completedQuests: STORY_TO_70 });
+  const bosses = tier95(low);
+  assert.deepEqual(bosses.map((b) => b.boss), ["Rasial, the First Necromancer", "Amascut, the Devourer"]);
+  const amascut = bosses[1];
+  assert.equal(status(amascut.reqs, "Necromancy 95 to wield"), "below");
+  assert.equal(status(amascut.reqs, "Agility 65"), "met");
+  assert.deepEqual(tier95(f2p(20)), []);
+  // At 92 with tier 90 done, Devourer's Guard can't be wielded yet, so the target is Rasial.
+  const p = profile(
+    { Necromancy: 92, Agility: 70, Dungeoneering: 77, Archaeology: 86, Magic: 66, Prayer: 40 },
+    { completedQuests: ALL_STORY, necromancy: { weaponTier: 90 } },
+  );
+  assert.equal(killNext(p).progress.target, "Rasial, the First Necromancer");
+});
+
+test("free-to-play at 20 sees no members ink, recipe or regular-account XP note", () => {
+  const p = { ...f2p(20), kind: "Regular account" };
+  const rituals = ritualsFor(p);
+  assert.deepEqual(rituals.inks, ["Basic ghostly ink"]);
+  const ids = rituals.now.map((r) => r.id);
+  for (const id of ["lesser-communion-wyvern-bones", "lesser-communion-broken-memento", "lesser-communion-fragile-memento"])
+    assert.ok(!ids.includes(id), id);
+  assert.ok(ids.includes("lesser-communion-bones"));
+  assert.ok(ids.includes("lesser-necroplasm"));
+  // Members still see every recipe and ink.
+  const member = ritualsFor(profile({ Necromancy: 20 }));
+  assert.ok(member.now.some((r) => r.id === "lesser-communion-fragile-memento"));
+  assert.ok(member.inks.includes("Regular ghostly ink"));
+  // The XP row's mainNote (fragile mementos to about 26) is members advice: hidden on a free-to-play regular account.
+  assert.ok(killNext(p).xp.target.mainNote);
+  assert.equal(showsMainNote(p), false);
+  assert.equal(showsMainNote({ ...p, mode: "members" }), true);
+  assert.equal(showsMainNote(profile({ Necromancy: 20 })), false);
+  // Necromancy!'s members-only clause is split out, so the F2P storyline text doesn't name Kili Row.
+  const intro = storyProgress(p)[0].quest;
+  assert.ok(!intro.unlocks.includes("Kili Row"));
+  assert.match(intro.membersNote, /Kili Row/);
 });
 
 test("a tier 50 weapon still shows tier 95 as its destination, while progress stays on the next step", () => {
@@ -253,6 +293,13 @@ test("unknown quest status doesn't cap the assumed tier; only a quest known not 
   const war = storyProgress(p).find((s) => s.quest.quest === "the-spirit-of-war");
   assert.equal(status(war.reqs, "Necromancy 65"), "met");
   assert.equal(status(war.reqs, "3,000 souls"), "unknown");
+  // No quest is known not done, so none is next or locked: every storyline quest is unknown.
+  assert.ok(storyProgress(p).every((s) => s.state === "unknown"));
+  // Souls gates whose quest is unknown follow the recorded souls: 40,000 is past them all.
+  assert.equal(soulStatus({ ...p, necromancy: { souls: 40000 } }).next, undefined);
+  assert.equal(soulStatus({ ...p, necromancy: { souls: 3200 } }).next.souls, 4500);
+  assert.equal(soulStatus(p).next.souls, 3000);
+  assert.equal(soulStatus(p).next.status, "unknown");
   // Unknown quests aren't sent back as "Complete Necromancy!": at assumed T90 the target is the endgame boss.
   const progress = killNext(p).progress;
   assert.notEqual(progress.text, "Complete Necromancy!");
