@@ -101,3 +101,12 @@ test("xp method links resolve", () => {
   }
   assert.equal(XP_METHODS.filter((m) => m.requiresAttuner).length, 1);
 });
+
+test("The saved-kit validator's literal lists match the guide", async () => {
+  const { RUNECRAFTING_RUNES, RUNECRAFTING_POUCHES, RUNECRAFTING_FAMILIARS } = await import(
+    "../src/lib/profileStore.ts"
+  );
+  assert.deepEqual([...RUNECRAFTING_RUNES], ALTARS.map((a) => a.rune));
+  assert.deepEqual([...RUNECRAFTING_POUCHES], POUCHES.map((p) => p.id));
+  assert.deepEqual([...RUNECRAFTING_FAMILIARS], FAMILIARS.map((f) => f.id));
+});

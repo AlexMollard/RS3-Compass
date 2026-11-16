@@ -56,6 +56,15 @@ export interface Profile {
   trainingMethods?: Record<string, string>;
   /** The Slayer task the player picked: a master's id and a task id from SLAYER_TASKS. */
   slayerTask?: { master: string; task: string };
+  /** The player's Runecrafting kit and rune stock; same shape as RunecraftingKit in runecraftingPlan.ts. */
+  runecrafting?: {
+    xpRule?: "save-essence" | "fastest";
+    pouches?: ("small" | "medium" | "large" | "giant" | "massive" | "expansive")[];
+    familiar?: "parasite" | "lurker" | "titan";
+    infinityOutfit?: boolean;
+    attuner?: boolean;
+    stock?: { rune: string; have: number; want: number }[];
+  };
   source?: "sample" | "hiscores";
   hiscoresFetchedAt?: number;
   hiscoresImportStatus?: HiscoresImportStatus;
