@@ -47,7 +47,7 @@ The Runecrafting skill page gets its own layout, top to bottom:
 2. **Craft now.** Two picks for the player's level, altar access and kit:
    - **For XP:** the best method they can do now, with its rate and where. A two-way choice above it picks the rule, stored per character:
      - **Save essence** (default for Ironman): methods that need no essence first, such as the Runespan up to 77, then the Abyss and Soul altar.
-     - **Fastest** (default for regular accounts): the fastest method they can reach, such as the Abyss from early levels. It says how much essence an hour it uses.
+     - **Fastest** (default for regular accounts): the fastest method they can reach, such as the Abyss from early levels. It says it uses essence; it gives no essence-an-hour figure, because the Wiki doesn't publish one (amended 2026-11-17 during the build).
      - **When the pick needs essence**, it lists the best ways for an Ironman to get that essence, best first, gated by the player's levels and quests. Examples: the Rune Memories essence chest, noted drops from abyssal savages, mining it, Slayer/PvM drops, and impure essence for necrotic runes. The same ranked list appears on stockpile rows.
    - **For your stock:** the rune from their stock list that is furthest from its target and that they can craft, with runes per essence at their level.
    - Non-Ironman profiles get a third line: **For profit**, ranked by live GE prices.
@@ -70,7 +70,7 @@ The Runecrafting skill page gets its own layout, top to bottom:
 ## Worked examples (acceptance checks)
 
 1. **Ironman, Runecrafting 82, Lunar Diplomacy and Legacy of Seergaze done, 'Phite Club not done. Kit: Small to Giant pouches, abyssal lurker.**
-   - Craft now, for XP, on Save essence (the Ironman default): the high Runespan, which uses no essence. Switched to Fastest: Abyss blood runes (77+), with its pure essence an hour and the best Ironman ways to get pure essence.
+   - Craft now, for XP, on Save essence (the Ironman default): the high Runespan, which uses no essence. Switched to Fastest: Abyss blood runes (77+), with the best Ironman ways to get pure essence.
    - Unlock next: Savvy +275% at 95; Massive pouch at 90; Soul altar needs 'Phite Club (unmet) and 90 (unmet).
    - Stockpile: blood runes, have 4,200, want 20,000. It shows runes per essence at 82, the pure essence needed, and the trips at the free backpack slots + 30 in pouches + 12 in the lurker per trip.
 2. **Same player adds soul runes to the stockpile.**
@@ -98,7 +98,7 @@ The Runecrafting skill page gets its own layout, top to bottom:
 - **Ironman** means the profile kind is Solo Ironman or Group Ironman (`ACCOUNT_KINDS` in `src/data.ts`). Only Regular account sees the profit line.
 - **Quest state** comes from `completedQuests`. A quest that isn't in it shows as unmet, unless the profile's quest import is unavailable, when it shows as "unknown". The Time altar's requirement shows as "check in game" until it's confirmed.
 - **Runes per essence** comes from each altar's Wiki step table: one rune, plus one more at each listed level. Boosts (cape, potions) aren't counted. Savvy changes XP only, not rune count.
-- **Essence per trip** is the free backpack slots (28 minus the pouches carried), plus pouch capacity, plus the familiar, plus 12 for the infinity outfit. The Expansive pouch can't be carried with other pouches, so the planner uses whichever is larger: the Expansive alone, or the other pouches together.
+- **Essence per trip** is the free backpack slots (28 minus the pouches carried), plus pouch capacity, plus the familiar, plus 12 for the infinity outfit. Only kit the player can use counts: a pouch above their Runecrafting level, or a familiar above a recorded Summoning level, is left out (amended during the build). The Expansive pouch can't be carried with other pouches, so the planner uses whichever is larger: the Expansive alone, or the other pouches together.
 - **"Furthest from its target"** means the most essence still needed.
 - **Kit values** are fixed ids: small, medium, large, giant, massive, expansive. A pouch above the player's level can still be ticked, and is shown as "needs level N to use". The Pouch Protector relic isn't tracked.
 - **Sources show on the page.** Each section ends with the existing `CheckedSources` line: Wiki links and the checked date.
@@ -143,7 +143,7 @@ Pure functions, unit-tested: runes per essence at a level, essence per trip from
 
 ### Profile
 
-`runecrafting?: { xpRule?: "save-essence" | "fastest"; pouches?: string[]; familiar?: "parasite" | "lurker" | "titan"; infinityOutfit?: boolean; attuner?: boolean; stock?: { rune: string; have: number; want: number }[] }` is optional. Old saves stay valid, and validation rejects bad shapes.
+`runecrafting?: { xpRule?: "save-essence" | "fastest"; pouches?: ("small" | "medium" | "large" | "giant" | "massive" | "expansive")[]; familiar?: "parasite" | "lurker" | "titan"; infinityOutfit?: boolean; attuner?: boolean; stock?: { rune: string; have: number; want: number }[] }` is optional. Old saves stay valid, and validation rejects bad shapes.
 
 ### Page
 
