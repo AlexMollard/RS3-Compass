@@ -75,14 +75,14 @@ interface Candidate {
 }
 
 const armourOrder = (c: Candidate) => (c.item.armourType === "power" ? 0 : 1);
-/** Strongest first: rank, then power before tank, then name. */
-const strongestFirst = (a: Candidate, b: Candidate) =>
-  b.rank - a.rank || b.item.tier - a.item.tier || armourOrder(a) - armourOrder(b) || a.item.name.localeCompare(b.item.name);
 /** Weakest first: rank, then power before tank, then name. */
 const weakestFirst = (a: Candidate, b: Candidate) =>
   a.rank - b.rank || a.item.tier - b.item.tier || armourOrder(a) - armourOrder(b) || a.item.name.localeCompare(b.item.name);
 
-/** For each gear row, the best item the player can wear, an easier one to get, a minimum and the next upgrade. */
+/**
+ * For each gear row, the best item the player can wear, an easier one to get, a minimum and the next upgrade.
+ * In tool mode (`class: "tool"`), `minTier` and `maxTier` are gathering-skill levels (e.g. Mining), not item tiers.
+ */
 export function selectGear(options: SelectGearOptions): GearRow[] {
   const { profile, minTier, maxTier } = options;
   const tools = options.class === "tool";
@@ -132,6 +132,14 @@ export function selectGear(options: SelectGearOptions): GearRow[] {
     c.wear.some((w) => levelStatus(profile.levels[w.skill], w.level) === "below")
       ? undefined
       : c.wear.find((w) => profile.levels[w.skill] == null)?.skill;
+  // Strongest first: rank, tier, power before tank, then a harder route before an easy one (so an equal-tier
+  // boss drop is best and the smithable item is easier), then name.
+  const strongestFirst = (a: Candidate, b: Candidate) =>
+    b.rank - a.rank ||
+    b.item.tier - a.item.tier ||
+    armourOrder(a) - armourOrder(b) ||
+    Number(easy(a)) - Number(easy(b)) ||
+    a.item.name.localeCompare(b.item.name);
 
   const rows: GearRow[] = [];
   for (const name of ROW_ORDER) {
@@ -140,18 +148,16 @@ export function selectGear(options: SelectGearOptions): GearRow[] {
     candidates.sort(strongestFirst);
     const best = candidates.find(wearable);
     const above = best ? candidates.filter((c) => c.rank > best.rank) : candidates;
-    // When nothing is wearable, or only requirement-free items are (bronze), an unrecorded level hides the real
-    // answer: prompt for the first one gating a stronger item rather than fall back.
-    let unrecorded: SkillName | undefined;
-    if (!best || best.wear.length === 0)
-      for (const c of [...above].reverse()) if ((unrecorded = unknownSkill(c))) break;
+    const next = above.reduce<Candidate | undefined>((low, c) => (!low || weakestFirst(c, low) < 0 ? c : low), undefined);
+    // When nothing is wearable, or only requirement-free items are (bronze), and the next item is gated only by
+    // an unrecorded level, prompt for that level rather than fall back.
+    const unrecorded = next && (!best || best.wear.length === 0) ? unknownSkill(next) : undefined;
     const row: GearRow = { row: name };
     if (unrecorded) row.unrecorded = unrecorded;
     else {
       if (best) row.best = pick(best);
       const easier = candidates.find((c) => easy(c) && wearable(c));
       if (easier && easier !== best) row.easier = pick(easier);
-      const next = above.reduce<Candidate | undefined>((low, c) => (!low || weakestFirst(c, low) < 0 ? c : low), undefined);
       if (next) row.next = pick(next);
     }
     if (minTier !== undefined) {

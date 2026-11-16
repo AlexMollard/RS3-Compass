@@ -34,7 +34,7 @@ const row = (rows, name) => rows.find((r) => r.row === name);
 
 test("worked example 1", () => {
   const items = [
-    item("Test bane 2h", "2h", 79, { Attack: 80 }),
+    item("Test bane 2h", "2h", 80, { Attack: 80 }),
     item("Test boss 2h", "2h", 80, { Attack: 80 }, drop),
     item("Test elder 2h", "2h", 90, { Attack: 90 }),
     item("Test body 80", "body", 80, { Defence: 80 }),
@@ -84,6 +84,18 @@ test("worked example 3 unrecorded Defence", () => {
     assert.equal(row(rows, name).next, undefined, name);
   }
   assert.equal(row(rows, "2h").best.item.name, "Test 2h");
+});
+
+test("a secondary unrecorded skill above next does not prompt", () => {
+  const items = [
+    item("Test bronze 2h", "2h", 1),
+    item("Test iron 2h", "2h", 10, { Attack: 10 }),
+    item("Test slayer 2h", "2h", 20, { Slayer: 31 }),
+  ];
+  const twoH = row(selectGear({ class: "melee", profile: profile({ Attack: 1 }), items }), "2h");
+  assert.equal(twoH.unrecorded, undefined);
+  assert.equal(twoH.best.item.name, "Test bronze 2h");
+  assert.equal(twoH.next.item.name, "Test iron 2h");
 });
 
 test("best needs every wear requirement", () => {
