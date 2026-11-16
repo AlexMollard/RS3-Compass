@@ -12,6 +12,7 @@ import {
 } from "../src/data.ts";
 import { RS3_SKILL_NAMES } from "../src/skillNames.ts";
 import { LOCATIONS } from "../src/locations.ts";
+import { ALTARS } from "../src/runecraftingGuide.ts";
 
 const profile = (skill, level, mode = "members") => ({
   ...structuredClone(SAMPLE_PROFILES[0]),
@@ -312,4 +313,41 @@ test("A stored member method survives mode changes without being recommended in 
   assert.equal(trainingStage(skill, { ...p, mode: "f2p" }).from, 1);
   assert.equal(skillNeedsMembership(skill, { ...p, mode: "f2p" }), true);
   assert.equal(trainingStage(skill, p).from, 13);
+});
+
+test("Runecrafting ranges follow the members guide and keep a free route", () => {
+  const rc = skillByName("Runecrafting");
+  assert.equal(rc.trainingWiki, "Pay-to-play_Runecrafting_training");
+  assert.ok(!rc.membersNote.includes("Free players can train to 110"));
+  assert.deepEqual(
+    rc.stages.map((stage) => [stage.from, stage.to]),
+    [[1, 33], [33, 66], [66, 90], [90, 105], [105, 110]],
+  );
+  for (const stage of rc.stages) {
+    const context = "Runecrafting " + stage.from;
+    const members = availableTrainingOptions(stage, "members");
+    assert.ok(members.some((o) => o.wiki === "Runespan" || o.wiki === "Fleshy growth"), context + " has no Runespan");
+    assert.ok(members.some((o) => /altar|abyss/i.test(o.wiki)), context + " has no altar");
+    assert.ok(availableTrainingOptions(stage, "f2p").length > 0, context + " has no free route");
+  }
+  for (const stage of rc.stages.filter((s) => s.from >= 90)) {
+    const soul = stage.options.find((o) => o.id === "soul-altar");
+    assert.ok(soul?.requirements.some((r) => r.includes("'Phite Club")), "Soul altar needs 'Phite Club");
+  }
+  assert.ok(rc.stages.at(-1).options.some((o) => o.id === "runic-attuner"));
+  for (const o of rc.stages.at(-1).options.filter((o) => o.id === "soul-altar" || o.id === "runic-attuner"))
+    assert.deepEqual(o.locations, [], o.id + " has no fixed location");
+});
+
+test("Runecrafting altar requirements use the altar's own level", () => {
+  const rc = skillByName("Runecrafting");
+  const matches = rc.stages
+    .flatMap((stage) => stage.options.flatMap((o) => o.requirements))
+    .flatMap((r) => [...r.matchAll(/(\d+) Runecrafting for ([A-Z]\w+)/g)]);
+  assert.ok(matches.length >= 6, "too few altar requirements matched");
+  for (const [text, level, rune] of matches) {
+    const altar = ALTARS.find((a) => a.rune === rune);
+    assert.ok(altar, text + " names no altar");
+    assert.equal(Number(level), altar.level, text);
+  }
 });

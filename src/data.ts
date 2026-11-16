@@ -63,6 +63,15 @@ export interface Profile {
     robeLine?: "deathwarden" | "deathdealer";
     souls?: number;
   };
+  /** The player's Runecrafting kit and rune stock; same shape as RunecraftingKit in runecraftingPlan.ts. */
+  runecrafting?: {
+    xpRule?: "save-essence" | "fastest";
+    pouches?: ("small" | "medium" | "large" | "giant" | "massive" | "expansive")[];
+    familiar?: "parasite" | "lurker" | "titan";
+    infinityOutfit?: boolean;
+    attuner?: boolean;
+    stock?: { rune: string; have: number; want: number }[];
+  };
   source?: "sample" | "hiscores";
   hiscoresFetchedAt?: number;
   hiscoresImportStatus?: HiscoresImportStatus;

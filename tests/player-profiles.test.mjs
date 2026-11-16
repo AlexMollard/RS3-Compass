@@ -693,3 +693,68 @@ test("Necromancy progress validates, merges and clears", (t) => {
   storage.set(KEY, JSON.stringify(old));
   assert.equal(current(load()).necromancy, undefined);
 });
+
+test("A saved Runecrafting kit loads and round-trips, and a malformed one is rejected", (t) => {
+  const descriptor = Object.getOwnPropertyDescriptor(globalThis, "localStorage");
+  const storage = new Map();
+  Object.defineProperty(globalThis, "localStorage", {
+    configurable: true,
+    value: {
+      getItem: (key) => storage.get(key) ?? null,
+      setItem: (key, value) => storage.set(key, value),
+    },
+  });
+  const controllers = [];
+  t.after(() => {
+    controllers.forEach((c) => c.destroy());
+    if (descriptor) Object.defineProperty(globalThis, "localStorage", descriptor);
+    else delete globalThis.localStorage;
+  });
+  const load = () => {
+    const c = createCompassController();
+    controllers.push(c);
+    c.initialize();
+    return c;
+  };
+  const first = load();
+  assert.equal(current(first).runecrafting, undefined);
+  const kit = {
+    xpRule: "fastest",
+    pouches: ["small", "giant"],
+    familiar: "lurker",
+    infinityOutfit: true,
+    stock: [{ rune: "Blood", have: 0, want: 20000 }],
+  };
+  first.updateProfile((p) => ({ ...p, runecrafting: kit }));
+  assert.deepEqual(current(load()).runecrafting, kit);
+
+  const raw = JSON.parse(storage.get(KEY));
+  const withKit = (runecrafting) =>
+    JSON.stringify({ ...raw, profiles: raw.profiles.map((p) => ({ ...p, runecrafting })) });
+  const row = (over) => ({ stock: [{ rune: "Blood", have: 0, want: 5, ...over }] });
+  const bads = [
+    { pouches: ["huge"] },
+    { pouches: ["small", "small"] },
+    { familiar: "imp" },
+    { xpRule: "slow" },
+    { infinityOutfit: "yes" },
+    { attuner: 1 },
+    "fastest",
+    row({ have: -1 }),
+    row({ rune: "" }),
+    row({ rune: "Nope" }),
+    row({ want: 1.5 }),
+    row({ want: 100000001 }),
+    { stock: Array.from({ length: 31 }, () => ({ rune: "Blood", have: 0, want: 5 })) },
+  ];
+  for (const bad of bads) {
+    storage.set(KEY, withKit(bad));
+    // A rejected save falls back to the samples, which carry no kit.
+    assert.equal(current(load()).runecrafting, undefined, JSON.stringify(bad));
+  }
+  storage.set(KEY, withKit({ stock: Array.from({ length: 30 }, () => ({ rune: "Soul", have: 0, want: 100000000 })) }));
+  assert.equal(current(load()).runecrafting?.stock?.length, 30);
+  const old = { ...raw, profiles: raw.profiles.map(({ runecrafting, ...rest }) => rest) };
+  storage.set(KEY, JSON.stringify(old));
+  assert.equal(current(load()).runecrafting, undefined);
+});

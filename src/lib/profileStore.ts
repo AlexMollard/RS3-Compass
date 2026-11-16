@@ -48,6 +48,44 @@ function validNecromancy(n: unknown): boolean {
   );
 }
 
+// Literal lists keep the guide data out of the main chunk; tests/runecrafting-guide.test.mjs pins them to the guide.
+export const RUNECRAFTING_RUNES = [
+  "Air", "Mind", "Water", "Earth", "Fire", "Body", "Cosmic", "Chaos", "Astral", "Nature",
+  "Law", "Death", "Blood", "Soul", "Time", "Spirit", "Bone", "Flesh", "Miasma",
+] as const;
+export const RUNECRAFTING_POUCHES = ["small", "medium", "large", "giant", "massive", "expansive"] as const;
+export const RUNECRAFTING_FAMILIARS = ["parasite", "lurker", "titan"] as const;
+const MAX_STOCK_ROWS = 30;
+const MAX_RUNES = 100_000_000;
+const isCount = (n: unknown) =>
+  typeof n === "number" && Number.isInteger(n) && n >= 0 && n <= MAX_RUNES;
+const isOneOf = (list: readonly string[], v: unknown) => typeof v === "string" && list.includes(v);
+
+export function isRunecraftingKit(value: unknown): boolean {
+  if (!isRecord(value)) return false;
+  const { xpRule, pouches, familiar, infinityOutfit, attuner, stock } = value;
+  return (
+    (xpRule === undefined || xpRule === "save-essence" || xpRule === "fastest") &&
+    (pouches === undefined ||
+      (Array.isArray(pouches) &&
+        pouches.every((id) => isOneOf(RUNECRAFTING_POUCHES, id)) &&
+        new Set(pouches).size === pouches.length)) &&
+    (familiar === undefined || isOneOf(RUNECRAFTING_FAMILIARS, familiar)) &&
+    (infinityOutfit === undefined || typeof infinityOutfit === "boolean") &&
+    (attuner === undefined || typeof attuner === "boolean") &&
+    (stock === undefined ||
+      (Array.isArray(stock) &&
+        stock.length <= MAX_STOCK_ROWS &&
+        stock.every(
+          (row) =>
+            isRecord(row) &&
+            isOneOf(RUNECRAFTING_RUNES, row.rune) &&
+            isCount(row.have) &&
+            isCount(row.want),
+        )))
+  );
+}
+
 function validProfile(value: unknown): value is Profile {
   if (!value || typeof value !== "object") return false;
   const p = value as Partial<Profile>;
@@ -98,6 +136,7 @@ function validProfile(value: unknown): value is Profile {
           (id) => typeof id === "string" && id.length > 0 && id.length <= 128,
         ))) &&
     (p.necromancy === undefined || validNecromancy(p.necromancy)) &&
+    (p.runecrafting === undefined || isRunecraftingKit(p.runecrafting)) &&
     [p.collected, p.collectedAuto].every(
       (a) =>
         a === undefined ||
