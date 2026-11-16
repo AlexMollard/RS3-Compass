@@ -87,6 +87,8 @@
       ? []
       : ALTARS.filter((a) => altarAccess(profile, a).every((r) => r.state !== "unmet")),
   );
+  // shortcut: a failed price fetch isn't retried until the craftable rune set changes or the page reloads; add a
+  // retry button if users hit rate limits.
   let priced = $state<{ key: string; done: boolean; prices?: Prices }>({ key: "", done: false });
   $effect(() => {
     const names = profitAltars.map((a) => `${a.rune} rune`);
@@ -302,7 +304,10 @@
                       >
                     </p>
                     <p class="cap">
-                      {xp(method.rate[0])}–{xp(method.rate[1])} XP/hr base{#if method.provisional}{" "}<span
+                      <!-- A provisional rate can span several Wiki bands, so only its low end is shown. -->
+                      {method.provisional
+                        ? `from ${xp(method.rate[0])}`
+                        : `${xp(method.rate[0])}–${xp(method.rate[1])}`} XP/hr base{#if method.provisional}{" "}<span
                           class="estimate">estimate</span
                         >{/if} · {method.needsEssence ? "uses essence" : "uses no essence"}
                     </p>
