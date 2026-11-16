@@ -8,8 +8,17 @@
     activitySkillReferences,
     activitySubject,
   } from "../activityPresentation";
-  import { mergeActivity, type ActivitySource } from "../activityFeed";
-  import { Activity } from "@lucide/svelte";
+  import {
+    FILTER_GROUPS,
+    filterGroup,
+    groupActivity,
+    isHighlight,
+    levelUp,
+    mergeActivity,
+    type ActivityRow,
+    type ActivitySource,
+  } from "../activityFeed";
+  import { Activity, Star } from "@lucide/svelte";
   import { wikiImage } from "../../wiki";
   import { relativeTime } from "../relativeTime";
   import GameText from "./GameText.svelte";
@@ -58,21 +67,37 @@
       ? sources
       : sources.filter((source) => source.playerId === selectedPlayer),
   );
-  let rows = $derived(mergeActivity(scopedSources));
-  let categories = $derived(
-    [...new Set(rows.map((row) => row.category))].sort(),
+  let allRows = $derived(mergeActivity(sources));
+  let rows = $derived(
+    selectedPlayer === "all"
+      ? allRows
+      : allRows.filter((row) => row.playerId === selectedPlayer),
   );
+  const tally = (list: readonly ActivityRow[], pick: (row: ActivityRow) => string) => {
+    const counts = new Map<string, number>();
+    for (const row of list) counts.set(pick(row), (counts.get(pick(row)) ?? 0) + 1);
+    return counts;
+  };
+  let playerCounts = $derived(tally(allRows, (row) => row.playerId));
+  let categoryCounts = $derived(tally(rows, (row) => filterGroup(row.category)));
+  let categories = $derived(FILTER_GROUPS.filter((g) => categoryCounts.has(g)));
+  // Players with nothing loaded are explained on the page, not offered as a filter.
+  let playerChoices = $derived(
+    sources.filter((source) => playerCounts.has(source.playerId)),
+  );
+  const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
   let selectedCategory = $derived(
     categories.includes(category) ? category : "all",
   );
   let filtered = $derived(
     selectedCategory === "all"
       ? rows
-      : rows.filter((row) => row.category === selectedCategory),
+      : rows.filter((row) => filterGroup(row.category) === selectedCategory),
   );
   let visible = $derived(
     filtered.slice(0, showAll ? undefined : Math.max(1, initialLimit)),
   );
+  let days = $derived(groupActivity(visible, now));
   const date = (value: string | number) => {
     const parsed = new Date(value);
     return Number.isNaN(parsed.getTime())
@@ -105,16 +130,21 @@
 </script>
 
 <div class="feed" aria-busy={resolving}>
-  {#if showFilters && sources.length > 1}
+  {#if showFilters && playerChoices.length > 1}
     <ChoiceStrip
       label="Player"
       name={instance + "-player"}
       value={selectedPlayer}
       choices={[
-        { value: "all", label: "All players" },
-        ...sources.map((source) => ({
+        {
+          value: "all",
+          label: "All players",
+          detail: plural(allRows.length, "event"),
+        },
+        ...playerChoices.map((source) => ({
           value: source.playerId,
           label: source.name,
+          detail: plural(playerCounts.get(source.playerId) ?? 0, "event"),
         })),
       ]}
       onChange={(value) => {
@@ -131,8 +161,11 @@
       name={instance + "-category"}
       value={selectedCategory}
       choices={[
-        { value: "all", label: "All categories" },
-        ...categories.map((value) => ({ value, label: value })),
+        { value: "all", label: `All · ${rows.length}` },
+        ...categories.map((value) => ({
+          value,
+          label: `${value} · ${categoryCounts.get(value)}`,
+        })),
       ]}
       onChange={(value) => {
         category = value;
@@ -193,51 +226,78 @@
       Resolving Wiki artwork…
     </p>{/if}
   {#if visible.length}
-    <ul class="events">
-      {#each visible as row (row.key)}
-        {@const subject = activitySubject(row.event)}
-        {@const references = subject
-          ? [activityReference(subject, articles.get(subject.name))]
-          : activitySkillReferences(row.event)}
-        {@const reference = references?.find((r) => r.imageUrl || r.image)}
-        {@const art = reference
-          ? (reference.imageUrl ?? wikiImage(reference.image!))
-          : undefined}
-        {@const when = Date.parse(row.event.date)}
-        <li>
-          <span class="art" aria-hidden="true"
-            >{#if art}<img src={art} alt="" loading="lazy" decoding="async" />{:else}<Activity
-                size={20}
-              />{/if}</span
-          >
-          <div class="ev-main">
-            <p class="title">
-              <strong>{row.playerName}</strong>
-              <GameText text={row.event.text} {references} catalogue={false} />
-            </p>
-            <div class="meta">
-              <span>{row.category}</span>
-              <time datetime={row.event.date} title={date(row.event.date)}
-                >{Number.isNaN(when)
-                  ? date(row.event.date)
-                  : relativeTime(when, now)}</time
+    {#each days as day (day.key)}
+      <svelte:element this={framed ? "h3" : "h4"} class="day"
+        >{day.label} <span>{plural(day.count, "event")}</span></svelte:element
+      >
+      <ul class="events">
+        {#each day.items as item (item.key)}
+          {#if item.kind === "levels"}
+            {@const newest = item.rows[0]}
+            <li>
+              <span class="art batch" aria-hidden="true">+{item.levels.length}</span>
+              <div class="ev-main">
+                <p class="title">
+                  <strong>{item.playerName}</strong>
+                  gained {item.levels.length} levels
+                  {#if item.highlight}{@render highlight()}{/if}
+                </p>
+                <ul class="levels">
+                  {#each item.levels as level, i (i)}
+                    <li>{level.skill}{level.level ? ` ${level.level}` : ""}</li>
+                  {/each}
+                </ul>
+                {@render meta(newest, newest.category)}
+              </div>
+            </li>
+          {:else}
+            {@const row = item.row}
+            {@const subject = activitySubject(row.event)}
+            {@const references = subject
+              ? [activityReference(subject, articles.get(subject.name))]
+              : activitySkillReferences(row.event)}
+            {@const reference = references?.find((r) => r.imageUrl || r.image)}
+            {@const art = reference
+              ? (reference.imageUrl ?? wikiImage(reference.image!))
+              : undefined}
+            <li>
+              <span class="art" aria-hidden="true"
+                >{#if art}<img
+                    src={art}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                  />{:else}<Activity size={20} />{/if}</span
               >
-            </div>
-            <details>
-              <summary>Jagex details</summary>
-              {#if row.event.details && row.event.details !== row.event.text}<p>
+              <div class="ev-main">
+                <p class="title">
+                  <strong>{row.playerName}</strong>
                   <GameText
-                    text={row.event.details}
+                    text={row.event.text}
                     {references}
                     catalogue={false}
                   />
-                </p>{/if}
-              <small>Event type: <code>{row.event.type}</code></small>
-            </details>
-          </div>
-        </li>
-      {/each}
-    </ul>
+                  {#if isHighlight(row.event)}{@render highlight()}{/if}
+                </p>
+                {@render meta(row)}
+                {#if row.event.details && row.event.details !== row.event.text && !/^quest complete!?$/i.test(row.event.details.trim()) && !levelUp(row.event)?.level}
+                  <details>
+                    <summary>Details</summary>
+                    <p>
+                      <GameText
+                        text={row.event.details}
+                        {references}
+                        catalogue={false}
+                      />
+                    </p>
+                  </details>
+                {/if}
+              </div>
+            </li>
+          {/if}
+        {/each}
+      </ul>
+    {/each}
     {#if filtered.length > Math.max(1, initialLimit)}
       <Button
         variant="quiet"
@@ -254,19 +314,34 @@
     <p class="source">No public events yet for the players in scope.</p>
   {/if}
   <p class="source">
-    Reported activity is not current inventory. Jagex and Compass can each cache
-    responses for up to 10 minutes. Only the latest 20 events per player are
-    returned.
+    Jagex returns each player's latest 20 events, and Jagex and Compass can each
+    cache them for up to 10 minutes. The log shows what happened, not what a
+    player holds now.
   </p>
-  <details class="help">
-    <summary>Event settings</summary>
-    <p>
-      Active members can enable event types in Settings → Gameplay → Chat &amp;
-      Social → RuneMetrics Event Log. Changes are not retroactive; kills and
-      level-ups can be batched. Compass planning mode does not change account
-      membership.
-    </p>
-  </details>
+  {#if !framed}<details class="help">
+      <summary>Event settings</summary>
+      <p>
+        Active members can enable event types in Settings → Gameplay → Chat
+        &amp; Social → RuneMetrics Event Log. Changes are not retroactive;
+        kills and level-ups can be batched. Compass planning mode does not
+        change account membership.
+      </p>
+    </details>{/if}
+{/snippet}
+
+{#snippet highlight()}<span class="highlight"
+    ><Star size={12} aria-hidden="true" />Highlight</span
+  >{/snippet}
+
+{#snippet meta(row: ActivityRow, label?: string)}
+  {@const when = Date.parse(row.event.date)}
+  {@const level = levelUp(row.event)?.level}
+  <div class="meta">
+    <span>{label ?? (level ? `Level ${level}` : row.category)}</span>
+    <time datetime={row.event.date} title={date(row.event.date)}
+      >{Number.isNaN(when) ? date(row.event.date) : relativeTime(when, now)}</time
+    >
+  </div>
 {/snippet}
 
 <style>
@@ -289,9 +364,60 @@
   .events {
     list-style: none;
     padding: 0;
-    margin: 12px 0;
+    margin: 0 0 8px;
     display: grid;
     gap: 0;
+  }
+  .day {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin: 16px 0 0;
+    padding: 8px 0;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+    border-bottom: 1px solid var(--line);
+  }
+  .day span {
+    font-size: var(--font-caption);
+    font-weight: 400;
+    color: var(--muted);
+  }
+  .art.batch {
+    font-size: var(--font-caption);
+    font-weight: 700;
+  }
+  .levels {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 6px 0;
+    padding: 0;
+  }
+  .levels li {
+    padding: 0 8px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--panel-raised);
+    font-size: var(--font-caption);
+    line-height: 22px;
+  }
+  .highlight {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 6px;
+    padding: 0 6px;
+    border: 1px solid var(--gold);
+    border-radius: 4px;
+    font-size: var(--font-caption);
+    line-height: 18px;
+    font-weight: 600;
+    color: var(--gold-bright);
+    vertical-align: 1px;
   }
   .feed-body {
     padding: 4px 18px 16px;

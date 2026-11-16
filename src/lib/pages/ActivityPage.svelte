@@ -3,14 +3,13 @@
   import { page } from "$app/state";
   import { getCompass, getPlayerActions } from "../compassContext";
   import { playerKey } from "../playerName";
-  import type { ActivitySource } from "../activityFeed";
+  import { weeklyTotals, type ActivitySource } from "../activityFeed";
   import ActivityFeed from "../components/ActivityFeed.svelte";
   import PageHeading from "../components/PageHeading.svelte";
   import ChoiceStrip from "../components/ChoiceStrip.svelte";
   import Button from "../components/Button.svelte";
   import GameWindow from "../components/GameWindow.svelte";
   import PlayerPortrait from "../components/PlayerPortrait.svelte";
-  import SourceBanner from "../components/SourceBanner.svelte";
   import StatusChip from "../components/StatusChip.svelte";
   import { isSnapshotStale } from "../sourceStatus";
   import { relativeTime } from "../relativeTime";
@@ -63,7 +62,45 @@
   let queued = $derived(
     watched.filter((p) => $sync[p.id]?.state === "queued").length,
   );
-  let errors = $derived(watched.filter((p) => $sync[p.id]?.state === "error"));
+  // Re-stamped whenever a refresh brings new sources, so ages do not freeze at mount.
+  let now = $derived.by(() => {
+    void sources;
+    return Date.now();
+  });
+  let lastFetched = $derived(
+    Math.max(0, ...watched.map((p) => p.eventLog?.fetchedAt ?? 0)),
+  );
+  let totals = $derived(weeklyTotals(sources, now));
+  let attention = $derived(
+    profiles.filter((p) => {
+      const state = $sync[p.id]?.state;
+      return (
+        state !== "refreshing" && state !== "queued" && chipFor(p).tone !== "ok"
+      );
+    }),
+  );
+  /** Mirrors chipFor's order so the chip and the sentence agree. */
+  function attentionCopy(profile: Profile): { message: string; retry: boolean } {
+    const syncState = $sync[profile.id];
+    const status = profile.eventImportStatus;
+    if (syncState?.state === "error")
+      return {
+        message: `${syncState.message ?? ""} Any previous snapshot is kept.`.trim(),
+        retry: true,
+      };
+    if (quiet(status))
+      return { message: statusCopy(status)!.message, retry: false };
+    if (isSnapshotStale(profile, syncState))
+      return {
+        message: profile.eventLog
+          ? `The last refresh failed. Showing events from ${relativeTime(profile.eventLog.fetchedAt, now)}.`
+          : "The last refresh failed. Showing the last snapshot.",
+        retry: true,
+      };
+    const copy = statusCopy(status);
+    if (copy) return { message: copy.message, retry: true };
+    return { message: "Events have not been loaded yet.", retry: true };
+  }
   function statusCopy(status?: string) {
     if (status === "not-member")
       return {
@@ -95,7 +132,7 @@
     if ($sync[profile.id]?.state === "error")
       return { tone: "bad", label: "Refresh failed" };
     if (status === "not-member")
-      return { tone: "info", label: "Needs membership and a public Event Log" };
+      return { tone: "info", label: "Needs membership" };
     if (status === "private-or-unavailable")
       return { tone: "neutral", label: "Private or unavailable" };
     if (isSnapshotStale(profile, $sync[profile.id]))
@@ -135,10 +172,16 @@
     title="Activity"
     subtitle="Recent public Adventurer's Log events, with player attribution."
   >
-    {#snippet trailing()}<Button
-        onclick={() => refresh(false)}
-        disabled={!sourceIds.length || !!refreshing || !!queued}
-        >Refresh activity</Button
+    {#snippet trailing()}<span class="refresh"
+        >{#if lastFetched}<span class="updated"
+            >Updated <time title={new Date(lastFetched).toLocaleString()}
+              >{relativeTime(lastFetched, now)}</time
+            ></span
+          >{/if}<Button
+          onclick={() => refresh(false)}
+          disabled={!sourceIds.length || !!refreshing || !!queued}
+          >Refresh activity</Button
+        ></span
       >{/snippet}
   </PageHeading>
   <div class="activity-actions">
@@ -168,27 +211,6 @@
     {#if refreshing || queued}<p class="source" role="status">
         {refreshing} refreshing · {queued} queued. Existing events stay visible.
       </p>{/if}
-    {#each errors as profile (profile.id)}<SourceBanner
-        notice={{
-          tone: quiet(profile.eventImportStatus) ? "private" : "failed",
-          title: `${profile.name}: refresh failed`,
-          message: `${$sync[profile.id].message ?? ""} Any previous snapshot is kept.`.trim(),
-          retry: true,
-        }}
-        onRetry={() =>
-          void controller.refreshPlayers([profile.id], { staleOnly: false })}
-      />{/each}
-    {#each profiles as profile (profile.id)}
-      {@const copy = statusCopy(profile.eventImportStatus)}
-      {#if copy && $sync[profile.id]?.state !== "error"}<SourceBanner
-          notice={{
-            tone: copy.tone,
-            title: `${profile.name}: event log unavailable`,
-            message: copy.message,
-            retry: false,
-          }}
-        />{/if}
-    {/each}
     <div class="two">
       <ActivityFeed
         {sources}
@@ -199,41 +221,71 @@
         playerId={selectedPlayer}
         onPlayerChange={(id) => (playerFilter = id)}
       />
-      <GameWindow title="Who's included" className="included">
-        <ul class="people">
-          {#each profiles as profile (profile.id)}
-            {@const chip = chipFor(profile)}
-            {@const log = profile.eventLog}
-            <li>
-              <PlayerPortrait name={profile.name} size={36} />
-              <span class="who">
-                <b>{profile.name}</b>
-                <span class="cap"
-                  >{#if log}{log.events.length}
-                    {log.events.length === 1 ? "event" : "events"} · updated
-                    <time title={new Date(log.fetchedAt).toLocaleString()}
-                      >{relativeTime(log.fetchedAt)}</time
-                    >{:else}No events loaded yet{/if}</span
-                >
-                {#if log && !log.events.length && !statusCopy(profile.eventImportStatus)}<span
-                    class="cap">No public events were returned.</span
-                  >{/if}
-                <a
-                  class="cap"
-                  href={"https://secure.runescape.com/m=adventurers-log/api/v1/playerEvents/" +
-                    encodeURIComponent(profile.name)}
-                  target="_blank"
-                  rel="noopener noreferrer">Jagex source ↗</a
-                >
-              </span>
-              <StatusChip tone={chip.tone} label={chip.label} />
-            </li>
-          {/each}
-        </ul>
-        <p class="cap note">
-          Turn on the Event Log in RuneMetrics settings in-game to appear here.
-        </p>
-      </GameWindow>
+      <div class="side">
+        {#if totals.length}<GameWindow title="Last 7 days">
+            <table class="week">
+              <thead>
+                <tr>
+                  <th scope="col">Player</th>
+                  <th scope="col">Levels</th>
+                  <th scope="col">Quests</th>
+                  <th scope="col">Drops</th>
+                </tr>
+              </thead>
+              <tbody>
+                {#each totals as row (row.playerId)}
+                  <tr>
+                    <th scope="row">{row.name}</th>
+                    <td>{row.levels}</td>
+                    <td>{row.quests}</td>
+                    <td>{row.drops}</td>
+                  </tr>
+                {/each}
+              </tbody>
+            </table>
+            <p class="cap note">Counts only cover events Jagex returned.</p>
+          </GameWindow>{/if}
+        {#if attention.length}<GameWindow title="Needs attention">
+            <ul class="people">
+              {#each attention as profile (profile.id)}
+                {@const chip = chipFor(profile)}
+                {@const copy = attentionCopy(profile)}
+                <li>
+                  <PlayerPortrait name={profile.name} size={28} />
+                  <span class="who">
+                    <b>{profile.name}</b>
+                    <StatusChip tone={chip.tone} label={chip.label} />
+                    <span class="cap">{copy.message}</span>
+                    <span class="links">
+                      {#if copy.retry}<Button
+                          variant="quiet"
+                          onclick={() =>
+                            void controller.refreshPlayers([profile.id], {
+                              staleOnly: false,
+                            })}>Try again</Button
+                        >{/if}
+                      <a
+                        class="cap"
+                        href={"https://secure.runescape.com/m=adventurers-log/api/v1/playerEvents/" +
+                          encodeURIComponent(profile.name)}
+                        target="_blank"
+                        rel="noopener noreferrer">Jagex source ↗</a
+                      >
+                    </span>
+                  </span>
+                </li>
+              {/each}
+            </ul>
+            <details class="note">
+              <summary>How to share your Event Log</summary>
+              <p>
+                Active members can turn it on in Settings → Gameplay → Chat
+                &amp; Social → RuneMetrics Event Log. Changes are not
+                retroactive, and kills and level-ups can be batched.
+              </p>
+            </details>
+          </GameWindow>{/if}
+      </div>
     </div>
   {/if}
 </div>
@@ -279,9 +331,71 @@
   .who {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
     flex: 1 1 100px;
     min-width: 0;
     overflow-wrap: anywhere;
+  }
+  .refresh {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+  }
+  .updated {
+    font-size: var(--font-caption);
+    color: var(--muted);
+  }
+  .side {
+    display: grid;
+    gap: 20px;
+    min-width: 0;
+  }
+  .people li {
+    align-items: flex-start;
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 12px;
+  }
+  .week {
+    width: calc(100% - 32px);
+    margin: 8px 16px 0;
+    border-collapse: collapse;
+    font-size: var(--font-ui);
+  }
+  .week th,
+  .week td {
+    padding: 6px 0;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .week thead th {
+    font-size: var(--font-caption);
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .week th:first-child {
+    text-align: left;
+  }
+  .week tbody tr {
+    border-top: 1px solid var(--line);
+  }
+  details.note summary {
+    cursor: pointer;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    color: var(--gold-bright);
+    font-weight: 600;
+  }
+  details.note p {
+    margin: 0;
+    color: var(--text);
+    font-size: var(--font-ui);
   }
   .cap,
   .note {
