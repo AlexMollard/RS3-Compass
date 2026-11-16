@@ -436,9 +436,9 @@
           >
           <p>
             {souls.souls === undefined ? "Souls not recorded" : `${count(souls.souls)} souls recorded`} in the
-            {@render wikiLink("Well of Souls", "Well of Souls")}{#if souls.next}. Next gate: {count(
-                souls.next.souls,
-              )}.{:else}.{/if}
+            {@render wikiLink("Well of Souls", "Well of Souls")}{#if souls.next}. {souls.next.status === "met"
+                ? "Gate"
+                : "Next gate"}: {count(souls.next.souls)}.{:else}.{/if}
           </p>
         </div>
         {#if souls.next}
@@ -501,8 +501,7 @@
                   <span class="cap"
                     >{#each w.purchases as p, i (p.items.join())}{i ? "; " : ""}{#each p.items as item, j (item)}{j
                           ? " and "
-                          : ""}{@render wikiLink(item, item)}{/each}
-                      {count(p.tokens)} tokens{p.plus ? ` plus ${p.plus}` : ""}{/each}.
+                          : ""}{@render wikiLink(item, item)}{/each}{" "}{count(p.tokens)} tokens{p.plus ? ` plus ${p.plus}` : ""}{/each}.
                     <GameText text={w.note} /></span
                   >
                   {#if w.unverified}<span class="cap warn">Unverified: {w.unverified}</span>{/if}
@@ -658,8 +657,7 @@
         <h4>{heading}</h4>
         {@render ritualCard([ritual])}
         <p class="cap">
-          Needs Necromancy {ritual.level}{#if gate}
-            and {@render wikiLink(
+          Needs Necromancy {ritual.level}{#if gate}{" "}and {@render wikiLink(
               questsById.get(gate.quest)?.wiki ?? gate.quest,
               questsById.get(gate.quest)?.name ?? gate.quest,
             )}.
