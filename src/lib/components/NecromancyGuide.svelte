@@ -5,8 +5,10 @@
   import {
     DISTURBANCES,
     DUNGEONEERING_WEAPONS,
+    NECRO_IMPORT,
     PROGRESS_TARGETS,
     RITUAL_QUESTS,
+    RITUAL_SITE,
     SOUL_GATES,
     progressKey,
     type Target,
@@ -46,15 +48,21 @@
   const STATE = {
     done: { tone: "ok", label: "Done" },
     next: { tone: "info", label: "Next" },
-    locked: { tone: "neutral", label: "Later" },
+    locked: { tone: "neutral", label: "Locked" },
   } as const;
   const LINE_PAGE: Record<UpgradeStep["line"], string> = {
     weapon: "Death Skull equipment",
     deathwarden: "Deathwarden robe armour",
     deathdealer: "Deathdealer robe armour",
   };
-  /** Ritual sites open a new tier of glyph spots at these Necromancy levels (Wiki: Rituals). */
-  const SITE_LEVEL = { 1: 1, 2: 60, 3: 90 } as const;
+  /** Each Dungeoneering weapon set's Wiki page (also the first source of its entry). */
+  const DUNGEONEERING_PAGE = { Gravite: "Gravite weaponry", Chaotic: "Chaotic equipment", Ruinous: "Ruinous weapons" };
+  // shortcut: training locations are display strings; most are Wiki titles, and these two (checked 2026-11-17) aren't.
+  // Move a `wiki` field onto locations if more of them stop matching a page.
+  const LOCATION_PAGE: Record<string, string> = {
+    "Stronghold of Security ankou": "Stronghold of Security",
+    "Slayer Tower abyssal demons": "Slayer Tower",
+  };
   const NOT_RECORDED = "none";
   const questsById = new Map(QUESTS.map((q) => [q.id, q]));
   const questByName = new Map(QUESTS.map((q) => [q.name, q]));
@@ -116,7 +124,14 @@
     story.find((r) => questsById.get(r.quest.quest)?.name === kill.progress?.target)?.quest ??
       (weapon.next ? stepTarget(weapon.next.step) : weapon.endgame?.target),
   );
-  const weaponBlockers = $derived(weapon.next?.reqs.filter((r) => r.status !== "met") ?? []);
+  // The next weapon step's unmet or unknown chips that the progress row doesn't already show (an unknown quest).
+  const weaponBlockers = $derived(
+    weapon.next?.reqs.filter(
+      (r) =>
+        (r.status === "below" || r.status === "unknown") &&
+        !kill.progress?.reqs.some((p) => p.label === r.label),
+    ) ?? [],
+  );
 
   // Souls: a whole number from 0, or blank for not recorded. The field follows the recorded value and the character.
   // A text field, not type="number": a number field reports unparsable input ("3,500" in some browsers) as blank,
@@ -210,7 +225,7 @@
               title={entry.qty ? `${count(entry.qty)} × ${entry.name}` : entry.name}
               ><GameArt file={entry.image} size={32} alt={entry.name} />{#if entry.qty}<small
                   >{count(entry.qty)}</small
-                >{/if}</a
+                >{/if}<span class="sr-only"> (opens a new tab)</span></a
             >
           </li>
         {/if}
@@ -313,9 +328,14 @@
         <p class="cap"><CheckedSources checked={target.checked} sources={target.sources} /></p>
       {/if}
     </section>
-  {:else if path.endgame}
+  {/if}
+  {#if path.endgame}
     {@const end = path.endgame}
-    <section class="next-step endgame" id={`necro-next-${line}`} aria-label="Tier 95">
+    <section
+      class="next-step endgame"
+      id={`necro-endgame-${line}`}
+      aria-label={`Tier 95 ${line === "weapon" ? "weapons" : "robes"}`}
+    >
       <header>
         {#if end.target.image}<GameArt file={end.target.image} size={56} />{/if}
         <span class="target-copy">
@@ -352,10 +372,19 @@
           aria-current={step.tier === path.current ? "step" : undefined}
         >
           {#if step.image}<GameArt file={step.image} size={32} alt={tierPage(step)} />{/if}
-          <span>T{step.tier}</span>
+          <span>T{step.tier}</span><span class="sr-only"> (opens a new tab)</span>
         </a>
       </li>
     {/each}
+    {#if path.endgame}
+      {@const end = path.endgame}
+      <li class="destination">
+        <a href={wikiHref(end.target.wiki)} target="_blank" rel="noopener noreferrer" title={`Tier 95: ${end.boss}`}>
+          {#if end.target.image}<GameArt file={end.target.image} size={32} alt={end.boss} />{/if}
+          <span>T95</span><span class="sr-only"> (opens a new tab)</span>
+        </a>
+      </li>
+    {/if}
   </ol>
   <p class="cap">
     Current: tier {path.current}{path.assumed ? ", assumed from your levels" : ", recorded"}.
@@ -400,10 +429,16 @@
       {#if souls}
         <h4>Souls</h4>
         <div class="souls">
-          <GameArt file="Soul.png" size={32} />
+          <a href={wikiHref("Well of Souls")} target="_blank" rel="noopener noreferrer"
+            ><GameArt file="Soul.png" size={32} alt="Souls" /><span class="sr-only">
+              (Well of Souls, opens a new tab)</span
+            ></a
+          >
           <p>
-            {souls.souls === undefined ? "Souls not recorded" : `${count(souls.souls)} souls recorded`}{#if souls.next}.
-              Next gate: {count(souls.next.souls)}{/if}
+            {souls.souls === undefined ? "Souls not recorded" : `${count(souls.souls)} souls recorded`} in the
+            {@render wikiLink("Well of Souls", "Well of Souls")}{#if souls.next}. Next gate: {count(
+                souls.next.souls,
+              )}.{:else}.{/if}
           </p>
         </div>
         {#if souls.next}
@@ -461,7 +496,7 @@
                 {#if w.purchases[0]?.image}<GameArt file={w.purchases[0].image} size={36} />{/if}
                 <span class="target-copy">
                   <b
-                    >{w.name}: Necromancy {w.level}, Dungeoneering {w.dungeoneering}</b
+                    >{@render wikiLink(DUNGEONEERING_PAGE[w.name], w.name)}: Necromancy {w.level}, Dungeoneering {w.dungeoneering}</b
                   >
                   <span class="cap"
                     >{#each w.purchases as p, i (p.items.join())}{i ? "; " : ""}{#each p.items as item, j (item)}{j
@@ -479,11 +514,16 @@
         </section>
       {/if}
 
-      <h4>Robes: {@render wikiLink(LINE_PAGE.deathwarden, "Deathwarden")}</h4>
+      <h4>
+        Robes: {#if robe.robeLine === "deathdealer"}{@render wikiLink(
+            LINE_PAGE.deathdealer,
+            "Deathdealer",
+          )}{:else}{@render wikiLink(LINE_PAGE.deathwarden, "Deathwarden")}{/if}
+      </h4>
       {#if !free}
         <p class="cap">
-          {@render wikiLink(LINE_PAGE.deathdealer, "Deathdealer")} robes branch from tier 60 Deathwarden at tier 70.
-          Pick your line and the ladder follows it.
+          {@render wikiLink(LINE_PAGE.deathdealer, "Deathdealer")} robes branch from tier 60
+          {@render wikiLink(LINE_PAGE.deathwarden, "Deathwarden")} at tier 70. Pick your line and the ladder follows it.
         </p>
       {/if}
       {@render ladder("robe", robe)}
@@ -512,6 +552,12 @@
         onChange={(v) => pickTier("robe", v)}
       />
       {@render nextStep("robe", robe)}
+      <p class="cap">
+        Tiers, wear levels and upgrade materials: <CheckedSources
+          checked={NECRO_IMPORT.checked}
+          sources={NECRO_IMPORT.sources}
+        />
+      </p>
     </div>
   </GameWindow>
 
@@ -525,7 +571,12 @@
             <GameArt file={xp.option.image} size={48} />
             <span class="target-copy">
               <b>{@render wikiLink(xp.option.wiki, xp.option.title)}</b>
-              <span class="cap">{xp.option.locations.join(", ")}</span>
+              <span class="cap"
+                >{#each xp.option.locations as place, i (place)}{i ? ", " : ""}{@render wikiLink(
+                    LOCATION_PAGE[place] ?? place,
+                    place,
+                  )}{/each}</span
+              >
             </span>
           </div>
           <p><GameText text={xp.target.note} /></p>
@@ -574,9 +625,9 @@
   <GameWindow title="Rituals" icon={groups[0]?.[0]?.image} trailing={`${groups.length} ready`}>
     <div class="body">
       <p>
-        Your {@render wikiLink("Ritual site", "ritual site")}: tier {rituals.siteTier} (opens at Necromancy {SITE_LEVEL[
-          rituals.siteTier
-        ]}).
+        Your {@render wikiLink("Ritual site", "ritual site")}: tier {rituals.siteTier} (opens at Necromancy {RITUAL_SITE
+          .levels[rituals.siteTier]}).
+        <span class="cap"><CheckedSources checked={RITUAL_SITE.checked} sources={RITUAL_SITE.sources} /></span>
       </p>
       {#if rituals.inks.length}
         <h4>Glyph inks you need</h4>
@@ -621,6 +672,12 @@
       <p class="cap disturbances">
         <GameText text={DISTURBANCES.note} />
         <CheckedSources checked={DISTURBANCES.checked} sources={DISTURBANCES.sources} />
+      </p>
+      <p class="cap">
+        Rituals, recipes, XP and glyph inks: <CheckedSources
+          checked={NECRO_IMPORT.checked}
+          sources={NECRO_IMPORT.sources}
+        />
       </p>
     </div>
   </GameWindow>
@@ -781,6 +838,11 @@
   }
   .ladder .reached a {
     color: var(--text);
+  }
+  .ladder .destination a {
+    border-style: dashed;
+    border-color: var(--gold);
+    color: var(--gold);
   }
   .ladder .current a {
     border-color: var(--gold-bright);

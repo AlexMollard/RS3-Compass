@@ -44,7 +44,8 @@ test("Example 1: nothing recorded at Necromancy 64 assumes tier 60 and needs The
   assert.equal(status(reqs, "Kili's Knowledge V"), "check");
   assert.equal(status(reqs, "4 × Ensouled bar per weapon"), "check");
   assert.equal(status(reqs, "50 × Bone rune per weapon"), "check");
-  assert.equal(weapon.endgame, undefined);
+  // Tier 95 is the end of the path at every tier, not only once tier 90 is done.
+  assert.equal(weapon.endgame.boss, "Rasial, the First Necromancer");
 
   const robe = gearPath(example1(), "robe");
   assert.equal(robe.robeLine, "deathwarden");
@@ -118,6 +119,16 @@ test("Example 2: weapon tier 50 recorded with 3,200 souls", () => {
   assert.equal(souls.next.souls, 3000);
   assert.equal(souls.next.status, "met");
   assert.equal(status(storyProgress(p).find((s) => s.quest.quest === "the-spirit-of-war").reqs, "3,000 souls"), "met");
+});
+
+test("a tier 50 weapon still shows tier 95 as its destination, while progress stays on the next step", () => {
+  const p = example1({ necromancy: { weaponTier: 50 } });
+  const weapon = gearPath(p, "weapon");
+  assert.equal(weapon.next.step.tier, 60);
+  assert.equal(weapon.endgame.boss, "Rasial, the First Necromancer");
+  assert.equal(status(weapon.endgame.reqs, "Alpha vs Omega"), "below");
+  assert.equal(status(weapon.endgame.reqs, "Necromancy 95"), "below");
+  assert.notEqual(killNext(p).progress.target, weapon.endgame.target.wiki);
 });
 
 test("Example 3: free-to-play at Necromancy 15", () => {

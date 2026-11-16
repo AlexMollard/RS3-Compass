@@ -214,6 +214,26 @@ export const RITUAL_QUESTS: Record<string, RitualQuest> = {
   "Powerful essence": { quest: "rune-mythos", ...RUNE_MYTHOS },
 };
 
+/**
+ * Where the imported rituals, glyphs and gear ladders (necromancyImported.ts) come from, dated with the import. A test
+ * keeps `checked` equal to the generated file's header date, so a re-import can't leave it stale.
+ */
+export const NECRO_IMPORT: Checked = {
+  checked: "2026-11-16",
+  sources: [
+    page("Module:Necromancy/rituals/data"),
+    page("Template:Death Skull upgrades"),
+    page("Deathwarden robe armour"),
+    page("Template:Deathdealer upgrades"),
+  ],
+};
+
+/** Ritual sites open a new tier of glyph spots at Necromancy 1, 60 and 90, per the Wiki's Rituals page. */
+export const RITUAL_SITE: Checked & { levels: Record<1 | 2 | 3, number> } = {
+  levels: { 1: 1, 2: 60, 3: 90 },
+  ...dated(page("Rituals")),
+};
+
 /** The Rituals window's one line on disturbances and soul attraction, from the Wiki's Rituals page. */
 export const DISTURBANCES: Checked & { note: string } = {
   note: "Disturbances spawn while a ritual runs: tend them for extra XP and loot such as mementos, bones and necroplasm, or ignore them at no cost. Soul attraction sets how often they spawn, and Attraction and Speed glyphs raise it.",

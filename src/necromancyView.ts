@@ -207,12 +207,13 @@ export type GearPath = {
   /** The line's ladder for this profile, in tier order: Deathdealer branches in, free-to-play stops at tier 10. */
   steps: UpgradeStep[];
   next?: { step: UpgradeStep; reqs: Req[] };
+  /** The tier 95 destination at the end of the line, at every tier. Members only. */
   endgame?: Endgame;
 };
 
 /**
- * Where a gear line stands and its next step. A recorded tier wins; otherwise it's assumed from levels and quests. The
- * robe line defaults to Deathwarden. Free-to-play stops at tier 10, with no endgame.
+ * Where a gear line stands, its next step and its tier 95 destination. A recorded tier wins; otherwise it's assumed
+ * from levels and quests. The robe line defaults to Deathwarden. Free-to-play stops at tier 10, with no endgame.
  */
 export function gearPath(profile: Profile, line: GearLine): GearPath {
   const robeLine = profile.necromancy?.robeLine ?? "deathwarden";
@@ -221,9 +222,12 @@ export function gearPath(profile: Profile, line: GearLine): GearPath {
   const current = recorded === undefined ? assumedTier(profile, steps) : Math.min(recorded, steps.at(-1)!.tier);
   const path: GearPath = { current, assumed: recorded === undefined, robeLine, steps };
   const step = steps.find((s) => s.tier > current);
-  if (step) return { ...path, next: { step, reqs: stepReqs(profile, step, steps) } };
   const endgame = isFree(profile) ? undefined : endgameFor(profile, line);
-  return endgame ? { ...path, endgame } : path;
+  return {
+    ...path,
+    ...(step ? { next: { step, reqs: stepReqs(profile, step, steps) } } : {}),
+    ...(endgame ? { endgame } : {}),
+  };
 }
 
 /** The ritual that makes a step's ensouled materials. */
