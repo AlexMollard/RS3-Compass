@@ -147,13 +147,13 @@
                     void goto(skillPath(skill.name));
                   }}
                 >
-                  <strong>{level}</strong>{#if mine}<span
-                      class="xp"
-                      aria-hidden="true">{compact(mine.xp)}</span
-                    >{/if}<small aria-hidden="true">{labels[index]}</small
-                  >{#if behind}<em class="behind" aria-hidden="true"
-                      >−{behind}</em
-                    >{/if}{#if mine}<span class="xp-bar" aria-hidden="true"
+                  <!-- Every box keeps all four lines, blank when empty, so cards line up. -->
+                  <strong>{level}</strong><span class="xp" aria-hidden="true"
+                    >{mine ? compact(mine.xp) : " "}</span
+                  ><small aria-hidden="true">{labels[index]}</small><em
+                    class="behind"
+                    aria-hidden="true">{behind ? `−${behind}` : " "}</em
+                  >{#if mine}<span class="xp-bar" aria-hidden="true"
                       ><span style:width="{mine.share}%"></span></span
                     >{/if}
                 </button>
@@ -166,8 +166,11 @@
                     skill.name +
                     " unrecorded"}
                 >
-                  <strong>?</strong><small aria-hidden="true"
-                    >{labels[index]}</small
+                  <strong>?</strong><span class="xp" aria-hidden="true"
+                    >{" "}</span
+                  ><small aria-hidden="true">{labels[index]}</small><em
+                    class="behind"
+                    aria-hidden="true">{" "}</em
                   >
                 </div>
               {/if}
@@ -210,7 +213,12 @@
   }
   .skill-comparisons {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    /* At most six per row; fewer when a card would drop below the width that
+       fits "Dungeoneering ↗ 16.5k gap" whole (min() keeps one card on phones). */
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(max(min(100%, 220px), calc((100% - 5 * 8px) / 6)), 1fr)
+    );
     gap: 8px;
   }
   .comparison-card {
@@ -223,17 +231,29 @@
     border: 1px solid #2f3e48;
     border-radius: 3px;
   }
+  /* One line, so every card in a row starts its boxes at the same height. */
   .skill-head {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 2px 8px;
+    gap: 8px;
     min-width: 0;
   }
-  /* A long skill name pushes the gap figure onto its own line rather than under it. */
-  .skill-head .skill-title {
-    min-width: auto;
+  .skill-title > :global(*) {
+    flex: none;
+  }
+  /* Some skill icons are taller than wide (Necromancy); a fixed box keeps headers level. */
+  .skill-title > :global(img) {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+  }
+  .skill-title > span:first-of-type {
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .xp-gap {
     flex: none;
