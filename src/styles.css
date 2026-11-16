@@ -151,6 +151,12 @@ option {
   background: #17242e;
   color: var(--text);
 }
+optgroup {
+  background: var(--well);
+  color: var(--gold-bright);
+  font-style: normal;
+  font-weight: 700;
+}
 button,
 a,
 input,
