@@ -190,10 +190,10 @@ export function unlockNext(profile: Profile, kit: RunecraftingKit, level: number
   if (savvy) {
     steps.push({
       track: "savvy",
-      name: `Savvy Runecrafting at ${savvy.level}`,
+      name: `Savvy Runecrafting +${savvy.bonus}%`,
       wiki: SAVVY_SOURCE.sources[0],
       image: RC_ICON,
-      how: `The next Savvy Runecrafting step, bonus ${savvy.bonus}.`,
+      how: `+${savvy.bonus}% XP at every altar from Runecrafting ${savvy.level}.`,
       reqs: [levelReq("Runecrafting", savvy.level, level)],
     });
   }
@@ -201,7 +201,7 @@ export function unlockNext(profile: Profile, kit: RunecraftingKit, level: number
   const pouch = POUCHES.find((p) => !kit.pouches?.includes(p.id));
   if (pouch) steps.push(pouchStep(pouch, "pouch"));
 
-  const altar = [...ALTARS].sort((a, b) => a.level - b.level).find((a) => accessAt(profile, a, level).some((r) => r.state !== "met"));
+  const altar = [...ALTARS].sort((a, b) => a.level - b.level).find((a) => accessAt(profile, a, level).some((r) => r.state === "unmet"));
   if (altar) steps.push(altarStep(altar, "altar"));
 
   for (const target of kit.stock ?? []) {

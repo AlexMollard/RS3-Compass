@@ -70,6 +70,24 @@ test("the altar unlock step is Cosmic without Lost City", () => {
   assert.equal(unlockNext(p, KIT, 82).find((s) => s.track === "altar").name, "Cosmic altar");
 });
 
+test("a level-110 player with every quest done sees no altar step, and Savvy copy shows the percentage", () => {
+  const p = example({ levels: { Runecrafting: 110 }, completedQuests: [...QUESTS, "phite-club"] });
+  const steps = unlockNext(p, KIT, 82);
+  assert.equal(steps.find((s) => s.track === "savvy").name, "Savvy Runecrafting +275%");
+  const done = unlockNext(p, KIT, 110);
+  assert.equal(done.find((s) => s.track === "altar"), undefined);
+  const time = steps.find((s) => s.name === "Time altar");
+  assert.equal(time.track, "milestone");
+  assert.ok(time.reqs.some((r) => r.state === "check"));
+});
+
+test("unknown quests stay in the craft-now choice, marked unknown", () => {
+  const p = profile({ questImportStatus: "service-unavailable" });
+  const now = craftNow(p, { xpRule: "fastest" }, 82);
+  assert.equal(now.xp.method.id, "abyss-75-90");
+  assert.ok(now.xp.reqs.some((r) => r.state === "unknown"));
+});
+
 test("worked example 2: a locked Soul target is skipped", () => {
   const p = example();
   const kit = { ...KIT, stock: [blood, astral, soul] };
