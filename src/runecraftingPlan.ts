@@ -162,6 +162,7 @@ export type UnlockStep = {
 };
 
 const RC_ICON = "Runecrafting.png";
+const MAX_LEVEL = 110;
 const MILESTONES: { kind: "altar" | "pouch"; name: string; level: number }[] = [
   { kind: "altar", name: "Soul altar", level: 90 },
   { kind: "pouch", name: "Massive pouch", level: 90 },
@@ -208,7 +209,7 @@ export function unlockNext(profile: Profile, kit: RunecraftingKit, level: number
 
   for (const target of kit.stock ?? []) {
     const stockAltar = altarFor(target.rune);
-    const next = stockAltar?.multipliers.find((m) => m > level);
+    const next = stockAltar?.multipliers.find((m) => m > level && m <= MAX_LEVEL);
     if (stockAltar && next !== undefined) {
       steps.push({
         track: "multiplier",

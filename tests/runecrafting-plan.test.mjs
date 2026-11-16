@@ -65,6 +65,12 @@ test("worked example 1: trips, craft-now choice and unlock steps", () => {
   assert.equal(soulStep.reqs.find((r) => r.text.includes("90")).state, "unmet");
 });
 
+test("unlock next skips multiplier levels above 110", () => {
+  const kit = { ...KIT, stock: [blood, soul, astral] };
+  const multipliers = unlockNext(example(), kit, 82).filter((s) => s.track === "multiplier");
+  assert.deepEqual(multipliers, []);
+});
+
 test("the altar unlock step is Cosmic without Lost City", () => {
   const p = example({ completedQuests: QUESTS.filter((q) => q !== "lost-city") });
   assert.equal(unlockNext(p, KIT, 82).find((s) => s.track === "altar").name, "Cosmic altar");
