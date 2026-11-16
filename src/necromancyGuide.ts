@@ -566,7 +566,8 @@ const robe = (line: "deathwarden" | "deathdealer", tier: number, t: TaskTarget, 
   sources: [...t.sources, ...(extra.sources ?? [])].filter((s, i, all) => all.indexOf(s) === i),
 });
 
-export const PROGRESS_TARGETS: Record<StepKey, StepTarget> = Object.fromEntries(
+/** Tier 10 steps have no Kili task and so no entry: callers fall back to the step's quest (Necromancy!). */
+export const PROGRESS_TARGETS: Partial<Record<StepKey, StepTarget>> = Object.fromEntries(
   [
     weapon(20, kiliRow),
     weapon(30, knowledge1),
@@ -592,7 +593,7 @@ export const PROGRESS_TARGETS: Record<StepKey, StepTarget> = Object.fromEntries(
     robe("deathdealer", 80, power6, { drop: plates(10), note: HOLD_ARMOUR, sources: [HERMOD, PLATE, TRAINING] }),
     robe("deathdealer", 90, power7, { drop: plates(15), note: HOLD_ARMOUR, sources: [HERMOD, PLATE, TRAINING] }),
   ].map((t) => [progressKey(t.line, t.tier), t]),
-) as Record<StepKey, StepTarget>;
+) as Partial<Record<StepKey, StepTarget>>;
 
 const RASIAL = page("Rasial, the First Necromancer");
 export const ENDGAME_TARGETS: EndgameTarget[] = [
@@ -675,6 +676,6 @@ export const DUNGEONEERING_WEAPONS: DungeoneeringWeapon[] = [
       },
     ],
     note: "Tier 90 damage with tier 100 accuracy; degrades in combat. Bought as a pair since 1 June 2026. The Siphon page's 750,000 is the older main-hand-only price.",
-    ...dated(page("Ruinous weapons"), page("Ruinous guard"), page("Ruinous lantern")),
+    ...dated(page("Ruinous weapons"), page("Ruinous guard"), page("Ruinous lantern"), page("Siphon")),
   },
 ];

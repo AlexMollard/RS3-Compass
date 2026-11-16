@@ -167,6 +167,16 @@ test("every upgrade step with a Kili task has exactly one progress target, and n
   }
 });
 
+test("tier 10 steps have no progress target, and every later step has one", () => {
+  // Tier 10 comes from Necromancy! with no Kili task; callers fall back to the step's quest.
+  for (const step of NECRO_UPGRADES) {
+    const key = progressKey(step.line, step.tier);
+    if (step.tier === 10) assert.equal(PROGRESS_TARGETS[key], undefined, `${key} has no entry`);
+    else assert.ok(PROGRESS_TARGETS[key], `${key} has an entry`);
+  }
+  assert.ok(NECRO_UPGRADES.some((s) => s.tier === 10), "the import has tier 10 steps");
+});
+
 test("every Deathdealer step names Hermod for its hermodic plates", () => {
   for (const step of NECRO_UPGRADES.filter((s) => s.materials.some((m) => m.item === "Hermodic plate"))) {
     const entry = PROGRESS_TARGETS[progressKey(step.line, step.tier)];
