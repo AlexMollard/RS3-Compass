@@ -1166,27 +1166,34 @@ const abyssRunes = (
   );
 const abyssLow = abyssRunes(
   "abyss-low",
-  "Abyss: body to nature runes",
-  "Body, Cosmic or Nature",
-  "body, cosmic or nature",
-  "12k-118k",
-  ["25 Runecrafting for Cosmic (Lost City)", "35 Runecrafting for Nature"],
+  "Abyss: body and cosmic runes",
+  "Body or Cosmic",
+  "body or cosmic",
+  "12k-67k",
+  ["27 Runecrafting for Cosmic (Lost City)"],
 );
 const abyssMid = abyssRunes(
   "abyss-mid",
-  "Abyss: law and death runes",
-  "Law or Death",
-  "law or death",
-  "91k-207k",
-  ["50 Runecrafting for Law", "60 Runecrafting for Death (Mourning's End Part II)"],
+  "Abyss: nature, law and death runes",
+  "Nature, Law or Death",
+  "nature, law or death",
+  "70k-178k",
+  [
+    "44 Runecrafting for Nature",
+    "54 Runecrafting for Law",
+    "65 Runecrafting for Death (Mourning's End Part II)",
+  ],
 );
 const abyssHigh = abyssRunes(
   "abyss-high",
   "Abyss: death and blood runes",
   "Death or Blood",
   "death or blood",
-  "135k-254k",
-  ["75 Runecrafting for Blood (Legacy of Seergaze)"],
+  "115k-254k",
+  [
+    "65 Runecrafting for Death (Mourning's End Part II)",
+    "77 Runecrafting for Blood (Legacy of Seergaze)",
+  ],
 );
 const soul = opt(
   "soul-altar",

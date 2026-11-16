@@ -12,6 +12,7 @@ import {
 } from "../src/data.ts";
 import { RS3_SKILL_NAMES } from "../src/skillNames.ts";
 import { LOCATIONS } from "../src/locations.ts";
+import { ALTARS } from "../src/runecraftingGuide.ts";
 
 const profile = (skill, level, mode = "members") => ({
   ...structuredClone(SAMPLE_PROFILES[0]),
@@ -334,4 +335,17 @@ test("Runecrafting ranges follow the members guide and keep a free route", () =>
     assert.ok(soul?.requirements.some((r) => r.includes("'Phite Club")), "Soul altar needs 'Phite Club");
   }
   assert.ok(rc.stages.at(-1).options.some((o) => o.id === "runic-attuner"));
+});
+
+test("Runecrafting altar requirements use the altar's own level", () => {
+  const rc = skillByName("Runecrafting");
+  const matches = rc.stages
+    .flatMap((stage) => stage.options.flatMap((o) => o.requirements))
+    .flatMap((r) => [...r.matchAll(/(\d+) Runecrafting for ([A-Z]\w+)/g)]);
+  assert.ok(matches.length >= 6, "too few altar requirements matched");
+  for (const [text, level, rune] of matches) {
+    const altar = ALTARS.find((a) => a.rune === rune);
+    assert.ok(altar, text + " names no altar");
+    assert.equal(Number(level), altar.level, text);
+  }
 });
