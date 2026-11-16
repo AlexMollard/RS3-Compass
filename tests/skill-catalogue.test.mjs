@@ -249,6 +249,54 @@ test("Full free-play skills remain usable at high levels rather than becoming fa
   }
 });
 
+const COMBAT = ["Attack", "Strength", "Defence", "Constitution", "Ranged", "Magic", "Necromancy"];
+const combatStages = () =>
+  COMBAT.flatMap((name) => skillByName(name).stages.map((stage) => ({ skill: name, stage })));
+
+test("Every combat method says when it was checked and which Wiki guide it follows", () => {
+  for (const { skill, stage } of combatStages())
+    for (const option of stage.options) {
+      const context = `${skill} ${stage.from} ${option.id}`;
+      assert.equal(option.checked, "2026-11-16", context);
+      assert.ok(option.sources?.length, context + " has no source");
+      for (const source of option.sources) assert.match(source, /^https:\/\/runescape\.wiki\/w\/\S+$/, context);
+    }
+});
+
+test("Members see members methods first; F2P keeps the free order and sees none", () => {
+  for (const { skill, stage } of combatStages()) {
+    const context = `${skill} ${stage.from}`;
+    const members = availableTrainingOptions(stage, "members");
+    const firstFree = members.findIndex((option) => !option.members);
+    if (firstFree >= 0)
+      assert.ok(members.slice(firstFree).every((option) => !option.members), context + " has a members method after a free one");
+    const free = availableTrainingOptions(stage, "f2p");
+    assert.ok(free.every((option) => !option.members), context);
+    assert.deepEqual(
+      free.map((option) => option.id),
+      members.filter((option) => !option.members).map((option) => option.id),
+      context + " reorders the free methods",
+    );
+  }
+});
+
+test("Combat minimums stay valid item tiers", () => {
+  for (const { skill, stage } of combatStages())
+    for (const option of stage.options)
+      if (option.gear)
+        assert.ok(Number.isInteger(option.gear.minTier) && option.gear.minTier >= 1 && option.gear.minTier <= 99, `${skill} ${option.id}`);
+});
+
+test("The level 1 range leads with a quest for members and troll chuckers for free melee", () => {
+  const attack = skillByName("Attack").stages[0];
+  assert.equal(availableTrainingOptions(attack, "members")[0].id, "waterfall-quest");
+  assert.equal(availableTrainingOptions(attack, "f2p")[0].id, "troll-chuckers");
+  // A saved method the refresh removed falls back to the range's first method.
+  const p = { ...profile("Attack", 60), trainingMethods: { Attack: "cockroach-soldiers" } };
+  assert.equal(trainingMethod(skillByName("Attack"), p).id, "abyss-creatures");
+  assert.equal(trainingMethod(skillByName("Attack"), { ...p, mode: "f2p" }).id, "ankou");
+});
+
 test("A stored member method survives mode changes without being recommended in the free trial", () => {
   const skill = SKILLS.find((skill) => skill.name === "Herblore");
   const p = { ...profile("Herblore", 30), trainingRanges: { Herblore: 13 } };

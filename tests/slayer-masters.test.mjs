@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { combatLevel, COMBAT_SKILLS } from "../src/lib/combatLevel.ts";
-import { masterFor } from "../src/slayerMasters.ts";
+import { efficientSlayerRoute, masterFor } from "../src/slayerMasters.ts";
 
 const levels = (over = {}) => ({
   ...Object.fromEntries(COMBAT_SKILLS.map((skill) => [skill, 1])),
@@ -137,4 +137,44 @@ test("Kuradal's thresholds are exactly combat 110 and Slayer 75; below either gi
   assert.equal(masterFor(profile({ ...C110, Slayer: 75 }, "members", quests)).master.id, "kuradal");
   assert.equal(masterFor(profile({ ...C109, Slayer: 75 }, "members", quests)).master.id, "duradel");
   assert.equal(masterFor(profile({ ...C110, Slayer: 74 }, "members", quests)).master.id, "duradel");
+});
+
+test("the efficient route for Attack at combat 110 and Slayer 80 is Kuradal's tasks", () => {
+  const route = efficientSlayerRoute("Attack", profile({ ...C110, Attack: 85, Strength: 100, Slayer: 80 }));
+  assert.equal(combatLevel(levels({ ...C110, Attack: 85, Strength: 100, Slayer: 80 })), 110);
+  assert.equal(route.master.id, "kuradal");
+  assert.match(route.reason, /Kuradal/);
+  for (const skill of ["Attack", "Strength", "Defence", "Constitution", "Slayer", "Prayer"])
+    assert.ok(route.feeds.includes(skill), skill);
+  assert.ok(!route.feeds.includes("Mining"));
+  assert.equal(route.checked, "2026-11-16");
+  assert.ok(route.sources.length > 0);
+  for (const source of route.sources) assert.match(source, /^https:\/\/runescape\.wiki\/w\/\S+$/);
+});
+
+test("every combat skill gets the route, and no other skill does", () => {
+  const p = profile({ ...C110, Slayer: 80 });
+  for (const skill of ["Attack", "Strength", "Defence", "Constitution", "Ranged", "Magic", "Necromancy"])
+    assert.equal(efficientSlayerRoute(skill, p)?.master.id, "kuradal", skill);
+  for (const skill of ["Slayer", "Prayer", "Mining", "Summoning"]) assert.equal(efficientSlayerRoute(skill, p), undefined, skill);
+});
+
+test("F2P never gets the efficient route", () => {
+  assert.equal(efficientSlayerRoute("Attack", profile({ ...C120, Slayer: 99 }, "f2p")), undefined);
+  assert.equal(efficientSlayerRoute("Attack", profile({ ...C110, Attack: 30, Slayer: 3 }, "f2p")), undefined);
+});
+
+test("below Vannaka, or with no master, there is no efficient route", () => {
+  // Combat 3: Turael is the master, and the starter masters never count.
+  assert.equal(masterFor(profile({})).master.id, "turael");
+  assert.equal(efficientSlayerRoute("Attack", profile({})), undefined);
+  const unrecorded = profile(C110);
+  delete unrecorded.levels.Slayer;
+  assert.equal(efficientSlayerRoute("Attack", unrecorded), undefined);
+});
+
+test("Vannaka is the first master that counts", () => {
+  const C30 = { Attack: 30, Strength: 30, Defence: 30, Constitution: 30 };
+  assert.ok(combatLevel(levels(C30)) >= 30);
+  assert.equal(efficientSlayerRoute("Ranged", profile({ ...C30, Slayer: 5 })).master.id, "vannaka");
 });

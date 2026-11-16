@@ -169,6 +169,63 @@ export const COMBAT_LOCATIONS: Record<string, LocationRecord> = {
     access:
       "Enter Morytania through Priest in Peril or by defeating the Paterdomus mausoleum ghoul. Ghosts Ahoy provides an optional ectophial teleport.",
   },
+  // Added 2026-11-16 for the refreshed combat routes; each from its Wiki location page's infobox.
+  "Stronghold of Security": {
+    name: "Stronghold of Security",
+    wiki: "Stronghold_of_Security",
+    image: "Vault_of_War.png",
+    members: false,
+    summary: "A four-level dungeon under Barbarian Village: Flesh Crawlers on the second level, catablepons on the third.",
+    access: "The entrance is in the middle of Barbarian Village; its doors ask security questions.",
+  },
+  Abyss: {
+    name: "Abyss",
+    wiki: "Abyss",
+    image: "The_Abyss.png",
+    members: true,
+    summary: "Aggressive abyssal creatures gather in the south-west and south-east corners.",
+    access: "Complete Enter the Abyss, then use the Mage of Zamorak in the Wilderness north of Edgeville.",
+  },
+  "Karamja Volcano": {
+    name: "Karamja Volcano",
+    wiki: "Karamja_Volcano",
+    image: "Karamja_Volcano.png",
+    members: false,
+    summary: "The dungeon under the volcano holds many lesser demons.",
+    access: "Travel to Karamja and climb down into the volcano.",
+  },
+  "Exiled Kalphite Hive": {
+    name: "Exiled Kalphite Hive",
+    wiki: "Exiled_Kalphite_Hive",
+    image: "Exiled_Kalphite_Hive.png",
+    members: true,
+    summary: "High-level kalphites, including the aggressive marauders, in the Kharidian Desert.",
+    access: "The Kalphite entrance is south of the Jaldraocht Pyramid and north of Menaphos.",
+  },
+  "Taverley Dungeon": {
+    name: "Taverley Dungeon",
+    wiki: "Taverley_Dungeon",
+    image: "Inside_Taverley_Dungeon.png",
+    members: true,
+    summary: "A members' dungeon with chaos druids near the entrance and dragons deeper in.",
+    access: "The entrance is south of Taverley, west of Falador.",
+  },
+  "Chaos Temple Dungeon": {
+    name: "Chaos Temple Dungeon",
+    wiki: "Chaos_Temple_Dungeon",
+    image: "Zemouregal's_Base.png",
+    members: true,
+    summary: "Dense, aggressive armoured zombies.",
+    access: "Partial completion of Defender of Varrock; Hartwin in Varrock Palace teleports you in.",
+  },
+  "Slayer Tower Mausoleum": {
+    name: "Slayer Tower Mausoleum",
+    wiki: "Slayer_Tower_Mausoleum",
+    image: "Morytania_Slayer_Tower_Mausoleum.png",
+    members: true,
+    summary: "The crypt under the Slayer Tower, home to ravenous ghouls.",
+    access: "Enter through the trapdoor in the Slayer Tower's south-east corner.",
+  },
 };
 
 // Item images and recipes: https://runescape.wiki/w/Free-to-play_Prayer_training
@@ -437,6 +494,19 @@ const gear = (minTier: number, reason: string) => ({
   checked: "2026-11-16",
 });
 
+// The current RuneScape Wiki training guides each combat method was checked against, read on 2026-11-16.
+const W = "https://runescape.wiki/w/";
+const F2P_MELEE = W + "Free-to-play_melee_training";
+const P2P_MELEE = W + "Pay-to-play_melee_training";
+const F2P_RANGED = W + "Free-to-play_Ranged_training";
+const P2P_RANGED = W + "Pay-to-play_Ranged_training";
+const F2P_MAGIC = W + "Free-to-play_Magic_training";
+const P2P_MAGIC = W + "Pay-to-play_Magic_training";
+const NECRO = W + "Necromancy_training";
+const IRON_NECRO = W + "Ironman_Mode/Guide/Necromancy";
+const ABYSS = W + "Abyss/Combat_training";
+const checked = (...sources: string[]) => ({ checked: "2026-11-16", sources });
+
 const chicken: TrainingOption = {
   id: "chickens",
   title: "Chickens",
@@ -449,6 +519,7 @@ const chicken: TrainingOption = {
   benefit:
     "Feathers support Fishing; raw chicken and bones support Cooking and Prayer. Easy kills trade combat experience for useful supplies.",
   gear: gear(1, "Level 1 chickens never attack first and hit at most 15, so any gear will do."),
+  ...checked(F2P_MELEE, F2P_RANGED),
 };
 const cows: TrainingOption = {
   id: "cows",
@@ -468,6 +539,7 @@ const cows: TrainingOption = {
   benefit:
     "Cowhide supplies Crafting, raw beef supplies Cooking, and bones supply Prayer; banking slows combat training.",
   gear: gear(1, "Level 2 cows never attack first and hit at most 20, so any gear will do."),
+  ...checked(F2P_MELEE, F2P_RANGED),
 };
 const trolls: TrainingOption = {
   id: "troll-chuckers",
@@ -475,7 +547,8 @@ const trolls: TrainingOption = {
   wiki: "Troll_chucker",
   image: "Troll_chucker.png",
   locations: ["Burthorpe Troll Cave"],
-  method: "Practise abilities against troll chuckers near the cave tutors.",
+  method:
+    "Fight troll chuckers in the Burthorpe Troll Cave. They respawn every 20–30 seconds, so there is always a target.",
   sites: [
     {
       label: "Burthorpe Troll Cave chuckers",
@@ -484,9 +557,10 @@ const trolls: TrainingOption = {
     },
   ],
   benefit:
-    "Convenient early combat practice, but fewer useful resources than chickens or cows.",
+    "The fastest free start: the Wiki's melee guide puts them at around 35,000 XP an hour, and they die in a hit or two. Drops are worth less than chickens' or cows'.",
   risks: "Leave if trolls overwhelm your food supply.",
   gear: gear(1, "Level 7 troll chuckers don't attack first; their thrown ranged attacks hit at most 100."),
+  ...checked(F2P_MELEE, F2P_RANGED, P2P_MELEE),
 };
 const giants: TrainingOption = {
   id: "hill-giants",
@@ -494,16 +568,18 @@ const giants: TrainingOption = {
   wiki: "Hill_giant",
   image: "Hill_Giant_(1).png",
   locations: ["Edgeville Dungeon hill giants"],
-  method: "Fight hill giants in Edgeville Dungeon and bank their big bones.",
+  method:
+    "Fight hill giants in Edgeville Dungeon and bank their big bones. Magic users can cast Air Blast from the dungeon's safe spots from level 41.",
   sites: [hillSite],
   benefit:
-    "Big bones provide more Prayer experience per bone than ordinary bones, alongside combat experience.",
+    "Low Defence for their life points, and every kill drops big bones for Prayer. The Wiki's melee guides recommend them from about 30 Attack.",
   requirements: [
     "A brass key is useful for the shed entrance but not required from Edgeville.",
   ],
   risks:
     "Giants hit hard for an unprepared player; bring food and an escape, and move back to cows if needed.",
   gear: gear(20, "Level 26 hill giants attack on sight and hit up to 450 in melee."),
+  ...checked(F2P_MELEE, P2P_MELEE, F2P_MAGIC, P2P_RANGED),
 };
 const iceGiants: TrainingOption = {
   id: "ice-giants",
@@ -511,7 +587,8 @@ const iceGiants: TrainingOption = {
   wiki: "Ice_giant",
   image: "Ice_giant.png",
   locations: ["Asgarnian Ice Dungeon"],
-  method: "Fight ice giants and collect their big bones.",
+  method:
+    "Fight ice giants and ice warriors in the Asgarnian Ice Dungeon and collect their big bones. Magic users cast Fire Bolt from level 35.",
   sites: [
     {
       label: "Asgarnian Ice Dungeon ice giants",
@@ -520,35 +597,11 @@ const iceGiants: TrainingOption = {
     },
   ],
   benefit:
-    "Substantial combat targets and Prayer supplies, at the cost of a longer, riskier trip.",
+    "They're aggressive, so it's semi-AFK: the Wiki's melee guide puts it at up to about 135,000 XP an hour, with big bones for Prayer.",
   risks:
     "Nearby ice warriors can attack; bring food and a teleport, and leave if you cannot sustain the damage.",
   gear: gear(40, "Level 47 ice giants attack on sight and hit up to 750 in melee."),
-};
-const roaches: TrainingOption = {
-  id: "cockroach-soldiers",
-  title: "Cockroach soldiers",
-  wiki: "Cockroach_soldier",
-  image: "Cockroach_soldier.png",
-  locations: ["Stronghold of Player Safety"],
-  method:
-    "Fight soldiers in the stronghold; earth spells exploit their weakness, although other styles can train here.",
-  sites: [
-    {
-      label: "Player Safety stronghold soldier area",
-      wiki: "Cockroach_soldier",
-      map: { x: 112, y: 121, plane: 0, mapId: 9 },
-      access: "Enter the stronghold and reach the middle level.",
-    },
-  ],
-  benefit:
-    "Carapace supports ranged armour crafting; mithril stone spirits and adamantite stone spirits support Mining, and salvage provides alchemy value. Members-only seeds do not drop in F2P.",
-  risks:
-    "They hit hard even through rune armour. Test one with food and an escape; a combat skill level alone does not establish readiness.",
-  gear: gear(
-    50,
-    "Level 70 cockroach soldiers hit up to 1,000 in both melee and ranged, often even through rune armour.",
-  ),
+  ...checked(F2P_MELEE, F2P_MAGIC),
 };
 const blueDragonReason =
   "Level 74 blue dragons hit up to 349 with magic and melee, and their dragonfire hits well over 1,000 without protection.";
@@ -559,7 +612,8 @@ const dragons: TrainingOption = {
   image: "Blue_dragon.png",
   members: true,
   locations: ["Taverley Dungeon blue dragons"],
-  method: "Kill blue dragons and bank dragon bones and blue dragonhide.",
+  method:
+    "Kill blue dragons and bank dragon bones and blue dragonhide. They are weak to bolts, so rangers use a crossbow.",
   sites: [dragonSite],
   benefit:
     "Supplies Prayer and Crafting while training combat; bulky drops cost banking time.",
@@ -571,17 +625,7 @@ const dragons: TrainingOption = {
   risks:
     "Dragonfire is dangerous; bring food and a teleport, and check your protection before engaging.",
   gear: gear(50, blueDragonReason),
-};
-const necroDragons: TrainingOption = {
-  ...dragons,
-  id: "necro-blue-dragons",
-  requirements: [
-    "Access to the dragons",
-    "Super antifire protects against ordinary dragonfire while keeping both Necromancy weapons equipped; an anti-dragon shield replaces the skull lantern",
-  ],
-  supplies: ["Super antifire (3)", "Food", "Teleport"],
-  risks:
-    "Do not engage without effective dragonfire protection. Keep potion protection active; bring food and a teleport for the dragons' other attacks.",
+  ...checked(P2P_RANGED),
 };
 const wildDragons: TrainingOption = {
   id: "wilderness-blue-dragons",
@@ -632,6 +676,7 @@ const moss: TrainingOption = {
     "Big bones support Prayer and runes support Magic; the trip and banking slow combat training.",
   risks: "Their melee attacks can overwhelm low-level players; bring food.",
   gear: gear(30, "Level 40 moss giants attack on sight and hit up to 625 in melee."),
+  ...checked(F2P_MELEE),
 };
 const ankou: TrainingOption = {
   id: "ankou",
@@ -648,11 +693,12 @@ const ankou: TrainingOption = {
     },
   ],
   method:
-    "Fight ankou on the fourth floor; earth spells exploit their weakness.",
+    "Fight ankou on the fourth floor of the Stronghold of Security; they are weak to earth spells, and mages cast Air Blast from the room's safe spots.",
   benefit:
-    "Death runes, adamant arrows and mithril stone spirits support Magic, Ranged and Mining; members-only herbs are not a F2P drop.",
+    "The best free XP from 70: the Wiki's guides put it at up to about 200,000 melee or 140,000 Magic XP an hour. Death runes, adamant arrows and mithril stone spirits support Magic, Ranged and Mining.",
   risks: "They hit harder than early monsters; bring food and an escape.",
   gear: gear(40, "Level 54 ankou hit up to 800 in melee."),
+  ...checked(F2P_MELEE, F2P_MAGIC, P2P_MAGIC),
 };
 const hellhounds: TrainingOption = {
   id: "wild-hellhounds",
@@ -668,14 +714,16 @@ const hellhounds: TrainingOption = {
       access: "Level 23 Wilderness; prepare for Wilderness threats.",
     },
   ],
-  method: "Fight level 92 hellhounds in the Wilderness Crater.",
+  method:
+    "Fight level 92 hellhounds in the Wilderness Crater with a slash weapon, using Protect Item.",
   benefit:
-    "Stronger free-player combat training with bones; ordinary drops are limited, so choose another target for supplies.",
+    "They're aggressive and respawn fast, so it's semi-AFK: the Wiki's melee guide puts it at up to about 124,000 XP an hour. Drops are only bones.",
   risks: "Aggressive hellhounds and Wilderness threats make this dangerous.",
   gear: gear(
     50,
     "Level 92 hellhounds attack on sight and hit up to 264 in melee, in the Wilderness where players can attack too.",
   ),
+  ...checked(F2P_MELEE),
 };
 const gargoyles: TrainingOption = {
   id: "gargoyles",
@@ -706,6 +754,7 @@ const gargoyles: TrainingOption = {
     60,
     "Level 93 gargoyles attack on sight, hit up to 268 in melee and have 6,700 life points to wear down before the rock hammer.",
   ),
+  ...checked(P2P_MAGIC),
 };
 const abyssals: TrainingOption = {
   id: "abyssal-demons",
@@ -721,9 +770,10 @@ const abyssals: TrainingOption = {
       map: { x: 3407, y: 3548, plane: 2, mapId: 28 },
     },
   ],
-  method: "Fight abyssal demons on the third floor of the Slayer Tower.",
+  method:
+    "Fight abyssal demons on the third floor of the Slayer Tower; aggression potions make them easy to AFK at higher levels.",
   benefit:
-    "Infernal ashes support Prayer, while salvage and gems provide resources; an abyssal whip is a rare drop.",
+    "High XP per kill. Infernal ashes support Prayer and crimson charms Summoning, while salvage and gems provide resources; an abyssal whip is a rare drop.",
   requirements: [
     "85 Slayer",
     "Enter Morytania by completing Priest in Peril or defeating the Paterdomus mausoleum ghoul",
@@ -734,24 +784,280 @@ const abyssals: TrainingOption = {
     70,
     "Level 98 abyssal demons hit up to 672 in melee, have 8,500 life points and teleport around you.",
   ),
+  ...checked(P2P_MELEE, P2P_MAGIC, P2P_RANGED, NECRO),
 };
 const jacquelynReason =
   "Jacquelyn assigns early Lumbridge creatures such as rats, goblins, cave bugs, cave slimes and zombies.";
-const assigned: TrainingOption = {
-  id: "slayer-assignment",
-  title: "Slayer assignments",
-  wiki: "Jacquelyn",
-  image: "Jacquelyn_chathead.png",
+
+// Methods added on 2026-11-16 from the current guides. Spawns are the LocLine tables on each creature's Wiki page:
+// /w/Rock_crab, /w/Flesh_Crawler, /w/Abyssal_walker, /w/Lesser_demon, /w/Catablepon, /w/Skoblin, /w/Troll_brute,
+// /w/Exiled_kalphite_marauder, /w/Chaos_druid, /w/Ghostly_troll_bruiser, /w/Skeleton_(Lumbridge_Catacombs),
+// /w/Armoured_zombie and /w/Ravenous_ghoul. Maximum hits are from the same pages' infoboxes.
+const waterfallQuest: TrainingOption = {
+  id: "waterfall-quest",
+  title: "Waterfall Quest",
+  wiki: "Waterfall_Quest",
+  image: "Waterfall_Quest.png",
   members: true,
-  locations: ["Lumbridge"],
-  sites: [jacquelynSite],
+  locations: ["Baxtorian Falls"],
+  sites: [
+    {
+      label: "Almera's house, Baxtorian Falls",
+      wiki: "Almera",
+      map: { x: 2522, y: 3498, plane: 0, mapId: 28 },
+      access: "The quest starts with Almera, north-east of the falls.",
+    },
+  ],
   method:
-    "Take a suitable assignment from Jacquelyn or another unlocked Slayer master, then fight the assigned creatures.",
+    "Complete Waterfall Quest first, then Tree Gnome Village and Fight Arena for Attack. Their rewards replace the slowest levels of melee training.",
   benefit:
-    "Earn Slayer progress and task drops alongside combat instead of focusing exclusively on combat experience.",
+    "Waterfall Quest's 13,750 Attack and 13,750 Strength XP takes a fresh account from 1 to 30 in both, with no required combat.",
+  requirements: ["Membership", "A rope and 6 each of air, earth and water runes"],
   risks:
-    "Tasks differ in difficulty and equipment requirements; inspect the target and use a safer master if needed.",
-  gear: gear(10, jacquelynReason),
+    "The route passes aggressive mid-level monsters; bring some food even though no fight is required.",
+  gear: gear(
+    1,
+    "Waterfall Quest has no required combat, so any gear will do; only bring food for the aggressive monsters on the way.",
+  ),
+  ...checked(P2P_MELEE, W + "Ironman_Mode/Guide/Melee"),
+};
+const rockCrabs: TrainingOption = {
+  id: "rock-crabs",
+  title: "Rock crabs",
+  wiki: "Rock_crab",
+  image: "Rock_Crab.png",
+  members: true,
+  locations: ["Rellekka"],
+  sites: [
+    {
+      label: "Rock crabs north of Rellekka",
+      wiki: "Rock_crab",
+      map: { x: 2666, y: 3715, plane: 0, mapId: 28 },
+      access: "Walk north along the coast from the Fremennik Province lodestone.",
+    },
+  ],
+  method:
+    "Walk next to the rocks on the coast north of Rellekka; rock crabs wake when you are a tile away and attack you, so you can fight several at once.",
+  benefit:
+    "A safe, fast grind from the mid-20s: low damage, 8,400 life points each and a lodestone nearby.",
+  risks: "Ranged and Magic can't target a crab until it wakes, so stand next to the rocks.",
+  gear: gear(30, "Level 47 rock crabs attack once woken and hit up to 300 in melee."),
+  ...checked(P2P_MELEE),
+};
+const strongholdSite = (label: string, wiki: string, x: number, y: number, access: string) => ({
+  label,
+  wiki,
+  map: { x, y, plane: 0 as const, mapId: 24 },
+  access,
+});
+const fleshCrawlers: TrainingOption = {
+  id: "flesh-crawlers",
+  title: "Flesh Crawlers",
+  wiki: "Flesh_Crawler",
+  image: "Flesh_Crawler.png",
+  locations: ["Stronghold of Security"],
+  sites: [strongholdSite("Stronghold second-level flesh crawlers", "Flesh_Crawler", 92, 139, "Descend to the second level of the Stronghold of Security.")],
+  method:
+    "Fight Flesh Crawlers on the second level of the Stronghold of Security. They gather in groups, so area-of-effect abilities hit several at once.",
+  benefit:
+    "The Wiki's melee guide calls AoE here extremely effective, viable up to 70; they are weak to stab and drop grimy herbs.",
+  risks: "You'll fight several at once, so bring food; a herb bag keeps the herb drops from filling your pack.",
+  gear: gear(20, "Level 26 Flesh Crawlers don't attack first, but their ranged attacks hit up to 320 and they come in groups."),
+  ...checked(F2P_MELEE, P2P_MELEE, F2P_RANGED),
+};
+const abyss: TrainingOption = {
+  id: "abyss-creatures",
+  title: "Abyss creatures",
+  wiki: "Abyss/Combat_training",
+  image: "Abyssal_walker.png",
+  members: true,
+  locations: ["Abyss"],
+  sites: [
+    {
+      label: "Abyss, south-west corner",
+      wiki: "Abyss/Combat_training",
+      map: { x: 3025, y: 4811, plane: 0, mapId: 187 },
+      access: "The Mage of Zamorak teleports you in from the low Wilderness north of Edgeville after Enter the Abyss.",
+    },
+  ],
+  method:
+    "Stand in the south-west or south-east corner of the Abyss, where 15+ aggressive creatures spawn, and use area-of-effect abilities. Run to the other corner and back when they stop attacking after 10 minutes.",
+  benefit:
+    "The Wiki's Abyss guide puts it at around 500,000–600,000 XP an hour and AFK. Charms feed Summoning and ashes feed Prayer or Necromancy rituals.",
+  requirements: [
+    "Enter the Abyss miniquest",
+    "The Wiki suggests 70 in every combat skill and 92 Prayer for Soul Split",
+  ],
+  risks:
+    "Many creatures hit you at once. Bring healing such as Vampyrism, a blood amulet of fury or a bunyip, and travel through the low Wilderness to get there.",
+  gear: gear(
+    70,
+    "The Abyss guide suggests tier 70 armour: level 72–79 creatures attack on sight in groups, hitting up to 275 in melee, 228 with magic and 208 with ranged.",
+  ),
+  ...checked(ABYSS, P2P_MELEE, P2P_MAGIC, P2P_RANGED, IRON_NECRO),
+};
+const lesserDemons: TrainingOption = {
+  id: "lesser-demons",
+  title: "Lesser demons",
+  wiki: "Lesser_demon",
+  image: "Lesser_demon.png",
+  locations: ["Karamja Volcano"],
+  sites: [
+    {
+      label: "Crandor and Karamja Dungeon lesser demons",
+      wiki: "Lesser_demon",
+      map: { x: 271, y: 154, plane: 0, mapId: 13 },
+      access: "Enter through Karamja Volcano.",
+    },
+  ],
+  method:
+    "Fight lesser demons in the Crandor and Karamja Dungeon. They are weak to bolts; mages cast Air Blast.",
+  benefit:
+    "Easy to hit even at middling levels: the Wiki's guides put it at about 110,000 Ranged or 100,000 Magic XP an hour. Accursed ashes feed Prayer.",
+  risks: "They're aggressive and attack with magic from range, so there is no safe spot.",
+  gear: gear(40, "Level 70 lesser demons attack on sight and hit up to 480 with magic."),
+  ...checked(F2P_RANGED, F2P_MAGIC),
+};
+const catablepons: TrainingOption = {
+  id: "catablepons",
+  title: "Catablepons",
+  wiki: "Catablepon",
+  image: "Catablepon.png",
+  locations: ["Stronghold of Security"],
+  sites: [strongholdSite("Stronghold third-level catablepons", "Catablepon", 15, 64, "Descend to the third level of the Stronghold of Security.")],
+  method:
+    "Fight catablepons on the third level of the Stronghold of Security, skipping the drops. They are weak to bolts.",
+  benefit:
+    "Easy kills that rarely hurt: the Wiki's Ranged guide puts it at up to about 110,000 XP an hour.",
+  risks: "Their Weaken spell lowers your Strength by up to 8.",
+  gear: gear(40, "Level 43 catablepons don't attack first, but hit up to 480 in melee and 700 with magic."),
+  ...checked(F2P_RANGED),
+};
+const skoblins: TrainingOption = {
+  id: "skoblins",
+  title: "Skoblins",
+  wiki: "Skoblin",
+  image: "Skoblin.png",
+  locations: ["Lumbridge Catacombs"],
+  sites: [
+    {
+      label: "Lumbridge Catacombs skoblins",
+      wiki: "Skoblin",
+      map: { x: 3993, y: 5493, plane: 0, mapId: 165 },
+      access: "The ninth room of the Lumbridge Catacombs, after The Blood Pact.",
+    },
+  ],
+  method: "Fight skoblins in the ninth room of the Lumbridge Catacombs.",
+  benefit: "The best free Ranged XP the Wiki lists for 70+: up to 170,000 an hour.",
+  requirements: ["The Blood Pact"],
+  gear: gear(20, "Level 19 skoblins don't attack first and hit up to 280 in melee."),
+  ...checked(F2P_RANGED),
+};
+const trollBrutes: TrainingOption = {
+  id: "troll-brutes",
+  title: "Troll brutes",
+  wiki: "Troll_brute",
+  image: "Troll_brute.png",
+  locations: ["Burthorpe Troll Cave"],
+  sites: [
+    {
+      label: "Burthorpe Troll Cave, west cave",
+      wiki: "Troll_brute",
+      map: { x: 135, y: 283, plane: 0, mapId: 719 },
+    },
+  ],
+  method:
+    "Cast Air Strike, then air spells as you unlock them, on troll brutes in the west cave of the Burthorpe Troll Cave. A staff of air or Caitlin's staff saves the air runes.",
+  benefit:
+    "Weak to air, so cheap spells kill them quickly; good XP for how easy they are. Their drops aren't worth picking up.",
+  gear: gear(1, "Level 7 troll brutes don't attack first and hit at most 100 in melee."),
+  ...checked(F2P_MAGIC, P2P_MAGIC),
+};
+const marauders: TrainingOption = {
+  id: "exiled-marauders",
+  title: "Exiled kalphite marauders",
+  wiki: "Exiled_kalphite_marauder",
+  image: "Exiled_kalphite_marauder.png",
+  members: true,
+  locations: ["Exiled Kalphite Hive"],
+  sites: [
+    {
+      label: "Exiled Kalphite Hive marauders",
+      wiki: "Exiled_kalphite_marauder",
+      map: { x: 64, y: 29, plane: 0, mapId: 45 },
+      access: "The Kalphite entrance south of the Jaldraocht Pyramid, north of Menaphos.",
+    },
+  ],
+  method:
+    "Fight marauders in the first room of the Exiled Kalphite Hive. They're always aggressive, so you don't need aggression potions.",
+  benefit:
+    "AFK with Soul Split: the Wiki puts it at up to 300,000 Ranged XP an hour, or 147,000 Necromancy XP on tier 70 gear. A strong source of blue charms, herbs and seeds.",
+  risks: "Their attacks stack up, so without Soul Split you'll bank for food often.",
+  gear: gear(70, "Level 98 marauders attack on sight in groups and hit up to 280 with magic; the Necromancy guide rates it on tier 70 gear."),
+  ...checked(P2P_RANGED, NECRO),
+};
+const chaosDruids: TrainingOption = {
+  id: "chaos-druids",
+  title: "Chaos druids",
+  wiki: "Chaos_druid",
+  image: "Chaos_druid_(bald).png",
+  members: true,
+  locations: ["Taverley Dungeon"],
+  sites: [
+    {
+      label: "Taverley Dungeon chaos druids",
+      wiki: "Chaos_druid",
+      map: { x: 2929, y: 9848, plane: 0, mapId: 17 },
+    },
+  ],
+  method: "Fight chaos druids in Taverley Dungeon. They're aggressive and weak to arrows.",
+  benefit: "Semi-AFK, and they drop herbs often, which an Ironman needs for Herblore.",
+  gear: gear(10, "Level 32 chaos druids attack on sight but hit only up to 92 with magic."),
+  ...checked(P2P_RANGED),
+};
+const highAlchemy: TrainingOption = {
+  id: "high-alchemy",
+  title: "High Level Alchemy",
+  wiki: "High_Level_Alchemy",
+  image: "High_Level_Alchemy_icon.png",
+  locations: [],
+  sites: [],
+  locationNote: "Cast it anywhere, such as at a bank or while you train a gathering skill.",
+  method:
+    "From level 55, cast High Level Alchemy on the drops you'd otherwise sell. A staff of fire saves the fire runes, so each cast costs one nature rune.",
+  benefit:
+    "65 XP a cast, up to 78,000 an hour, and it turns your drops into the coins an Ironman can't get from the Grand Exchange.",
+  requirements: ["55 Magic"],
+  supplies: ["Nature rune", "Staff of fire"],
+  ...checked(F2P_MAGIC, P2P_MAGIC, W + "Ironman_Mode/Guide/Magic"),
+};
+// Defence and Constitution train with whichever style you fight in, so their routes take the methods that the
+// style guides share. https://runescape.wiki/w/Defence_training and /w/Pay-to-play_Constitution_training.
+const ROUTES: Record<"melee" | "ranged" | "magic" | "any", TrainingOption[][]> = {
+  melee: [
+    [waterfallQuest, trolls, chicken, cows],
+    [rockCrabs, fleshCrawlers, giants, moss],
+    [abyss, ankou, iceGiants, moss],
+    [abyss, abyssals, ankou, iceGiants, hellhounds],
+  ],
+  ranged: [
+    [trolls, chicken, cows],
+    [chaosDruids, fleshCrawlers, giants],
+    [abyss, dragons, catablepons, lesserDemons],
+    [abyss, marauders, abyssals, skoblins, catablepons, lesserDemons],
+  ],
+  magic: [
+    [trollBrutes],
+    [iceGiants, giants],
+    [abyss, gargoyles, ankou, lesserDemons, highAlchemy],
+    [abyss, abyssals, ankou, lesserDemons, highAlchemy],
+  ],
+  any: [
+    [trolls, chicken, cows],
+    [rockCrabs, fleshCrawlers, giants, moss],
+    [abyss, dragons, ankou, lesserDemons, iceGiants],
+    [abyss, abyssals, ankou, lesserDemons, hellhounds],
+  ],
 };
 function stage(
   from: number,
@@ -764,14 +1070,25 @@ function stage(
 ) {
   return { from, to, title, method, options, supplies, members };
 }
+/**
+ * A combat skill's four ranges from its style's route. Each list is ranked members first, then the free methods in
+ * their own order, so F2P profiles (which never see a members option) keep the free ranking.
+ */
 function combatSkill(
   name: SkillRecord["name"],
   cap: number,
   description: string,
   instruction: string,
   supplies: string[],
+  route: TrainingOption[][],
 ): SkillRecord {
   const method = `${instruction} Select targets for your whole equipment and survival setup, not this skill alone; return to an easier option whenever necessary.`;
+  const ranges: [number, number, string][] = [
+    [1, 20, "Learn combat"],
+    [20, 50, "Build up on stronger targets"],
+    [50, 80, "Train on groups and AFK spots"],
+    [80, cap, "Continue towards mastery"],
+  ];
   return {
     name,
     category: "Combat",
@@ -787,63 +1104,10 @@ function combatSkill(
           ? "Free-to-play_Magic_training"
           : "Free-to-play_melee_training",
     maxLevel: cap,
-    stages: [
-      stage(
-        1,
-        20,
-        "Learn combat and gather supplies",
-        method,
-        [chicken, cows, trolls],
-        false,
-        supplies,
-      ),
-      stage(
-        20,
-        50,
-        "Gather materials while improving gear",
-        method,
-        [cows, giants, moss, assigned],
-        false,
-        supplies,
-      ),
-      stage(
-        50,
-        80,
-        "Choose bones or stronger drops",
-        method,
-        [
-          moss,
-          ankou,
-          roaches,
-          iceGiants,
-          wildDragons,
-          dragons,
-          gargoyles,
-          assigned,
-        ],
-        false,
-        supplies,
-      ),
-      stage(
-        80,
-        cap,
-        "Continue towards mastery",
-        method,
-        [
-          ankou,
-          wildDragons,
-          hellhounds,
-          roaches,
-          dragons,
-          gargoyles,
-          abyssals,
-          assigned,
-        ],
-        false,
-        supplies,
-      ),
-    ],
-    membersNote: `Free players can continue training ${name} to ${cap}; member assignments and Taverley dragons are additional options, not a requirement.`,
+    stages: ranges.map(([from, to, title], i) =>
+      stage(from, to, title, method, route[i], false, supplies),
+    ),
+    membersNote: `Free players can train ${name} to ${cap} with the free methods; the Members view lists members methods first.`,
   };
 }
 function option(
@@ -1196,7 +1460,7 @@ const ritual = option(
   "Um_ritual_site.png",
   ["City of Um"],
   "At level 5 use one Elemental I and two Commune I glyphs with suitable bones or mementos; tend disturbances.",
-  "The ritual produces souls for the Well of Souls and ectoplasm, at the cost of glyph materials.",
+  "The Wiki's fastest XP from 5 to 26, and the souls (400 by about level 26) unlock talents at the Well of Souls; glyph ink costs materials.",
   {
     sites: [ritualSite],
     requirements: [
@@ -1209,18 +1473,28 @@ const ritual = option(
       "Basic ritual candles",
       "Eligible bones or mementos",
     ],
+    ...checked(NECRO, IRON_NECRO),
   },
 );
+// Combat targets: https://runescape.wiki/w/Necromancy_training#Combat_training and the Ironman guide's
+// "Suggested enemies for combat training".
 const combatNecro = option(
   "necro-combat",
   "Necromancy combat",
-  "Chicken",
-  "Chicken.png",
-  ["Lumbridge"],
-  "Use your necromancy weapons and unlocked abilities against chickens or other enemies suited to your equipment.",
-  "Earn combat experience and useful drops while saving ritual materials.",
+  "Ghostly_troll_bruiser",
+  "Ghostly_troll_bruiser.png",
+  ["City of Um"],
+  "Fight the ghostly trolls in the City of Um troll cave with your Necromancy weapons, using area-of-effect abilities where you can.",
+  "The Wiki's Necromancy guides start combat here: undead, so undead-slayer effects work, and their bones feed early rituals.",
   {
-    sites: [chickenSite],
+    sites: [
+      {
+        label: "City of Um troll cave",
+        wiki: "City_of_Um_troll_cave",
+        map: { x: 1193, y: 2002, plane: 0, mapId: -1 },
+        access: "The cave holds at most three players.",
+      },
+    ],
     requirements: ["Complete Necromancy!"],
     supplies: [
       "Level-appropriate Death guard",
@@ -1229,7 +1503,8 @@ const combatNecro = option(
     ],
     risks:
       "Move to stronger enemies only when your equipment and survival are adequate.",
-    gear: chicken.gear,
+    gear: gear(1, "Level 7 ghostly trolls don't attack first and hit at most 100 in melee, so any gear will do."),
+    ...checked(NECRO, IRON_NECRO),
   },
 );
 // https://runescape.wiki/w/Greater_communion https://runescape.wiki/w/Powerful_communion
@@ -1254,7 +1529,8 @@ const greaterRitual = {
     "Eligible bones or mementos",
   ],
   benefit:
-    "Build souls and ectoplasm for talents and supplies; higher-tier glyphs consume better ink.",
+    "From 60 the Wiki suggests greater communion for souls, with Multiply II glyphs (66, boostable) to raise the output; higher-tier glyphs consume better ink.",
+  ...checked(NECRO, IRON_NECRO),
 };
 const powerfulRitual = {
   ...ritual,
@@ -1276,19 +1552,91 @@ const powerfulRitual = {
     "Eligible high-level bones or mementos",
   ],
   benefit:
-    "Generate souls and ectoplasm using high-tier materials; multiply glyphs increase output when available.",
+    "The Wiki's fastest Necromancy XP from 90, though active: maximise soul attraction from disturbances. Multiply glyphs increase output when available.",
+  ...checked(NECRO, IRON_NECRO),
 };
-const memberNecro = {
+const memberNecro: TrainingOption = {
   ...combatNecro,
-  title: "Necromancy at hill giants",
-  wiki: "Hill_giant",
-  image: "Hill_Giant_(1).png",
-  locations: ["Edgeville Dungeon hill giants"],
-  sites: [hillSite],
+  title: "Necromancy at skeletons",
+  wiki: "Skeleton_(Lumbridge_Catacombs)",
+  image: "Skeleton_(Lumbridge_Catacombs).png",
+  locations: ["Lumbridge Catacombs"],
+  sites: [
+    {
+      label: "Lumbridge Catacombs skeletons",
+      wiki: "Skeleton_(Lumbridge_Catacombs)",
+      map: { x: 4020, y: 5531, plane: 0, mapId: 165 },
+    },
+  ],
   members: true,
   method:
-    "Fight hill giants with Necromancy; upgrade deathwarden equipment through Kili's tasks and unlock talents at the Well of Souls.",
-  gear: giants.gear,
+    "Fight the skeletons in the Lumbridge Catacombs with area-of-effect abilities; upgrade your equipment through Kili's tasks every 10 levels.",
+  benefit:
+    "Undead, so undead-slayer effects such as a salve amulet (e) add damage. The Ironman guide recommends them from 20 to 70.",
+  gear: gear(10, "Level 15 skeletons don't attack first and hit up to 220 in melee."),
+};
+const necroAnkou: TrainingOption = {
+  ...ankou,
+  id: "necro-ankou",
+  members: true,
+  method:
+    "Fight ankou on the fourth floor of the Stronghold of Security with Necromancy, after Kili's Knowledge II gives you tier 40 weapons.",
+  benefit:
+    "Undead, so a salve amulet (e) adds damage; the Wiki's Necromancy guide lists them from 40. Their drops include death runes and herbs.",
+  ...checked(NECRO, IRON_NECRO),
+};
+const armouredZombies: TrainingOption = {
+  id: "armoured-zombies",
+  title: "Armoured zombies",
+  wiki: "Armoured_zombie",
+  image: "Armoured_zombie.png",
+  members: true,
+  locations: ["Chaos Temple Dungeon"],
+  sites: [
+    {
+      label: "Chaos Temple Dungeon armoured zombies",
+      wiki: "Armoured_zombie",
+      map: { x: 3242, y: 10025, plane: 0, mapId: 581 },
+      access: "Hartwin in Varrock Palace's north-west tower teleports you in.",
+    },
+  ],
+  method:
+    "Fight the armoured zombies in the Chaos Temple Dungeon with Necromancy. They're aggressive and dense, so area-of-effect abilities keep hitting several.",
+  benefit:
+    "Very AFK on tier 60 armour with only your conjured ghost for healing; drops include planks, herbs, essence and charms.",
+  requirements: ["Partial completion of Defender of Varrock"],
+  gear: gear(60, "The Necromancy guide rates them AFK on tier 60 armour; level 85–86 zombies attack on sight and hit up to 297 in melee."),
+  ...checked(NECRO),
+};
+const ravenousGhouls: TrainingOption = {
+  id: "ravenous-ghouls",
+  title: "Ravenous ghouls",
+  wiki: "Ravenous_ghoul",
+  image: "Ravenous_ghoul.png",
+  members: true,
+  locations: ["Slayer Tower Mausoleum"],
+  sites: [
+    {
+      label: "Slayer Tower Mausoleum",
+      wiki: "Ravenous_ghoul",
+      map: { x: 4431, y: 7898, plane: 0, mapId: -1 },
+      access: "Through the trapdoor in the south-east corner of the Slayer Tower.",
+    },
+  ],
+  method:
+    "Fight ravenous ghouls in the Slayer Tower Mausoleum with a blood essence equipped, which keeps them aggressive.",
+  benefit:
+    "The AFK alternative to rituals from 90: the Wiki puts it at up to 850,000 XP an hour. Their bones help make a demon horn necklace; other loot is poor.",
+  requirements: ["Enter Morytania by completing Priest in Peril or defeating the Paterdomus mausoleum ghoul"],
+  gear: gear(80, "Level 105 ravenous ghouls have 14,500 life points and hit up to 595 in melee."),
+  ...checked(NECRO),
+};
+const necroAbyssals: TrainingOption = {
+  ...abyssals,
+  id: "necro-abyssals",
+  method:
+    "Fight abyssal demons with Necromancy; demon-slayer effects add damage. The Wiki's Necromancy guide prefers the Wilderness spawns, where they stay aggressive.",
+  ...checked(NECRO, IRON_NECRO),
 };
 
 export const COMBAT_SKILLS: SkillRecord[] = [
@@ -1298,6 +1646,7 @@ export const COMBAT_SKILLS: SkillRecord[] = [
     "Train melee accuracy and unlock stronger melee weapons.",
     "Select Attack experience in Gameplay > Combat & Action Bar > Combat XP; match weapon type to the target's weakness.",
     ["Suitable melee weapon", "Armour", "Food"],
+    ROUTES.melee,
   ),
   combatSkill(
     "Defence",
@@ -1305,6 +1654,7 @@ export const COMBAT_SKILLS: SkillRecord[] = [
     "Improve survivability and unlock protective armour.",
     "Select Defence experience in combat settings; Defence can be trained with your chosen combat style.",
     ["Suitable weapon and armour", "Food"],
+    ROUTES.any,
   ),
   combatSkill(
     "Strength",
@@ -1312,6 +1662,7 @@ export const COMBAT_SKILLS: SkillRecord[] = [
     "Improve melee damage through combat.",
     "Select Strength experience in combat settings; upgrade weapons using Attack and match their type to the target's weakness.",
     ["Suitable melee weapon", "Armour", "Food"],
+    ROUTES.melee,
   ),
   combatSkill(
     "Constitution",
@@ -1319,6 +1670,7 @@ export const COMBAT_SKILLS: SkillRecord[] = [
     "Increase life points by fighting with any combat style.",
     "Constitution experience accompanies combat; use the style and equipment appropriate to the target.",
     ["Suitable combat equipment", "Food"],
+    ROUTES.any,
   ),
   combatSkill(
     "Ranged",
@@ -1326,6 +1678,7 @@ export const COMBAT_SKILLS: SkillRecord[] = [
     "Fight from a distance using ranged weapons and abilities.",
     "Select Ranged experience; a chargebow needs no ammunition, while other weapons need compatible ammunition.",
     ["Ranged weapon", "Compatible ammunition if needed", "Food"],
+    ROUTES.ranged,
   ),
   combatSkill(
     "Magic",
@@ -1333,6 +1686,7 @@ export const COMBAT_SKILLS: SkillRecord[] = [
     "Use spells for combat, travel and utility.",
     "Select Magic experience and a combat spell; match elemental weakness when practical. A staff of air supplies air runes.",
     ["Magic weapon", "Runes for the chosen spell", "Food"],
+    ROUTES.magic,
   ),
   {
     name: "Prayer",
@@ -1596,7 +1950,7 @@ export const COMBAT_SKILLS: SkillRecord[] = [
         20,
         40,
         "Upgrade with Kili",
-        "After subscribing, complete Kili Row and check each equipment upgrade's materials.",
+        "After subscribing, complete Kili Row and Rune Mythos, and check each equipment upgrade's materials.",
         [memberNecro, memberRitual],
         true,
       ),
@@ -1604,37 +1958,24 @@ export const COMBAT_SKILLS: SkillRecord[] = [
         40,
         60,
         "Develop talents and equipment",
-        "Use Necromancy against moss giants or blue dragons when equipped; continue Kili's armour tasks.",
-        [
-          { ...moss, id: "necro-moss", members: true },
-          memberRitual,
-          necroDragons,
-        ],
+        "Fight undead with Necromancy and continue Kili's tasks every 10 levels.",
+        [necroAnkou, memberNecro, memberRitual],
         true,
       ),
       stage(
         60,
         90,
         "Greater communion",
-        "Use greater communion for souls; improve equipment and choose combat targets for your gear and Slayer level.",
-        [
-          greaterRitual,
-          necroDragons,
-          { ...gargoyles, id: "necro-gargoyles" },
-          { ...abyssals, id: "necro-abyssals" },
-        ],
+        "Use greater communion for souls; fight AFK undead and kalphites between rituals, and improve equipment every 10 levels.",
+        [armouredZombies, marauders, greaterRitual, necroAbyssals],
         true,
       ),
       stage(
         90,
         120,
         "Powerful communion",
-        "Use powerful communion for high-tier souls and ectoplasm, or train combat for supplies.",
-        [
-          powerfulRitual,
-          { ...abyssals, id: "necro-abyssals" },
-          { ...gargoyles, id: "necro-gargoyles" },
-        ],
+        "Powerful communion is the fastest XP; AFK combat is slower but needs no materials.",
+        [powerfulRitual, ravenousGhouls, necroAbyssals],
         true,
       ),
     ],

@@ -100,14 +100,21 @@ const nonDragonCombat = [
   "hill-giants",
   "moss-giants",
   "ankou",
-  "cockroach-soldiers",
   "ice-giants",
   "gargoyles",
   "slayer-assignment",
   "wild-hellhounds",
   "abyssal-demons",
+  "rock-crabs",
+  "flesh-crawlers",
+  "chaos-druids",
+  "abyss-creatures",
+  "lesser-demons",
+  "catablepons",
+  "skoblins",
+  "exiled-marauders",
 ];
-const dragonCombat = ["blue-dragons", "wilderness-blue-dragons"];
+const dragonCombat = ["blue-dragons"];
 const gargoyleHammer = item(
   "Rock hammer",
   1,

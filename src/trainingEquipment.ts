@@ -28,7 +28,7 @@ const STYLE_EXTRAS: Record<CombatClass, SkillName> = {
   magic: "Magic",
   necromancy: "Necromancy",
 };
-const DRAGONS = ["blue-dragons", "wilderness-blue-dragons"];
+const DRAGONS = ["blue-dragons"];
 const SLAYER_MASTERS = ["jacquelyn", "vannaka", "sumona", "kuradal", "laniakea"];
 
 /** The gear class a skill page shows; `style` applies to Defence, Constitution and Slayer. */
@@ -96,12 +96,6 @@ export function trainingGear(
 ): { rows: GearRow[]; extras: EquipmentRecommendation[]; note?: string } {
   const chooseStyle = STYLE_SKILLS.includes(skill);
   const gearStyle = gearClass(skill, style);
-  if (chooseStyle && style === "necromancy" && DRAGONS.includes(method.id) && profile.mode !== "members")
-    return {
-      rows: [],
-      extras: [],
-      note: "The dual-weapon Necromancy setup needs members' super antifire. Choose another style for this F2P dragon method.",
-    };
   // A combat table needs the method's minimum; Necromancy rituals have none because they are not fights.
   const rows =
     gearStyle === "tool"

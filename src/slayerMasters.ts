@@ -3,7 +3,7 @@ import type { Profile } from "./data.ts";
 import { COMBAT_SKILLS, combatLevel } from "./lib/combatLevel.ts";
 import { levelStatus } from "./lib/levelStatus.ts";
 import type { SkillName } from "./skillNames.ts";
-import { SLAYER_MASTERS } from "./slayerImported.ts";
+import { SLAYER_MASTERS } from "./slayerMastersImported.ts";
 import type { SlayerMaster } from "./slayerTypes.ts";
 
 /** Wilderness masters: offered as alternatives, never as the default or the next step. */
@@ -64,5 +64,48 @@ export function masterFor(profile: Profile): MasterChoice {
     next: ladder.find((m) => !master || byLadder(m, master) > 0),
     alternatives: inMode.filter((m) => ALTERNATIVE_IDS.includes(m.id) && usable(m)),
     ...(unrecorded.length ? { unrecorded } : {}),
+  };
+}
+
+const ROUTE_SKILLS: readonly SkillName[] = ["Attack", "Strength", "Defence", "Constitution", "Ranged", "Magic", "Necromancy"];
+/**
+ * What Slayer tasks train besides the skill fought with. Every combat skill and Slayer from the fighting; Prayer
+ * from bones and ashes; Herblore from herb drops; Summoning from charm drops. See ROUTE_SOURCES.
+ */
+const ROUTE_FEEDS: readonly SkillName[] = [...ROUTE_SKILLS, "Slayer", "Prayer", "Herblore", "Summoning"];
+const ROUTE_SOURCES = [
+  // "Slayer experience is granted in addition to regular combat experience."
+  "https://runescape.wiki/w/Slayer",
+  // Charms are "obtained primarily as drops from any of hundreds of different monsters".
+  "https://runescape.wiki/w/Charms",
+  // Herb drops give Herblore XP through a herb bag or herbicide (the bandit entry).
+  "https://runescape.wiki/w/Necromancy_training",
+  // Combat is "ideally" trained "while ... training Slayer or Prayer".
+  "https://runescape.wiki/w/Ironman_Mode/Guide/Ranged",
+];
+const VANNAKA = SLAYER_MASTERS.find((m) => m.id === "vannaka");
+
+export type EfficientRoute = {
+  master: SlayerMaster;
+  feeds: SkillName[];
+  reason: string;
+  checked: string;
+  sources: string[];
+};
+
+/**
+ * "Slayer tasks from <your master>" for a combat skill's page. Only members whose master is Vannaka or above on the
+ * ladder get it: the starter masters' tasks are too short and too weak to beat focused training.
+ */
+export function efficientSlayerRoute(skill: SkillName, profile: Profile): EfficientRoute | undefined {
+  if (profile.mode !== "members" || !ROUTE_SKILLS.includes(skill) || !VANNAKA) return undefined;
+  const { master } = masterFor(profile);
+  if (!master || byLadder(master, VANNAKA) < 0) return undefined;
+  return {
+    master,
+    feeds: [skill, ...ROUTE_FEEDS.filter((s) => s !== skill)],
+    reason: `${master.name} is the best master your Combat and Slayer levels allow: each task trains ${skill} alongside Slayer, and the drops feed Prayer, Herblore and Summoning.`,
+    checked: "2026-11-16",
+    sources: ROUTE_SOURCES,
   };
 }

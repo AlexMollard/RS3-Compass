@@ -27,10 +27,12 @@ const maxed = Object.fromEntries(
 );
 const COMBAT = ["Attack", "Strength", "Defence", "Constitution", "Ranged", "Magic", "Slayer", "Necromancy"];
 const RITUALS = ["communion", "greater-communion", "powerful-communion"];
+// Methods that aren't fights have no gear minimum: Necromancy rituals and Magic's High Level Alchemy.
+const NOT_FIGHTS = [...RITUALS, "high-alchemy"];
 const combatMethods = () =>
   COMBAT.flatMap((name) =>
     skillOf(name).stages.flatMap((stage) =>
-      stage.options.filter((o) => !RITUALS.includes(o.id)).map((option) => ({ skill: name, stage, option })),
+      stage.options.filter((o) => !NOT_FIGHTS.includes(o.id)).map((option) => ({ skill: name, stage, option })),
     ),
   );
 
@@ -45,14 +47,16 @@ test("Every combat method has a Wiki-checked minimum with a stated reason", () =
     assert.ok(option.gear.reason.trim().length > 20, context + " needs a real reason");
   }
   for (const id of RITUALS) assert.equal(methodOf("Necromancy", id).gear, undefined, id);
+  assert.equal(methodOf("Magic", "high-alchemy").gear, undefined);
 });
 
-test("Necromancy at hill giants keeps its own minimum rather than the chickens'", () => {
+test("Necromancy at skeletons keeps its own minimum rather than the troll cave's", () => {
   const stages = skillOf("Necromancy").stages;
-  const chickens = stages[0].options.find((o) => o.id === "necro-combat");
-  const giants = stages[1].options.find((o) => o.id === "necro-combat");
-  assert.match(giants.gear.reason, /giant/i);
-  assert.ok(giants.gear.minTier > chickens.gear.minTier);
+  const trolls = stages[0].options.find((o) => o.id === "necro-combat");
+  const skeletons = stages[1].options.find((o) => o.id === "necro-combat");
+  assert.match(trolls.gear.reason, /troll/i);
+  assert.match(skeletons.gear.reason, /skeleton/i);
+  assert.ok(skeletons.gear.minTier > trolls.gear.minTier);
 });
 
 test("Skills map to the documented gear class", () => {
@@ -120,10 +124,6 @@ test("Dragon methods carry the protection that fits the style", () => {
   const necro = trainingGear("Defence", dragons, profile, "necromancy");
   assert.ok(necro.extras.some((item) => item.name === "Super antifire (3)"));
   assert.ok(!necro.extras.some((item) => item.name === "Anti-dragon shield"));
-  const wild = methodOf("Constitution", "wilderness-blue-dragons");
-  const freeNecro = trainingGear("Constitution", wild, character({ Necromancy: 20, Defence: 50 }, "f2p"), "necromancy");
-  assert.deepEqual(freeNecro.rows, []);
-  assert.match(freeNecro.note, /super antifire/i);
 });
 
 test("An unrecorded wear level asks for the level instead of falling back to bronze", () => {
@@ -204,8 +204,8 @@ test("The tool row is named after the skill's tool, with or without a pick", () 
 });
 
 test("Ranged lists ammunition for its level, with Lowe's arrows on F2P", () => {
-  const ankou = methodOf("Ranged", "ankou");
-  const ammo = (profile, method = ankou, skill = "Ranged", style) =>
+  const catablepons = methodOf("Ranged", "catablepons");
+  const ammo = (profile, method = catablepons, skill = "Ranged", style) =>
     trainingGear(skill, method, profile, style).extras.filter((item) => /arrow|bolts/i.test(item.name));
   assert.equal(ammo(character({ Ranged: 80 })).length, 1);
   assert.equal(ammo(character({ Ranged: 80 }))[0].name, "Bane arrow");

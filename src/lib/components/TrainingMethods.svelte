@@ -6,7 +6,9 @@
     type Profile,
     type SkillRecord,
   } from "../../data";
+  import { efficientSlayerRoute } from "../../slayerMasters";
   import { wikiHref } from "../../wiki";
+  import { skillPath } from "../navigation";
   import GameArt from "./GameArt.svelte";
   import GameText from "./GameText.svelte";
   import GameWindow from "./GameWindow.svelte";
@@ -31,16 +33,21 @@
     trainingRangeLabel(skill, stage, profile.mode) +
       (profile.mode === "members" ? " · Members" : " · F2P"),
   );
+  // Computed from the profile's levels, not the range: it shows once the player can use Vannaka or above.
+  const route = $derived(efficientSlayerRoute(skill.name, profile));
 </script>
 
 {#if selected}
   <div class="training-method-view">
     <GameWindow title="Method" trailing={rangeLabel}>
       <div class="method-body">
+        <h3 class="route-label" id={`focused-route-${skill.name}`}>
+          Train this skill
+        </h3>
         <div
           class="method-cards"
           role="radiogroup"
-          aria-label="Training method"
+          aria-labelledby={`focused-route-${skill.name}`}
         >
           {#each options as option (option.id)}
             {@const isSelected = option.id === selected.id}
@@ -116,6 +123,32 @@
             (opens a new tab)</span
           ></a
         >
+        {#if route}
+          <section
+            class="efficient-route"
+            aria-labelledby={`efficient-route-${skill.name}`}
+          >
+            <h3 class="route-label" id={`efficient-route-${skill.name}`}>
+              Efficient: trains more at once
+            </h3>
+            <a class="method-card route-card" href={skillPath("Slayer")}>
+              {#if route.master.image}<GameArt
+                  file={route.master.image}
+                  size={56}
+                />{/if}
+              <span class="method-copy">
+                <span class="method-title"
+                  ><b>Slayer tasks from {route.master.name}</b></span
+                >
+                <span class="method-description">{route.reason}</span>
+                <span class="route-feeds"
+                  >Trains {route.feeds.join(", ")}</span
+                >
+                <span class="route-link">Open the Slayer guide →</span>
+              </span>
+            </a>
+          </section>
+        {/if}
       </div>
     </GameWindow>
     <TrainingEquipment {skill} {profile} method={selected} />
@@ -210,6 +243,41 @@
   }
   .method-card > :global(.status-chip) {
     flex: none;
+  }
+  .route-label {
+    margin: 0;
+    font-size: var(--font-caption);
+    font-weight: 700;
+    letter-spacing: 1.55px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .efficient-route {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+  }
+  .route-card {
+    color: var(--text);
+    text-decoration: none;
+  }
+  .route-card:focus-visible {
+    outline: 2px solid var(--gold-bright);
+    outline-offset: 2px;
+  }
+  .route-feeds {
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .route-link {
+    color: var(--text);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .route-card:hover .route-link {
+    color: var(--gold-bright);
   }
   .method-benefit {
     display: flex;
