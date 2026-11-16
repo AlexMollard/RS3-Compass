@@ -232,7 +232,7 @@
     vertical-align: top;
     text-align: left;
     border-top: 1px solid var(--line);
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
   }
   .gear-table thead th {
     border-top: 0;
