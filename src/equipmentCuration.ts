@@ -23,6 +23,7 @@ export const EQUIPMENT_CURATION: GearCuration = {
     "Stealing Creation": "Only usable inside the Stealing Creation minigame.",
     "Removed content": "No longer in the game.",
     "Holiday items": "Holiday event items.",
+    "Fun weapons": "Novelty weapons (rubber chicken, mouse toy, flowers) with tier-1 stats, not training gear.",
   },
   exclude: [
     // Their Infobox Bonuses has no tier (checked 2026-11-16), so they can't sit on a tier ladder.
@@ -33,6 +34,9 @@ export const EQUIPMENT_CURATION: GearCuration = {
     "Empty Easter basket", // holiday items
     "Full Easter basket",
     "Law talisman staff", // a Runecrafting novelty
+    // Its requirements include "{{sc|combat|40}}" (combat level 40), which wear (skill levels) can't hold; a
+    // tier-10 Slayer-task boost, not training armour (checked 2026-11-16).
+    "Black mask",
     // Squeal of Fortune "lucky equipment": a cosmetic copy of the regular item, no longer on sale (checked 2026-11-16).
     "Lucky abyssal whip",
     "Lucky Ahrim's hood",
@@ -65,6 +69,66 @@ export const EQUIPMENT_CURATION: GearCuration = {
     "Lucky Verac's flail",
     "Lucky Verac's helm",
     "Lucky Verac's plateskirt",
+    // More lucky equipment: Squeal of Fortune and Treasure Hunter prizes (also from Umbral chests and clover
+    // necklaces), each a copy of a regular item; their pages say "a piece of lucky equipment" (checked 2026-11-16).
+    // Not Lucky cutlass (a coin shop item) or Lucky shot flag (Trouble Brewing): they are ordinary items.
+    "Lucky arcane spirit shield",
+    "Lucky Armadyl chainskirt",
+    "Lucky Armadyl chestplate",
+    "Lucky Armadyl crossbow",
+    "Lucky Armadyl godsword",
+    "Lucky Armadyl helmet",
+    "Lucky Bandos boots",
+    "Lucky Bandos chestplate",
+    "Lucky Bandos godsword",
+    "Lucky Bandos helmet",
+    "Lucky Bandos tassets",
+    "Lucky chaotic claw",
+    "Lucky chaotic crossbow",
+    "Lucky chaotic kiteshield",
+    "Lucky chaotic longsword",
+    "Lucky chaotic maul",
+    "Lucky chaotic rapier",
+    "Lucky chaotic spear",
+    "Lucky chaotic staff",
+    "Lucky divine spirit shield",
+    "Lucky eagle-eye kiteshield",
+    "Lucky elysian spirit shield",
+    "Lucky farseer kiteshield",
+    "Lucky garb of subjugation",
+    "Lucky gown of subjugation",
+    "Lucky hood of subjugation",
+    "Lucky off-hand chaotic claw",
+    "Lucky off-hand chaotic crossbow",
+    "Lucky off-hand chaotic longsword",
+    "Lucky off-hand chaotic rapier",
+    "Lucky Saradomin godsword",
+    "Lucky Saradomin sword",
+    "Lucky spectral spirit shield",
+    "Lucky Zamorak godsword",
+    "Lucky Zamorakian spear",
+    "Off-hand Lucky Armadyl crossbow",
+    // Golden godswords, chaotics and Akrisae's war mace: limited-edition copies won from Balthazar's Big Raffle
+    // (checked 2026-11-16). Golden cane is a Treasure Hunter rare-token item and Golden katana a Premier Token
+    // Store item: promotions, not training gear.
+    "Golden Akrisae's war mace",
+    "Golden Armadyl godsword",
+    "Golden Bandos godsword",
+    "Golden Saradomin godsword",
+    "Golden Zamorak godsword",
+    "Golden chaotic claw",
+    "Golden chaotic crossbow",
+    "Golden chaotic longsword",
+    "Golden chaotic maul",
+    "Golden chaotic rapier",
+    "Golden chaotic spear",
+    "Golden chaotic staff",
+    "Golden off-hand chaotic claw",
+    "Golden off-hand chaotic crossbow",
+    "Golden off-hand chaotic longsword",
+    "Golden off-hand chaotic rapier",
+    "Golden cane",
+    "Golden katana",
     // Golden Barrows, Bandos, Armadyl and subjugation sets: cosmetic copies won from Balthazar's Big Raffle or
     // Leonard's Lucky Dip, with the bonuses of the regular item (checked 2026-11-16).
     "Golden Ahrim's hood",
@@ -147,6 +211,9 @@ export const EQUIPMENT_CURATION: GearCuration = {
     "Starfury robe",
     "Starfury skirt",
     "Starfury vambraces",
+    "Starfury bow", // upgraded Starfire weapons; Starfire and starborn diamonds came from the same promotion
+    "Starfury staff",
+    "Starfury sword",
     // Treasure Hunter prizes and promotions: no way to earn them in normal play (checked 2026-11-16).
     "Diamond Cane",
     "Emerald Cane",
@@ -191,6 +258,63 @@ export const EQUIPMENT_CURATION: GearCuration = {
     "Slime hunter helmet",
     "Slime hunter legplates",
     "White stag bow",
+    // Treasure Hunter (mtx) prizes and discontinued promotion weapons: each page carries {{R2Rbox/mtx}},
+    // "restriction = th" or a {{Discontinued item}} banner (checked 2026-11-16).
+    "Ardent mace",
+    "Auspicious Katana",
+    "Balancing wand",
+    "Ban hammer",
+    "Off-hand ban hammer",
+    "Broken heart",
+    "Deathtouched dart",
+    "Dominion Tower maul",
+    "Festive mistletoe",
+    "Goblin basher",
+    "Heartseeker crossbow",
+    "Imcando arcane focus",
+    "Imcando axe",
+    "Off-hand Imcando axe",
+    "Imcando channeling rod",
+    "Imcando pistol",
+    "Off-hand imcando pistol",
+    "Lightning staff",
+    "Monkey mace",
+    "Queen's guard staff",
+    "Serpentine 2h crossbow",
+    "Serpentine rapier",
+    "Off-hand serpentine rapier",
+    "Serpentine wand",
+    "Shark fist",
+    "Slayer Tower shortbow",
+    "Spear of despite",
+    "Twang crossbow",
+    "Off-hand twang crossbow",
+    "TzHaar whip",
+    "Wizards' Tower staff",
+    "Two-handed swordfish", // Talk like a Pirate Treasure Hunter promotion and Deathbeard's Demise event boxes
+    "Ornate katana", // a Premier Token Store vanity item
+    // Holiday items outside the Holiday items category (checked 2026-11-16).
+    "Rubber turkey", // Christmas presents, 2014 to 2022
+    "Off-hand rubber turkey",
+    "Gift wrap scythe", // Santa's Grotto Treasure Hunter promotion and Christmas presents
+    "Sparkler (2025 Halloween event)", // Halloween clan competition rewards
+    "Reaping scythe",
+    // A novelty thrown weapon: tier 30 accuracy but 0 damage ("Snowball" page), from the Christmas Village or
+    // glacor remnants. With no requirement it would be "best" for every Ranged level under 30.
+    "Snowball",
+    // Quest-stage items: made or handed over during a quest and used up by it (checked 2026-11-16).
+    "Lunar staff - pt1", // Lunar Diplomacy: becomes a lunar staff
+    "Lunar staff - pt2",
+    "Lunar staff - pt3",
+    "Relomia's wand", // the Fortunes miniquest
+    "Slender blade", // Devious Minds: becomes a bow-sword
+    "Argonlike battleaxe", // Succession: the argonlike set is smithed and worn to speak to Vengeance
+    "Argonlike boots",
+    "Argonlike full helm",
+    "Argonlike gauntlets",
+    "Argonlike kiteshield",
+    "Argonlike platebody",
+    "Argonlike platelegs",
     // Shattered Worlds: given by "equip me" on entering the minigame, restricted to it (checked 2026-11-16).
     "Abyssal adamant crossbow",
     "Abyssal bat spellbook",
@@ -549,10 +673,15 @@ export const EQUIPMENT_CURATION: GearCuration = {
       match: "^Superior void knight ",
       route: {
         kind: "reward",
-        note: "Pest Control: Void knight armour patches bought with commendation points.",
-        unlocks: ["Void knight armour patches (11 patches, 2,200 commendation points in total)"],
+        note: "Pest Control: use a Void knight armour patch (200 commendation points) on the matching void knight helm.",
+        unlocks: ["A void knight helm", "A Void knight armour patch (200 Void Knight commendation points)"],
         members: true,
-        ...wiki("Superior void knight melee helm", "Void knight armour patch"),
+        ...wiki(
+          "Superior void knight melee helm",
+          "Superior void knight mage helm",
+          "Superior void knight ranger helm",
+          "Void knight armour patch",
+        ),
       },
     },
     {
@@ -631,7 +760,8 @@ export const EQUIPMENT_CURATION: GearCuration = {
     "Ancient mace": { quests: ["another-slice-of-ham"], ...wiki("Ancient mace") },
   },
   // Tool infoboxes list only the level to wield (Attack for hatchets); the level to chop or mine is in the
-  // Hatchets table ("Woodcutting level" column) and the Inferno adze's own page.
+  // Hatchets table ("Woodcutting level" column) and the Inferno adze's own page ("{{Infobox pickaxe|level = 50}}":
+  // "Using the adze as a hatchet or pickaxe requires level 60 Woodcutting and 50 Mining").
   toolLevels: [
     ...(
       [
@@ -657,12 +787,7 @@ export const EQUIPMENT_CURATION: GearCuration = {
     Darklight: wiki("Darklight"),
     "Enhanced Excalibur": wiki("Enhanced Excalibur"),
     "Guthix halo": wiki("Guthix halo"),
-    "Lunar staff - pt1": wiki("Lunar staff - pt1"),
-    "Lunar staff - pt2": wiki("Lunar staff - pt2"),
-    "Lunar staff - pt3": wiki("Lunar staff - pt3"),
-    "Relomia's wand": wiki("Relomia's wand"),
     "Saradomin halo": wiki("Saradomin halo"),
-    Snowball: wiki("Snowball"),
     "Zamorak halo": wiki("Zamorak halo"),
   },
 };

@@ -82,6 +82,18 @@ test("setupGear gives no icons when the line states no tier", () => {
   assert.deepEqual(setupGear("ranged", "Dragonhide and a crossbow", true), []);
 });
 
+test("setupGear kits hold no lucky, golden or Starfury promotion item", () => {
+  for (const style of ["melee", "ranged", "magic"])
+    for (const tier of [50, 70, 80, 90, 95])
+      for (const members of [true, false]) {
+        const kit = setupGear(style, `Tier ${tier} weapon and armour`, members);
+        const context = `${style} ${tier} ${members ? "members" : "f2p"}`;
+        assert.deepEqual(kit.filter((i) => /^(Lucky|Golden|Starfury) /.test(i.name)).map((i) => i.name), [], context);
+      }
+  // Lucky Bandos boots tied Bandos boots at tier 70 and won on name order before.
+  assert.ok(setupGear("melee", "Tier 70 armour", true).some((i) => i.name === "Bandos boots"));
+});
+
 test("setupGear never gives free accounts members gear", () => {
   const f2p = setupGear("melee", "Tier 70+ weapon", false);
   assert.ok(f2p.length > 0);

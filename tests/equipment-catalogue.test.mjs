@@ -118,6 +118,46 @@ test("every item at tier 20 or higher with no wear requirement is on the verifie
   assert.deepEqual(EQUIPMENT_IMPORTED.filter((i) => allowed.has(i.name) && i.wear.length).map((i) => i.name), []);
 });
 
+test("no lucky, golden or Starfire/Starfury promotion item is imported", () => {
+  // Lucky cutlass (a coin shop) and Lucky shot flag (Trouble Brewing) are ordinary items, not lucky equipment.
+  const leaks = EQUIPMENT_IMPORTED.map((i) => i.name).filter(
+    (n) => (/^(Off-hand )?Lucky /i.test(n) && !["Lucky cutlass", "Lucky shot flag"].includes(n)) || /^(Off-hand )?Golden /i.test(n) || /^Star(fire|fury) /.test(n),
+  );
+  assert.deepEqual(leaks, []);
+});
+
+test("holiday, quest-stage and novelty items are excluded", () => {
+  const names = new Set(EQUIPMENT_IMPORTED.map((i) => i.name));
+  for (const name of [
+    "Snowball",
+    "Lunar staff - pt1",
+    "Lunar staff - pt2",
+    "Lunar staff - pt3",
+    "Rubber turkey",
+    "Off-hand rubber turkey",
+    "Mouse toy",
+    "Two-handed swordfish",
+    "Relomia's wand",
+    "Argonlike battleaxe",
+    "Slender blade",
+    "Off-hand rubber chicken",
+  ])
+    assert.ok(!names.has(name), name);
+});
+
+test("a reward container is never a common drop: Raptor's chest items are rare drops", () => {
+  // Each is a 1/10,000 Slayer drop; Raptor's chest of slaying gives it at 1/50, but the chest's key is built
+  // from four 1/256 drops (Wyvern crossbow, Raptor key part 1 and Raptor's chest of slaying pages, 2026-11-16).
+  for (const name of ["Wyvern crossbow", "Camel staff", "Ripper claw", "Off-hand ripper claw"])
+    assert.equal(routeFor(item(name)).kind, "rare-drop", name);
+  // No common-drop note may name a container (a "reward" source); the importer files those as reward or rare-drop.
+  const containers = /Umbral chest|clover necklace|Christmas [Pp]resent|Casket \(CS Week\)|Frank's Free Chest|Raptor's chest|Reward casket/;
+  assert.deepEqual(
+    EQUIPMENT_IMPORTED.filter((i) => routeFor(i).kind === "common-drop" && containers.test(routeFor(i).note)).map((i) => i.name),
+    [],
+  );
+});
+
 test("Dominion Tower gloves carry their stated prerequisites", () => {
   for (const name of ["Goliath gloves (black)", "Spellcaster gloves", "Swift gloves"]) {
     const route = routeFor(item(name));
