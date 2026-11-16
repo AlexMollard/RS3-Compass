@@ -121,6 +121,17 @@ test("expansive is not stacked with the other pouches", () => {
   assert.equal(essencePerTrip({ pouches: all }), 97);
 });
 
+test("a trip counts only the kit the player can use", () => {
+  const massive = { ...KIT, pouches: [...KIT.pouches, "massive"] };
+  assert.equal(essencePerTrip(massive, 82), 66);
+  assert.equal(essencePerTrip(massive, 90), 66 - 1 + 18);
+  assert.equal(essencePerTrip(KIT, 82, 60), 66 - 12);
+  assert.equal(essencePerTrip(KIT, 82, 62), 66);
+  assert.equal(essencePerTrip(KIT, 82, undefined), 66);
+  const p = example({ levels: { Runecrafting: 82, Summoning: 60 } });
+  assert.equal(planStock(p, massive, 82, blood).trips, Math.ceil(15800 / 54));
+});
+
 test("familiar and infinity outfit add capacity", () => {
   assert.equal(essencePerTrip({ familiar: "titan", infinityOutfit: true }), 28 + 20 + 12);
 });

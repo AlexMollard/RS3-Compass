@@ -64,14 +64,16 @@ export const altarAccess = (profile: Profile, altar: Altar): Req[] => accessAt(p
 export const runesPerEssence = (altar: Altar, level: number): number =>
   1 + altar.multipliers.filter((m) => m <= level).length;
 
-export function essencePerTrip(kit: RunecraftingKit): number {
-  const carried = POUCHES.filter((p) => kit.pouches?.includes(p.id));
+/** Counts only the kit the player can use: pouches up to `level`, the familiar unless `summoning` is known and too low. */
+export function essencePerTrip(kit: RunecraftingKit, level?: number, summoning?: number): number {
+  const carried = POUCHES.filter((p) => kit.pouches?.includes(p.id) && (level === undefined || p.level <= level));
   const option = (list: Pouch[]) => BACKPACK_SLOTS - list.length + list.reduce((sum, p) => sum + p.capacity, 0);
   const expansive = carried.filter((p) => p.id === "expansive");
   const others = carried.filter((p) => p.id !== "expansive");
   // Expansive replaces the other pouches, so the two options are compared, never added.
   const base = Math.max(option(expansive), option(others));
-  const familiar = FAMILIARS.find((f) => f.id === kit.familiar)?.capacity ?? 0;
+  const pet = FAMILIARS.find((f) => f.id === kit.familiar);
+  const familiar = pet && (summoning === undefined || summoning >= pet.summoning) ? pet.capacity : 0;
   return base + familiar + (kit.infinityOutfit ? INFINITY_OUTFIT_CAPACITY : 0);
 }
 
@@ -109,7 +111,7 @@ export function planStock(profile: Profile, kit: RunecraftingKit, level: number,
   const remaining = Math.max(0, target.want - target.have);
   const perEssence = runesPerEssence(altar, level);
   const essence = locked.length ? 0 : Math.ceil(remaining / perEssence);
-  const trips = essence ? Math.ceil(essence / essencePerTrip(kit)) : 0;
+  const trips = essence ? Math.ceil(essence / essencePerTrip(kit, level, profile.levels.Summoning)) : 0;
   return { target, altar, remaining, perEssence, essence, trips, locked, sources: essenceSources(profile, altar.essence) };
 }
 

@@ -64,7 +64,7 @@
   const level = $derived(profile.levels.Runecrafting);
   const ironman = $derived(isIronman(profile.kind));
   const rule = $derived(kit.xpRule ?? defaultXpRule(profile.kind));
-  const perTrip = $derived(essencePerTrip(kit));
+  const perTrip = $derived(essencePerTrip(kit, level, profile.levels.Summoning));
   const craft = $derived(craftNow(profile, kit, level));
   const picks = $derived("needsLevel" in craft ? undefined : craft);
   // Saved rows keep their index so edits hit the right row; runes with no altar are skipped.
@@ -378,7 +378,7 @@
       </div>
     </GameWindow>
 
-    <GameWindow title="Rune stockpile" trailing={`${perTrip} essence a trip, from your kit`}>
+    <GameWindow title="Rune stockpile" trailing={`${perTrip} essence a trip, from the kit you can use`}>
       <div class="body">
         {#if kitUnrecorded}
           <p class="prompt" role="status">
