@@ -103,7 +103,84 @@ test("widest gaps break ties by skill order and honour the limit", () => {
   );
 });
 
-test("quest difference lists completions only one player has, and needs both players' quest data", async () => {
+test("three-way standings share the gold on ties, measure each gap from the leader and keep unknown levels unknown", async () => {
+  const { skillStandings } = await import("../src/lib/groupProgress.ts");
+  const trio = {
+    members: [{ name: "Alice" }, { name: "Bob" }, { name: "Cara" }],
+  };
+  const alice = player("Alice", { Mining: 70, Smithing: 50, Cooking: 30 });
+  alice.levels.Cooking = 99; // a manual plan edit never leads
+  const rows = groupPlayers(trio, [
+    alice,
+    player("Bob", { Mining: 70, Smithing: 41, Cooking: 45 }),
+    player("Cara", { Mining: 58, Cooking: 45 }),
+  ]);
+  const view = (skill) =>
+    skillStandings(rows, skill).map(({ level, top, behind }) => [
+      level,
+      top,
+      behind,
+    ]);
+  assert.deepEqual(view("Mining"), [
+    [70, true, 0],
+    [70, true, 0],
+    [58, false, 12],
+  ]);
+  assert.deepEqual(view("Smithing"), [
+    [50, true, 0],
+    [41, false, 9],
+    [undefined, false, undefined],
+  ]);
+  assert.deepEqual(view("Cooking"), [
+    [30, false, 15],
+    [45, true, 0],
+    [45, true, 0],
+  ]);
+  // One known level is still the highest, but there is nothing to trail.
+  const solo = groupPlayers(trio, [player("Cara", { Mining: 5 })]);
+  assert.deepEqual(
+    skillStandings(solo, "Mining").map((s) => [s.level, s.top, s.behind]),
+    [
+      [undefined, false, undefined],
+      [undefined, false, undefined],
+      [5, true, undefined],
+    ],
+  );
+});
+
+test("lead counts split sole and shared leads over skills every ranked player publishes", async () => {
+  const { leadCounts } = await import("../src/lib/groupProgress.ts");
+  const a = player("A", { Mining: 50, Smithing: 40, Cooking: 10, Fishing: 5 });
+  const b = player("B", { Mining: 60, Smithing: 40, Cooking: 1 });
+  const skills = ["Mining", "Smithing", "Cooking", "Fishing", "Crafting"];
+  assert.deepEqual(leadCounts([a, b], skills), [
+    { led: 1, shared: 1 },
+    { led: 1, shared: 1 },
+  ]);
+  const c = player("C", { Mining: 60, Smithing: 12, Cooking: 10 });
+  assert.deepEqual(leadCounts([a, b, c], skills), [
+    { led: 0, shared: 2 },
+    { led: 0, shared: 2 },
+    { led: 0, shared: 2 },
+  ]);
+  const hidden = player("D", {}, "sample");
+  assert.deepEqual(leadCounts([a, hidden], skills), [
+    { led: 0, shared: 0 },
+    undefined,
+  ]);
+});
+
+test("short labels drop a shared prefix only when four letters would clash", async () => {
+  const { shortLabels } = await import("../src/lib/groupProgress.ts");
+  assert.deepEqual(shortLabels(["GIM Alba", "GIM Bran", "Cara"]), [
+    "ALBA",
+    "BRAN",
+    "CARA",
+  ]);
+  assert.deepEqual(shortLabels(["Bob", "Bobby"]), ["BOB", "BOBB"]);
+});
+
+test("quest difference lists completions no other player has, and leaves out players without quest data", async () => {
   const { questDifference } = await import("../src/lib/groupProgress.ts");
   const quests = (...done) => ({
     questProgress: {
@@ -113,27 +190,20 @@ test("quest difference lists completions only one player has, and needs both pla
       ],
     },
   });
+  const a = quests("Cook's Assistant", "Dragon Slayer", "Druidic Ritual");
+  const b = quests("cook's assistant", "Blood Pact");
+  assert.deepEqual(questDifference([a, b]), [
+    ["Dragon Slayer", "Druidic Ritual"],
+    ["Blood Pact"],
+  ]);
   assert.deepEqual(
-    questDifference(
-      quests("Cook's Assistant", "Dragon Slayer", "Druidic Ritual"),
-      quests("cook's assistant", "Blood Pact"),
-    ),
-    { onlyA: ["Dragon Slayer", "Druidic Ritual"], onlyB: ["Blood Pact"] },
+    questDifference([a, b, quests("Dragon Slayer", "Ernest the Chicken")]),
+    [["Druidic Ritual"], ["Blood Pact"], ["Ernest the Chicken"]],
   );
-  assert.equal(questDifference(quests("Dragon Slayer"), {}), undefined);
-});
-
-test("head to head counts only skills both players publish", async () => {
-  const { headToHead } = await import("../src/lib/groupProgress.ts");
-  const a = player("A", { Mining: 50, Smithing: 40, Cooking: 10, Fishing: 5 });
-  const b = player("B", { Mining: 60, Smithing: 40, Cooking: 1 });
-  assert.deepEqual(
-    headToHead(a, b, ["Mining", "Smithing", "Cooking", "Fishing", "Crafting"]),
-    { aAhead: 1, bAhead: 1, level: 1 },
-  );
-  assert.deepEqual(headToHead(a, undefined, ["Mining"]), {
-    aAhead: 0,
-    bAhead: 0,
-    level: 0,
-  });
+  assert.deepEqual(questDifference([a, {}, b]), [
+    ["Dragon Slayer", "Druidic Ritual"],
+    undefined,
+    ["Blood Pact"],
+  ]);
+  assert.equal(questDifference([quests("Dragon Slayer"), {}]), undefined);
 });
