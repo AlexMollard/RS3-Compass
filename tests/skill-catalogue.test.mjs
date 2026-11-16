@@ -335,6 +335,8 @@ test("Runecrafting ranges follow the members guide and keep a free route", () =>
     assert.ok(soul?.requirements.some((r) => r.includes("'Phite Club")), "Soul altar needs 'Phite Club");
   }
   assert.ok(rc.stages.at(-1).options.some((o) => o.id === "runic-attuner"));
+  for (const o of rc.stages.at(-1).options.filter((o) => o.id === "soul-altar" || o.id === "runic-attuner"))
+    assert.deepEqual(o.locations, [], o.id + " has no fixed location");
 });
 
 test("Runecrafting altar requirements use the altar's own level", () => {

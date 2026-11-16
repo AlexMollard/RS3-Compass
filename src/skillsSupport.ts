@@ -1195,32 +1195,39 @@ const abyssHigh = abyssRunes(
     "77 Runecrafting for Blood (Legacy of Seergaze)",
   ],
 );
-const soul = opt(
-  "soul-altar",
-  "Soul altar",
-  "Soul altar",
-  "Soul_rune.png",
-  "Varrock",
-  "Reach the Soul altar by fairy ring and craft essence into soul runes. About 364k XP an hour at 90, rising to about 465k from 105.",
-  "The AFK members route to 110; the runes are worth keeping or selling.",
-  true,
-  ["90 Runecrafting", "'Phite Club"],
-  "Banking and essence supply limit the rate.",
-  ["Pure essence", "Essence pouches"],
-);
-const attuner = opt(
-  "runic-attuner",
-  "Runic attuner",
-  "Runic attuner",
-  "Runic_attuner.png",
-  "Varrock",
-  "Use the attuner at any altar it picks. Rates are provisional until the Wiki updates them, around 900k-1.1m XP an hour.",
-  "The fastest route to 110, but you need the item first.",
-  true,
-  ["80 Runecrafting to use", "Runic attuner (rare drop from The Gate of Elidinis)"],
-  "The attuner is a rare drop, so it is not a plan for most players.",
-  ["Pure essence"],
-);
+// Soul altar and attuner have no fixed Compass location: their locationNotes explain where to go.
+const soul: Option = {
+  ...opt(
+    "soul-altar",
+    "Soul altar",
+    "Soul altar",
+    "Soul_rune.png",
+    "",
+    "Reach the Soul altar by fairy ring and craft essence into soul runes. About 364k XP an hour at 90, rising to about 465k from 105.",
+    "The AFK members route to 110; the runes are worth keeping or selling.",
+    true,
+    ["90 Runecrafting", "'Phite Club"],
+    "Banking and essence supply limit the rate.",
+    ["Pure essence", "Essence pouches"],
+  ),
+  locations: [],
+};
+const attuner: Option = {
+  ...opt(
+    "runic-attuner",
+    "Runic attuner",
+    "Runic attuner",
+    "Runic_attuner.png",
+    "",
+    "Use the attuner at any altar it picks. Rates are provisional until the Wiki updates them, around 900k-1.1m XP an hour.",
+    "The fastest route to 110, but you need the item first.",
+    true,
+    ["80 Runecrafting to use", "Runic attuner (rare drop from The Gate of Elidinis)"],
+    "The attuner is a rare drop, so it is not a plan for most players.",
+    ["Pure essence"],
+  ),
+  locations: [],
+};
 const oakTrial: Option = { ...oak, members: false };
 const teak: Option = {
   ...oak,
