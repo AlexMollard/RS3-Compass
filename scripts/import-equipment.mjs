@@ -56,6 +56,8 @@ for (const category of [...CLASS_CATEGORIES, ...Object.keys(TOOL_CATEGORIES)]) {
     if (TOOL_CATEGORIES[category] && !tools.has(name)) tools.set(name, TOOL_CATEGORIES[category]);
   }
 }
+const stale = EQUIPMENT_CURATION.exclude.filter((n) => !names.has(n));
+if (stale.length) fail("Excluded names no equipment category lists: remove them from src/equipmentCuration.ts", stale);
 const excluded = new Set(EQUIPMENT_CURATION.exclude);
 for (const category of Object.keys(EQUIPMENT_CURATION.excludeCategories))
   for (const name of await categoryMembers(category)) excluded.add(name);

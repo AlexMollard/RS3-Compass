@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { EQUIPMENT_CURATION, routeFor } from "../src/equipmentCuration.ts";
 import { EQUIPMENT_IMPORTED } from "../src/equipmentImported.ts";
+import { QUESTS } from "../src/data.ts";
 import { isSkillName } from "../src/skillNames.ts";
 
 const CLASSES = ["melee", "ranged", "magic", "necromancy"];
@@ -84,4 +85,31 @@ test("routes come from Wiki recipe, shop and drop data", () => {
   assert.equal(routeFor(item("Bow of the Last Guardian")).kind, "rare-drop");
   // Sold at Skulgrimen's Battle Gear; no recipe.
   assert.equal(routeFor(item("Berserker helm")).kind, "shop");
+});
+
+test("no combat item at tier 70 or higher has an unknown route", () => {
+  const unknown = EQUIPMENT_IMPORTED.filter((i) => !i.tool && i.tier >= 70 && routeFor(i).kind === "unknown");
+  assert.deepEqual(unknown.map((i) => i.name), []);
+});
+
+test("curated quests exist, and curated names are neither stale nor repeated", () => {
+  const quests = new Set(QUESTS.map((q) => q.id));
+  const curated = [
+    ...Object.entries(EQUIPMENT_CURATION.routes).map(([n, r]) => [n, r.quests ?? []]),
+    ...EQUIPMENT_CURATION.families.map((f) => [f.match, f.route.quests ?? []]),
+    ...Object.entries(EQUIPMENT_CURATION.wearQuests).map(([n, w]) => [n, w.quests]),
+  ];
+  assert.deepEqual(curated.flatMap(([n, ids]) => ids.filter((id) => !quests.has(id)).map((id) => `${n}: ${id}`)), []);
+  // The importer fails on an excluded name that no Wiki category lists; here, none may be repeated or also curated.
+  const { exclude, routes, wearQuests } = EQUIPMENT_CURATION;
+  assert.equal(new Set(exclude).size, exclude.length);
+  assert.deepEqual(exclude.filter((n) => n in routes || n in wearQuests), []);
+});
+
+test("port-resource gear names the player-owned port", () => {
+  for (const name of ["Tetsu body", "Tetsu katana", "Death Lotus chaps", "Death Lotus dart", "Seasinger's hood", "Seasinger kiba"]) {
+    const route = routeFor(item(name));
+    assert.ok(["smith", "craft"].includes(route.kind), name);
+    assert.match(route.note, /player-owned port/, name);
+  }
 });
