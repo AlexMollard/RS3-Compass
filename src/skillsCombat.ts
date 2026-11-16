@@ -883,7 +883,7 @@ const abyss: TrainingOption = {
   method:
     "Stand in the south-west or south-east corner of the Abyss, where 15+ aggressive creatures spawn, and use area-of-effect abilities. Run to the other corner and back when they stop attacking after 10 minutes.",
   benefit:
-    "The Wiki's Abyss guide puts it at around 500,000–600,000 XP an hour and AFK. Charms feed Summoning and ashes feed Prayer or Necromancy rituals.",
+    "AFK, and the rate climbs with your levels: the Wiki's melee guide lists it from 50 at up to about 220,000 XP an hour in the south-west corner, and its Abyss guide's 500,000–600,000 an hour assumes 70 in every combat skill and tier 70 armour. Charms feed Summoning and ashes feed Prayer or Necromancy rituals.",
   requirements: [
     "Enter the Abyss miniquest",
     "The Wiki suggests 70 in every combat skill and 92 Prayer for Soul Split",
@@ -895,6 +895,28 @@ const abyss: TrainingOption = {
     "The Abyss guide suggests tier 70 armour: level 72–79 creatures attack on sight in groups, hitting up to 275 in melee, 228 with magic and 208 with ranged.",
   ),
   ...checked(ABYSS, P2P_MELEE, P2P_MAGIC, P2P_RANGED, IRON_NECRO),
+};
+// The Magic guide's first 50-70 pick (https://runescape.wiki/w/Pay-to-play_Magic_training), which lists the Abyss
+// only from 70. Tile from the "West of Yanille" LocLine on https://runescape.wiki/w/Ogre.
+const ogres: TrainingOption = {
+  id: "ogres",
+  title: "Ogres",
+  wiki: "Ogre",
+  image: "Ogre.png",
+  members: true,
+  locations: [],
+  sites: [
+    {
+      label: "Ogres west of Yanille",
+      wiki: "Ogre",
+      map: { x: 2496, y: 3092, plane: 0, mapId: 28 },
+    },
+  ],
+  method: "Cast air spells on the ogres west of Yanille, close to the Yanille lodestone. They can be safe-spotted.",
+  benefit:
+    "The Wiki's Magic guide lists them for 50–70: weak to air spells, 240 XP a kill, and big bones for Prayer.",
+  gear: gear(30, "Level 67 ogres hit up to 288 in melee, and the topless ones attack on sight."),
+  ...checked(P2P_MAGIC),
 };
 const lesserDemons: TrainingOption = {
   id: "lesser-demons",
@@ -1049,7 +1071,7 @@ const ROUTES: Record<"melee" | "ranged" | "magic" | "any", TrainingOption[][]> =
   magic: [
     [trollBrutes],
     [iceGiants, giants],
-    [abyss, gargoyles, ankou, lesserDemons, highAlchemy],
+    [ogres, gargoyles, abyss, ankou, lesserDemons, highAlchemy],
     [abyss, abyssals, ankou, lesserDemons, highAlchemy],
   ],
   any: [
@@ -1629,7 +1651,8 @@ const ravenousGhouls: TrainingOption = {
     "The AFK alternative to rituals from 90: the Wiki puts it at up to 850,000 XP an hour. Their bones help make a demon horn necklace; other loot is poor.",
   requirements: ["Enter Morytania by completing Priest in Peril or defeating the Paterdomus mausoleum ghoul"],
   gear: gear(80, "Level 105 ravenous ghouls have 14,500 life points and hit up to 595 in melee."),
-  ...checked(NECRO),
+  // The ghoul and mausoleum pages list no quest; Morytania's page gives its entry rule, quoted above.
+  ...checked(NECRO, W + "Morytania", W + "Ravenous_ghoul"),
 };
 const necroAbyssals: TrainingOption = {
   ...abyssals,

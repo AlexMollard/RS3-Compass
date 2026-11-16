@@ -78,8 +78,8 @@ const ROUTE_SOURCES = [
   "https://runescape.wiki/w/Slayer",
   // Charms are "obtained primarily as drops from any of hundreds of different monsters".
   "https://runescape.wiki/w/Charms",
-  // Herb drops give Herblore XP through a herb bag or herbicide (the bandit entry).
-  "https://runescape.wiki/w/Necromancy_training",
+  // A herbicide destroys grimy herb drops for double the cleaning XP, so the drops feed Herblore.
+  "https://runescape.wiki/w/Herbicide",
   // Combat is "ideally" trained "while ... training Slayer or Prayer".
   "https://runescape.wiki/w/Ironman_Mode/Guide/Ranged",
 ];

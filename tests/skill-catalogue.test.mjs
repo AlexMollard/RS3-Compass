@@ -297,6 +297,13 @@ test("The level 1 range leads with a quest for members and troll chuckers for fr
   assert.equal(trainingMethod(skillByName("Attack"), { ...p, mode: "f2p" }).id, "ankou");
 });
 
+test("Magic 50-80 opens on the Magic guide's 50-70 pick, not the Abyss it lists from 70", () => {
+  const magic = skillByName("Magic").stages.find((stage) => stage.from === 50);
+  const ids = availableTrainingOptions(magic, "members").map((option) => option.id);
+  assert.equal(ids[0], "ogres");
+  assert.ok(ids.indexOf("abyss-creatures") > ids.indexOf("ogres"));
+});
+
 test("A stored member method survives mode changes without being recommended in the free trial", () => {
   const skill = SKILLS.find((skill) => skill.name === "Herblore");
   const p = { ...profile("Herblore", 30), trainingRanges: { Herblore: 13 } };
