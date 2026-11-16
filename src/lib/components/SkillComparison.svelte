@@ -1,6 +1,7 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { SKILLS, skillByName } from "../../data";
+  import { SKILL_GAME_ORDER } from "../../skillNames";
   import { getCompass } from "../compassContext";
   import {
     publishedIn,
@@ -40,7 +41,8 @@
   const fullFormat = new Intl.NumberFormat("en");
   const compact = (n: number) => compactFormat.format(n).toLowerCase();
 
-  const ALL = SKILLS.map((s) => s.name);
+  // The in-game Skills interface order; it is also every sort's tie-break.
+  const ALL: readonly string[] = SKILL_GAME_ORDER;
   const CATEGORIES = [...new Set(SKILLS.map((s) => s.category))];
 
   let sort = $state<SkillSort>("game");
