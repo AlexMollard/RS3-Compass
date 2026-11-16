@@ -301,8 +301,14 @@
       </section>
 
       {#if isSlayer}
-        {#await import("../components/SlayerGuide.svelte") then { default: SlayerGuide }}
+        {#await import("../components/SlayerGuide.svelte")}
+          <p class="cap" role="status">Loading the Slayer guide…</p>
+        {:then { default: SlayerGuide }}
           <SlayerGuide {profile} />
+        {:catch}
+          <p class="cap" role="alert">
+            Couldn't load the Slayer guide — reload the page.
+          </p>
         {/await}
         {#if stage && method}
           <section class="tool-window skill-hero" aria-label="Level-range methods">

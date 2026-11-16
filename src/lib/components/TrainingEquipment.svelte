@@ -24,7 +24,10 @@
     method,
     profile,
     defaultStyle = "melee",
+    omitExtras = [],
   }: {
+    /** Extras the caller already lists itself, so they aren't repeated. */
+    omitExtras?: string[];
     skill: SkillRecord;
     method: TrainingOption;
     profile: Profile;
@@ -41,6 +44,9 @@
   ];
   const chooseStyle = $derived(STYLE_SKILLS.includes(skill.name));
   const gear = $derived(trainingGear(skill.name, method, profile, style));
+  const extras = $derived(
+    gear.extras.filter((item) => !omitExtras.includes(item.name)),
+  );
   const showMinimum = $derived(gear.rows.some((row) => row.atLeast));
   const columns = $derived(showMinimum ? 4 : 3);
   // The 2h setup and the dual-wield setup are alternatives, so each gets its own group.
@@ -95,7 +101,7 @@
   {@render gaps("To get", choice.routeMissing, choice.routeMissingQuests)}
 {/snippet}
 
-{#if gear.rows.length || gear.extras.length || gear.note}
+{#if gear.rows.length || extras.length || gear.note}
   <GameWindow title="Gear" trailing={method.title} className="training-equipment">
     <div class="gear-body">
       {#if chooseStyle}
@@ -177,11 +183,11 @@
           {/each}
         </table>
       {/if}
-      {#if gear.extras.length}
+      {#if extras.length}
         <div class="extras">
           <h3>Also take</h3>
           <ul>
-            {#each gear.extras as item (item.name)}
+            {#each extras as item (item.name)}
               {@render extra(item)}
             {/each}
           </ul>

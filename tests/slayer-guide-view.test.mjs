@@ -3,7 +3,15 @@ import test from "node:test";
 import { COMBAT_SKILLS } from "../src/lib/combatLevel.ts";
 import { SLAYER_MASTERS, SLAYER_TASKS } from "../src/slayerImported.ts";
 import { SLAYER_TASK_EXTRAS, slayerGearMethod } from "../src/slayerGear.ts";
-import { groupedTasks, masterFor, masterRequirements, slayerTaskCard, tasksFor } from "../src/slayerMasters.ts";
+import { ALTERNATIVE_IDS, canUseMaster, masterFor } from "../src/slayerMasters.ts";
+import {
+  ALTERNATIVE_TRADEOFFS,
+  groupedTasks,
+  masterGaps,
+  masterRequirements,
+  slayerTaskCard,
+  tasksFor,
+} from "../src/slayerTaskView.ts";
 
 const profile = (over = {}, extra = {}) => ({
   id: "p",
@@ -82,6 +90,42 @@ test("Grouped tasks put verdicts first and keep unverdicted tasks last, never hi
 
 test("An unrecorded Slayer level is reported by masterFor so the page can prompt for it", () => {
   assert.deepEqual(masterFor(profile({ Slayer: undefined })).unrecorded, ["Slayer"]);
+});
+
+test("A master the player can't use reports its unmet requirements, and a usable one reports none", () => {
+  const laniakea = SLAYER_MASTERS.find((m) => m.id === "laniakea");
+  // Combat 119 (just under 120) with Slayer 20 reads Laniakea (90 Slayer, 120 combat).
+  const low = profile({ Attack: 70, Strength: 70, Ranged: 1, Magic: 1, Necromancy: 1, Defence: 99, Constitution: 99, Prayer: 99, Summoning: 99, Slayer: 20 });
+  assert.equal(canUseMaster(low, laniakea), false);
+  assert.deepEqual(
+    masterGaps(low, laniakea).map((c) => [c.label, c.status]),
+    [["Slayer 90", "below"], ["Combat 120", "below"]],
+  );
+  const kuradal = SLAYER_MASTERS.find((m) => m.id === "kuradal");
+  assert.deepEqual(
+    masterGaps(profile(), kuradal).map((c) => c.label),
+    ["Barbarian Training"],
+    "Wiki text is never met",
+  );
+});
+
+test("Each Wilderness master has its own trade-off line and requirement chips", () => {
+  for (const id of ALTERNATIVE_IDS) {
+    assert.ok(ALTERNATIVE_TRADEOFFS[id]?.length > 20, id);
+    assert.ok(masterRequirements(profile(), SLAYER_MASTERS.find((m) => m.id === id)).length > 0, id);
+  }
+});
+
+test("Masters with no gear tier borrow from the nearest master strictly below them", () => {
+  const tier = (id) => {
+    const m = SLAYER_MASTERS.find((x) => x.id === id);
+    return slayerGearMethod(m, SLAYER_TASKS.find((t) => t.master === id)).gear.minTier;
+  };
+  // Morvran and Laniakea tie on combat 120: Morvran (85 Slayer) sits below Laniakea (90), so it takes Kuradal's 70.
+  assert.equal(tier("kuradal"), 70);
+  assert.equal(tier("morvran"), 70);
+  assert.equal(tier("laniakea"), 80);
+  assert.equal(tier("mandrith"), 80);
 });
 
 test("Every gear method for a master carries a wear-at-least tier and the task's name and site", () => {

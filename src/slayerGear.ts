@@ -4,6 +4,7 @@ import { skillByName, type TrainingOption } from "./data.ts";
 import type { CombatClass } from "./trainingEquipment.ts";
 import type { TaskVerdict } from "./slayerGuide.ts";
 import { SLAYER_MASTERS } from "./slayerImported.ts";
+import { byLadder } from "./slayerMasters.ts";
 import type { SlayerMaster, SlayerTask } from "./slayerTypes.ts";
 
 /**
@@ -47,7 +48,8 @@ const TIERED = ["jacquelyn", "vannaka", "sumona", "kuradal", "laniakea"];
 
 /**
  * A training method for the gear window: the task's name and map site over the master's Slayer option. Masters with
- * no option of their own (Chaeldar, Duradel, Morvran...) borrow the nearest lower master's tier by combat level.
+ * no option of their own (Chaeldar, Duradel, Morvran...) borrow the tier of the nearest master strictly below them on
+ * the (Slayer, combat) ladder, so a tie never borrows from a higher master.
  */
 export function slayerGearMethod(
   master: SlayerMaster,
@@ -57,8 +59,8 @@ export function slayerGearMethod(
   const options = skillByName("Slayer")?.stages.flatMap((stage) => stage.options) ?? [];
   const own = options.find((option) => option.id === master.id && option.gear);
   const borrowed = SLAYER_MASTERS
-    .filter((m) => TIERED.includes(m.id) && m.combat <= master.combat)
-    .sort((a, b) => TIERED.indexOf(a.id) - TIERED.indexOf(b.id))
+    .filter((m) => TIERED.includes(m.id) && byLadder(m, master) < 0)
+    .sort(byLadder)
     .at(-1);
   const base = own ?? options.find((option) => option.id === borrowed?.id && option.gear);
   if (!base?.gear) return undefined;

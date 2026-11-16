@@ -6,15 +6,16 @@
     gearStyleFor,
     slayerGearMethod,
   } from "../../slayerGear";
+  import { canUseMaster, masterFor, mastersFor } from "../../slayerMasters";
   import {
+    ALTERNATIVE_TRADEOFFS,
     groupedTasks,
-    masterFor,
+    masterGaps,
     masterRequirements,
-    mastersFor,
     slayerTaskCard,
     type RequirementChip,
     type VerdictGroup,
-  } from "../../slayerMasters";
+  } from "../../slayerTaskView";
   import { wikiHref } from "../../wiki";
   import { getCompass } from "../compassContext";
   import ChoiceStrip from "./ChoiceStrip.svelte";
@@ -69,10 +70,12 @@
       ? slayerGearMethod(viewed, card.task, card.verdict?.fastest.site)
       : undefined,
   );
-  const unmet = (chips: RequirementChip[]) =>
-    chips.filter((chip) => chip.status !== "met");
   const nextMissing = $derived(
-    choice.next ? unmet(masterRequirements(profile, choice.next)) : [],
+    choice.next ? masterGaps(profile, choice.next) : [],
+  );
+  // Reading a master that isn't the player's own: what they still lack for it.
+  const viewedGaps = $derived(
+    viewed && viewed.id !== choice.master?.id ? masterGaps(profile, viewed) : [],
   );
   const extras = $derived(card ? (SLAYER_TASK_EXTRAS[card.task.name] ?? []) : []);
 
@@ -151,14 +154,23 @@
           {#if nextMissing.length}{@render chipRow(nextMissing)}{/if}
         {/if}
         {#if choice.alternatives.length}
-          <p class="cap">
-            Also open to you, in the Wilderness (risky, never the default):
-            {#each choice.alternatives as alt, i (alt.id)}{i ? ", " : " "}<a
-                href={wikiHref(alt.wiki)}
-                target="_blank"
-                rel="noopener noreferrer">{alt.name}</a
-              >{/each}.
-          </p>
+          <h4>Wilderness alternatives</h4>
+          <p class="cap">Open to you, but never the default.</p>
+          <ul class="entries">
+            {#each choice.alternatives as alt (alt.id)}
+              <li>
+                <b
+                  ><a
+                    href={wikiHref(alt.wiki)}
+                    target="_blank"
+                    rel="noopener noreferrer">{alt.name}</a
+                  ></b
+                >
+                {@render chipRow(masterRequirements(profile, alt))}
+                <span>{ALTERNATIVE_TRADEOFFS[alt.id] ?? ""}</span>
+              </li>
+            {/each}
+          </ul>
         {/if}
         <ChoiceStrip
           label="Master to read"
@@ -167,7 +179,11 @@
           choices={masters.map((m) => ({
             value: m.id,
             label: m.name,
-            description: m.name + (m.location ? " · " + m.location : ""),
+            detail: canUseMaster(profile, m) ? undefined : "locked",
+            description:
+              m.name +
+              (m.location ? " · " + m.location : "") +
+              (canUseMaster(profile, m) ? "" : " (locked: requirements not met)"),
           }))}
           onChange={pickMaster}
         />
@@ -176,9 +192,18 @@
 
     <GameWindow title="Your task" trailing={viewed.name}>
       <div class="body">
+        {#if viewedGaps.length}
+          <div class="prompt" role="status">
+            <p>
+              You don't meet {viewed.name}'s requirements yet, so this isn't
+              your master. You still need:
+            </p>
+            {@render chipRow(viewedGaps)}
+          </div>
+        {/if}
         <label class="picker"
           >Task from {viewed.name}
-          <select aria-label="Slayer task" value={saved} onchange={pickTask}>
+          <select value={saved} onchange={pickTask}>
             <option value="" disabled>Choose your current task</option>
             {#each groups as { group, tasks } (group)}
               <optgroup label={GROUP_LABEL[group]}>
@@ -283,6 +308,7 @@
                 method={gearMethod}
                 {profile}
                 defaultStyle={gearStyleFor(verdict.fastest.style)}
+                omitExtras={extras.map((extra) => extra.item)}
               />
             {/key}
           {/if}
@@ -380,6 +406,9 @@
     text-underline-offset: 3px;
   }
   .prompt {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
     padding: 8px 10px;
     border: 1px solid var(--warn);
     border-radius: 3px;
