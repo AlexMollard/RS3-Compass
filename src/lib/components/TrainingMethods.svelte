@@ -118,7 +118,7 @@
         >
       </div>
     </GameWindow>
-    <TrainingEquipment {skill} {stage} {profile} method={selected} />
+    <TrainingEquipment {skill} {profile} method={selected} />
   </div>
 {/if}
 

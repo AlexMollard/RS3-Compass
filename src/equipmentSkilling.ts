@@ -42,12 +42,6 @@ const acquisition: Record<string, EquipmentRecommendation["acquisition"]> = {
       note: "Have Caleb enchant the family gauntlets for cooking.",
     },
   ],
-  "Dragon hatchet": [
-    {
-      label: "Dagannoth Kings",
-      note: "Rare random drop from the Dagannoth Kings; combat and dungeon access are needed.",
-    },
-  ],
   "Magic secateurs": [
     {
       label: "Fairy Tale I",
@@ -159,12 +153,6 @@ const acquisition: Record<string, EquipmentRecommendation["acquisition"]> = {
       note: "Claim the box from Ezreal.",
     },
   ],
-  "Dragon mattock": [
-    {
-      label: "Big Game Hunter",
-      note: "A rare random reward from Big Game Hunter; the dinosaur encounter has its own Hunter and Slayer requirements.",
-    },
-  ],
   Augmentor: [
     {
       label: "Inventor workbench",
@@ -227,74 +215,7 @@ const metals = [
   ["Elder rune", 90],
   ["Primal", 100],
 ] as const;
-const tools = (
-  kind: "pickaxe" | "hatchet" | "mattock",
-  skill: "Mining" | "Woodcutting" | "Archaeology",
-): EquipmentRecommendation[] =>
-  metals
-    .filter(([metal]) => kind !== "mattock" || metal !== "Primal")
-    .map(([metal, level]) =>
-      item(
-        `${metal} ${kind}`,
-        kind,
-        kind === "hatchet"
-          ? "Use from the tool belt or backpack; wielding separately requires Attack."
-          : "Use from the tool belt, backpack or wielded; the skill level shown is the use requirement.",
-        {
-          from: level,
-          members: level >= 60,
-          levels: [{ skill, level }],
-          acquisition: [
-            {
-              label: "Mine and smith",
-              levels: [
-                { skill: "Mining", level },
-                { skill: "Smithing", level },
-              ],
-              note: `Mine the ores, smelt ${metal.toLowerCase()} bars and smith the ${kind} at an anvil.`,
-            },
-            ...(level === 1
-              ? [
-                  {
-                    label:
-                      kind === "mattock"
-                        ? "Archaeology tutorial"
-                        : "Starting tool belt",
-                    note:
-                      kind === "mattock"
-                        ? "Reiniger supplies a tutorial mattock; check the bronze tool belt mattock after the tutorial."
-                        : "Check the default bronze tool on the tool belt.",
-                  },
-                ]
-              : []),
-            ...(kind === "mattock" && level <= 50
-              ? [
-                  {
-                    label: "Mattock shop",
-                    note: "Buy from Matty Ock's shop; stock and coins are needed.",
-                  },
-                ]
-              : []),
-            ...(kind === "pickaxe" && level <= 50
-              ? [
-                  {
-                    label: "Pickaxe shop",
-                    note: "Buy from Nurmof in the Dwarven Mines; stock and coins are needed.",
-                  },
-                ]
-              : []),
-            ...(kind === "hatchet" && level <= 40
-              ? [
-                  {
-                    label: "Hatchet shop",
-                    note: "Buy from Bob in Lumbridge; stock and coins are needed.",
-                  },
-                ]
-              : []),
-          ],
-        },
-      ),
-    );
+// Pickaxes, hatchets and mattocks come from the imported catalogue (src/equipmentImported.ts).
 const boxes = metals.map(([metal, level]) =>
   item(
     `${metal} ore box`,
@@ -334,7 +255,7 @@ const tool = (
 export const SKILLING_EQUIPMENT: Partial<Record<SkillName, EquipmentGuide>> = {
   Mining: {
     note: "The rune tier remains usable on free worlds through level 110; higher metal tools are members-only.",
-    items: [...tools("pickaxe", "Mining"), ...boxes],
+    items: boxes,
   },
   Smithing: {
     items: [
@@ -421,20 +342,7 @@ export const SKILLING_EQUIPMENT: Partial<Record<SkillName, EquipmentGuide>> = {
   },
   Woodcutting: {
     note: "Rune is the free-world plateau; the same hatchet works across tree types.",
-    items: [
-      ...tools("hatchet", "Woodcutting"),
-      item(
-        "Dragon hatchet",
-        "special hatchet",
-        "An augmentable alternative with better cutting power than orikalkum. Unaugmented can go on the tool belt.",
-        {
-          from: 60,
-          optional: true,
-          members: true,
-          levels: [{ skill: "Woodcutting", level: 60 }],
-        },
-      ),
-    ],
+    items: [],
   },
   Fletching: {
     items: [
@@ -726,23 +634,11 @@ export const SKILLING_EQUIPMENT: Partial<Record<SkillName, EquipmentGuide>> = {
   Archaeology: {
     note: "Mattocks can be used from the tool belt or backpack; free Archaeology training stops at level 20. Augmented mattocks cannot be tool-belted.",
     items: [
-      ...tools("mattock", "Archaeology"),
       tool(
         "Archaeological soil box",
         "Collect from Ezreal during the tutorial; holds 50 of each soil. Members can buy qualification-gated capacity upgrades.",
         {
           unlocks: ["Progress the Archaeology tutorial to claim the soil box"],
-        },
-      ),
-      item(
-        "Dragon mattock",
-        "special mattock",
-        "Optional augmentable upgrade from Big Game Hunter or ancient caskets.",
-        {
-          from: 60,
-          members: true,
-          optional: true,
-          levels: [{ skill: "Archaeology", level: 60 }],
         },
       ),
     ],

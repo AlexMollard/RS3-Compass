@@ -429,6 +429,14 @@ const ritualSite = {
   access: "Enter the Underworld portal; complete Necromancy! for rituals.",
 };
 
+// "Wear at least" item tiers. Each reason states the threat from the method's Wiki page (its `wiki`
+// field; for a Slayer master, that master's assignment table), read on the date below.
+const gear = (minTier: number, reason: string) => ({
+  minTier,
+  reason,
+  checked: "2026-11-16",
+});
+
 const chicken: TrainingOption = {
   id: "chickens",
   title: "Chickens",
@@ -440,6 +448,7 @@ const chicken: TrainingOption = {
     "Fight chickens at the farm north-east of Lumbridge and collect their drops.",
   benefit:
     "Feathers support Fishing; raw chicken and bones support Cooking and Prayer. Easy kills trade combat experience for useful supplies.",
+  gear: gear(1, "Level 1 chickens never attack first and hit at most 15, so any gear will do."),
 };
 const cows: TrainingOption = {
   id: "cows",
@@ -458,6 +467,7 @@ const cows: TrainingOption = {
     "Fight cows in the pen east of the River Lum and bank or tan their hides.",
   benefit:
     "Cowhide supplies Crafting, raw beef supplies Cooking, and bones supply Prayer; banking slows combat training.",
+  gear: gear(1, "Level 2 cows never attack first and hit at most 20, so any gear will do."),
 };
 const trolls: TrainingOption = {
   id: "troll-chuckers",
@@ -476,6 +486,7 @@ const trolls: TrainingOption = {
   benefit:
     "Convenient early combat practice, but fewer useful resources than chickens or cows.",
   risks: "Leave if trolls overwhelm your food supply.",
+  gear: gear(1, "Level 7 troll chuckers don't attack first; their thrown ranged attacks hit at most 100."),
 };
 const giants: TrainingOption = {
   id: "hill-giants",
@@ -492,6 +503,7 @@ const giants: TrainingOption = {
   ],
   risks:
     "Giants hit hard for an unprepared player; bring food and an escape, and move back to cows if needed.",
+  gear: gear(20, "Level 26 hill giants attack on sight and hit up to 450 in melee."),
 };
 const iceGiants: TrainingOption = {
   id: "ice-giants",
@@ -511,6 +523,7 @@ const iceGiants: TrainingOption = {
     "Substantial combat targets and Prayer supplies, at the cost of a longer, riskier trip.",
   risks:
     "Nearby ice warriors can attack; bring food and a teleport, and leave if you cannot sustain the damage.",
+  gear: gear(40, "Level 47 ice giants attack on sight and hit up to 750 in melee."),
 };
 const roaches: TrainingOption = {
   id: "cockroach-soldiers",
@@ -532,7 +545,13 @@ const roaches: TrainingOption = {
     "Carapace supports ranged armour crafting; mithril stone spirits and adamantite stone spirits support Mining, and salvage provides alchemy value. Members-only seeds do not drop in F2P.",
   risks:
     "They hit hard even through rune armour. Test one with food and an escape; a combat skill level alone does not establish readiness.",
+  gear: gear(
+    50,
+    "Level 70 cockroach soldiers hit up to 1,000 in both melee and ranged, often even through rune armour.",
+  ),
 };
+const blueDragonReason =
+  "Level 74 blue dragons hit up to 349 with magic and melee, and their dragonfire hits well over 1,000 without protection.";
 const dragons: TrainingOption = {
   id: "blue-dragons",
   title: "Blue dragons",
@@ -551,6 +570,7 @@ const dragons: TrainingOption = {
   supplies: ["Dragonfire protection for your weapon setup", "Food", "Teleport"],
   risks:
     "Dragonfire is dangerous; bring food and a teleport, and check your protection before engaging.",
+  gear: gear(50, blueDragonReason),
 };
 const necroDragons: TrainingOption = {
   ...dragons,
@@ -589,6 +609,7 @@ const wildDragons: TrainingOption = {
   supplies: ["Dragonfire protection for your weapon setup", "Food", "Teleport"],
   risks:
     "Dragonfire and Wilderness threats can be dangerous; bring food and an escape.",
+  gear: gear(50, blueDragonReason),
 };
 // Exact LocLine spawns: https://runescape.wiki/w/Moss_giant, /w/Ankou, /w/Hellhound,
 // /w/Gargoyle and /w/Abyssal_demon; Slayer Tower floors are plane 2.
@@ -610,6 +631,7 @@ const moss: TrainingOption = {
   benefit:
     "Big bones support Prayer and runes support Magic; the trip and banking slow combat training.",
   risks: "Their melee attacks can overwhelm low-level players; bring food.",
+  gear: gear(30, "Level 40 moss giants attack on sight and hit up to 625 in melee."),
 };
 const ankou: TrainingOption = {
   id: "ankou",
@@ -630,6 +652,7 @@ const ankou: TrainingOption = {
   benefit:
     "Death runes, adamant arrows and mithril stone spirits support Magic, Ranged and Mining; members-only herbs are not a F2P drop.",
   risks: "They hit harder than early monsters; bring food and an escape.",
+  gear: gear(40, "Level 54 ankou hit up to 800 in melee."),
 };
 const hellhounds: TrainingOption = {
   id: "wild-hellhounds",
@@ -649,6 +672,10 @@ const hellhounds: TrainingOption = {
   benefit:
     "Stronger free-player combat training with bones; ordinary drops are limited, so choose another target for supplies.",
   risks: "Aggressive hellhounds and Wilderness threats make this dangerous.",
+  gear: gear(
+    50,
+    "Level 92 hellhounds attack on sight and hit up to 264 in melee, in the Wilderness where players can attack too.",
+  ),
 };
 const gargoyles: TrainingOption = {
   id: "gargoyles",
@@ -675,6 +702,10 @@ const gargoyles: TrainingOption = {
   ],
   supplies: ["Rock hammer"],
   risks: "Bring food; the hammer is needed to finish kills.",
+  gear: gear(
+    60,
+    "Level 93 gargoyles attack on sight, hit up to 268 in melee and have 6,700 life points to wear down before the rock hammer.",
+  ),
 };
 const abyssals: TrainingOption = {
   id: "abyssal-demons",
@@ -699,7 +730,13 @@ const abyssals: TrainingOption = {
   ],
   risks:
     "Their teleports can disrupt positioning; bring suitable equipment and food.",
+  gear: gear(
+    70,
+    "Level 98 abyssal demons hit up to 672 in melee, have 8,500 life points and teleport around you.",
+  ),
 };
+const jacquelynReason =
+  "Jacquelyn assigns early Lumbridge creatures such as rats, goblins, cave bugs, cave slimes and zombies.";
 const assigned: TrainingOption = {
   id: "slayer-assignment",
   title: "Slayer assignments",
@@ -714,6 +751,7 @@ const assigned: TrainingOption = {
     "Earn Slayer progress and task drops alongside combat instead of focusing exclusively on combat experience.",
   risks:
     "Tasks differ in difficulty and equipment requirements; inspect the target and use a safer master if needed.",
+  gear: gear(10, jacquelynReason),
 };
 function stage(
   from: number,
@@ -913,6 +951,7 @@ const jacquelyn = option(
     sites: [jacquelynSite],
     risks:
       "Check target location and any required Slayer equipment before leaving.",
+    gear: gear(10, jacquelynReason),
   },
 );
 const vannaka = option(
@@ -936,6 +975,10 @@ const vannaka = option(
     requirements: ["30 combat level."],
     risks:
       "Tasks can be harder than early assignments; check protection and equipment.",
+    gear: gear(
+      30,
+      "Vannaka assigns mid-level creatures such as hill, moss and ice giants, ice warriors, Kalphite and catablepon.",
+    ),
   },
 );
 const sumona = option(
@@ -958,6 +1001,10 @@ const sumona = option(
     ],
     requirements: ["35 Slayer", "90 combat", "Smoking Kills"],
     risks: "Prepare equipment and supplies for the assigned target.",
+    gear: gear(
+      60,
+      "Sumona assigns abyssal and black demons, gargoyles, nechryael, dust devils and dragonfire-breathing blue dragons.",
+    ),
   },
 );
 const kuradal = option(
@@ -981,6 +1028,10 @@ const kuradal = option(
     ],
     requirements: ["75 Slayer", "110 combat", "Ancient Cavern access"],
     risks: "Advanced assignments require appropriate protection.",
+    gear: gear(
+      70,
+      "Kuradal assigns dark beasts, abyssal and black demons, steel and mithril dragons, waterfiends and Kal'gerion demons.",
+    ),
   },
 );
 const laniakea = option(
@@ -1004,6 +1055,10 @@ const laniakea = option(
     requirements: ["90 Slayer", "120 combat level", "Access to Anachronia"],
     risks:
       "Advanced creatures can hit hard and may require specialist equipment.",
+    gear: gear(
+      80,
+      "Laniakea assigns rune and adamant dragons, nodon dragonkin, Kal'gerion demons and ravenous strigoi.",
+    ),
   },
 );
 const pouchIngredients: Record<string, string[]> = {
@@ -1174,6 +1229,7 @@ const combatNecro = option(
     ],
     risks:
       "Move to stronger enemies only when your equipment and survival are adequate.",
+    gear: chicken.gear,
   },
 );
 // https://runescape.wiki/w/Greater_communion https://runescape.wiki/w/Powerful_communion
@@ -1232,6 +1288,7 @@ const memberNecro = {
   members: true,
   method:
     "Fight hill giants with Necromancy; upgrade deathwarden equipment through Kili's tasks and unlock talents at the Well of Souls.",
+  gear: giants.gear,
 };
 
 export const COMBAT_SKILLS: SkillRecord[] = [

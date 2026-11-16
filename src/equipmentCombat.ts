@@ -975,8 +975,50 @@ export const COMBAT_EQUIPMENT: Partial<Record<SkillName, EquipmentGuide>> = {
   },
 };
 
+// The items skill pages list under the gear table: finishers, dragonfire protection, task tools and
+// skill-specific carried items. Weapons and armour come from the imported catalogue instead.
+const styleExtras = { items: [dragonShield, gargoyleHammer] };
+export const COMBAT_EXTRAS: Partial<Record<SkillName, EquipmentGuide>> = {
+  Attack: styleExtras,
+  Strength: styleExtras,
+  Ranged: styleExtras,
+  Magic: styleExtras,
+  Necromancy: {
+    items: COMBAT_EQUIPMENT.Necromancy!.items.filter(
+      (item) => !necroWeapons.includes(item) && !necroArmour.includes(item),
+    ),
+  },
+  Prayer: COMBAT_EQUIPMENT.Prayer,
+  Slayer: { items: COMBAT_EQUIPMENT.Slayer!.items },
+  Summoning: COMBAT_EQUIPMENT.Summoning,
+};
+
+// Gear named in quest, boss and skill text. The gear table links imported items itself; these keep the
+// text links without loading the imported catalogue on every page.
+const namedGear = [
+  "Mithril 2h sword",
+  "Steel dagger",
+  "Orikalkum warhammer",
+  "Dragon Rider lance",
+  "Adamant platebody",
+  "Leather body",
+  "Black dragonhide body",
+  "Longbow",
+  "Oak longbow",
+  "Maple longbow",
+  "Staff of light",
+  "Adamant pickaxe",
+  "Primal pickaxe",
+  "Mithril hatchet",
+  "Rune hatchet",
+  "Dragon hatchet",
+  "Dragon mattock",
+].map((name) => ({ name, wiki: name, image: `${name.replaceAll(" ", "_")}.png` }));
+
 // Inventory images come from each named recipe input's Wiki infobox.
 export const EQUIPMENT_MATERIALS = [
+  ...namedGear,
+  { name: "Bane arrow", wiki: "Bane arrow", image: "Bane_arrow_5.png", aliases: ["bane arrows"] },
   { name: "Fire cape", wiki: "Fire cape", image: "Fire_cape.png" },
   {
     name: "Headless arrow",

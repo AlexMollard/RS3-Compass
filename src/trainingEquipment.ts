@@ -1,169 +1,114 @@
-import type {
-  ItemReference,
-  Profile,
-  SkillRecord,
-  TrainingOption,
-} from "./data.ts";
-import type {
-  EquipmentGuide,
-  EquipmentRecommendation,
-} from "./equipmentTypes.ts";
-import { COMBAT_EQUIPMENT, EQUIPMENT_MATERIALS } from "./equipmentCombat.ts";
-import { SKILLING_EQUIPMENT } from "./equipmentSkilling.ts";
+import type { Profile, TrainingOption } from "./data.ts";
+import type { EquipmentRecommendation, GearTool } from "./equipmentTypes.ts";
+import { EQUIPMENT_EXTRAS } from "./equipmentExtras.ts";
+import { selectGear, type GearRow, type GearStyle } from "./gearSelection.ts";
 import { levelStatus } from "./lib/levelStatus.ts";
+import type { SkillName } from "./skillNames.ts";
 
-export const EQUIPMENT_GUIDES = { ...COMBAT_EQUIPMENT, ...SKILLING_EQUIPMENT };
-export const EQUIPMENT_ITEMS: ItemReference[] = [
-  ...new Map<string, ItemReference>(
-    [
-      ...Object.values(EQUIPMENT_GUIDES).flatMap((guide) => guide.items),
-      ...EQUIPMENT_MATERIALS,
-    ].map((item) => [item.name.toLowerCase(), item] as const),
-  ).values(),
-];
+export type CombatClass = Exclude<GearStyle, "tool">;
 
-export function selectEquipment(
-  guide: EquipmentGuide,
-  method: TrainingOption,
-  profile: Profile,
-  planningLevel?: number,
-) {
-  // Recorded use levels describe current options; the selected range describes the target.
-  const available = guide.items.filter(
+/** Skills trained with any combat style; their page offers a style choice. */
+export const STYLE_SKILLS: SkillName[] = ["Defence", "Constitution", "Slayer"];
+const OWN_CLASS: Partial<Record<SkillName, CombatClass>> = {
+  Attack: "melee",
+  Strength: "melee",
+  Ranged: "ranged",
+  Magic: "magic",
+  Necromancy: "necromancy",
+};
+const TOOLS: Partial<Record<SkillName, GearTool>> = {
+  Mining: "pickaxe",
+  Woodcutting: "hatchet",
+  Archaeology: "mattock",
+};
+// The skill whose extras (dragonfire protection, finishers) go with each style.
+const STYLE_EXTRAS: Record<CombatClass, SkillName> = {
+  melee: "Attack",
+  ranged: "Ranged",
+  magic: "Magic",
+  necromancy: "Necromancy",
+};
+const DRAGONS = ["blue-dragons", "wilderness-blue-dragons"];
+
+/** The gear class a skill page shows; `style` applies to Defence, Constitution and Slayer. */
+export function gearClass(skill: SkillName, style: CombatClass = "melee"): GearStyle | undefined {
+  if (STYLE_SKILLS.includes(skill)) return style;
+  return OWN_CLASS[skill] ?? (TOOLS[skill] ? "tool" : undefined);
+}
+
+const usable = (item: EquipmentRecommendation, profile: Profile) =>
+  (!item.planningSkill || item.from <= (profile.levels[item.planningSkill] ?? 1)) &&
+  (item.levels ?? []).every(({ skill, level }) => levelStatus(profile.levels[skill], level) === "met");
+
+/**
+ * A guide's items for the method: per slot (or condition), the furthest step the recorded levels reach,
+ * or the first step when none is reached; then optional items.
+ */
+function pickExtras(items: EquipmentRecommendation[], methodId: string, profile: Profile) {
+  const available = items.filter(
     (item) =>
       (profile.mode === "members" || !item.members) &&
-      item.acquisition.some(
-        (route) => profile.mode === "members" || !route.members,
-      ) &&
-      (!item.methods || item.methods.includes(method.id)),
+      item.acquisition.some((route) => profile.mode === "members" || !route.members) &&
+      (!item.methods || item.methods.includes(methodId)),
   );
   const slots = new Map<string, EquipmentRecommendation[]>();
   for (const item of available.filter((item) => !item.optional)) {
-    // Conditional requirements are separate from ordinary equipped slots.
     const key = item.condition ? `${item.slot}:${item.condition}` : item.slot;
-    const group = slots.get(key);
-    if (group) group.push(item);
-    else slots.set(key, [item]);
+    slots.set(key, [...(slots.get(key) ?? []), item]);
   }
-  const current: EquipmentRecommendation[] = [];
-  const target: EquipmentRecommendation[] = [];
-  const upgrades: EquipmentRecommendation[] = [];
-  for (const items of slots.values()) {
-    const usable = items.filter((item) => {
-      if (
-        item.planningSkill &&
-        item.from > (profile.levels[item.planningSkill] ?? 1)
-      )
-        return false;
-      if (item.levels?.length)
-        return item.levels.every(
-          ({ skill: requirement, level }) =>
-            levelStatus(profile.levels[requirement], level) === "met",
-        );
-      return true;
-    });
-    // A basic example is useful even when a level has not been recorded; it
-    // is not evidence that the player owns or can use it.
-    const selected = (usable.length ? usable : items).reduce((best, item) =>
-      usable.length
-        ? item.from > best.from
-          ? item
-          : best
-        : item.from < best.from
-          ? item
-          : best,
-    );
-    current.push(selected);
-    let goal = selected;
-    if (planningLevel !== undefined && !selected.condition)
-      for (const item of items)
-        if (item.from <= planningLevel && item.from > goal.from) goal = item;
-    target.push(goal);
-    upgrades.push(
-      ...items.filter((item) => item.from > selected.from && item !== goal),
-    );
-  }
-  // Current and target can pick different weapons, so each kit drops its own off hand.
-  const hands = (list: EquipmentRecommendation[]) =>
-    list.some((item) => item.twoHanded)
-      ? list.filter((item) => !/off hand/i.test(item.slot))
-      : list;
-  return {
-    note: guide.note,
-    current: hands(current),
-    target: hands(target),
-    planningLevel,
-    upgrades,
-    optional: available.filter((item) => item.optional),
-  };
+  const picked = [...slots.values()].map((group) => {
+    const reached = group.filter((item) => usable(item, profile));
+    return reached.length
+      ? reached.reduce((best, item) => (item.from > best.from ? item : best))
+      : group.reduce((low, item) => (item.from < low.from ? item : low));
+  });
+  return [...picked, ...available.filter((item) => item.optional)];
 }
 
-export type CombatStyle = "Attack" | "Ranged" | "Magic" | "Necromancy";
-
-export function resolveTrainingEquipment(
-  skill: SkillRecord,
-  stage: SkillRecord["stages"][number],
+/**
+ * A skill page's gear: one row per slot from the imported catalogue, plus the hand-written extras
+ * (finishers, protection, skill tools) for the method.
+ */
+export function trainingGear(
+  skill: SkillName,
   method: TrainingOption,
   profile: Profile,
-  style: CombatStyle = "Attack",
-) {
-  const planningLevel = COMBAT_EQUIPMENT[skill.name] ? stage.from : undefined;
-  const chooseStyle = ["Defence", "Constitution", "Slayer"].includes(
-    skill.name,
-  );
-  if (!chooseStyle) {
-    const guide = EQUIPMENT_GUIDES[skill.name];
-    return guide
-      ? selectEquipment(guide, method, profile, planningLevel)
-      : undefined;
-  }
-  const guide = EQUIPMENT_GUIDES[style];
-  if (!guide) return undefined;
-  const masters = ["jacquelyn", "vannaka", "sumona", "kuradal", "laniakea"];
-  const isDragon = ["blue-dragons", "wilderness-blue-dragons"].includes(
-    method.id,
-  );
-  if (style === "Necromancy" && isDragon && profile.mode === "f2p")
+  style: CombatClass = "melee",
+): { rows: GearRow[]; extras: EquipmentRecommendation[]; note?: string } {
+  const chooseStyle = STYLE_SKILLS.includes(skill);
+  const gearStyle = gearClass(skill, style);
+  if (chooseStyle && style === "necromancy" && DRAGONS.includes(method.id) && profile.mode !== "members")
     return {
-      note: "The dual-weapon Necromancy example needs members' super antifire. Choose another equipment style for this F2P dragon method.",
-      current: [],
-      target: [],
-      planningLevel,
-      upgrades: [],
-      optional: [],
+      rows: [],
+      extras: [],
+      note: "The dual-weapon Necromancy setup needs members' super antifire. Choose another style for this F2P dragon method.",
     };
-  const isGargoyle = method.id === "gargoyles";
-  const context =
-    style === "Necromancy"
-      ? isDragon
-        ? "necro-blue-dragons"
-        : isGargoyle
-          ? "necro-gargoyles"
-          : "necro-combat"
-      : skill.name === "Slayer" && masters.includes(method.id)
-        ? "slayer-assignment"
+  // A combat table needs the method's minimum; Necromancy rituals have none because they are not fights.
+  const rows =
+    gearStyle === "tool"
+      ? selectGear({ class: "tool", toolSlot: TOOLS[skill], profile })
+      : gearStyle && method.gear
+        ? selectGear({ class: gearStyle, profile, minTier: method.gear.minTier, minReason: method.gear.reason })
+        : [];
+  // Necromancy extras are keyed by the Necromancy page's own method ids.
+  const styleMethod =
+    style === "necromancy" && DRAGONS.includes(method.id)
+      ? "necro-blue-dragons"
+      : style === "necromancy" && method.id === "gargoyles"
+        ? "necro-gargoyles"
         : method.id;
-  const result = selectEquipment(
-    guide,
-    { ...method, id: context },
-    profile,
-    planningLevel,
-  );
-  if (skill.name !== "Slayer") return result;
-  const taskGuide = EQUIPMENT_GUIDES.Slayer;
-  if (!taskGuide) return result;
-  const task = selectEquipment(taskGuide, method, profile);
-  // Slayer's own guide retains the original master and its task-specific tools.
-  const withoutFinisher = (items: EquipmentRecommendation[]) =>
-    items.filter((item) => item.name !== "Rock hammer");
-  return {
-    note: result.note,
-    current: [...withoutFinisher(result.current), ...task.current],
-    target: [...withoutFinisher(result.target), ...task.target],
-    planningLevel,
-    upgrades: [...withoutFinisher(result.upgrades), ...task.upgrades],
-    optional: [...withoutFinisher(result.optional), ...task.optional],
-  };
+  const sources: [EquipmentRecommendation[], string][] = chooseStyle
+    ? [
+        [EQUIPMENT_EXTRAS[STYLE_EXTRAS[style]]?.items ?? [], styleMethod],
+        [skill === "Slayer" ? (EQUIPMENT_EXTRAS.Slayer?.items ?? []) : [], method.id],
+      ]
+    : [[EQUIPMENT_EXTRAS[skill]?.items ?? [], method.id]];
+  const extras = [
+    ...new Map(
+      sources.flatMap(([items, id]) => pickExtras(items, id, profile)).map((item) => [item.name, item] as const),
+    ).values(),
+  ];
+  return { rows, extras, note: chooseStyle ? undefined : EQUIPMENT_EXTRAS[skill]?.note };
 }
 
 export function equipmentLevels(

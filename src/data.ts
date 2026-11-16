@@ -129,6 +129,12 @@ export interface TrainingOption {
   requirements?: string[];
   risks?: string;
   supplies?: string[];
+  /**
+   * "Wear at least": the minimum sensible gear for this method, a judgement checked against the method's
+   * Wiki page on `checked`. minTier is an item tier, or the gathering level for a tool. Absent where no
+   * minimum means anything.
+   */
+  gear?: { minTier: number; reason: string; checked: string };
 }
 export interface SkillRecord {
   name: SkillName;

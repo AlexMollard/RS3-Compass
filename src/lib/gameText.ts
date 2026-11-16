@@ -12,7 +12,7 @@ import { ADVENTURE_ITEMS } from "../questsAdventures.ts";
 import { SIDE_ITEMS } from "../questsSideActivities.ts";
 import { SEASONAL_ITEMS } from "../questsSeasonal.ts";
 import { QUEST_REWARD_ITEMS } from "../questRewardItems.ts";
-import { EQUIPMENT_ITEMS } from "../trainingEquipment.ts";
+import { EQUIPMENT_ITEMS } from "../equipmentExtras.ts";
 
 export interface GameTextReference {
   name: string;

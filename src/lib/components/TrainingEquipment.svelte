@@ -1,294 +1,238 @@
 <script lang="ts">
   import {
-    trainingRangeLabel,
+    QUESTS,
     type Profile,
     type SkillRecord,
     type TrainingOption,
   } from "../../data";
   import type { EquipmentRecommendation } from "../../equipmentTypes";
+  import type {
+    GearPick,
+    GearRow,
+    GearRowName,
+    LevelGap,
+  } from "../../gearSelection";
   import {
+    STYLE_SKILLS,
     equipmentLevels,
-    resolveTrainingEquipment,
-    type CombatStyle,
+    trainingGear,
+    type CombatClass,
   } from "../../trainingEquipment";
   import { wikiHref } from "../../wiki";
-  import { WORN_LAYOUT, wornSlot } from "../wornSlots";
   import ChoiceStrip from "./ChoiceStrip.svelte";
   import GameArt from "./GameArt.svelte";
   import GameText from "./GameText.svelte";
   import GameWindow from "./GameWindow.svelte";
   let {
     skill,
-    stage,
     method,
     profile,
   }: {
     skill: SkillRecord;
-    stage: SkillRecord["stages"][number];
     method: TrainingOption;
     profile: Profile;
   } = $props();
-  let style = $state<CombatStyle>("Attack");
+  let style = $state<CombatClass>("melee");
   const styleChoices = [
-    { value: "Attack", label: "Melee" },
-    { value: "Ranged", label: "Ranged" },
-    { value: "Magic", label: "Magic" },
-    { value: "Necromancy", label: "Necromancy" },
+    { value: "melee", label: "Melee" },
+    { value: "ranged", label: "Ranged" },
+    { value: "magic", label: "Magic" },
+    { value: "necromancy", label: "Necromancy" },
   ];
-  const chooseStyle = $derived(
-    ["Defence", "Constitution", "Slayer"].includes(skill.name),
-  );
-  const equipment = $derived(
-    resolveTrainingEquipment(skill, stage, method, profile, style),
-  );
-  const currentAlternatives = $derived(
-    equipment?.current.filter(
-      (item) => !equipment.target.some((target) => target.name === item.name),
-    ) ?? [],
-  );
-  // The first target item per worn slot fills the equipment screen.
-  const worn = $derived.by(() => {
-    const slots = new Map<string, EquipmentRecommendation>();
-    for (const item of equipment?.target ?? []) {
-      const slot = wornSlot(item.slot);
-      if (slot && !slots.has(slot)) slots.set(slot, item);
-    }
-    return slots;
+  const chooseStyle = $derived(STYLE_SKILLS.includes(skill.name));
+  const gear = $derived(trainingGear(skill.name, method, profile, style));
+  const showMinimum = $derived(gear.rows.some((row) => row.atLeast));
+  const columns = $derived(showMinimum ? 4 : 3);
+  // The 2h setup and the dual-wield setup are alternatives, so each gets its own group.
+  const groups = $derived.by(() => {
+    const of = (names: GearRowName[]) =>
+      gear.rows.filter((row) => names.includes(row.row));
+    return [
+      { label: "Two-handed", rows: of(["2h"]) },
+      { label: "Or dual wield", rows: of(["main hand", "off hand"]) },
+      { label: "Armour", rows: of(["head", "body", "legs", "hands", "feet"]) },
+      { label: "", rows: of(["tool"]) },
+    ].filter((group) => group.rows.length);
   });
+  const ROW_LABEL: Record<GearRowName, string> = {
+    "2h": "Two-handed",
+    "main hand": "Main hand",
+    "off hand": "Off hand",
+    head: "Head",
+    body: "Body",
+    legs: "Legs",
+    hands: "Hands",
+    feet: "Feet",
+    tool: "Tool",
+  };
+  const rowLabel = (row: GearRow) =>
+    row.row === "tool" && row.best?.item.tool
+      ? row.best.item.tool[0].toUpperCase() + row.best.item.tool.slice(1)
+      : ROW_LABEL[row.row];
+  const questTitle = (id: string) =>
+    QUESTS.find((quest) => quest.id === id)?.name ?? id;
 </script>
 
-{#snippet levels(
-  item: Pick<EquipmentRecommendation, "levels">,
-  label: string,
-)}
-  {#each equipmentLevels(item, profile) as check (check.skill)}
-    <div class="req">
-      <span class="req-label">{label}</span>
-      <span
-        class="lvl"
-        class:miss={check.status === "below"}
-        class:unknown={check.status === "unknown"}>{check.level}</span
-      >
-      <span class="req-skill"
-        ><GameText text={check.skill} /> · recorded {check.recorded ??
-          "?"}</span
-      >
-      {#if check.status === "met"}<span class="req-state met">✓ Met</span>
-      {:else if check.status === "below"}<span class="req-state below"
-          >▲ {check.level - (check.recorded ?? 0)} below</span
-        >
-      {:else}<span class="req-state unknown">Not recorded</span>{/if}
-    </div>
-  {/each}
+{#snippet gaps(label: string, levels: LevelGap[], quests: string[])}
+  {#if levels.length || quests.length}<p class="gaps">
+      <span class="gap-label">{label}</span>
+      {#each levels as gap (gap.skill)}<span
+          class="gap"
+          class:unknown={gap.recorded === undefined}
+          title={gap.recorded === undefined
+            ? `${gap.skill} not recorded`
+            : `Recorded ${gap.recorded}`}>{gap.skill} {gap.level}</span
+        >{/each}
+      {#each quests as quest (quest)}<span class="gap">{questTitle(quest)}</span
+        >{/each}
+    </p>{/if}
 {/snippet}
 
-{#snippet equipmentRow(item: EquipmentRecommendation)}
-  {@const routes = item.acquisition.filter(
-    (route) => profile.mode === "members" || !route.members,
-  )}
-  <div class="kit-item">
-    <a
-      class="kit-name"
-      href={wikiHref(item.wiki)}
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <GameArt file={item.image} size={40} />
-      <span
-        ><strong>{item.name}</strong><small
-          >{item.slot}{item.members ? " · Members" : ""}</small
-        ></span
-      >
-    </a>
-    {#if item.condition}<p class="unlock-check">
-        <GameText text={item.condition} />
-      </p>{/if}
-    {#if item.levels?.length}{@render levels(item, "Use")}{/if}
-    {#if item.unlocks?.length}<p class="unlock-check">
-        Check unlock: <GameText text={item.unlocks.join(" · ")} />
-      </p>{/if}
-    {#if routes[0]}
-      {@const route = routes[0]}
-      {#if route.levels?.length}{@render levels(route, "Make")}{/if}
-      {#if route.unlocks?.length}<p class="unlock-check">
-          Check unlock: <GameText text={route.unlocks.join(" · ")} />
-        </p>{/if}
-      {#if !route.levels?.length}<p class="route-note">
-          <strong><GameText text={route.label} />:</strong>
-          <GameText text={route.note} />
-        </p>{/if}
-    {/if}
-    <details class="equipment-detail">
-      <summary
-        >{routes.length > 1
-          ? "Other routes and item details"
-          : "Item details"}</summary
-      >
-      <p><GameText text={item.note} /></p>
-      {#if routes[0]?.levels?.length}<p>
-          <strong><GameText text={routes[0].label} />:</strong>
-          <GameText text={routes[0].note} />
-        </p>{/if}
-      {#each routes.slice(1) as route}
-        <div class="alternative-route">
-          <strong><GameText text={route.label} /></strong>
-          {@render levels(route, "Make")}
-          {#if route.unlocks?.length}<p>
-              Check unlock: <GameText text={route.unlocks.join(" · ")} />
-            </p>{/if}
-          <p><GameText text={route.note} /></p>
-        </div>
-      {/each}
-    </details>
-  </div>
-{/snippet}
-
-{#if equipment}
-  <GameWindow
-    title="Target kit"
-    trailing={"For " +
-      trainingRangeLabel(skill, stage, profile.mode).toLowerCase()}
-    className="training-equipment"
+{#snippet itemLink(item: { name: string; wiki: string; image?: string })}
+  <a
+    class="gear-item"
+    href={wikiHref(item.wiki)}
+    target="_blank"
+    rel="noopener noreferrer"
+    >{#if item.image}<GameArt file={item.image} size={32} />{/if}<span
+      >{item.name}</span
+    ></a
   >
-    <div class="kit-body">
-      {#if worn.size}
-        <div class="kit-doll">
-          <div class="doll" aria-label="Worn equipment" role="group">
-            {#each WORN_LAYOUT as row}
-              {#each row as slot}
-                {#if slot === null}<span></span>
-                {:else}
-                  {@const item = worn.get(slot)}
-                  <span
-                    class="eq"
-                    class:full={item}
-                    title={item ? item.name : undefined}
-                    >{#if item}<GameArt file={item.image} size={28} />{/if}{slot}</span
-                  >
-                {/if}
+{/snippet}
+
+{#snippet pick(choice: GearPick)}
+  {@render itemLink(choice.item)}
+  <p class="route"><GameText text={choice.route.note} images={false} /></p>
+  {#if choice.route.unlocks?.length}<p class="route">
+      Needs: {choice.route.unlocks.join(" · ")}
+    </p>{/if}
+  {@render gaps("To wear", choice.missing, choice.missingQuests)}
+  {@render gaps("To get", choice.routeMissing, choice.routeMissingQuests)}
+{/snippet}
+
+{#if gear.rows.length || gear.extras.length || gear.note}
+  <GameWindow title="Gear" trailing={method.title} className="training-equipment">
+    <div class="gear-body">
+      {#if chooseStyle}
+        <ChoiceStrip
+          label="Combat style"
+          name={`equipment-style-${skill.name}`}
+          value={style}
+          choices={styleChoices}
+          onChange={(value) => {
+            style = value as CombatClass;
+          }}
+        />
+      {/if}
+      {#if gear.note}<p class="cap"><GameText text={gear.note} /></p>{/if}
+      {#if showMinimum && method.gear}<p class="cap">
+          Wear at least is <span class="our-pick">our pick</span>: {method
+            .gear.reason}
+          <a href={wikiHref(method.wiki)} target="_blank" rel="noopener noreferrer"
+            >Wiki</a
+          >
+        </p>{/if}
+      {#if gear.rows.length}
+        <table class="gear-table">
+          <caption class="sr-only">Gear by slot for {method.title}</caption>
+          <thead>
+            <tr>
+              <th scope="col">Slot</th>
+              <th scope="col">Best you can have</th>
+              <th scope="col">Easier to get</th>
+              {#if showMinimum}<th scope="col">Wear at least</th>{/if}
+            </tr>
+          </thead>
+          {#each groups as group (group.label)}
+            <tbody>
+              {#if group.label}<tr class="group-row"
+                  ><th scope="rowgroup" colspan={columns}>{group.label}</th></tr
+                >{/if}
+              {#each group.rows as row (row.row)}
+                <tr>
+                  <th scope="row" class="slot">{rowLabel(row)}</th>
+                  {#if row.unrecorded}
+                    <td class="record" colspan={columns - 1}>
+                      <a href="/levels">Record your {row.unrecorded} level</a>
+                    </td>
+                  {:else}
+                    <td data-label="Best you can have">
+                      {#if row.best}{@render pick(row.best)}
+                      {:else}<p class="cap">Nothing you can wear yet</p>{/if}
+                      {#if row.next}<p class="next">
+                          <span class="gap-label">Next</span>
+                          <a
+                            href={wikiHref(row.next.item.wiki)}
+                            target="_blank"
+                            rel="noopener noreferrer">{row.next.item.name}</a
+                          >
+                          {#each row.next.missing as gap (gap.skill)}<span
+                              class="gap"
+                              class:unknown={gap.recorded === undefined}
+                              >{gap.skill} {gap.level}</span
+                            >{/each}
+                        </p>{/if}
+                    </td>
+                    <td data-label="Easier to get">
+                      {#if row.easier}{@render pick(row.easier)}
+                      {:else}<span class="none" aria-label="No easier item"
+                          >—</span
+                        >{/if}
+                    </td>
+                    {#if showMinimum}<td data-label="Wear at least">
+                        {#if row.atLeast}<span class="our-pick">Our pick</span
+                          >{@render pick(row.atLeast)}
+                        {:else}<span class="none" aria-label="No minimum">—</span
+                          >{/if}
+                      </td>{/if}
+                  {/if}
+                </tr>
               {/each}
+            </tbody>
+          {/each}
+        </table>
+      {/if}
+      {#if gear.extras.length}
+        <div class="extras">
+          <h3>Also take</h3>
+          <ul>
+            {#each gear.extras as item (item.name)}
+              {@render extra(item)}
             {/each}
-          </div>
-          <span class="cap">Only filled slots matter here</span>
+          </ul>
         </div>
       {/if}
-      <div class="kit-list">
-        {#if chooseStyle}
-          <ChoiceStrip
-            label="Equipment combat style"
-            name={`equipment-style-${skill.name}`}
-            value={style}
-            choices={styleChoices}
-            onChange={(value) => {
-              style = value as CombatStyle;
-            }}
-          />
-        {/if}
-        {#if equipment.note}<p class="cap">
-            <GameText text={equipment.note} />
-          </p>{/if}
-        {#if equipment.planningLevel !== undefined && equipment.target.length}
-          <p class="cap">
-            Aim for this kit in the selected range; unmet checks show
-            preparation gaps.
-          </p>
-        {/if}
-        {#each equipment.target as item (item.slot + (item.condition ?? ""))}{@render equipmentRow(
-            item,
-          )}{/each}
-        {#if currentAlternatives.length}<details
-            class="equipment-group current-options"
-          >
-            <summary
-              >Current-level alternatives <span
-                >{currentAlternatives.length}</span
-              ></summary
-            >
-            <p class="cap">
-              Based on recorded use levels, not owned items or what you can
-              craft.
-            </p>
-            {#each currentAlternatives as item (item.name)}{@render equipmentRow(
-                item,
-              )}{/each}
-          </details>{/if}
-        {#if equipment.upgrades.length}<details class="equipment-group">
-            <summary
-              >Other upgrades <span>{equipment.upgrades.length}</span></summary
-            >
-            {#each equipment.upgrades as item (item.name)}{@render equipmentRow(
-                item,
-              )}{/each}
-          </details>{/if}
-        {#if equipment.optional.length}<details class="equipment-group">
-            <summary
-              >Optional equipment <span>{equipment.optional.length}</span
-              ></summary
-            >
-            {#each equipment.optional as item (item.name)}{@render equipmentRow(
-                item,
-              )}{/each}
-          </details>{/if}
-        <p class="cap">
-          Suggestions, not a required minimum kit or proof of ownership. Check
-          unlocks and combat risks.
-        </p>
-      </div>
     </div>
   </GameWindow>
 {/if}
 
+{#snippet extra(item: EquipmentRecommendation)}
+  {@const missing = equipmentLevels(item, profile).filter(
+    (check) => check.status !== "met",
+  )}
+  <li>
+    {@render itemLink(item)}
+    <p class="route"><GameText text={item.condition ?? item.note} /></p>
+    {#if missing.length}<p class="gaps">
+        <span class="gap-label">To use</span>
+        {#each missing as gap (gap.skill)}<span
+            class="gap"
+            class:unknown={gap.status === "unknown"}>{gap.skill} {gap.level}</span
+          >{/each}
+      </p>{/if}
+  </li>
+{/snippet}
+
 <style>
-  .kit-body {
+  .gear-body {
     display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    gap: 24px;
+    flex-direction: column;
+    gap: 14px;
     padding: 18px;
+    min-width: 0;
   }
-  .kit-doll {
-    flex: 0 0 196px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .doll {
-    display: grid;
-    grid-template-columns: repeat(3, 52px);
-    gap: 8px;
-    justify-content: center;
-    padding: 12px;
-    background: #3b3226;
-    border: 1px solid #5a4b37;
-    border-radius: 3px;
-    box-shadow: inset 0 0 0 2px #1d1810;
-  }
-  .eq {
-    aspect-ratio: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2px;
-    padding: 2px;
-    background: #2a231a;
-    border: 1px solid #4a3e2e;
-    border-radius: 3px;
-    box-shadow: inset 0 2px 3px #00000070;
-    font-size: 9px;
-    line-height: 1.15;
-    color: #b9a888;
-    text-align: center;
-  }
-  .eq.full {
-    border-color: var(--gold);
-    background: #3a3020;
-    color: #f3e6c7;
-  }
-  .eq :global(.game-art) {
-    width: 26px;
-    height: 22px;
-    object-fit: contain;
+  .gear-body :global(.choice-fieldset) {
+    margin: 0;
   }
   .cap {
     margin: 0;
@@ -296,167 +240,163 @@
     line-height: 1.5;
     color: var(--muted);
   }
-  .kit-doll > .cap {
-    text-align: center;
+  .gear-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
   }
-  .kit-list {
-    flex: 1 1 260px;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
+  .gear-table th,
+  .gear-table td {
+    padding: 10px 8px;
+    vertical-align: top;
+    text-align: left;
+    border-top: 1px solid var(--line);
+    overflow-wrap: anywhere;
   }
-  .kit-list :global(.choice-fieldset) {
-    margin: 0;
-  }
-  .kit-name {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    min-height: 44px;
-    color: inherit;
-    text-decoration: none;
-  }
-  .kit-name :global(.game-art) {
-    flex: none;
-    width: 40px;
-    height: 40px;
-    object-fit: contain;
-    background: #0d161c;
-    border: 1px solid #3a4a55;
-    border-radius: 3px;
-  }
-  .kit-name strong {
-    font-size: 15px;
-    font-weight: 600;
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-  .kit-name:hover strong {
-    color: var(--gold-bright);
-  }
-  .kit-name small {
-    display: block;
-    color: var(--muted);
-    font-size: var(--font-caption);
-    margin-top: 0.15rem;
-  }
-  .req {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 0;
-    border-top: 1px solid #24323b;
-  }
-  .kit-name + .req,
-  .kit-name + .unlock-check {
-    margin-top: 8px;
-  }
-  .req-label {
-    flex: none;
-    width: 48px;
+  .gear-table thead th {
+    border-top: 0;
     font-size: var(--font-caption);
     font-weight: 700;
-    letter-spacing: 1.55px;
+    letter-spacing: 1.2px;
     text-transform: uppercase;
     color: var(--muted);
   }
-  .lvl {
-    flex: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 34px;
-    height: 28px;
-    padding: 0 6px;
-    border: 1px solid #63775d;
-    border-radius: 3px;
-    background: #31443b;
-    font-weight: 600;
-    font-size: 13px;
-    color: #d6e2c4;
+  .gear-table thead th:first-child {
+    width: 96px;
   }
-  .lvl.miss {
-    border-color: var(--warn);
-    background: transparent;
-    color: var(--warn);
-  }
-  .lvl.unknown {
-    border-color: #425260;
-    background: transparent;
-    color: var(--muted);
-  }
-  .req-skill {
-    flex: 1 1 auto;
-    min-width: 0;
-  }
-  .req-state {
-    flex: none;
-    font-weight: 600;
+  .group-row th {
+    padding-top: 16px;
     font-size: var(--font-caption);
-  }
-  .req-state.met {
-    color: var(--green);
-  }
-  .req-state.below {
-    color: var(--warn);
-  }
-  .req-state.unknown {
-    color: var(--muted);
-  }
-  .unlock-check {
-    margin: 0;
-    padding: 6px 0;
-    font-size: var(--font-caption);
+    font-weight: 700;
     color: var(--gold);
   }
-  .route-note,
-  .equipment-detail p {
-    margin-block: 0.25rem;
-    font-size: var(--font-caption);
-    color: var(--muted);
-  }
-  .equipment-detail summary {
-    min-height: 32px;
-    padding-block: 0.3rem;
-    font-size: var(--font-caption);
-    color: var(--muted);
-    cursor: pointer;
-  }
-  .equipment-group {
-    border-top: 1px solid #24323b;
-  }
-  .equipment-group > summary {
-    min-height: 44px;
-    padding-block: 0.7rem;
+  .slot {
     font-weight: 600;
-    cursor: pointer;
   }
-  .equipment-group > summary span {
+  .gear-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 32px;
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    font-weight: 600;
+  }
+  .gear-item:hover {
+    color: var(--gold-bright);
+  }
+  .gear-item :global(.game-art) {
+    flex: none;
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+  }
+  .route,
+  .next,
+  .gaps {
+    margin: 4px 0 0;
+    font-size: var(--font-caption);
+    line-height: 1.45;
     color: var(--muted);
-    font-weight: 500;
-    margin-left: 0.35rem;
   }
-  .equipment-group > .kit-item,
-  .equipment-group > .cap {
-    margin-bottom: 14px;
+  .next a {
+    color: inherit;
+    text-underline-offset: 3px;
   }
-  .alternative-route {
-    padding-top: 0.65rem;
+  .gaps,
+  .next {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 6px;
   }
-  @media (max-width: 760px) {
-    .kit-body {
+  .gap-label {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .gap {
+    padding: 1px 6px;
+    border: 1px solid var(--warn);
+    border-radius: 3px;
+    color: var(--warn);
+  }
+  .gap.unknown {
+    border-color: #425260;
+    color: var(--muted);
+  }
+  .our-pick {
+    display: inline-block;
+    margin-right: 6px;
+    font-size: var(--font-caption);
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  td > .our-pick {
+    display: block;
+  }
+  .record a {
+    color: var(--gold-bright);
+    font-weight: 600;
+    text-underline-offset: 3px;
+  }
+  .none {
+    color: var(--muted);
+  }
+  .extras h3 {
+    margin: 0 0 6px;
+    font-size: var(--font-caption);
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .extras ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .extras li {
+    padding: 8px 0;
+    border-top: 1px solid var(--line);
+  }
+  @media (max-width: 639px) {
+    .gear-body {
       padding: 14px;
-      gap: 14px;
     }
-    .kit-doll {
-      flex: 1 1 100%;
+    .gear-table,
+    .gear-table tbody,
+    .gear-table tr,
+    .gear-table th,
+    .gear-table td {
+      display: block;
+      width: auto;
     }
-    .req {
-      gap: 8px;
+    .gear-table thead {
+      display: none;
     }
-    .req-label {
-      width: 44px;
+    .gear-table tr {
+      padding: 10px 0;
+      border-top: 1px solid var(--line);
+    }
+    .gear-table th,
+    .gear-table td {
+      border-top: 0;
+      padding: 4px 0;
+    }
+    .group-row {
+      border-top: 0;
+    }
+    .gear-table td[data-label]::before {
+      content: attr(data-label);
+      display: block;
+      font-size: var(--font-caption);
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--muted);
     }
   }
 </style>
