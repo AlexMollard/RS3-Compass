@@ -5,7 +5,7 @@ export const wikiHref = (page: string) =>
 export const wikiTitle = (url: string) =>
   decodeURIComponent(url.replace(/^https:\/\/runescape\.wiki\/w\//, "")).replaceAll("_", " ");
 
-export const wikiImage =(filename: string) =>
+export const wikiImage = (filename: string) =>
   "https://runescape.wiki/images/" +
   encodeURIComponent(filename.replaceAll(" ", "_"));
 
