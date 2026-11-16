@@ -156,6 +156,15 @@ test("essenceSources puts met sources before unmet ones", () => {
   assert.ok(views.slice(firstUnmet).every((v) => !v.met));
 });
 
+test("Fastest keeps a reachable Abyss altar when the next band's altar is still locked", () => {
+  const fastest = (lvl) => craftNow(example({ kind: "Regular account", levels: { Runecrafting: lvl } }), {}, lvl).xp.method;
+  assert.equal(fastest(90).id, "abyss-75-90");
+  assert.equal(fastest(100).altar, "Blood");
+  assert.equal(fastest(76).altar, "Death");
+  assert.equal(fastest(63).id, "abyss-50-60");
+  assert.equal(fastest(82).id, "abyss-75-90");
+});
+
 test("an attuner method needs the attuner", () => {
   const p = example({ levels: { Runecrafting: 105 } });
   const fast = { xpRule: "fastest" };

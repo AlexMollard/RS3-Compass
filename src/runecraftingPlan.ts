@@ -122,10 +122,12 @@ export type CraftNow = {
 function bestMethod(profile: Profile, kit: RunecraftingKit, level: number): XpMethod | undefined {
   const rule = kit.xpRule ?? defaultXpRule(profile.kind);
   const candidates = XP_METHODS.filter((m) => {
-    if (level < m.from || level >= m.to) return false;
+    const altar = m.altar ? altarFor(m.altar) : undefined;
+    // An Abyss band starts below its altar's level, so a reachable altar's band stays a candidate past its `to`
+    // until a better reachable altar's band takes over.
+    if (level < m.from || (level >= m.to && !(altar && m.needsEssence))) return false;
     if (m.quests.some((id) => questState(profile, id) === "unmet")) return false;
     if (m.requiresAttuner && kit.attuner !== true) return false;
-    const altar = m.altar ? altarFor(m.altar) : undefined;
     return !altar || accessAt(profile, altar, level).every((r) => r.state !== "unmet");
   });
   const saves = (m: XpMethod) => (rule === "save-essence" && !m.needsEssence ? 1 : 0);
