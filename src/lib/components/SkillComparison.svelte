@@ -17,7 +17,12 @@
   import { wikiHref } from "../../wiki";
   import GameWindow from "./GameWindow.svelte";
   import GameArt from "./GameArt.svelte";
-  import { ArrowDownWideNarrow, ArrowUpNarrowWide } from "@lucide/svelte";
+  import {
+    ArrowDownWideNarrow,
+    ArrowUpNarrowWide,
+    LayoutGrid,
+    Table2,
+  } from "@lucide/svelte";
 
   let {
     players,
@@ -49,6 +54,12 @@
   let reversed = $state(false);
   let category = $state("");
   let gapsOnly = $state(false);
+  let view = $state<"table" | "cards">("table");
+
+  function openTraining(player: ComparedPlayer, skill: string) {
+    controller.selectProfile(player.profile!.id);
+    void goto(skillPath(skill));
+  }
 
   /** Players with published levels, who can lead or trail. */
   let ranked = $derived(
@@ -166,6 +177,17 @@
       <label class="check"
         ><input type="checkbox" bind:checked={gapsOnly} />Level gaps only</label
       >
+      <div class="field">
+        <span class="field-label" id={id + "-view"}>View</span>
+        <div class="joined view" role="group" aria-labelledby={id + "-view"}>
+          <button type="button" aria-pressed={view === "table"} onclick={() => (view = "table")}
+            ><Table2 size={16} aria-hidden="true" />Table</button
+          >
+          <button type="button" aria-pressed={view === "cards"} onclick={() => (view = "cards")}
+            ><LayoutGrid size={16} aria-hidden="true" />Cards</button
+          >
+        </div>
+      </div>
       <p class="count" aria-live="polite">
         <strong>{skills.length}</strong> of {ALL.length} skills
       </p>
@@ -174,7 +196,82 @@
     {#if !skills.length}<p class="caption empty">
         No skills match these filters.
       </p>{/if}
-    <div class="skill-comparisons">
+    {#if view === "table" && skills.length}
+      <div class="table-wrap" style:--players={players.length}>
+        <table class="skill-table">
+          <thead>
+            <tr>
+              <th scope="col" class="skill-col">Skill</th>
+              {#each players as player, index (player.member.name)}
+                <th scope="col" class="player-col" style:--player={playerColour(index)}
+                  ><span class="long-name">{player.member.name}</span><span class="short-name" aria-hidden="true"
+                    >{labels[index]}</span
+                  ></th
+                >
+              {/each}
+              <th scope="col" class="gap-col">XP gap</th>
+              <th scope="col" class="gap-col level-gap">Level gap</th>
+            </tr>
+          </thead>
+          <tbody>
+            {#each skills as skill (skill.name)}
+              {@const standings = skillStandings(players, skill.name)}
+              {@const xp = xpView(skill.name)}
+              {@const behinds = standings.flatMap((s) => (s.behind === undefined ? [] : [s.behind]))}
+              <tr>
+                <th scope="row" class="skill-col">
+                  <a
+                    class="skill-title"
+                    href={wikiHref(skill.wiki)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <GameArt file={skill.icon} size={22} />
+                    <span>{skill.name}</span><span class="wiki-arrow" aria-hidden="true">↗</span>
+                  </a>
+                </th>
+                {#each players as player, index (player.member.name)}
+                  {@const { level, top, behind } = standings[index]}
+                  {@const mine = xp.players[index]}
+                  <td class="player-cell">
+                    {#if level !== undefined}
+                      <button
+                        class="cell"
+                        class:top
+                        style:--player={playerColour(index)}
+                        title={mine
+                          ? `${player.member.name}: ${fullFormat.format(mine.xp)} XP`
+                          : undefined}
+                        aria-label={`${player.member.name}: ${skill.name} ${level}${mine ? `, ${fullFormat.format(mine.xp)} XP` : ""}. ${top ? highestLabel + ". " : behind ? behind + " behind the leader. " : ""}Open training as this player`}
+                        onclick={() => openTraining(player, skill.name)}
+                      >
+                        <span class="cell-line" aria-hidden="true"
+                          ><strong>{level}</strong><span class="xp">{mine ? compact(mine.xp) : ""}</span
+                          ><em class="behind">{behind ? `−${behind}` : ""}</em></span
+                        >
+                        <span class="xp-bar" aria-hidden="true"
+                          >{#if mine}<span style:width="{mine.share}%"></span>{/if}</span
+                        >
+                      </button>
+                    {:else}
+                      <span class="cell unk" title="Not recorded"
+                        ><span class="cell-line"><strong>?</strong></span
+                        ><span class="sr-only">{player.member.name}: not recorded</span></span
+                      >
+                    {/if}
+                  </td>
+                {/each}
+                <td class="gap-cell" title={xp.gap ? fullFormat.format(xp.gap) + " XP between highest and lowest" : undefined}
+                  >{xp.gap ? compact(xp.gap) : "—"}<span class="gap-word">&nbsp;gap</span></td
+                >
+                <td class="gap-cell level-gap">{behinds.length ? Math.max(...behinds) : "—"}</td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      </div>
+    {/if}
+    {#if view === "cards"}<div class="skill-comparisons">
       {#each skills as skill (skill.name)}
         {@const standings = skillStandings(players, skill.name)}
         {@const xp = xpView(skill.name)}
@@ -217,10 +314,7 @@
                     ? `${player.member.name}: ${fullFormat.format(mine.xp)} XP`
                     : undefined}
                   aria-label={`${player.member.name}: ${skill.name} ${level}${mine ? `, ${fullFormat.format(mine.xp)} XP` : ""}. ${top ? highestLabel + ". " : behind ? behind + " behind the leader. " : ""}Open training as this player`}
-                  onclick={() => {
-                    controller.selectProfile(player.profile!.id);
-                    void goto(skillPath(skill.name));
-                  }}
+                  onclick={() => openTraining(player, skill.name)}
                 >
                   <!-- Every box keeps all four lines, blank when empty, so cards line up. -->
                   <strong>{level}</strong><span class="xp" aria-hidden="true"
@@ -253,7 +347,7 @@
           </div>
         </section>
       {/each}
-    </div>
+    </div>{/if}
     <details class="comparison-help">
       <summary>About these levels</summary>
       <p>
@@ -341,6 +435,44 @@
     font-size: var(--font-ui);
     cursor: pointer;
     white-space: nowrap;
+  }
+  .field-label {
+    color: var(--muted);
+    font-size: var(--font-caption);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .view button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 36px;
+    padding: 0 12px;
+    color: var(--muted);
+    background: var(--panel-raised);
+    border: 1px solid #4b5e6a;
+    font: inherit;
+    font-size: var(--font-ui);
+    cursor: pointer;
+  }
+  .view button:first-child {
+    border-radius: 4px 0 0 4px;
+  }
+  .view button:last-child {
+    border-left: 0;
+    border-radius: 0 4px 4px 0;
+  }
+  .view button:hover {
+    color: var(--text);
+  }
+  .view button[aria-pressed="true"] {
+    color: var(--gold-bright);
+    background: #2a2418;
+    border-color: var(--gold);
+  }
+  .view button[aria-pressed="true"] + button {
+    border-left: 1px solid var(--gold);
   }
   .count {
     margin: 0 0 0 auto;
@@ -496,6 +628,164 @@
   .lv.unk {
     color: var(--muted);
     border-style: dashed;
+  }
+  .table-wrap {
+    container-type: inline-size;
+  }
+  .skill-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+  .skill-table thead th {
+    padding: 0 4px 6px;
+    color: var(--muted);
+    font-size: var(--font-caption);
+    font-weight: 600;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .skill-table thead .skill-col {
+    width: 180px;
+  }
+  .skill-table thead .gap-col {
+    width: 84px;
+    text-align: right;
+  }
+  .skill-table thead .player-col {
+    color: var(--text);
+    border-top: 3px solid var(--player);
+    padding-top: 6px;
+  }
+  .short-name,
+  .gap-word {
+    display: none;
+  }
+  .skill-table tbody tr {
+    border-top: 1px solid var(--line);
+  }
+  .skill-table tbody tr:hover {
+    background: rgb(255 255 255 / 0.025);
+  }
+  .skill-table tbody th,
+  .skill-table td {
+    padding: 4px;
+    font-weight: 400;
+    text-align: left;
+    vertical-align: middle;
+  }
+  .skill-table .skill-title > span:first-of-type {
+    white-space: nowrap;
+  }
+  .cell {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 40px;
+    padding: 0 8px 3px;
+    color: var(--text);
+    background: #0b1318;
+    border: 1px solid #33434d;
+    border-radius: 3px;
+    font: inherit;
+    text-align: left;
+  }
+  button.cell {
+    cursor: pointer;
+  }
+  button.cell:hover {
+    border-color: #8fa3b1;
+  }
+  .cell.top {
+    color: #f0e2c2;
+    border-color: var(--gold);
+    background: #2a2418;
+  }
+  .cell.unk {
+    color: var(--muted);
+    border-style: dashed;
+  }
+  .cell-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 8px;
+    width: 100%;
+    min-width: 0;
+  }
+  .cell strong {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .cell .xp {
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .cell .behind {
+    margin-left: auto;
+    font-size: 0.75rem;
+    font-style: normal;
+    font-weight: 600;
+    color: #e0a36b;
+    font-variant-numeric: tabular-nums;
+  }
+  .gap-cell {
+    color: var(--muted);
+    font-size: var(--font-caption);
+    font-variant-numeric: tabular-nums;
+    text-align: right !important;
+  }
+  /* Narrow panels: the skill name spans a line above one box per player, the
+     XP gap rides at the end of that line, and players go by their short label. */
+  @container (max-width: 560px) {
+    .skill-table,
+    .skill-table tbody {
+      display: block;
+    }
+    .skill-table thead tr,
+    .skill-table tbody tr {
+      display: grid;
+      grid-template-columns: repeat(var(--players), minmax(0, 1fr));
+      gap: 4px;
+    }
+    .skill-table tbody tr {
+      padding: 6px 0;
+    }
+    .skill-table thead .skill-col,
+    .skill-table thead .gap-col,
+    .level-gap,
+    .long-name {
+      display: none;
+    }
+    .short-name,
+    .gap-word {
+      display: inline;
+    }
+    .skill-table thead .player-col {
+      width: auto;
+      letter-spacing: 0.5px;
+    }
+    .skill-table tbody th,
+    .skill-table td {
+      padding: 0;
+    }
+    .skill-table tbody .skill-col,
+    .skill-table .gap-cell {
+      grid-row: 1;
+      grid-column: 1 / -1;
+      align-self: center;
+    }
+    .skill-table .gap-cell {
+      justify-self: end;
+    }
+    .cell {
+      padding: 0 6px 3px;
+    }
   }
   .comparison-help {
     margin-top: 16px;

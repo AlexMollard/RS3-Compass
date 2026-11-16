@@ -2,11 +2,10 @@
   import { onMount, untrack } from "svelte";
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
-  import { SKILLS, accountBadge, type Profile } from "../../data";
+  import { accountBadge, type Profile } from "../../data";
   import { getCompass } from "../compassContext";
   import { fetchPlayer } from "../playerClient";
   import {
-    leadCounts,
     questDifference,
     togglePick,
     type ComparedPlayer,
@@ -23,8 +22,7 @@
   import PageHeading from "../components/PageHeading.svelte";
   import GameArt from "../components/GameArt.svelte";
   import GameWindow from "../components/GameWindow.svelte";
-  import GameStat from "../components/GameStat.svelte";
-  import PlayerPortrait from "../components/PlayerPortrait.svelte";
+  import HeadToHead from "../components/HeadToHead.svelte";
   import SourceBanner from "../components/SourceBanner.svelte";
   import StatusChip from "../components/StatusChip.svelte";
   import SkillComparison from "../components/SkillComparison.svelte";
@@ -59,12 +57,6 @@
   let compared = $derived([a, b, c].filter((p): p is Profile => !!p));
   let players = $derived<ComparedPlayer[]>(
     compared.map((profile) => ({ member: { name: profile.name }, profile })),
-  );
-  let leads = $derived(
-    leadCounts(
-      compared,
-      SKILLS.map((s) => s.name),
-    ),
   );
   let quests = $derived(questDifference(compared));
   let questColumns = $derived(
@@ -141,8 +133,6 @@
     if (mounted) untrack(() => refresh());
     return () => controller.cancelRefreshScope("compare-view");
   });
-  const number = (value: number | undefined) =>
-    value === undefined ? "?" : value.toLocaleString();
   /** Each saved public player once, with their compare slot when picked. */
   let roster = $derived(
     candidates.map((p) => ({
@@ -231,90 +221,37 @@
   <!-- With a pair on screen, the lookup moves below the results. -->
   {#if !(a && b)}{@render lookupWindow()}{/if}
   {#if a && b}
-    <section
-      class="versus"
-      class:trio={compared.length > 2}
-      aria-label={compared.map((p) => p.name).join(" compared with ")}
-    >
-      {#each compared as profile, index (profile.id)}
-        {@const state = $sync[profile.id]}
-        {@const lead = leads[index]}
-        {#if index === 1 && compared.length === 2}<span
-            class="vs"
-            aria-hidden="true">VS</span
-          >{/if}
-        <article
-          class="player-card game-surface"
-          style:--player={playerColour(index)}
-        >
-          <div class="player-heading">
-            <PlayerPortrait name={profile.name} size={72} />
-            <div>
-              <a
-                class="player-name"
-                href={"/activity?player=" + encodeURIComponent(profile.id)}
-                >{profile.name}</a
-              >
-              <p class="caption">{profile.kind}</p>
-              <div class="player-chip">
-                {#if isSyncBusy(state)}<StatusChip
-                    tone="info"
-                    label="Loading public data…"
-                  />
-                {:else if state?.state === "error"}<StatusChip
-                    tone="warn"
-                    label="Refresh failed"
-                  />
-                {:else if isSnapshotStale(profile, state)}<StatusChip
-                    tone="warn"
-                    label="Showing last saved data"
-                  />
-                {:else if !profile.hiscoresLevels}<StatusChip
-                    tone="neutral"
-                    label="No published levels"
-                  />
-                {:else}<StatusChip
-                    tone="ok"
-                    label={"Checked " +
-                      relativeTime(
-                        snapshotFetchedAt(profile) ?? 0,
-                      )}
-                  />{/if}
-              </div>
-            </div>
-          </div>
-          <div class="player-stats">
-            <GameStat
-              label="Total level"
-              value={number(profile.statistics?.overall.level)}
-            />
-            <GameStat
-              label="Total XP"
-              value={number(profile.statistics?.overall.xp)}
-            />
-            <GameStat
-              label="Quest points"
-              value={number(profile.questProgress?.questPoints)}
-            />
-            <GameStat
-              label="Skills leading"
-              value={lead &&
-              compared.some((p) => p !== profile && p.hiscoresLevels)
-                ? lead.led
-                : "?"}
-              detail={lead?.shared ? ` · ${lead.shared} tied` : undefined}
-            />
-          </div>
-        </article>
-      {/each}
-    </section>
+    {#snippet freshness(profile: Profile)}
+      {@const state = $sync[profile.id]}
+      {#if isSyncBusy(state)}<StatusChip
+          tone="info"
+          label="Loading public data…"
+        />
+      {:else if state?.state === "error"}<StatusChip
+          tone="warn"
+          label="Refresh failed"
+        />
+      {:else if isSnapshotStale(profile, state)}<StatusChip
+          tone="warn"
+          label="Showing last saved data"
+        />
+      {:else if !profile.hiscoresLevels}<StatusChip
+          tone="neutral"
+          label="No published levels"
+        />
+      {:else}<StatusChip
+          tone="ok"
+          label={"Checked " + relativeTime(snapshotFetchedAt(profile) ?? 0)}
+        />{/if}
+    {/snippet}
+    <HeadToHead profiles={compared} status={freshness} />
     <SkillComparison
       {players}
       id="compare"
       highestLabel={compared.length > 2
         ? "Highest published level"
         : "Higher published level"}
-      sourceNote="Each player's last check is shown on their card."
+      sourceNote="Each player's last check is shown under their name in Head to head."
     />
     <GameWindow title="Quest differences" icon="Quest.png">
       {#if quests}
@@ -479,59 +416,6 @@
   .form-notice :global(.source-banner) {
     margin-top: 0;
   }
-  .versus {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    align-items: center;
-    gap: 16px;
-  }
-  .versus.trio {
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
-    align-items: stretch;
-  }
-  .vs {
-    font-family: "Cinzel", serif;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--gold-bright);
-  }
-  .player-card {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    padding: 16px;
-    min-width: 0;
-    height: 100%;
-    border-top: 3px solid var(--player);
-  }
-  .player-heading {
-    display: flex;
-    gap: 14px;
-    align-items: center;
-  }
-  .player-heading > div {
-    min-width: 0;
-  }
-  .player-name {
-    font-family: "Cinzel", serif;
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--heading);
-    overflow-wrap: anywhere;
-    text-underline-offset: 4px;
-  }
-  .player-chip {
-    margin-top: 6px;
-  }
-  /* Two columns when a ten-digit Total XP fits in half the card, else one; never a lone gap. */
-  .player-stats {
-    display: grid;
-    grid-template-columns: repeat(
-      auto-fit,
-      minmax(max(min(100%, 170px), calc((100% - 8px) / 2)), 1fr)
-    );
-    gap: 8px;
-  }
   .caption {
     color: var(--muted);
     font-size: var(--font-caption);
@@ -578,12 +462,6 @@
     .lookup-form {
       grid-template-columns: 1fr;
       padding: 16px;
-    }
-    .versus {
-      grid-template-columns: minmax(0, 1fr);
-    }
-    .vs {
-      justify-self: center;
     }
   }
 </style>

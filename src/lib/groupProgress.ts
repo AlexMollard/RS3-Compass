@@ -13,26 +13,55 @@ export interface GroupPlayer extends ComparedPlayer {
 }
 
 /**
- * Per player, skills they lead alone and skills they share the lead in. Only
- * skills every player with published levels publishes count; a player without
- * published levels gets undefined, never 0.
+ * Per player, the skills they lead alone; plus the skills with a shared top,
+ * all in `skills` order. Only skills every player with published levels
+ * publishes count; a player without published levels gets undefined, never [].
  */
-export function leadCounts(
+export function leadSplit(
   profiles: readonly Profile[],
   skills: readonly string[],
-): ({ led: number; shared: number } | undefined)[] {
+): { sole: (string[] | undefined)[]; tied: string[] } {
   const ranked = profiles.filter((p) => p.hiscoresLevels);
-  const counts = new Map(ranked.map((p) => [p, { led: 0, shared: 0 }]));
+  const sole = new Map(ranked.map((p) => [p, [] as string[]]));
+  const tied: string[] = [];
   if (ranked.length >= 2)
     for (const skill of skills) {
       const levels = ranked.map((p) => p.hiscoresLevels![skill]);
       if (levels.some((level) => level === undefined)) continue;
       const highest = Math.max(...(levels as number[]));
       const leaders = ranked.filter((_, i) => levels[i] === highest);
-      for (const p of leaders)
-        counts.get(p)![leaders.length === 1 ? "led" : "shared"]++;
+      if (leaders.length > 1) tied.push(skill);
+      else sole.get(leaders[0])!.push(skill);
     }
-  return profiles.map((p) => counts.get(p));
+  return { sole: profiles.map((p) => sole.get(p)), tied };
+}
+
+export interface StatStanding {
+  best: boolean;
+  /** The best value is shared with another player. */
+  tied: boolean;
+  /** Distance from the best value; undefined when unknown or unbeaten by anyone. */
+  behind: number | undefined;
+}
+
+/**
+ * Each value's place against the best one. Unknown values stay unknown, and
+ * with fewer than two known values nobody leads.
+ */
+export function statStandings(
+  values: readonly (number | undefined)[],
+  lowerIsBetter = false,
+): StatStanding[] {
+  const known = values.filter((v): v is number => v !== undefined);
+  if (known.length < 2)
+    return values.map(() => ({ best: false, tied: false, behind: undefined }));
+  const best = lowerIsBetter ? Math.min(...known) : Math.max(...known);
+  const tied = known.filter((v) => v === best).length > 1;
+  return values.map((v) =>
+    v === undefined
+      ? { best: false, tied: false, behind: undefined }
+      : { best: v === best, tied: v === best && tied, behind: Math.abs(v - best) },
+  );
 }
 
 /**

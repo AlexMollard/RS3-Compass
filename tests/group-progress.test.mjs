@@ -232,6 +232,52 @@ test("skill sorts keep game order, put the widest gaps first, or put a player's 
   ]);
 });
 
+test("stat standings mark the best value, share ties, measure the gap and keep unknowns unknown", async () => {
+  const { statStandings } = await import("../src/lib/groupProgress.ts");
+  assert.deepEqual(statStandings([3160, 3082, 3060]), [
+    { best: true, tied: false, behind: 0 },
+    { best: false, tied: false, behind: 78 },
+    { best: false, tied: false, behind: 100 },
+  ]);
+  assert.deepEqual(statStandings([476, 476, 448]), [
+    { best: true, tied: true, behind: 0 },
+    { best: true, tied: true, behind: 0 },
+    { best: false, tied: false, behind: 28 },
+  ]);
+  // Rank: lower is better, and the gap is still a positive distance.
+  assert.deepEqual(
+    statStandings([44917, 71392], true).map((s) => [s.best, s.behind]),
+    [
+      [true, 0],
+      [false, 26475],
+    ],
+  );
+  // One known value has nothing to beat.
+  assert.deepEqual(statStandings([undefined, 10]), [
+    { best: false, tied: false, behind: undefined },
+    { best: false, tied: false, behind: undefined },
+  ]);
+});
+
+test("lead split names the skills each player leads alone and those with a shared top", async () => {
+  const { leadSplit } = await import("../src/lib/groupProgress.ts");
+  const a = player("A", { Mining: 50, Smithing: 40, Cooking: 10 });
+  const b = player("B", { Mining: 60, Smithing: 40, Cooking: 1 });
+  const c = player("C", { Mining: 60, Smithing: 12, Cooking: 10 });
+  assert.deepEqual(leadSplit([a, b, c], ["Mining", "Smithing", "Cooking", "Fishing"]), {
+    sole: [[], [], []],
+    tied: ["Mining", "Smithing", "Cooking"],
+  });
+  assert.deepEqual(leadSplit([a, b], ["Mining", "Smithing", "Cooking"]), {
+    sole: [["Cooking"], ["Mining"]],
+    tied: ["Smithing"],
+  });
+  assert.deepEqual(leadSplit([a, player("D", {}, "sample")], ["Mining"]), {
+    sole: [[], undefined],
+    tied: [],
+  });
+});
+
 test("roster picks add up to three, replace the third when full and never drop below two", async () => {
   const { togglePick } = await import("../src/lib/groupProgress.ts");
   assert.deepEqual(togglePick(["a", "b"], "c"), ["a", "b", "c"]);
@@ -303,26 +349,16 @@ test("three-way standings share the gold on ties, measure each gap from the lead
   );
 });
 
-test("lead counts split sole and shared leads over skills every ranked player publishes", async () => {
-  const { leadCounts } = await import("../src/lib/groupProgress.ts");
+test("lead split only counts skills every ranked player publishes", async () => {
+  const { leadSplit } = await import("../src/lib/groupProgress.ts");
+  // Fishing is A's alone and Crafting nobody's, so neither counts.
   const a = player("A", { Mining: 50, Smithing: 40, Cooking: 10, Fishing: 5 });
   const b = player("B", { Mining: 60, Smithing: 40, Cooking: 1 });
   const skills = ["Mining", "Smithing", "Cooking", "Fishing", "Crafting"];
-  assert.deepEqual(leadCounts([a, b], skills), [
-    { led: 1, shared: 1 },
-    { led: 1, shared: 1 },
-  ]);
-  const c = player("C", { Mining: 60, Smithing: 12, Cooking: 10 });
-  assert.deepEqual(leadCounts([a, b, c], skills), [
-    { led: 0, shared: 2 },
-    { led: 0, shared: 2 },
-    { led: 0, shared: 2 },
-  ]);
-  const hidden = player("D", {}, "sample");
-  assert.deepEqual(leadCounts([a, hidden], skills), [
-    { led: 0, shared: 0 },
-    undefined,
-  ]);
+  assert.deepEqual(leadSplit([a, b], skills), {
+    sole: [["Cooking"], ["Mining"]],
+    tied: ["Smithing"],
+  });
 });
 
 test("short labels drop a shared prefix only when four letters would clash", async () => {
