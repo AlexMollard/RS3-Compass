@@ -67,6 +67,9 @@ fail("Invalid assignment rows: fix the parser", invalid);
 
 // 3. A picture per task: the lead image of the monster that represents its Slayer category in the Wiki's
 // infobox_monster Bucket (the data Module:Slayer Tasks by Master reads), skipping monsters the Wiki marks removed.
+// Pinned where the automatic choice lands on a minigame copy or an odd variant. Each page is in the category's own
+// infobox_monster rows and has a Wiki lead image (checked 2026-11-16); the importer fails if one stops qualifying.
+const PINNED_MONSTERS = { Demons: "Lesser demon", Kalphite: "Kalphite Worker", Dinosaurs: "Feral Dinosaur" };
 const categories = [...new Set(tasks.map((t) => t.name))];
 const monsterRows = (
   await bucketRows("infobox_monster", ["page_name", "combat_level", "location_restriction"], "slayer_category", categories)
@@ -74,9 +77,16 @@ const monsterRows = (
 const monsterFor = new Map();
 for (const category of categories) {
   const rows = monsterRows.filter((r) => [r.slayer_category].flat().some((c) => nameKey(c) === nameKey(category)));
-  const monster = representativeMonster(category, rows);
+  const pinned = PINNED_MONSTERS[category];
+  const monster = pinned && rows.some((r) => r.page_name === pinned) ? pinned : representativeMonster(category, rows);
   if (monster) monsterFor.set(category, monster);
 }
+fail(
+  "Pinned monsters no longer in their category: update PINNED_MONSTERS",
+  Object.entries(PINNED_MONSTERS)
+    .filter(([category, page]) => categories.includes(category) && monsterFor.get(category) !== page)
+    .map(([category, page]) => `${category}: ${page}`),
+);
 const leadImage = new Map();
 for (const batch of chunks([...new Set(monsterFor.values())])) {
   const json = await api({ action: "query", prop: "pageimages", piprop: "name", redirects: "1", titles: batch.join("|") });
@@ -91,6 +101,7 @@ for (const t of tasks) {
   if (image) t.image = image;
 }
 const unpictured = categories.filter((c) => !taskImages.has(leadImage.get(monsterFor.get(c))));
+fail("Pinned monsters with no Wiki lead image: update PINNED_MONSTERS", unpictured.filter((c) => c in PINNED_MONSTERS));
 
 // 4. Chathead art, resolved through Wiki file redirects.
 const images = await servedFiles(masters.map((m) => m.image).filter(Boolean));
