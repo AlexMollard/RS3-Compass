@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { combatLevel, COMBAT_LEVEL_SKILLS } from "../src/lib/combatLevel.ts";
-import { skillByName, trainingMethod } from "../src/data.ts";
 import { efficientSlayerRoute, masterFor } from "../src/slayerMasters.ts";
 
 const levels = (over = {}) => ({
@@ -173,21 +172,6 @@ test("below Vannaka, or with no master, there is no efficient route", () => {
   const unrecorded = profile(C110);
   delete unrecorded.levels.Slayer;
   assert.equal(efficientSlayerRoute("Attack", unrecorded), undefined);
-});
-
-test("the Slayer level methods open on the guide's master unless a pick is saved", () => {
-  // SkillPage passes masterFor's master as the fallback, so the two windows on the Slayer page agree (Ruling 13).
-  const C116 = { Attack: 90, Strength: 95, Defence: 90, Constitution: 90, Prayer: 80, Summoning: 8 };
-  assert.equal(combatLevel(levels(C116)), 116);
-  const slayer = skillByName("Slayer");
-  const p = profile({ ...C116, Slayer: 80 });
-  const fallback = masterFor(p).master?.id;
-  assert.equal(fallback, "kuradal");
-  // The 75-90 range lists Vannaka first, so without the fallback the strip would open on Vannaka.
-  assert.equal(trainingMethod(slayer, p).id, "vannaka");
-  assert.equal(trainingMethod(slayer, p, undefined, undefined, fallback).id, "kuradal");
-  const saved = { ...p, trainingMethods: { Slayer: "vannaka" } };
-  assert.equal(trainingMethod(slayer, saved, undefined, undefined, fallback).id, "vannaka");
 });
 
 test("Vannaka is the first master that counts", () => {

@@ -13,7 +13,6 @@
     trainingSupplies,
     trainingRangeLabel,
   } from "../../data";
-  import { masterFor } from "../../slayerMasters";
   import { wikiHref } from "../../wiki";
   import { activeProfile, getCompass } from "../compassContext";
   import { parseLevel } from "../levelChanges";
@@ -63,13 +62,7 @@
   let stage = $derived(
     needsMembership ? undefined : trainingStage(skill, profile),
   );
-  // With no saved Slayer pick, the level methods open on the player's own master, matching the Slayer guide.
-  let fallbackMethod = $derived(
-    isSlayer ? masterFor(profile).master?.id : undefined,
-  );
-  let method = $derived(
-    trainingMethod(skill, profile, stage, undefined, fallbackMethod),
-  );
+  let method = $derived(trainingMethod(skill, profile, stage));
   let supplies = $derived(
     stage && method ? trainingSupplies(stage, method) : [],
   );
@@ -115,20 +108,14 @@
   function selectTraining(from: number, selectedId?: string) {
     const range = stages.find((entry) => entry.from === from);
     if (!range || needsMembership) return;
-    const selected = trainingMethod(
-      skill,
-      profile,
-      range,
-      selectedId,
-      fallbackMethod,
-    );
+    const selected = trainingMethod(skill, profile, range, selectedId);
     if (!selected) return;
     controller.updateProfile((p) => {
       const previousRange =
         p.trainingRanges?.[skill.name] ?? trainingStage(skill, p)?.from;
       const previousMethod =
         p.trainingMethods?.[skill.name] ??
-        trainingMethod(skill, p, range, undefined, fallbackMethod)?.id;
+        trainingMethod(skill, p, range)?.id;
       const changed =
         previousRange !== range.from || previousMethod !== selected.id;
       return {
@@ -188,7 +175,7 @@
   <div class="skill-range">
     <ChoiceStrip
       variant="joined"
-      label={isSlayer ? "Training range (generic level methods)" : "Training range"}
+      label="Training range"
       name={`training-range-${skill.name}`}
       value={String(range.from)}
       choices={stages.map((entry) => ({
@@ -324,14 +311,11 @@
             Couldn't load the Slayer guide — reload the page.
           </p>
         {/await}
-        {#if stage && method}
-          <section class="tool-window skill-hero" aria-label="Level-range methods">
-            {@render rangeStrip(stage)}
-          </section>
-        {/if}
       {/if}
 
-      {#if stage && method}
+      {#if isSlayer && !needsMembership}
+        <!-- The Slayer guide replaces the level-range methods, which can't follow the player's own master (Ruling 3). -->
+      {:else if stage && method}
         <TrainingMethods
           {skill}
           {stage}
@@ -365,7 +349,7 @@
     </div>
 
     <aside class="skill-aside" aria-label="Training preparation">
-      {#if stage && method}
+      {#if stage && method && !isSlayer}
         <GameWindow
           title="Before you go"
           trailing={supplies.length
