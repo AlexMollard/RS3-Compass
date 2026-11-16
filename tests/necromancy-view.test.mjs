@@ -240,6 +240,14 @@ test("unknown quest status doesn't cap the assumed tier; only a quest known not 
   const war = storyProgress(p).find((s) => s.quest.quest === "the-spirit-of-war");
   assert.equal(status(war.reqs, "Necromancy 65"), "met");
   assert.equal(status(war.reqs, "3,000 souls"), "unknown");
+  // Unknown quests aren't sent back as "Complete Necromancy!": at assumed T90 the target is the endgame boss.
+  const progress = killNext(p).progress;
+  assert.notEqual(progress.text, "Complete Necromancy!");
+  assert.equal(progress.text, "Kill Rasial, the First Necromancer");
+  // Rituals behind a quest of unknown status are runnable.
+  const names = new Set(ritualsFor(p).now.map((r) => r.name));
+  for (const name of ["Lesser ensoul material", "Ensoul material", "Greater ensoul material", "Lesser essence", "Powerful essence"])
+    assert.ok(names.has(name), name);
   // A manual profile that knows The Spirit of War isn't done still stops at 60.
   assert.equal(gearPath(profile({ Necromancy: 99, Defence: 99 }, { completedQuests: STORY_TO_70 }), "weapon").current, 60);
 });

@@ -36,6 +36,12 @@ const questName = (id: string) => questsById.get(id)?.name ?? id;
 /** Free-to-play can't do members quests, so they never count as done there. */
 const done = (profile: Profile, id: string) =>
   questStatus(profile, id) === "met" && !(isFree(profile) && questsById.get(id)?.members);
+/**
+ * Known not done: "below", or a members quest in free-to-play. An unknown status (a private quest import) is not, so it
+ * never caps a tier, blocks a ritual or becomes a progress target; its chips show it as unknown.
+ */
+const knownUndone = (profile: Profile, id: string) =>
+  questStatus(profile, id) === "below" || Boolean(isFree(profile) && questsById.get(id)?.members);
 const count = (n: number) => n.toLocaleString("en-GB");
 
 const check = (label: string): Req => ({ label, status: "check" });
@@ -74,7 +80,7 @@ function prerequisites(id: string, seen = new Set<string>()): Set<string> {
 }
 
 /**
- * The first quest to do towards `quests`: within the storyline, the first one not done, in storyline order, of each
+ * The first quest to do towards `quests`: within the storyline, the first one known not done, in storyline order, of each
  * quest and the storyline quests it needs (Vessel of the Harbinger before The Spirit of War). Optional storyline
  * quests are never prerequisites, so they never come up.
  */
@@ -84,7 +90,7 @@ function firstOpenQuest(profile: Profile, quests: string[]): string | undefined 
     const chain = NECRO_STORY.some((s) => s.quest === id)
       ? NECRO_STORY.filter((s) => needed.has(s.quest)).map((s) => s.quest)
       : [id];
-    const open = chain.find((q) => !done(profile, q));
+    const open = chain.find((q) => knownUndone(profile, q));
     if (open) return open;
   }
   return undefined;
@@ -152,7 +158,7 @@ const wearMet = (profile: Profile, step: UpgradeStep) =>
 function assumedTier(profile: Profile, steps: UpgradeStep[]): number {
   let tier = steps[0].tier;
   for (const step of steps) {
-    if (!wearMet(profile, step) || step.quests.some((q) => questStatus(profile, q) === "below")) break;
+    if (!wearMet(profile, step) || step.quests.some((q) => knownUndone(profile, q))) break;
     tier = step.tier;
   }
   return tier;
@@ -306,7 +312,7 @@ export function ritualsFor(profile: Profile): Rituals {
     const quest = gate(r);
     return !r.members && r.level <= FREE_CAP && !(quest && questsById.get(quest)?.members);
   });
-  const runnable = (r: Ritual) => r.level <= level && (gate(r) === undefined || done(profile, gate(r)!));
+  const runnable = (r: Ritual) => r.level <= level && (gate(r) === undefined || !knownUndone(profile, gate(r)!));
   const now = shown.filter(runnable);
   const next = shown.filter((r) => !runnable(r)).sort((a, b) => a.level - b.level)[0];
   const inks = [...NECRO_GLYPHS]
