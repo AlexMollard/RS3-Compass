@@ -258,7 +258,7 @@
             <h4>Task facts</h4>
             <ul class="facts">
               <li>Amount {task.amount[0]}–{task.amount[1]}</li>
-              <li>Weighting {task.weight}</li>
+              <li>Weighting {task.weight ?? "unknown"}</li>
               {#if task.members}<li>Members only</li>{/if}
             </ul>
 

@@ -19,7 +19,8 @@ export type SlayerMaster = {
 /**
  * One master's Slayer assignment, from the Wiki's Module:Slayer assignments/<Master>. `requirements.quests`
  * holds quest IDs from QUESTS; anything else stays in `requirements.text`. `combat` is the combat level the
- * master needs before assigning the task, absent when there is none.
+ * master needs before assigning the task, absent when there is none. `weight` is absent where the Wiki gives none
+ * (its table shows "?"): the task can still be assigned, but how often is unknown.
  */
 export type SlayerTask = {
   id: string;
@@ -30,6 +31,6 @@ export type SlayerTask = {
   slayer: number;
   combat?: number;
   requirements: { levels: { skill: SkillName; level: number }[]; quests: string[]; text: string[] };
-  weight: number;
+  weight?: number;
   members: boolean;
 };

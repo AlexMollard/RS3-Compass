@@ -475,6 +475,259 @@ const DRAFTS: Record<string, Draft> = {
     sources: [page("Wall beast")],
   },
 
+  // --- Mazchna ---
+  Ankou: {
+    verdict: "do",
+    reason: "The Wiki's Ironman guide rates it Do: herbs, and a good source of mystic cloth for ensouled cloth.",
+    feeds: ["Herblore", "Crafting", "Prayer"],
+    fastest: {
+      where: "Stronghold of Security fourth level",
+      site: site("Stronghold fourth-level ankou", "Ankou", 107, 45, 0, 24),
+      style: "magic",
+      aoe: false,
+      notes: "Weak to earth; a salve amulet adds damage. Not aggressive.",
+    },
+    sources: [IRONMAN, page("Ankou")],
+  },
+  Cockatrice: {
+    verdict: "do",
+    reason: `${NOT_RATED}; frequent limpwurt roots for Herblore, but needs petrification protection.`,
+    feeds: ["Herblore", "Farming"],
+    fastest: {
+      where: "Fremennik Slayer Dungeon",
+      site: site("Fremennik Slayer Dungeon cockatrice", "Cockatrice", 2785, 10035, 0, 5),
+      style: "melee",
+      aoe: false,
+      notes: "Wear a mirror shield, Mask of Stone or Mask of Reflection, or its stat-draining attack hits you. Weak to crush.",
+    },
+    sources: [page("Cockatrice")],
+  },
+  Cyclopes: {
+    verdict: "do",
+    reason: `${NOT_RATED}; big bones, and the Warriors' Guild cyclopes drop the defenders up to the dragon defender.`,
+    feeds: ["Prayer"],
+    fastest: {
+      where: "Top floor of the Warriors' Guild",
+      site: site(
+        "Warriors' Guild cyclopes",
+        "Cyclops",
+        2842,
+        3546,
+        2,
+        28,
+        "Warriors' Guild entry: Attack plus Strength of 130, or 99 in either.",
+      ),
+      style: "melee",
+      aoe: false,
+      notes: "Melee only: they are immune to Ranged, Magic and Necromancy. Entering the room costs Warriors' Guild tokens.",
+    },
+    sources: [page("Cyclops")],
+  },
+  Dogs: {
+    verdict: "do",
+    reason: `${NOT_RATED}; jackals travel in aggressive packs, so several come to you at once.`,
+    feeds: ["Prayer"],
+    fastest: {
+      where: "Jackals in the desert north of Menaphos, or guard dogs in McGrubor's Wood",
+      site: site("Jackals north of Menaphos", "Jackal", 3212, 2863, 0, 28),
+      style: "magic",
+      aoe: true,
+      notes: "Jackals are aggressive and weak to air. Bring water for the desert heat.",
+    },
+    sources: [page("Jackal"), page("Guard dog")],
+  },
+  "Earth warriors": {
+    verdict: "do",
+    reason: `${NOT_RATED}; a decent source of seeds and grimy herbs, and elite earth warriors spawn on task.`,
+    feeds: ["Herblore", "Farming"],
+    fastest: {
+      where: "Chaos Tunnels, or the members' part of Edgeville Dungeon (level 7-10 Wilderness)",
+      site: site(
+        "Chaos Tunnels earth warriors",
+        "Earth_warrior",
+        3139,
+        5529,
+        0,
+        23,
+        "The Chaos Tunnels aren't Wilderness, but their rifts are in the low Wilderness.",
+      ),
+      style: "magic",
+      aoe: false,
+      notes: "Weak to water; aggressive. Reaching either spot means crossing the low Wilderness.",
+    },
+    sources: [page("Earth warrior")],
+  },
+  Ghouls: {
+    verdict: "do",
+    reason: `${NOT_RATED}; ghouls are next to Mazchna in Canifis, and ravenous ghouls in the Slayer Tower Mausoleum also count.`,
+    feeds: ["Prayer"],
+    fastest: {
+      where: "Graveyard north of Canifis; ravenous ghouls (level 105) in the Slayer Tower Mausoleum",
+      site: site("Canifis graveyard ghouls", "Ghoul", 3483, 3533, 0, 28),
+      style: "magic",
+      aoe: true,
+      notes: "Weak to fire. The Wiki calls the graveyard an excellent cannon spot. Not undead, so a salve amulet does nothing.",
+    },
+    sources: [page("Ghoul"), page("Ravenous ghoul")],
+  },
+  "Green dragons": {
+    verdict: "do",
+    reason: `${NOT_RATED}; dragon bones for Prayer and green dragonhide for Crafting.`,
+    feeds: ["Prayer", "Crafting"],
+    fastest: {
+      where: "Chaos Tunnels; every other spawn is in the Wilderness",
+      site: site(
+        "Chaos Tunnels green dragons",
+        "Green_dragon",
+        3303,
+        5452,
+        0,
+        23,
+        "The Chaos Tunnels aren't Wilderness, but their rifts are in the low Wilderness.",
+      ),
+      style: "ranged",
+      aoe: false,
+      notes: "Bring dragonfire protection such as an anti-dragon shield. Weak to bolts.",
+    },
+    sources: [page("Green dragon")],
+  },
+  Killerwatts: {
+    verdict: "do",
+    reason: `${NOT_RATED}; impious ashes for Prayer, but needs the Killerwatt Plane from Ernest the Chicken.`,
+    feeds: ["Prayer"],
+    fastest: {
+      where: "Killerwatt Plane, through the portal in Draynor Manor",
+      site: site("Killerwatt Plane", "Killerwatt", 2642, 5202, 0, 179, "Needs Ernest the Chicken."),
+      style: "melee",
+      aoe: false,
+      notes: "Wear insulated boots, which halve their hits. Weak to crush; no cannon.",
+    },
+    sources: [page("Killerwatt")],
+  },
+  Molanisks: {
+    verdict: "do",
+    reason: `${NOT_RATED}; wergali seeds for Farming, but each one must be lured off the wall.`,
+    feeds: ["Farming"],
+    fastest: {
+      where: "Dorgesh-Kaan South Dungeon",
+      style: "melee",
+      aoe: false,
+      notes: "Bring a Slayer bell to lure them off the wall, and a light source. Weak to crush.",
+    },
+    sources: [page("Molanisk")],
+  },
+  Ogres: {
+    verdict: "do",
+    reason: `${NOT_RATED}; big bones, and the Wiki's Magic guide lists ogres for 50-70.`,
+    feeds: ["Prayer"],
+    fastest: {
+      where: "West of Yanille",
+      site: site("Ogres west of Yanille", "Ogre", 2496, 3092, 0, 28),
+      style: "magic",
+      aoe: false,
+      notes: "Weak to air. A cannon works here.",
+    },
+    sources: [page("Ogre"), page("Pay-to-play Magic training")],
+  },
+  "Otherworldly beings": {
+    verdict: "do",
+    reason: `${NOT_RATED}; runes and battlestaves, but their magic hits up to 900.`,
+    feeds: [],
+    fastest: {
+      where: "South-west of Zanaris",
+      site: site("Zanaris otherworldly beings", "Otherworldly_being", 2381, 4422, 0, 1, "Needs Lost City."),
+      style: "ranged",
+      aoe: false,
+      notes: "Weak to thrown weapons. Pray against magic.",
+    },
+    sources: [page("Otherworldly being")],
+  },
+  Pyrefiends: {
+    verdict: "do",
+    reason: `${NOT_RATED}; impious ashes, guam and harralander, and a high rate of medium clue scrolls.`,
+    feeds: ["Prayer", "Herblore"],
+    fastest: {
+      where: "Smoke Dungeon (cannon allowed), or the Fremennik Slayer Dungeon",
+      site: site("Fremennik Slayer Dungeon pyrefiends", "Pyrefiend", 2757, 10008, 0, 5),
+      style: "ranged",
+      aoe: false,
+      notes: "Weak to bolts and to demon-slayer effects; accurate magic for their level.",
+    },
+    sources: [page("Pyrefiend")],
+  },
+  "Rock slugs": {
+    verdict: "do",
+    reason: `${NOT_RATED}; a short task with grimy guam drops, but each needs salt to finish.`,
+    feeds: ["Herblore"],
+    fastest: {
+      where: "Fremennik Slayer Dungeon, or the Lumbridge Swamp Caves",
+      site: site("Fremennik Slayer Dungeon rock slugs", "Rock_slug", 2793, 10016, 0, 5),
+      style: "magic",
+      aoe: false,
+      notes: "Finish each below 15% life points with a bag of salt or a salt shaker. Weak to water.",
+    },
+    sources: [page("Rock slug")],
+  },
+  "Sea snakes": {
+    verdict: "do",
+    reason: `${NOT_RATED}; seaweed, oyster pearls and fish, behind Royal Trouble.`,
+    feeds: ["Crafting"],
+    fastest: {
+      where: "Miscellania and Etceteria dungeon, nearest the Etceteria entrance",
+      site: site(
+        "Miscellania and Etceteria dungeon sea snakes",
+        "Sea_Snake_Hatchling",
+        2577,
+        10295,
+        0,
+        14,
+        "Needs partial completion of Royal Trouble.",
+      ),
+      style: "melee",
+      aoe: false,
+      notes: "Bring antipoison. Weak to slash; not aggressive.",
+    },
+    sources: [page("Sea Snake Hatchling")],
+  },
+  Shades: {
+    verdict: "do",
+    reason: `${NOT_RATED}; quick kills next to the ankou, with shade robes as the only drop.`,
+    feeds: [],
+    fastest: {
+      where: "Stronghold of Security fourth level, or the Loar shades of Mort'ton",
+      site: site("Stronghold fourth-level shades", "Shade", 150, 28, 0, 24),
+      style: "magic",
+      aoe: false,
+      notes: "Weak to earth; a salve amulet (e) adds damage.",
+    },
+    sources: [page("Shade"), page("Loar Shade")],
+  },
+  Vampyres: {
+    verdict: "do",
+    reason: `${NOT_RATED}; feral vampyres in the Haunted Woods are the closest to the Canifis lodestone.`,
+    feeds: ["Farming"],
+    fastest: {
+      where: "Feral vampyres in the Haunted Woods, east of Canifis",
+      site: site("Haunted Woods feral vampyres", "Feral_vampyre", 3585, 3478, 0, 28),
+      style: "magic",
+      aoe: false,
+      notes: "Weak to fire. A holy symbol can weaken vampyres; silver and blisterwood weapons work well.",
+    },
+    sources: [page("Feral vampyre"), page("Vampyre")],
+  },
+  Werewolves: {
+    verdict: "do",
+    reason: `${NOT_RATED}; Canifis's villagers turn into werewolves when attacked, next to a bank.`,
+    feeds: ["Prayer", "Crafting"],
+    fastest: {
+      where: "Canifis: attack the villagers",
+      style: "magic",
+      aoe: false,
+      notes: "Weak to water. Don't wield Wolfbane, which stops them turning. Ranged or Magic can safe-spot them over tables in the bar.",
+    },
+    sources: [page("Werewolf")],
+  },
+
   // --- Chaeldar to Duradel ---
   "Aberrant spectres": {
     verdict: "do",
@@ -1018,16 +1271,47 @@ const DRAFTS: Record<string, Draft> = {
   },
   "Ravenous strigoi": {
     verdict: "do",
-    reason: `${NOT_RATED}; Laniakea lists it at weight 0, so it rarely comes up.`,
+    reason: `${NOT_RATED}; Kuradal, Morvran and Laniakea assign it at 104 Slayer, but Laniakea weights it 0 and the Wiki gives the other two no weight, so how often it comes up is unknown.`,
     feeds: ["Farming"],
     fastest: {
       where: "West of Shuruk-Ba",
-      site: site("Ravenous strigoi west of Shuruk-Ba", "Ravenous_strigoi", 4680, 3381, 0, 28),
+      site: site(
+        "Ravenous strigoi west of Shuruk-Ba",
+        "Ravenous_strigoi",
+        4680,
+        3381,
+        0,
+        28,
+        "Needs partial completion of Heralds of Crimson.",
+      ),
       style: "ranged",
       aoe: false,
-      notes: "The Wiki recommends havensilver bolts from range; stun to interrupt the life drain.",
+      notes:
+        "Needs partial completion of Heralds of Crimson. The Wiki recommends havensilver bolts from range; stun to interrupt the life drain.",
     },
     sources: [page("Ravenous strigoi")],
+  },
+  "Sanguine werewolves": {
+    verdict: "do",
+    reason: `${NOT_RATED}; level 120 werewolves with high-level herb seeds. The Wiki gives no weight at Kuradal, Morvran or Laniakea, so how often it comes up is unknown.`,
+    feeds: ["Farming"],
+    fastest: {
+      where: "Berylbrook, on Havenhythe",
+      site: site(
+        "Berylbrook sanguine werewolves",
+        "Sanguine_werewolf",
+        4581,
+        3341,
+        0,
+        28,
+        "Needs partial completion of Heralds of Crimson.",
+      ),
+      style: "magic",
+      aoe: false,
+      notes:
+        "Needs partial completion of Heralds of Crimson, and the monster page says 72 Slayer to be assigned them (the assignment table lists no Slayer level). Weak to earth; their melee hits leave an Afflicted Wound.",
+    },
+    sources: [page("Sanguine werewolf")],
   },
   "Risen ghosts": {
     verdict: "do",
@@ -1746,7 +2030,7 @@ const DRAFTS: Record<string, Draft> = {
   "Tormented demons": {
     verdict: "do",
     reason: "The Ironman guide says Do: the only monster source of several dragon items, including limbs.",
-    mainNote: "The Wiki's XP table rates it Block/Skip (about 130k XP/hr); leave it toggled off.",
+    mainNote: "The Wiki's XP table rates it Block / Skip (about 130k XP/hr); leave it toggled off.",
     feeds: [],
     fastest: {
       where: "Ancient Guthix Temple, or your Sunken Pyramid in Legacy Mode (99 Slayer)",
@@ -1858,10 +2142,12 @@ const blocks = (
 
 /**
  * Per members master: the tasks to block first, the ones to cancel when you have points, and the ranked prefers.
- * Neither Vannaka nor Chaeldar assigns a task the Wiki says to block.
+ * Vannaka, Mazchna and Chaeldar assign no task the Wiki says to block, and none of Vannaka's or Mazchna's tasks is
+ * worth a prefer slot.
  */
 export const SLAYER_BLOCKS: Readonly<Record<string, MasterBlocks>> = {
   vannaka: blocks([], ["Grotworms"], []),
+  mazchna: blocks([], ["Grotworms"], []),
   chaeldar: blocks([], ["Gargoyles", "Grotworms", "Dagannoth"], ["Elves", "Vyrewatch"]),
   sumona: blocks(
     ["Aquanites", "Black demons", "Mutated jadinkos"],

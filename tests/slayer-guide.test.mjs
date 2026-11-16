@@ -5,9 +5,21 @@ import { SLAYER_BLOCKS, SLAYER_VERDICTS } from "../src/slayerGuide.ts";
 import { SLAYER_MASTERS, SLAYER_TASKS } from "../src/slayerImported.ts";
 
 // The masters a member trains with, plus the free ones (spec "Coverage"). Every one of their tasks needs a verdict.
-const COVERED = ["turael", "jacquelyn", "vannaka", "chaeldar", "sumona", "duradel", "kuradal", "morvran", "laniakea"];
+// Mazchna is covered because masterFor picks him for members at combat 50-74.
+const COVERED = [
+  "turael",
+  "jacquelyn",
+  "vannaka",
+  "mazchna",
+  "chaeldar",
+  "sumona",
+  "duradel",
+  "kuradal",
+  "morvran",
+  "laniakea",
+];
 // Members masters on that list carry block lists; Turael and Jacquelyn earn too few points for blocking.
-const BLOCKING = ["vannaka", "chaeldar", "sumona", "duradel", "kuradal", "morvran", "laniakea"];
+const BLOCKING = ["vannaka", "mazchna", "chaeldar", "sumona", "duradel", "kuradal", "morvran", "laniakea"];
 const CHECKED = "2026-11-16";
 const WIKI = /^https:\/\/runescape\.wiki\/w\/\S+$/;
 

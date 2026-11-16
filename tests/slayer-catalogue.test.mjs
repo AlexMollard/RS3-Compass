@@ -77,7 +77,7 @@ test("every task has a sane amount, weight, Slayer level and requirements", () =
   const bad = SLAYER_TASKS.filter(
     (t) =>
       !(Number.isInteger(t.amount[0]) && t.amount[0] >= 1 && t.amount[0] <= t.amount[1]) ||
-      !(Number.isInteger(t.weight) && t.weight >= 0) ||
+      !(t.weight === undefined || (Number.isInteger(t.weight) && t.weight >= 0)) ||
       !(t.slayer >= 1 && t.slayer <= 120) ||
       !t.requirements.levels.every((l) => isSkillName(l.skill) && l.level >= 1 && l.level <= 120) ||
       t.requirements.text.some((s) => /\[\[|\]\]|\{\{|<ref/.test(s)),

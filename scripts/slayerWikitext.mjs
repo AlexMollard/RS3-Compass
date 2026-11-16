@@ -152,8 +152,9 @@ export function parseRequirements(other = "", quests = []) {
 }
 
 /**
- * The tasks of one master from its Module:Slayer assignments/<Master> source. A row without a whole-number
- * weight, or with a bad amount, is rejected into `invalid`, never defaulted. A task is members-only when the
+ * The tasks of one master from its Module:Slayer assignments/<Master> source. A row with a bad weight or amount is
+ * rejected into `invalid`, never defaulted. A nil weight (the rendered table shows "?") leaves `weight` absent, so
+ * the task is kept with an unknown weight. A task is members-only when the
  * master is, or when the Wiki marks it with the members icon. No Slayer requirement means level 1. A combat
  * level requirement goes in `combat`, which is absent when there is none.
  * `wikiPages` maps a lower-case task name to its page where Module:Slayer assignments/disambig overrides
@@ -172,7 +173,7 @@ export function parseAssignments(master, source, { quests = [], members, wikiPag
       !whole(row.min, 1) && "no minimum amount",
       !whole(row.max, 1) && "no maximum amount",
       whole(row.min, 1) && whole(row.max, 1) && row.min > row.max && "minimum above maximum",
-      row.weight === undefined ? "no weight" : !whole(row.weight, 0) && `bad weight ${row.weight}`,
+      row.weight !== undefined && !whole(row.weight, 0) && `bad weight ${row.weight}`,
       ...Object.keys(reqs)
         .filter((k) => !["combat", "other"].includes(k) && !canonicalSkillName(k))
         .map((k) => `unknown requirement ${k}`),
@@ -203,7 +204,7 @@ export function parseAssignments(master, source, { quests = [], members, wikiPag
         quests: parsed.quests,
         text: parsed.text,
       },
-      weight: row.weight,
+      ...(row.weight !== undefined ? { weight: row.weight } : {}),
       members: members || parsed.members,
     });
   }
@@ -241,9 +242,13 @@ export function parseMastersTable(wikitext, quests = []) {
       if (!m) throw new Error(`Slayer masters table: ${wiki} has an unreadable ${skill} cell ${JSON.stringify(cell)}`);
       return Number(m[1]);
     };
-    const questNames = /^\{\{NA\}\}$/i.test(questCell)
-      ? []
-      : [...questCell.matchAll(/\[\[([^|\]]+)(?:\|[^\]]*)?\]\]/g)].map((m) => m[1]);
+    const noQuests = /^\{\{NA\}\}$/i.test(questCell);
+    const questNames = noQuests ? [] : [...questCell.matchAll(/\[\[([^|\]]+)(?:\|[^\]]*)?\]\]/g)].map((m) => m[1]);
+    // Only linked quest names, joined by commas or "and", are read. Other text ("partial completion of") would
+    // change what the links mean, so it stops the import rather than being dropped.
+    const leftover = noQuests ? "" : questCell.replace(/\[\[[^\]]*\]\]/g, "").replace(/,|\band\b/g, "").trim();
+    if (leftover)
+      throw new Error(`Slayer masters table: ${wiki} has unlinked quest text ${JSON.stringify(leftover)}`);
     const image = /\{\{chatlp\|([^|}]+)/i.exec(heads ?? "")?.[1];
     const location = /text=([^|}]+)/.exec(locationCell ?? "")?.[1]?.trim();
     masters.push({

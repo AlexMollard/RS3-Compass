@@ -224,10 +224,10 @@ test("partial quest completion is not a quest requirement", () => {
   });
 });
 
-test("a row with a missing weight is rejected, not defaulted; weight 0 is kept", () => {
+test("a row with a nil weight is kept with the weight unknown, not defaulted; weight 0 is kept", () => {
   const result = parseAssignments("laniakea", laniakea, { quests: QUESTS, members: true });
-  assert.equal(result.tasks.find((t) => t.name === "Sanguine werewolves"), undefined);
-  assert.deepEqual(result.invalid, [{ name: "Sanguine werewolves", problems: ["no weight"] }]);
+  assert.equal("weight" in task(result, "Sanguine werewolves"), false);
+  assert.deepEqual(result.invalid, []);
   assert.equal(task(result, "Ravenous strigoi").weight, 0);
   assert.equal(task(result, "Ravenous strigoi").slayer, 104);
 });
@@ -297,4 +297,13 @@ test("the masters table gives Kuradal and Morvran with their requirements", () =
   const raptor = masters.find((m) => m.wiki === "The Raptor");
   assert.equal(raptor.slayer, 10);
   assert.deepEqual(raptor.quests, ["unwelcome-guests"]);
+});
+
+test("a quest cell reads linked names joined by commas or and, and stops on any other text", () => {
+  const joined = mastersTable.replace("| [[Plague's End]]", "| [[Plague's End]], [[Unwelcome Guests]] and [[Barbarian Training]]");
+  const morvran = parseMastersTable(joined, QUESTS).find((m) => m.wiki === "Morvran");
+  assert.deepEqual(morvran.quests, ["plagues-end", "unwelcome-guests"]);
+  assert.deepEqual(morvran.text, ["Barbarian Training"]);
+  const partial = mastersTable.replace("| [[Plague's End]]", "| Partial completion of [[Plague's End]]");
+  assert.throws(() => parseMastersTable(partial, QUESTS), /Morvran has unlinked quest text "Partial completion of"/);
 });

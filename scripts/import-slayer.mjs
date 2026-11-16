@@ -1,8 +1,8 @@
 // Generates src/slayerMastersImported.ts (the masters) and src/slayerImported.ts (each master's assignments) from the
 // RuneScape Wiki. The masters get their own small module because every skill page loads them; the tasks stay in the
 // lazy Slayer chunk. Run locally: node --experimental-strip-types scripts/import-slayer.mjs
-// Prints one review line per master and per task (amount, weight, Slayer level, requirements), the rows left out
-// and the quest names that matched no quest. Exits non-zero, writing nothing, on any unexpected row.
+// Prints one review line per master and per task (amount, weight, Slayer level, requirements), the tasks with an
+// unknown weight and the quest names that matched no quest. Exits non-zero, writing nothing, on any unexpected row.
 import { writeFileSync } from "node:fs";
 import { QUESTS } from "../src/data.ts";
 import { parseAssignments, parseDisambig, parseMastersTable } from "./slayerWikitext.mjs";
@@ -25,16 +25,6 @@ const FREE_MASTERS = new Set(["Turael", "Jacquelyn"]);
 // 2026-11-16). A free master's task above it is members-only even without the Wiki's members icon (Jacquelyn's
 // Cave bugs at 7 and Cave slimes at 17; Turael's Cave bugs at 7 carries the icon).
 const F2P_SLAYER_CAP = 5;
-
-// Rows whose weight is nil in the master's module (the rendered table shows "?"). They are left out rather than
-// given an invented weight. Checked 2026-11-16 on https://runescape.wiki/w/Module:Slayer_assignments/<Master>.
-const NO_WEIGHT = [
-  { master: "Kuradal", task: "Ravenous strigoi" },
-  { master: "Kuradal", task: "Sanguine werewolves" },
-  { master: "Morvran", task: "Ravenous strigoi" },
-  { master: "Morvran", task: "Sanguine werewolves" },
-  { master: "Laniakea", task: "Sanguine werewolves" },
-];
 
 const fail = (title, lines) => {
   if (!lines.length) return;
@@ -59,26 +49,21 @@ const wikiPages = parseDisambig(sources.get(DISAMBIG) ?? "");
 const tasks = [];
 const invalid = [];
 const unmatched = new Set();
-const skipped = new Set(NO_WEIGHT.map((r) => `${r.master}|${r.task}`));
-const seenSkipped = new Set();
 for (const master of masters) {
   const source = sources.get(MODULE + master.wiki);
-  if (!source) continue; // reported above
+  if (!source) {
+    fail("Assignment module missing from the Wiki's reply", [MODULE + master.wiki]);
+    continue;
+  }
   for (const q of master.text) unmatched.add(`${q} (master ${master.wiki})`);
   const members = !FREE_MASTERS.has(master.wiki);
   const result = parseAssignments(master.id, source, { quests: QUESTS, members, wikiPages });
   for (const t of result.tasks) if (t.slayer > F2P_SLAYER_CAP) t.members = true;
   tasks.push(...result.tasks);
   for (const q of result.unmatched) unmatched.add(`${q} (${master.wiki} task)`);
-  for (const row of result.invalid) {
-    const key = `${master.wiki}|${row.name}`;
-    if (skipped.has(key) && row.problems.join() === "no weight") seenSkipped.add(key);
-    else invalid.push(`${master.wiki}: ${row.name}: ${row.problems.join(", ")}`);
-  }
+  for (const row of result.invalid) invalid.push(`${master.wiki}: ${row.name}: ${row.problems.join(", ")}`);
 }
-fail("Invalid assignment rows: fix the parser or add them to NO_WEIGHT with a reason", invalid);
-const stale = [...skipped].filter((k) => !seenSkipped.has(k));
-fail("NO_WEIGHT rows the Wiki now weights or no longer lists: remove them", stale);
+fail("Invalid assignment rows: fix the parser", invalid);
 
 // 3. Chathead art, resolved through Wiki file redirects.
 const images = await servedFiles(masters.map((m) => m.image).filter(Boolean));
@@ -137,6 +122,7 @@ const reqs = (t) =>
     ...t.requirements.text,
   ].join("; ") || "none";
 for (const t of tasks)
-  console.log(`  ${t.master} | ${t.name} | ${t.amount.join("-")} | weight ${t.weight} | Slayer ${t.slayer} | ${t.members ? "members" : "free"} | ${reqs(t)}`);
-console.log(`Imported ${records.length} masters and ${tasks.length} tasks. Left out (no weight): ${[...seenSkipped].join(", ") || "none"}.`);
+  console.log(`  ${t.master} | ${t.name} | ${t.amount.join("-")} | weight ${t.weight ?? "unknown"} | Slayer ${t.slayer} | ${t.members ? "members" : "free"} | ${reqs(t)}`);
+const unweighted = tasks.filter((t) => t.weight === undefined).map((t) => `${t.master}/${t.name}`);
+console.log(`Imported ${records.length} masters and ${tasks.length} tasks. Unknown weight: ${unweighted.join(", ") || "none"}.`);
 console.log(`Quest names with no QUESTS entry, kept as text (${unmatched.size}): ${[...unmatched].join(", ") || "none"}`);
