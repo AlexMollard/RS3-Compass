@@ -78,11 +78,88 @@ test("widest gaps rank published spreads, skip single-member and level skills an
   assert.deepEqual(widestGaps(rows, skills), [
     {
       skill: "Mining",
-      highest: 40,
-      lowest: 12,
-      gap: 28,
-      leaders: ["Alice"],
-      trailing: ["Bob"],
+      levelGap: 28,
+      players: [
+        { name: "Alice", level: 40 },
+        { name: "Bob", level: 12 },
+      ],
+    },
+  ]);
+});
+
+const withXp = (name, levels, xp) => ({
+  ...player(name, levels),
+  statistics: {
+    skills: Object.fromEntries(
+      Object.entries(xp).map(([skill, value]) => [skill, { xp: value }]),
+    ),
+  },
+});
+
+test("widest gaps rank by XP, keep maxed players with an XP spread and list every player", () => {
+  const three = {
+    members: [{ name: "Alice" }, { name: "Bob" }, { name: "Cara" }],
+  };
+  const rows = groupPlayers(three, [
+    withXp(
+      "Alice",
+      { Attack: 99, Mining: 90, Cooking: 50 },
+      { Attack: 200_000_000, Mining: 5_346_332, Cooking: 101_333 },
+    ),
+    withXp(
+      "Bob",
+      { Attack: 99, Mining: 99, Cooking: 10 },
+      { Attack: 13_034_431, Mining: 13_034_431, Cooking: 1_154 },
+    ),
+    withXp(
+      "Cara",
+      { Attack: 99, Mining: 70, Cooking: 30 },
+      { Attack: 13_034_431, Mining: 737_627, Cooking: 13_363 },
+    ),
+  ]);
+  const gaps = widestGaps(rows, ["Mining", "Cooking", "Attack"]);
+  // Attack has no level spread at all, yet its 187m XP spread leads.
+  assert.deepEqual(
+    gaps.map((g) => [g.skill, g.xpGap, g.levelGap]),
+    [
+      ["Attack", 186_965_569, 0],
+      ["Mining", 12_296_804, 29],
+      ["Cooking", 100_179, 40],
+    ],
+  );
+  assert.deepEqual(gaps[1].players, [
+    { name: "Alice", level: 90, xp: 5_346_332 },
+    { name: "Bob", level: 99, xp: 13_034_431 },
+    { name: "Cara", level: 70, xp: 737_627 },
+  ]);
+  assert.deepEqual(
+    widestGaps(rows, ["Mining", "Cooking", "Attack"], 1).map((g) => g.skill),
+    ["Attack"],
+  );
+});
+
+test("widest gaps rank a skill by level gap after the XP gaps when a player has no published XP", () => {
+  const rows = groupPlayers(group, [
+    withXp("Alice", { Mining: 90, Cooking: 20 }, { Cooking: 4_470 }),
+    withXp("Bob", { Mining: 10, Cooking: 19 }, { Mining: 1_154, Cooking: 3_973 }),
+  ]);
+  assert.deepEqual(widestGaps(rows, ["Mining", "Cooking"]), [
+    {
+      skill: "Cooking",
+      xpGap: 497,
+      levelGap: 1,
+      players: [
+        { name: "Alice", level: 20, xp: 4_470 },
+        { name: "Bob", level: 19, xp: 3_973 },
+      ],
+    },
+    {
+      skill: "Mining",
+      levelGap: 80,
+      players: [
+        { name: "Alice", level: 90 },
+        { name: "Bob", level: 10, xp: 1_154 },
+      ],
     },
   ]);
 });

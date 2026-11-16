@@ -150,40 +150,58 @@ export function groupSkillSummary(
   return { highest, known, leaders };
 }
 
-export interface SkillGap {
-  skill: string;
-  highest: number;
-  lowest: number;
-  gap: number;
-  leaders: string[];
-  trailing: string[];
+export interface GapPlayer {
+  name: string;
+  level: number;
+  xp?: number;
 }
 
-/** Largest published-level spreads. `skills` order is the in-game tie-break. */
+export interface SkillGap {
+  skill: string;
+  /** Published XP spread; absent unless every listed player publishes XP. */
+  xpGap?: number;
+  levelGap: number;
+  /** Every player with a published level, in player order. */
+  players: GapPlayer[];
+}
+
+const spread = (values: number[]) => Math.max(...values) - Math.min(...values);
+
+/**
+ * Published spreads, widest XP gap first, then skills missing someone's XP by
+ * level gap. `skills` order is the in-game tie-break.
+ */
 export function widestGaps(
   players: readonly ComparedPlayer[],
   skills: readonly string[],
-  limit = 5,
+  limit = Infinity,
 ): SkillGap[] {
   const gaps: SkillGap[] = [];
   for (const skill of skills) {
-    const known = players.flatMap(({ member, profile }) => {
+    const known = players.flatMap(({ member, profile }): GapPlayer[] => {
       const level = profile?.hiscoresLevels?.[skill];
-      return level === undefined ? [] : [{ name: member.name, level }];
+      if (level === undefined) return [];
+      const xp = profile?.statistics?.skills?.[skill]?.xp;
+      return [{ name: member.name, level, ...(xp === undefined ? {} : { xp }) }];
     });
     if (known.length < 2) continue;
-    const highest = Math.max(...known.map((k) => k.level));
-    const lowest = Math.min(...known.map((k) => k.level));
-    if (highest === lowest) continue;
+    const levelGap = spread(known.map((k) => k.level));
+    const xpGap = known.every((k) => k.xp !== undefined)
+      ? spread(known.map((k) => k.xp!))
+      : undefined;
+    if (!levelGap && !xpGap) continue;
     gaps.push({
       skill,
-      highest,
-      lowest,
-      gap: highest - lowest,
-      leaders: known.filter((k) => k.level === highest).map((k) => k.name),
-      trailing: known.filter((k) => k.level === lowest).map((k) => k.name),
+      ...(xpGap === undefined ? {} : { xpGap }),
+      levelGap,
+      players: known,
     });
   }
   // Array.sort is stable, so equal gaps keep the in-game order.
-  return gaps.sort((a, b) => b.gap - a.gap).slice(0, limit);
+  return gaps
+    .sort(
+      (a, b) =>
+        (b.xpGap ?? -1) - (a.xpGap ?? -1) || b.levelGap - a.levelGap,
+    )
+    .slice(0, limit);
 }
