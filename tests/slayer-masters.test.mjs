@@ -97,13 +97,44 @@ test("an unrecorded Slayer level leaves the master undefined and says so", () =>
   assert.deepEqual(choice.unrecorded, ["Slayer"]);
 });
 
-test("an unrecorded combat skill is listed with Slayer when that is missing too", () => {
+test("unrecorded combat skills are listed with Slayer when that is missing too", () => {
   const p = profile({ ...C110, Slayer: 80 });
   delete p.levels.Necromancy;
   delete p.levels.Summoning;
+  assert.deepEqual(masterFor(p).unrecorded, ["Necromancy", "Summoning"]);
+  delete p.levels.Slayer;
   const choice = masterFor(p);
   assert.equal(choice.master, undefined);
+  assert.deepEqual(choice.unrecorded, ["Necromancy", "Summoning", "Slayer"]);
+});
+
+test("F2P with unrecorded combat skills still gets Turael", () => {
+  const p = profile({ Slayer: 3 }, "f2p");
+  delete p.levels.Necromancy;
+  delete p.levels.Summoning;
+  const choice = masterFor(p);
+  assert.equal(choice.master.id, "turael");
   assert.deepEqual(choice.unrecorded, ["Necromancy", "Summoning"]);
-  delete p.levels.Slayer;
-  assert.deepEqual(masterFor(p).unrecorded, ["Necromancy", "Summoning", "Slayer"]);
+});
+
+test("members with unknown combat only get masters that need no combat, never Kuradal", () => {
+  const p = profile({ ...C110, Slayer: 80 });
+  delete p.levels.Necromancy;
+  const choice = masterFor(p);
+  assert.equal(choice.master.combat, 0);
+  assert.notEqual(choice.master.id, "kuradal");
+  assert.deepEqual(choice.unrecorded, ["Necromancy"]);
+});
+
+test("Turael wins the tie with Jacquelyn", () => {
+  assert.equal(masterFor(profile({}, "f2p")).master.id, "turael");
+});
+
+test("Kuradal's thresholds are exactly combat 110 and Slayer 75; below either gives Duradel", () => {
+  const C109 = { ...C110, Attack: 90, Strength: 94 };
+  assert.equal(combatLevel(levels(C109)), 109);
+  const quests = ["shilo-village"]; // Duradel's quest
+  assert.equal(masterFor(profile({ ...C110, Slayer: 75 }, "members", quests)).master.id, "kuradal");
+  assert.equal(masterFor(profile({ ...C109, Slayer: 75 }, "members", quests)).master.id, "duradel");
+  assert.equal(masterFor(profile({ ...C110, Slayer: 74 }, "members", quests)).master.id, "duradel");
 });

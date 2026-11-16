@@ -26,7 +26,7 @@ export function combatLevel(levels: Record<string, number>): number | undefined 
     2 * l.Ranged,
     2 * l.Necromancy,
   );
-  return Math.floor(
-    (1.3 * offence + l.Defence + l.Constitution + Math.floor(l.Prayer / 2) + Math.floor(l.Summoning / 2)) / 4,
-  );
+  // Whole numbers throughout (13 / 10 and / 4 become * 13 + 10 * rest and / 40) so no float rounding can shift a floor.
+  const rest = l.Defence + l.Constitution + Math.floor(l.Prayer / 2) + Math.floor(l.Summoning / 2);
+  return Math.floor((13 * offence + 10 * rest) / 40);
 }
