@@ -912,11 +912,11 @@ const ogres: TrainingOption = {
       map: { x: 2496, y: 3092, plane: 0, mapId: 28 },
     },
   ],
-  method: "Cast air spells on the ogres west of Yanille, close to the Yanille lodestone. They can be safe-spotted.",
+  method: "Cast air spells on the ogres west of Yanille, close to the Yanille lodestone.",
   benefit:
-    "The Wiki's Magic guide lists them for 50–70: weak to air spells, 240 XP a kill, and big bones for Prayer.",
+    "The Wiki's Magic guide lists them for 50–70: weak to air spells, 240 XP a kill, and they can be safe-spotted. They also drop big bones for Prayer.",
   gear: gear(30, "Level 67 ogres hit up to 288 in melee, and the topless ones attack on sight."),
-  ...checked(P2P_MAGIC),
+  ...checked(P2P_MAGIC, W + "Ogre"),
 };
 const lesserDemons: TrainingOption = {
   id: "lesser-demons",

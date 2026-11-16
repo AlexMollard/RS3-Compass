@@ -150,6 +150,7 @@ test("the efficient route for Attack at combat 110 and Slayer 80 is Kuradal's ta
   assert.ok(!route.feeds.includes("Mining"));
   assert.equal(route.checked, "2026-11-16");
   assert.ok(route.sources.length > 0);
+  assert.equal(new Set(route.sources).size, route.sources.length);
   for (const source of route.sources) assert.match(source, /^https:\/\/runescape\.wiki\/w\/\S+$/);
 });
 

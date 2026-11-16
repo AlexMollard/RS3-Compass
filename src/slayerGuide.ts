@@ -532,7 +532,7 @@ const DRAFTS: Record<string, Draft> = {
       site: site("Jackals north of Menaphos", "Jackal", 3212, 2863, 0, 28),
       style: "magic",
       aoe: true,
-      notes: "Jackals are aggressive and weak to air. Bring water for the desert heat.",
+      notes: "Jackals are aggressive and weak to air.",
     },
     sources: [page("Jackal"), page("Guard dog")],
   },

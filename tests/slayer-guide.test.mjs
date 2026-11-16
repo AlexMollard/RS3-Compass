@@ -28,6 +28,8 @@ const tasksOf = (master) => SLAYER_TASKS.filter((t) => t.master === master);
 const dated = (entry, label) => {
   assert.equal(entry.checked, CHECKED, `${label} checked`);
   assert.ok(entry.sources.length > 0, `${label} has sources`);
+  // CheckedSources keys its links by URL, so a repeat would break the render.
+  assert.equal(new Set(entry.sources).size, entry.sources.length, `${label} sources are unique`);
   for (const url of entry.sources) assert.match(url, WIKI, `${label} source ${url}`);
 };
 

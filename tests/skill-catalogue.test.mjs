@@ -259,6 +259,7 @@ test("Every combat method says when it was checked and which Wiki guide it follo
       const context = `${skill} ${stage.from} ${option.id}`;
       assert.equal(option.checked, "2026-11-16", context);
       assert.ok(option.sources?.length, context + " has no source");
+      assert.equal(new Set(option.sources).size, option.sources.length, context + " repeats a source");
       for (const source of option.sources) assert.match(source, /^https:\/\/runescape\.wiki\/w\/\S+$/, context);
     }
 });
