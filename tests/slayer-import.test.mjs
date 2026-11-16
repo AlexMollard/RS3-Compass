@@ -193,18 +193,26 @@ test("Laniakea's Abyssal demons: amount, Slayer level, Morytania text and weight
   });
 });
 
-test("a quest-gated task maps its quest to a QUESTS id; other levels and the combat level stay", () => {
+test("a quest-gated task maps its quest to a QUESTS id; other levels stay", () => {
   const result = parseAssignments("laniakea", laniakea, { quests: QUESTS, members: true });
   assert.deepEqual(task(result, "Shadow creatures").requirements, {
     levels: [],
     quests: ["plagues-end"],
-    text: ["Combat level 100"],
+    text: [],
   });
   assert.deepEqual(task(result, "Edimmu").requirements, {
     levels: [{ skill: "Dungeoneering", level: 115 }],
     quests: ["plagues-end"],
-    text: ["Combat level 110"],
+    text: [],
   });
+});
+
+test("the combat level requirement is its own field, absent when it is 0", () => {
+  const result = parseAssignments("laniakea", laniakea, { quests: QUESTS, members: true });
+  assert.equal(task(result, "Edimmu").combat, 110);
+  assert.equal(task(result, "Shadow creatures").combat, 100);
+  assert.equal("combat" in task(result, "Abyssal demons"), false);
+  assert.equal("combat" in task(result, "Ravenous strigoi"), false);
 });
 
 test("partial quest completion is not a quest requirement", () => {
@@ -227,7 +235,8 @@ test("a row with a missing weight is rejected, not defaulted; weight 0 is kept",
 test("a free master's task is members only when the Wiki marks it so; no Slayer level means 1", () => {
   const result = parseAssignments("turael", turael, { quests: QUESTS, members: false });
   assert.equal(task(result, "Cave bugs").members, true);
-  assert.deepEqual(task(result, "Cave bugs").requirements, { levels: [], quests: [], text: ["Combat level 8"] });
+  assert.deepEqual(task(result, "Cave bugs").requirements, { levels: [], quests: [], text: [] });
+  assert.equal(task(result, "Cave bugs").combat, 8);
   assert.equal(task(result, "Crawling hands").members, false);
   assert.equal(task(result, "Crawling hands").slayer, 5);
 });
@@ -273,7 +282,8 @@ test("the masters table gives Kuradal and Morvran with their requirements", () =
   assert.equal(kuradal.combat, 110);
   assert.equal(kuradal.slayer, 75);
   assert.deepEqual(kuradal.quests, []);
-  assert.deepEqual(kuradal.unmatched, ["Barbarian Training"]);
+  assert.deepEqual(kuradal.text, ["Barbarian Training"]);
+  assert.deepEqual(masters.find((m) => m.wiki === "Morvran").text, []);
   assert.equal(kuradal.location, "Ancient Cavern");
   const morvran = masters.find((m) => m.wiki === "Morvran");
   assert.equal(morvran.combat, 120);

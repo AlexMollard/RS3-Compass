@@ -11,13 +11,15 @@ export type SlayerMaster = {
   slayer: number;
   /** Quest IDs from QUESTS. */
   quests: string[];
+  /** Requirements with no QUESTS entry ("Barbarian Training"), kept as Wiki text. */
+  text?: string[];
   location?: string;
 };
 
 /**
  * One master's Slayer assignment, from the Wiki's Module:Slayer assignments/<Master>. `requirements.quests`
- * holds quest IDs from QUESTS; anything else, including a combat level requirement ("Combat level 100"),
- * stays in `requirements.text`.
+ * holds quest IDs from QUESTS; anything else stays in `requirements.text`. `combat` is the combat level the
+ * master needs before assigning the task, absent when there is none.
  */
 export type SlayerTask = {
   id: string;
@@ -26,6 +28,7 @@ export type SlayerTask = {
   wiki: string;
   amount: [number, number];
   slayer: number;
+  combat?: number;
   requirements: { levels: { skill: SkillName; level: number }[]; quests: string[]; text: string[] };
   weight: number;
   members: boolean;

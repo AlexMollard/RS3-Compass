@@ -41,6 +41,22 @@ test("master requirements match the Wiki table", () => {
   assert.deepEqual([master("Morvran").combat, master("Morvran").slayer, master("Morvran").quests], [120, 85, ["plagues-end"]]);
 });
 
+test("unmatched master requirements are kept as text", () => {
+  assert.deepEqual(master("Kuradal").text, ["Barbarian Training"]);
+});
+
+test("combat level requirements are imported", () => {
+  const find = (m, name) => SLAYER_TASKS.find((t) => t.master === m && t.name === name);
+  assert.equal(find("morvran", "Edimmu").combat, 110);
+  assert.equal(find("vannaka", "Mogres").combat, 35);
+  assert.deepEqual(SLAYER_TASKS.filter((t) => t.requirements.text.some((s) => /^Combat level/.test(s))).map((t) => t.id), []);
+});
+
+test("no free task is above the F2P Slayer cap of 5", () => {
+  const bad = SLAYER_TASKS.filter((t) => !t.members && t.slayer > 5);
+  assert.deepEqual(bad.map((t) => `${t.master}/${t.id}`), []);
+});
+
 test("every task's master exists, and every quest ID exists in QUESTS", () => {
   const masters = new Set(SLAYER_MASTERS.map((m) => m.id));
   const quests = new Set(QUESTS.map((q) => q.id));

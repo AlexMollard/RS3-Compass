@@ -19,6 +19,10 @@ const HELPERS = new Set(["disambig", "disambig/doc", "normalise"]);
 // Sources (checked 2026-11-16): https://runescape.wiki/w/Turael (members1 = No, the Slayer Master version) and
 // https://runescape.wiki/w/Jacquelyn ("more advanced Slayer Masters which are all available only to members").
 const FREE_MASTERS = new Set(["Turael", "Jacquelyn"]);
+// Free-to-play players can train Slayer only to level 5 (https://runescape.wiki/w/Slayer, maxf2p = 5, checked
+// 2026-11-16). A free master's task above it is members-only even without the Wiki's members icon (Jacquelyn's
+// Cave bugs at 7 and Cave slimes at 17; Turael's Cave bugs at 7 carries the icon).
+const F2P_SLAYER_CAP = 5;
 
 // Rows whose weight is nil in the master's module (the rendered table shows "?"). They are left out rather than
 // given an invented weight. Checked 2026-11-16 on https://runescape.wiki/w/Module:Slayer_assignments/<Master>.
@@ -58,9 +62,10 @@ const seenSkipped = new Set();
 for (const master of masters) {
   const source = sources.get(MODULE + master.wiki);
   if (!source) continue; // reported above
-  for (const q of master.unmatched) unmatched.add(`${q} (master ${master.wiki})`);
+  for (const q of master.text) unmatched.add(`${q} (master ${master.wiki})`);
   const members = !FREE_MASTERS.has(master.wiki);
   const result = parseAssignments(master.id, source, { quests: QUESTS, members, wikiPages });
+  for (const t of result.tasks) if (t.slayer > F2P_SLAYER_CAP) t.members = true;
   tasks.push(...result.tasks);
   for (const q of result.unmatched) unmatched.add(`${q} (${master.wiki} task)`);
   for (const row of result.invalid) {
@@ -75,7 +80,7 @@ fail("NO_WEIGHT rows the Wiki now weights or no longer lists: remove them", stal
 
 // 3. Chathead art, resolved through Wiki file redirects.
 const images = await servedFiles(masters.map((m) => m.image).filter(Boolean));
-const records = masters.map(({ unmatched: _, image, ...m }) => {
+const records = masters.map(({ image, ...m }) => {
   const served = image && images.get(image);
   return {
     id: m.id,
@@ -86,6 +91,7 @@ const records = masters.map(({ unmatched: _, image, ...m }) => {
     combat: m.combat,
     slayer: m.slayer,
     quests: m.quests,
+    ...(m.text.length ? { text: m.text } : {}),
     ...(m.location ? { location: m.location } : {}),
   };
 });
@@ -110,10 +116,11 @@ if (!process.exitCode) writeFileSync(OUT, source.replace(/\r?\n/g, "\r\n"));
 
 for (const m of records)
   console.log(
-    `${m.name} | ${m.members ? "members" : "free"} | combat ${m.combat} | Slayer ${m.slayer} | quests ${m.quests.join(" ") || "none"} | ${m.location ?? "no location"} | ${m.image ?? "no image"} | ${tasks.filter((t) => t.master === m.id).length} tasks`,
+    `${m.name} | ${m.members ? "members" : "free"} | combat ${m.combat} | Slayer ${m.slayer} | quests ${m.quests.join(" ") || "none"}${m.text ? ` + ${m.text.join("; ")}` : ""} | ${m.location ?? "no location"} | ${m.image ?? "no image"} | ${tasks.filter((t) => t.master === m.id).length} tasks`,
   );
 const reqs = (t) =>
   [
+    ...(t.combat ? [`combat ${t.combat}`] : []),
     ...t.requirements.levels.map((l) => `${l.skill} ${l.level}`),
     ...t.requirements.quests,
     ...t.requirements.text,

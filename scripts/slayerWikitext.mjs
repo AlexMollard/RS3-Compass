@@ -155,7 +155,7 @@ export function parseRequirements(other = "", quests = []) {
  * The tasks of one master from its Module:Slayer assignments/<Master> source. A row without a whole-number
  * weight, or with a bad amount, is rejected into `invalid`, never defaulted. A task is members-only when the
  * master is, or when the Wiki marks it with the members icon. No Slayer requirement means level 1. A combat
- * level requirement has no field of its own, so it leads `requirements.text` ("Combat level 100").
+ * level requirement goes in `combat`, which is absent when there is none.
  * `wikiPages` maps a lower-case task name to its page where Module:Slayer assignments/disambig overrides
  * the "<Name> (Slayer assignment)" default.
  */
@@ -197,10 +197,11 @@ export function parseAssignments(master, source, { quests = [], members, wikiPag
       wiki: wikiPages[key] ?? `${name} (Slayer assignment)`,
       amount: [row.min, row.max],
       slayer: reqs.slayer > 0 ? reqs.slayer : 1,
+      ...(reqs.combat > 0 ? { combat: reqs.combat } : {}),
       requirements: {
         levels: [...levels, ...parsed.levels],
         quests: parsed.quests,
-        text: [...(reqs.combat > 0 ? [`Combat level ${reqs.combat}`] : []), ...parsed.text],
+        text: parsed.text,
       },
       weight: row.weight,
       members: members || parsed.members,
@@ -219,7 +220,7 @@ export function parseDisambig(source) {
 /**
  * The masters in Template:Slayer masters/table, in table order. "N/A" means no requirement: combat 0, Slayer 1.
  * `wiki` is the first linked master in the name cell (Turael for "Turael / Spria"), whose name the assignment
- * module also uses. `unmatched` lists quest names that matched no QUESTS entry.
+ * module also uses. A quest name that matches no QUESTS entry is kept in `text`, never dropped.
  */
 export function parseMastersTable(wikitext, quests = []) {
   const index = questIndex(quests);
@@ -253,7 +254,7 @@ export function parseMastersTable(wikitext, quests = []) {
       combat: level(combatCell, "Combat level", 0),
       slayer: level(slayerCell, "Slayer", 1),
       quests: questNames.filter((q) => index.has(nameKey(q))).map((q) => index.get(nameKey(q))),
-      unmatched: questNames.filter((q) => !index.has(nameKey(q))),
+      text: questNames.filter((q) => !index.has(nameKey(q))),
       ...(location ? { location } : {}),
     });
   }
