@@ -41,6 +41,9 @@
   let profile = $derived(activeProfile($saved));
   let skill = $derived(skillByName(selectedSkill) ?? SKILLS[0]);
   let isSlayer = $derived(skill.name === "Slayer");
+  let isRunecraftingGuide = $derived(
+    skill.name === "Runecrafting" && profile.mode === "members",
+  );
   let search = $state("");
   let level = $state("");
   let message = $state("");
@@ -313,6 +316,18 @@
         {/await}
       {/if}
 
+      {#if isRunecraftingGuide}
+        {#await import("../components/RunecraftingGuide.svelte")}
+          <p class="cap" role="status">Loading the Runecrafting guide…</p>
+        {:then { default: RunecraftingGuide }}
+          <RunecraftingGuide {profile} />
+        {:catch}
+          <p class="cap" role="alert">
+            Couldn't load the Runecrafting guide — reload the page.
+          </p>
+        {/await}
+      {/if}
+
       {#if isSlayer && !needsMembership}
         <!-- The Slayer guide replaces the level-range methods, which can't follow the player's own master (Ruling 3). -->
       {:else if stage && method}
@@ -349,6 +364,12 @@
     </div>
 
     <aside class="skill-aside" aria-label="Training preparation">
+      {#if isRunecraftingGuide}
+        <!-- The kit half of the same lazy module; the centre mount shows its loading and error copy. -->
+        {#await import("../components/RunecraftingGuide.svelte") then { default: RunecraftingGuide }}
+          <RunecraftingGuide {profile} part="kit" />
+        {/await}
+      {/if}
       {#if stage && method && !isSlayer}
         <GameWindow
           title="Before you go"
