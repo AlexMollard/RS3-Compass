@@ -263,7 +263,9 @@ function xpRow(profile: Profile): XpRow | undefined {
   const option = options.find((o) => o.id === target.optionId);
   if (!option) return undefined;
   const alt = target.altOptionId ? options.find((o) => o.id === target.altOptionId) : undefined;
-  return { option, ...(alt ? { alt } : {}), range: `${target.from}–${target.to}`, target };
+  // Inclusive, like trainingRangeLabel: ranges are [from, to), except each mode's last one, which also covers its `to`.
+  const end = target === targets.at(-1) ? target.to : target.to - 1;
+  return { option, ...(alt ? { alt } : {}), range: `${target.from}–${end}`, target };
 }
 
 /**

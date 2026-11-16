@@ -78,7 +78,8 @@ test("Example 1: the storyline's next quest is Vessel of the Harbinger, and The 
 test("Example 1: kill armoured zombies for XP, complete Vessel of the Harbinger for progress, ensoul bars next", () => {
   const kill = killNext(example1());
   assert.equal(kill.xp.option.id, "armoured-zombies");
-  assert.equal(kill.xp.range, "60–80");
+  assert.equal(kill.xp.range, "60–79");
+  assert.equal(killNext(profile({ Necromancy: 99 })).xp.range, "90–120");
   assert.equal(kill.progress.text, "Complete Vessel of the Harbinger");
   assert.equal(kill.progress.target, "Vessel of the Harbinger");
   assert.equal(status(kill.progress.reqs, "Prayer 40"), "unknown");
