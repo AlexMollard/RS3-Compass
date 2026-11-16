@@ -7,6 +7,7 @@
     shortLabels,
     skillStandings,
     sortSkills,
+    widestGaps,
     type ComparedPlayer,
     type SkillSort,
   } from "../groupProgress";
@@ -15,7 +16,7 @@
   import { wikiHref } from "../../wiki";
   import GameWindow from "./GameWindow.svelte";
   import GameArt from "./GameArt.svelte";
-  import ChoiceStrip from "./ChoiceStrip.svelte";
+  import { ArrowDownWideNarrow, ArrowUpNarrowWide } from "@lucide/svelte";
 
   let {
     players,
@@ -24,7 +25,7 @@
     sourceNote,
   }: {
     players: ComparedPlayer[];
-    /** Unique per page, for the skill filter's radio name. */
+    /** Unique per page, for the toolbar's control ids. */
     id: string;
     /** How gold reads here, e.g. "Highest published in the group". */
     highestLabel: string;
@@ -39,26 +40,54 @@
   const fullFormat = new Intl.NumberFormat("en");
   const compact = (n: number) => compactFormat.format(n).toLowerCase();
 
+  const ALL = SKILLS.map((s) => s.name);
+  const CATEGORIES = [...new Set(SKILLS.map((s) => s.category))];
+
   let sort = $state<SkillSort>("game");
-  let sortChoices = $derived([
-    { value: "game", label: "Game order" },
-    { value: "gap", label: "Widest gap" },
-    ...players.flatMap((p, i) =>
-      p.profile?.hiscoresLevels
-        ? [{ value: `trails:${i}`, label: `${p.member.name} trails` }]
-        : [],
+  let reversed = $state(false);
+  let category = $state("");
+  let gapsOnly = $state(false);
+
+  /** Players with published levels, who can lead or trail. */
+  let ranked = $derived(
+    players.flatMap((p, index) =>
+      p.profile?.hiscoresLevels ? [{ name: p.member.name, index }] : [],
     ),
-  ]);
+  );
   // A sort for a player who has since left the comparison falls back to game order.
   let activeSort = $derived<SkillSort>(
-    sortChoices.some((c) => c.value === sort) ? sort : "game",
+    sort.includes(":") &&
+      !ranked.some((p) => sort.endsWith(`:${p.index}`))
+      ? "game"
+      : sort,
   );
-  let skills = $derived(
-    sortSkills(
-      players,
-      SKILLS.map((s) => s.name),
-      activeSort,
-    ).map((name) => skillByName(name)!),
+  // A gap here means a level difference; same-level XP spreads don't count.
+  let withGap = $derived(
+    new Set(
+      widestGaps(players, ALL)
+        .filter((g) => g.levelGap > 0)
+        .map((g) => g.skill),
+    ),
+  );
+  let skills = $derived.by(() => {
+    const ordered = sortSkills(players, ALL, activeSort);
+    if (reversed) ordered.reverse();
+    return ordered
+      .map((name) => skillByName(name)!)
+      .filter(
+        (s) =>
+          (!category || s.category === category) &&
+          (!gapsOnly || withGap.has(s.name)),
+      );
+  });
+  let directionLabel = $derived(
+    activeSort === "game"
+      ? reversed
+        ? "Reversed"
+        : "In order"
+      : reversed
+        ? "Smallest first"
+        : "Largest first",
   );
   let labels = $derived(shortLabels(players.map((p) => p.member.name)));
 
@@ -89,16 +118,60 @@
   trailing={"Gold marks the " + highestLabel.toLowerCase()}
 >
   <div class="comparisons">
-    <div class="comparison-toolbar">
-      <ChoiceStrip
-        label="Sort skills"
-        name={id + "-sort"}
-        value={activeSort}
-        choices={sortChoices}
-        onChange={(value) => (sort = value as SkillSort)}
-      />
-      <p class="caption">Each level opens that skill's guide as that player.</p>
+    <div class="comparison-toolbar" role="group" aria-label="Sort and filter skills">
+      <div class="field">
+        <label for={id + "-sort"}>Sort</label>
+        <div class="joined">
+        <select id={id + "-sort"} bind:value={() => activeSort, (v) => (sort = v)}>
+          <option value="game">Game order</option>
+          <option value="gap">Widest XP gap</option>
+          <option value="level-gap">Widest level gap</option>
+          {#if ranked.length}
+            <optgroup label="Where a player trails">
+              {#each ranked as p (p.index)}
+                <option value={`trails:${p.index}`}>{p.name} trails</option>
+              {/each}
+            </optgroup>
+            <optgroup label="Where a player leads">
+              {#each ranked as p (p.index)}
+                <option value={`leads:${p.index}`}>{p.name} leads</option>
+              {/each}
+            </optgroup>
+          {/if}
+        </select>
+        <button
+          type="button"
+          class="direction"
+          aria-pressed={reversed}
+          aria-label={"Reverse order, now " + directionLabel.toLowerCase()}
+          title={directionLabel}
+          onclick={() => (reversed = !reversed)}
+        >
+          {#if reversed}<ArrowUpNarrowWide size={18} aria-hidden="true" />{:else}<ArrowDownWideNarrow
+              size={18}
+              aria-hidden="true"
+            />{/if}
+        </button>
+        </div>
+      </div>
+      <div class="field">
+        <label for={id + "-category"}>Show</label>
+        <select id={id + "-category"} bind:value={category}>
+          <option value="">All skills</option>
+          {#each CATEGORIES as c (c)}<option value={c}>{c}</option>{/each}
+        </select>
+      </div>
+      <label class="check"
+        ><input type="checkbox" bind:checked={gapsOnly} />Level gaps only</label
+      >
+      <p class="count" aria-live="polite">
+        <strong>{skills.length}</strong> of {ALL.length} skills
+      </p>
     </div>
+    <p class="caption hint">Each level opens that skill's guide as that player.</p>
+    {#if !skills.length}<p class="caption empty">
+        No skills match these filters.
+      </p>{/if}
     <div class="skill-comparisons">
       {#each skills as skill (skill.name)}
         {@const standings = skillStandings(players, skill.name)}
@@ -198,13 +271,89 @@
   .comparisons {
     padding: 12px 16px 16px;
   }
+  /* One row: inline labels, the direction button joined to its sort, count at the end. */
   .comparison-toolbar {
     display: flex;
-    justify-content: space-between;
-    align-items: end;
+    align-items: center;
     flex-wrap: wrap;
-    gap: 8px 16px;
+    gap: 10px 20px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    background: var(--well);
+    border: 1px solid #2f3e48;
+    border-radius: 4px;
+  }
+  .field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+  .field label {
+    color: var(--muted);
+    font-size: var(--font-caption);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .field select {
+    height: 36px;
+    min-width: 0;
+    font-size: var(--font-ui);
+  }
+  .joined {
+    display: flex;
+    min-width: 0;
+  }
+  .joined select {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+  .direction {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    flex: none;
+    color: var(--text);
+    background: var(--panel-raised);
+    border: 1px solid #4b5e6a;
+    border-left: 0;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+  }
+  .direction:hover,
+  .direction:focus-visible {
+    color: var(--gold-bright);
+    border-color: var(--gold);
+  }
+  .direction[aria-pressed="true"] {
+    color: var(--gold-bright);
+  }
+  .check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 36px;
+    color: var(--text);
+    font-size: var(--font-ui);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .count {
+    margin: 0 0 0 auto;
+    color: var(--muted);
+    font-size: var(--font-caption);
+    white-space: nowrap;
+  }
+  .count strong {
+    color: var(--text);
+  }
+  .hint {
     margin-bottom: 14px;
+  }
+  .empty {
+    padding: 16px 0;
   }
   .caption {
     color: var(--muted);

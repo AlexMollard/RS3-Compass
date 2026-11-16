@@ -8,6 +8,7 @@
   import {
     leadCounts,
     questDifference,
+    togglePick,
     type ComparedPlayer,
   } from "../groupProgress";
   import { publicProfileId } from "../playerName";
@@ -20,7 +21,7 @@
   import { startVisibleRefresh } from "../visibleRefresh";
   import { wikiHref } from "../../wiki";
   import PageHeading from "../components/PageHeading.svelte";
-  import ChoiceStrip from "../components/ChoiceStrip.svelte";
+  import GameArt from "../components/GameArt.svelte";
   import GameWindow from "../components/GameWindow.svelte";
   import GameStat from "../components/GameStat.svelte";
   import PlayerPortrait from "../components/PlayerPortrait.svelte";
@@ -77,13 +78,13 @@
   );
   let syncKey = $derived(JSON.stringify(compared.map((p) => p.id)));
 
-  /** Picking a player already in another slot swaps the two; "" clears the optional third. */
-  function choose(slot: number, id: string) {
-    const next = [a?.id ?? "", b?.id ?? "", c?.id ?? ""];
-    const other = id ? next.indexOf(id) : -1;
-    if (other !== -1 && other !== slot) next[other] = next[slot];
-    next[slot] = id;
-    const query = new URLSearchParams({ a: next[0], b: next[1] });
+  /** Adds or removes a player on the roster; the URL keeps the picked order. */
+  function toggle(id: string) {
+    const next = togglePick(
+      compared.map((p) => p.id),
+      id,
+    );
+    const query = new URLSearchParams({ a: next[0] ?? "", b: next[1] ?? "" });
     if (next[2]) query.set("c", next[2]);
     void goto(`/compare?${query}`, { replace: true, reset: false });
   }
@@ -108,7 +109,7 @@
       const id = publicProfileId(player.name);
       name = "";
       // The newcomer takes the first empty slot, else replaces the third player.
-      if (!compared.some((p) => p.id === id)) choose(!a ? 0 : !b ? 1 : 2, id);
+      if (!compared.some((p) => p.id === id)) toggle(id);
     } catch (error) {
       if (!current.signal.aborted && request === current)
         lookupError =
@@ -142,34 +143,13 @@
   });
   const number = (value: number | undefined) =>
     value === undefined ? "?" : value.toLocaleString();
-  // The first two strips list everyone; picking a player shown elsewhere swaps them.
-  let choices = $derived(
+  /** Each saved public player once, with their compare slot when picked. */
+  let roster = $derived(
     candidates.map((p) => ({
-      value: p.id,
-      label: p.name,
-      image: accountBadge(p.kind),
+      profile: p,
+      slot: compared.findIndex((q) => q.id === p.id),
     })),
   );
-  // The optional third strip offers only players not already compared.
-  let thirdChoices = $derived([
-    { value: "", label: "No third player" },
-    ...choices.filter(
-      (choice) => choice.value !== a?.id && choice.value !== b?.id,
-    ),
-  ]);
-  const pickers = $derived([
-    { label: "First player", value: a?.id ?? "", choices },
-    { label: "Second player", value: b?.id ?? "", choices },
-    ...(candidates.length >= 3
-      ? [
-          {
-            label: "Third player (optional)",
-            value: c?.id ?? "",
-            choices: thirdChoices,
-          },
-        ]
-      : []),
-  ]);
 </script>
 
 <div class="compare-page page-enter">
@@ -178,16 +158,39 @@
     subtitle="Two or three public players, side by side: levels, gaps and quests."
   />
   {#if candidates.length >= 2}
-    <div class="pickers">
-      {#each pickers as picker, slot (picker.label)}
-        <ChoiceStrip
-          label={picker.label}
-          name={"compare-" + slot}
-          value={picker.value}
-          choices={picker.choices}
-          onChange={(id) => choose(slot, id)}
-        />
-      {/each}
+    <div class="roster" role="group" aria-labelledby="roster-label">
+      <span id="roster-label" class="roster-label">Players</span>
+      <ul>
+        {#each roster as { profile, slot } (profile.id)}
+          {@const picked = slot !== -1}
+          {@const locked = picked && compared.length <= 2}
+          <li>
+            <button
+              type="button"
+              class="roster-chip"
+              class:picked
+              style:--player={picked ? playerColour(slot) : undefined}
+              aria-pressed={picked}
+              aria-disabled={locked}
+              title={locked
+                ? "Two players are always compared; pick another to swap"
+                : picked
+                  ? "Remove from the comparison"
+                  : compared.length >= 3
+                    ? "Replace the third player"
+                    : "Add to the comparison"}
+              onclick={() => toggle(profile.id)}
+            >
+              <GameArt file={accountBadge(profile.kind)} size={24} />
+              <span class="roster-name">{profile.name}</span>
+              {#if picked}<span class="slot" aria-label={"slot " + (slot + 1)}
+                  >{slot + 1}</span
+                >{/if}
+            </button>
+          </li>
+        {/each}
+      </ul>
+      <span class="roster-hint">Pick two or three</span>
     </div>
   {/if}
   {#snippet lookupWindow()}<GameWindow
@@ -377,10 +380,72 @@
   .compare-page :global(.btn) {
     min-height: 44px;
   }
-  .pickers {
+  /* One row: every saved player once; picked chips carry their slot colour. */
+  .roster {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+  }
+  .roster ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .roster-label,
+  .roster-hint {
+    color: var(--muted);
+    font-size: var(--font-caption);
+    font-weight: 600;
+  }
+  .roster-label {
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .roster-hint {
+    font-weight: 400;
+  }
+  .roster-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 4px 12px 4px 8px;
+    color: var(--muted);
+    font: inherit;
+    font-size: var(--font-ui);
+    background: var(--well);
+    border: 1px solid #33434d;
+    border-left: 4px solid #33434d;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .roster-chip:hover {
+    color: var(--text);
+    border-color: #8fa3b1;
+  }
+  .roster-chip.picked {
+    color: var(--text);
+    background: var(--panel-raised);
+    border-color: #4b5e6a;
+    border-left-color: var(--player);
+  }
+  .roster-chip[aria-disabled="true"] {
+    cursor: default;
+  }
+  .slot {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
-    gap: 12px 24px;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    color: var(--text);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    border: 2px solid var(--player);
   }
   .lookup-form {
     display: grid;
@@ -424,11 +489,6 @@
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
     align-items: stretch;
   }
-  /* Three cards are narrower; a ten-digit Total XP gets its own row. */
-  .trio .player-stats > :global(.game-stat:nth-child(2)) {
-    grid-column: 1 / -1;
-    order: 3;
-  }
   .vs {
     font-family: "Cinzel", serif;
     font-size: 1.5rem;
@@ -463,9 +523,13 @@
   .player-chip {
     margin-top: 6px;
   }
+  /* Two columns when a ten-digit Total XP fits in half the card, else one; never a lone gap. */
   .player-stats {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(max(min(100%, 170px), calc((100% - 8px) / 2)), 1fr)
+    );
     gap: 8px;
   }
   .caption {

@@ -165,6 +165,16 @@ export interface SkillGap {
   players: GapPlayer[];
 }
 
+/**
+ * Compare roster: a click adds a player (replacing the third when three are
+ * picked) or removes a picked one, never leaving fewer than two.
+ */
+export function togglePick(picked: readonly string[], id: string): string[] {
+  if (picked.includes(id))
+    return picked.length > 2 ? picked.filter((p) => p !== id) : [...picked];
+  return picked.length < 3 ? [...picked, id] : [...picked.slice(0, 2), id];
+}
+
 const spread = (values: number[]) => Math.max(...values) - Math.min(...values);
 
 /** Each player's published level and XP in a skill, in player order; undefined without a level. */
@@ -180,13 +190,21 @@ export function publishedIn(
   });
 }
 
-/** "game" order, widest "gap" first, or `trails:<index>` for that player's deepest deficits first. */
-export type SkillSort = "game" | "gap" | `trails:${number}`;
+/**
+ * "game" order; widest XP "gap" or "level-gap" first; `trails:<index>` for that
+ * player's deepest deficits first; `leads:<index>` for their widest leads first.
+ */
+export type SkillSort =
+  | "game"
+  | "gap"
+  | "level-gap"
+  | `trails:${number}`
+  | `leads:${number}`;
 
 /**
- * Skill names in the chosen order. Deficits count in XP when every player with
- * a level publishes XP, else in levels after the XP deficits; skills where the
- * player leads, ties or has no level keep game order at the end.
+ * Skill names in the chosen order. Gaps and margins count in XP when every
+ * player with a level publishes XP, else in levels after the XP ones; skills
+ * with no gap or margin keep game order at the end.
  */
 export function sortSkills(
   players: readonly ComparedPlayer[],
@@ -194,27 +212,36 @@ export function sortSkills(
   sort: SkillSort,
 ): string[] {
   if (sort === "game") return [...skills];
-  if (sort === "gap") {
-    const first = widestGaps(players, skills).map((g) => g.skill);
-    return [...first, ...skills.filter((s) => !first.includes(s))];
-  }
-  const index = Number(sort.slice("trails:".length));
-  const deficit = (skill: string) => {
+  // [XP measure, level measure]; only one is used, the other stays -1.
+  const key = (skill: string): [number, number] => {
     const all = publishedIn(players, skill);
-    const mine = all[index];
     const known = all.flatMap((p) => (p ? [p] : []));
-    if (!mine) return { xp: -1, level: -1 };
-    if (known.every((k) => k.xp !== undefined))
-      return { xp: Math.max(...known.map((k) => k.xp!)) - mine.xp!, level: -1 };
-    return { xp: -1, level: Math.max(...known.map((k) => k.level)) - mine.level };
+    const byXp = known.every((k) => k.xp !== undefined);
+    if (sort === "gap" || sort === "level-gap") {
+      if (known.length < 2) return [-1, -1];
+      const levelGap = spread(known.map((k) => k.level));
+      if (sort === "level-gap") return [-1, levelGap];
+      return byXp ? [spread(known.map((k) => k.xp!)), -1] : [-1, levelGap];
+    }
+    const [kind, at] = sort.split(":");
+    const mine = all[Number(at)];
+    const others = known.filter((k) => k !== mine);
+    if (!mine || !others.length) return [-1, -1];
+    if (kind === "leads")
+      return byXp
+        ? [mine.xp! - Math.max(...others.map((o) => o.xp!)), -1]
+        : [-1, mine.level - Math.max(...others.map((o) => o.level))];
+    return byXp
+      ? [Math.max(...known.map((k) => k.xp!)) - mine.xp!, -1]
+      : [-1, Math.max(...known.map((k) => k.level)) - mine.level];
   };
-  const keyed = skills.map((skill) => ({ skill, ...deficit(skill) }));
-  // Array.sort is stable, so equal deficits keep the in-game order.
-  return keyed
+  const rank = (n: number) => (n > 0 ? n : -1);
+  // Array.sort is stable, so equal keys keep the in-game order.
+  return skills
+    .map((skill) => ({ skill, key: key(skill) }))
     .sort(
       (a, b) =>
-        (b.xp > 0 ? b.xp : -1) - (a.xp > 0 ? a.xp : -1) ||
-        (b.level > 0 ? b.level : -1) - (a.level > 0 ? a.level : -1),
+        rank(b.key[0]) - rank(a.key[0]) || rank(b.key[1]) - rank(a.key[1]),
     )
     .map((k) => k.skill);
 }

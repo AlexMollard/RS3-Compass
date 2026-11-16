@@ -209,6 +209,37 @@ test("skill sorts keep game order, put the widest gaps first, or put a player's 
     "Cooking",
     "Fishing",
   ]);
+  // Level gaps ignore XP, so the all-99 Attack falls to the end with the tied Fishing.
+  assert.deepEqual(sortSkills(rows, order, "level-gap"), [
+    "Cooking",
+    "Mining",
+    "Fishing",
+    "Attack",
+  ]);
+  // Alice leads Attack by 187m XP and Cooking by 20 levels; she ties Fishing and trails Mining.
+  assert.deepEqual(sortSkills(rows, order, "leads:0"), [
+    "Attack",
+    "Cooking",
+    "Fishing",
+    "Mining",
+  ]);
+  // Bob leads only Mining, by 7.7m XP over Alice.
+  assert.deepEqual(sortSkills(rows, order, "leads:1"), [
+    "Mining",
+    "Fishing",
+    "Cooking",
+    "Attack",
+  ]);
+});
+
+test("roster picks add up to three, replace the third when full and never drop below two", async () => {
+  const { togglePick } = await import("../src/lib/groupProgress.ts");
+  assert.deepEqual(togglePick(["a", "b"], "c"), ["a", "b", "c"]);
+  assert.deepEqual(togglePick(["a", "b", "c"], "d"), ["a", "b", "d"]);
+  // Removing keeps the others in their picked order.
+  assert.deepEqual(togglePick(["a", "b", "c"], "a"), ["b", "c"]);
+  assert.deepEqual(togglePick(["a", "b", "c"], "c"), ["a", "b"]);
+  assert.deepEqual(togglePick(["a", "b"], "a"), ["a", "b"]);
 });
 
 test("widest gaps break ties by skill order and honour the limit", () => {
