@@ -146,12 +146,13 @@ const wearMet = (profile: Profile, step: UpgradeStep) =>
 
 /**
  * The tier the levels and quests allow when none is recorded: up the ladder while each step's wear levels are met and
- * its quests are done (Kili tasks aren't visible, so they don't count). This stops at tier 60 until The Spirit of War.
+ * none of its quests is known to be not done (Kili tasks aren't visible, so they don't count). This stops at tier 60
+ * while The Spirit of War is known not done. Unknown quest status (a private quest import) leaves the wear levels alone.
  */
 function assumedTier(profile: Profile, steps: UpgradeStep[]): number {
   let tier = steps[0].tier;
   for (const step of steps) {
-    if (!wearMet(profile, step) || !step.quests.every((q) => done(profile, q))) break;
+    if (!wearMet(profile, step) || step.quests.some((q) => questStatus(profile, q) === "below")) break;
     tier = step.tier;
   }
   return tier;

@@ -223,6 +223,27 @@ test("the assumed tier stops at the first upgrade whose quest isn't done", () =>
   assert.equal(killNext(p).progress.text, "Complete Kili Row");
 });
 
+test("unknown quest status doesn't cap the assumed tier; only a quest known not done does", () => {
+  // A Hiscores profile whose quest import is unavailable: questStatus is unknown for every quest.
+  const p = profile(
+    { Necromancy: 99, Defence: 99 },
+    { source: "hiscores", questImportStatus: "private-or-unavailable" },
+  );
+  const weapon = gearPath(p, "weapon");
+  assert.equal(weapon.assumed, true);
+  assert.equal(weapon.current, 90);
+  assert.equal(gearPath(p, "robe").current, 90);
+  // Recorded below 90, the next step's quest chip is unknown, not below.
+  const next = gearPath({ ...p, necromancy: { weaponTier: 60 } }, "weapon").next;
+  assert.equal(status(next.reqs, "The Spirit of War"), "unknown");
+  // The storyline's chips stay unknown too: souls unrecorded, levels met.
+  const war = storyProgress(p).find((s) => s.quest.quest === "the-spirit-of-war");
+  assert.equal(status(war.reqs, "Necromancy 65"), "met");
+  assert.equal(status(war.reqs, "3,000 souls"), "unknown");
+  // A manual profile that knows The Spirit of War isn't done still stops at 60.
+  assert.equal(gearPath(profile({ Necromancy: 99, Defence: 99 }, { completedQuests: STORY_TO_70 }), "weapon").current, 60);
+});
+
 test("members rituals need their quest: ensoul rituals need Kili Row", () => {
   const p = profile({ Necromancy: 64 }, { completedQuests: ["necromancy"] });
   const names = new Set(ritualsFor(p).now.map((r) => r.name));
