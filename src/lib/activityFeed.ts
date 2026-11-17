@@ -89,6 +89,14 @@ export function isHighlight(event: PlayerEvent): boolean {
   );
 }
 
+/** One skill within a batch: the lowest and highest level reached that day. */
+export interface SkillRun {
+  skill: string;
+  from?: number;
+  to?: number;
+  count: number;
+}
+
 export type FeedItem =
   | { kind: "event"; key: string; row: ActivityRow }
   | {
@@ -97,7 +105,7 @@ export type FeedItem =
       playerId: string;
       playerName: string;
       rows: ActivityRow[];
-      levels: LevelUp[];
+      skills: SkillRun[];
       highlight: boolean;
     };
 
@@ -131,15 +139,33 @@ export function dayLabel(time: number, now: number): string {
   });
 }
 
+function skillRuns(rows: readonly ActivityRow[]): SkillRun[] {
+  const runs = new Map<string, SkillRun>();
+  for (const row of rows) {
+    const { skill, level } = levelUp(row.event)!;
+    const run = runs.get(skill) ?? { skill, count: 0 };
+    run.count++;
+    // Min and max, not first and last, in case Jagex reports levels out of order.
+    if (level) {
+      run.from = Math.min(run.from ?? level, level);
+      run.to = Math.max(run.to ?? level, level);
+    }
+    runs.set(skill, run);
+  }
+  return [...runs.values()];
+}
+
 /**
- * Groups newest-first rows by local day and folds back-to-back level-ups by
- * one player on the same day into a single batch.
+ * Groups newest-first rows by local day. All of one player's level-ups in a
+ * day fold into a single batch at the position of their newest level-up.
  */
 export function groupActivity(
   rows: readonly ActivityRow[],
   now: number,
 ): FeedDay[] {
   const days: FeedDay[] = [];
+  // Index of each player's first level-up item in the current day.
+  let firstLevel = new Map<string, number>();
   for (const row of rows) {
     const time = Date.parse(row.event.date);
     const known = Number.isFinite(time);
@@ -153,36 +179,37 @@ export function groupActivity(
         items: [],
       };
       days.push(day);
+      firstLevel = new Map();
     }
     day.count++;
-    const level = levelUp(row.event);
-    const prev = day.items.at(-1);
-    if (level && prev?.kind === "levels" && prev.playerId === row.playerId) {
-      prev.rows.push(row);
-      prev.levels.push(level);
-      prev.highlight ||= highlightLevel(level.level);
+    const index = firstLevel.get(row.playerId);
+    if (!levelUp(row.event) || index == null) {
+      if (levelUp(row.event)) firstLevel.set(row.playerId, day.items.length);
+      day.items.push({ kind: "event", key: row.key, row });
       continue;
     }
-    const prevLevel = prev?.kind === "event" ? levelUp(prev.row.event) : undefined;
-    if (
-      level &&
-      prevLevel &&
-      prev?.kind === "event" &&
-      prev.row.playerId === row.playerId
-    ) {
-      day.items[day.items.length - 1] = {
-        kind: "levels",
-        key: prev.key,
-        playerId: row.playerId,
-        playerName: row.playerName,
-        rows: [prev.row, row],
-        levels: [prevLevel, level],
-        highlight: highlightLevel(prevLevel.level) || highlightLevel(level.level),
-      };
-      continue;
-    }
-    day.items.push({ kind: "event", key: row.key, row });
+    const first = day.items[index];
+    const batch: Extract<FeedItem, { kind: "levels" }> =
+      first.kind === "levels"
+        ? first
+        : {
+            kind: "levels",
+            key: first.key,
+            playerId: row.playerId,
+            playerName: row.playerName,
+            rows: [first.row],
+            skills: [],
+            highlight: false,
+          };
+    batch.rows.push(row);
+    day.items[index] = batch;
   }
+  for (const day of days)
+    for (const item of day.items)
+      if (item.kind === "levels") {
+        item.skills = skillRuns(item.rows);
+        item.highlight = item.rows.some((r) => isHighlight(r.event));
+      }
   return days;
 }
 

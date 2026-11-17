@@ -32,16 +32,15 @@
     active = false,
     showFilters = false,
     initialLimit = 20,
-    playerId,
-    onPlayerChange,
+    playerId = "all",
     framed = false,
   }: {
     sources: ActivitySource[];
     active?: boolean;
+    /** Shows the category chips; the page owns the player filter. */
     showFilters?: boolean;
     initialLimit?: number;
     playerId?: string;
-    onPlayerChange?: (id: string) => void;
     /** Page mode: the feed sits in a window and per-player status lives in a separate panel. */
     framed?: boolean;
   } = $props();
@@ -51,16 +50,12 @@
     return Date.now();
   });
   const instance = $props.id();
-  let player = $state("all");
   let category = $state("all");
   let showAll = $state(false);
   let articles = $state<Map<string, ActivityWikiArticle>>(new Map());
   let resolving = $state(false);
-  let chosenPlayer = $derived(playerId ?? player);
   let selectedPlayer = $derived(
-    sources.some((source) => source.playerId === chosenPlayer)
-      ? chosenPlayer
-      : "all",
+    sources.some((source) => source.playerId === playerId) ? playerId : "all",
   );
   let scopedSources = $derived(
     selectedPlayer === "all"
@@ -78,13 +73,8 @@
     for (const row of list) counts.set(pick(row), (counts.get(pick(row)) ?? 0) + 1);
     return counts;
   };
-  let playerCounts = $derived(tally(allRows, (row) => row.playerId));
   let categoryCounts = $derived(tally(rows, (row) => filterGroup(row.category)));
   let categories = $derived(FILTER_GROUPS.filter((g) => categoryCounts.has(g)));
-  // Players with nothing loaded are explained on the page, not offered as a filter.
-  let playerChoices = $derived(
-    sources.filter((source) => playerCounts.has(source.playerId)),
-  );
   const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
   let selectedCategory = $derived(
     categories.includes(category) ? category : "all",
@@ -130,49 +120,6 @@
 </script>
 
 <div class="feed" aria-busy={resolving}>
-  {#if showFilters && playerChoices.length > 1}
-    <ChoiceStrip
-      label="Player"
-      name={instance + "-player"}
-      value={selectedPlayer}
-      choices={[
-        {
-          value: "all",
-          label: "All players",
-          detail: plural(allRows.length, "event"),
-        },
-        ...playerChoices.map((source) => ({
-          value: source.playerId,
-          label: source.name,
-          detail: plural(playerCounts.get(source.playerId) ?? 0, "event"),
-        })),
-      ]}
-      onChange={(value) => {
-        if (onPlayerChange) onPlayerChange(value);
-        else player = value;
-        category = "all";
-        showAll = false;
-      }}
-    />
-  {/if}
-  {#if showFilters && categories.length > 1}
-    <ChoiceStrip
-      label="Category"
-      name={instance + "-category"}
-      value={selectedCategory}
-      choices={[
-        { value: "all", label: `All · ${rows.length}` },
-        ...categories.map((value) => ({
-          value,
-          label: `${value} · ${categoryCounts.get(value)}`,
-        })),
-      ]}
-      onChange={(value) => {
-        category = value;
-        showAll = false;
-      }}
-    />
-  {/if}
   {#if !framed}{#each scopedSources as source (source.playerId)}
     <div class="source">
       <strong>{source.name}</strong> ·
@@ -222,6 +169,25 @@
 </div>
 
 {#snippet body()}
+  {#if showFilters && categories.length > 1}<div class="categories">
+      <ChoiceStrip
+        label="Category"
+        legend="hidden"
+        name={instance + "-category"}
+        value={selectedCategory}
+        choices={[
+          { value: "all", label: `All · ${rows.length}` },
+          ...categories.map((value) => ({
+            value,
+            label: `${value} · ${categoryCounts.get(value)}`,
+          })),
+        ]}
+        onChange={(value) => {
+          category = value;
+          showAll = false;
+        }}
+      />
+    </div>{/if}
   {#if resolving}<p class="source" role="status">
       Resolving Wiki artwork…
     </p>{/if}
@@ -234,17 +200,32 @@
         {#each day.items as item (item.key)}
           {#if item.kind === "levels"}
             {@const newest = item.rows[0]}
+            {@const icon =
+              item.skills.length === 1
+                ? activitySkillReferences(newest.event)?.[0]?.image
+                : undefined}
             <li>
-              <span class="art batch" aria-hidden="true">+{item.levels.length}</span>
+              <span class="art batch" aria-hidden="true"
+                >{#if icon}<img
+                    src={wikiImage(icon)}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                  />{:else}+{item.rows.length}{/if}</span
+              >
               <div class="ev-main">
                 <p class="title">
                   <strong>{item.playerName}</strong>
-                  gained {item.levels.length} levels
+                  gained {item.rows.length} levels
                   {#if item.highlight}{@render highlight()}{/if}
                 </p>
                 <ul class="levels">
-                  {#each item.levels as level, i (i)}
-                    <li>{level.skill}{level.level ? ` ${level.level}` : ""}</li>
+                  {#each item.skills as run (run.skill)}
+                    <li>
+                      {run.skill}
+                      {#if run.from != null && run.to != null && run.from !== run.to}{run.from}
+                        → {run.to}{:else if run.to != null}{run.to}{:else if run.count > 1}×{run.count}{/if}
+                    </li>
                   {/each}
                 </ul>
                 {@render meta(newest, newest.category)}
@@ -276,6 +257,7 @@
                     text={row.event.text}
                     {references}
                     catalogue={false}
+                    images={!art}
                   />
                   {#if isHighlight(row.event)}{@render highlight()}{/if}
                 </p>
@@ -384,6 +366,9 @@
     font-size: var(--font-caption);
     font-weight: 400;
     color: var(--muted);
+  }
+  .categories {
+    padding-top: 12px;
   }
   .art.batch {
     font-size: var(--font-caption);

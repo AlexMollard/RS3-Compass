@@ -3,7 +3,11 @@
   import { page } from "$app/state";
   import { getCompass, getPlayerActions } from "../compassContext";
   import { playerKey } from "../playerName";
-  import { weeklyTotals, type ActivitySource } from "../activityFeed";
+  import {
+    mergeActivity,
+    weeklyTotals,
+    type ActivitySource,
+  } from "../activityFeed";
   import ActivityFeed from "../components/ActivityFeed.svelte";
   import PageHeading from "../components/PageHeading.svelte";
   import ChoiceStrip from "../components/ChoiceStrip.svelte";
@@ -71,6 +75,16 @@
     Math.max(0, ...watched.map((p) => p.eventLog?.fetchedAt ?? 0)),
   );
   let totals = $derived(weeklyTotals(sources, now));
+  let eventCounts = $derived(
+    new Map(sources.map((s) => [s.playerId, mergeActivity([s]).length])),
+  );
+  let totalEvents = $derived(
+    [...eventCounts.values()].reduce((sum, n) => sum + n, 0),
+  );
+  // Players with nothing loaded are explained under Needs attention, not offered as a filter.
+  let playerChoices = $derived(profiles.filter((p) => eventCounts.get(p.id)));
+  const plural = (n: number, word: string) =>
+    `${n} ${word}${n === 1 ? "" : "s"}`;
   let attention = $derived(
     profiles.filter((p) => {
       const state = $sync[p.id]?.state;
@@ -170,7 +184,7 @@
 <div class="page-enter activity-page">
   <PageHeading
     title="Activity"
-    subtitle="Recent public Adventurer's Log events, with player attribution."
+    subtitle="What your players did recently, from their public Adventurer's Logs."
   >
     {#snippet trailing()}<span class="refresh"
         >{#if lastFetched}<span class="updated"
@@ -184,11 +198,9 @@
         ></span
       >{/snippet}
   </PageHeading>
-  <div class="activity-actions">
-    <a href="/players">Manage players →</a><a href="/groups">Group Ironman →</a>
-  </div>
   {#if groups.length}<ChoiceStrip
       label="Group"
+      legend="inline"
       name="activity-group"
       value={selectedGroup ? groupFilter : "all"}
       choices={[
@@ -211,6 +223,31 @@
     {#if refreshing || queued}<p class="source" role="status">
         {refreshing} refreshing · {queued} queued. Existing events stay visible.
       </p>{/if}
+    <div class="players">
+      {#if playerChoices.length > 1}<ChoiceStrip
+          label="Player"
+          legend="hidden"
+          name="activity-player"
+          value={selectedPlayer}
+          choices={[
+            {
+              value: "all",
+              label: "All players",
+              detail: plural(totalEvents, "event"),
+            },
+            ...playerChoices.map((p) => ({
+              value: p.id,
+              label: p.name,
+              detail: plural(eventCounts.get(p.id) ?? 0, "event"),
+            })),
+          ]}
+          onChange={(value) => (playerFilter = value)}
+        />{/if}
+      {#if attention.length}<a class="attention-link" href="#needs-attention"
+          >{plural(attention.length, "player")}
+          {attention.length === 1 ? "needs" : "need"} attention</a
+        >{/if}
+    </div>
     <div class="two">
       <ActivityFeed
         {sources}
@@ -219,7 +256,6 @@
         framed={true}
         initialLimit={20}
         playerId={selectedPlayer}
-        onPlayerChange={(id) => (playerFilter = id)}
       />
       <div class="side">
         {#if totals.length}<GameWindow title="Last 7 days">
@@ -245,7 +281,7 @@
             </table>
             <p class="cap note">Counts only cover events Jagex returned.</p>
           </GameWindow>{/if}
-        {#if attention.length}<GameWindow title="Needs attention">
+        {#if attention.length}<div id="needs-attention"><GameWindow title="Needs attention">
             <ul class="people">
               {#each attention as profile (profile.id)}
                 {@const chip = chipFor(profile)}
@@ -284,21 +320,27 @@
                 retroactive, and kills and level-ups can be batched.
               </p>
             </details>
-          </GameWindow>{/if}
+          </GameWindow></div>{/if}
       </div>
     </div>
   {/if}
 </div>
 
 <style>
-  .activity-actions {
+  .activity-page :global(.utility-heading) {
+    margin-bottom: 20px;
+  }
+  .players {
     display: flex;
     flex-wrap: wrap;
-    gap: 20px;
-    margin: 16px 0 24px;
+    align-items: flex-start;
+    gap: 0 16px;
   }
-  .activity-actions a {
-    color: var(--gold-bright);
+  .attention-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--muted);
     text-underline-offset: 3px;
   }
   .source {

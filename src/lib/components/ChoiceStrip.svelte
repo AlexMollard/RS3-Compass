@@ -7,8 +7,11 @@
     choices,
     onChange,
     variant = "chips",
+    legend = "above",
   }: {
     label: string;
+    /** Where the label sits: above the options, on their left as a small caps label, or only for screen readers. */
+    legend?: "above" | "inline" | "hidden";
     /** "joined" is one bar of equal cells sharing a border; it scrolls inside itself when narrow. */
     variant?: "chips" | "joined";
     name: string;
@@ -24,8 +27,12 @@
   } = $props();
 </script>
 
-<fieldset class="choice-fieldset" class:joined={variant === "joined"}>
-  <legend>{label}</legend>
+<fieldset
+  class="choice-fieldset"
+  class:joined={variant === "joined"}
+  class:legend-inline={legend === "inline"}
+>
+  <legend class:sr-only={legend === "hidden"}>{label}</legend>
   <div class="choice-strip">
     {#each choices as choice (choice.value)}
       <label
@@ -63,6 +70,16 @@
   legend {
     font-size: 0.875rem;
     margin-bottom: 0.5rem;
+  }
+  .legend-inline legend {
+    float: left;
+    margin: 0 12px 0 0;
+    line-height: 44px;
+    font-size: var(--font-caption);
+    font-weight: 700;
+    letter-spacing: 1.55px;
+    text-transform: uppercase;
+    color: var(--muted);
   }
   .choice-strip {
     display: flex;

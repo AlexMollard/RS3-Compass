@@ -114,7 +114,7 @@ test("highlights rare drops and level 99 or 120 only", () => {
   );
 });
 
-test("groups by local day and batches one player's back-to-back level-ups", () => {
+test("groups by local day and batches each player's level-ups for the day", () => {
   const now = new Date("2026-11-17T20:00:00").getTime();
   const rows = mergeActivity([
     source("Alice", [
@@ -136,19 +136,36 @@ test("groups by local day and batches one player's back-to-back level-ups", () =
       ["Date unknown", 1],
     ],
   );
-  // Bob's level lands between Alice's, so Alice's batch is split around it.
+  // Bob's level lands between Alice's; Alice's still fold into one batch.
   assert.deepEqual(
     days[0].items.map((i) =>
-      i.kind === "levels" ? i.levels.map((l) => l.skill) : i.row.playerId,
+      i.kind === "levels" ? i.skills.map((s) => s.skill) : i.row.playerId,
     ),
-    ["Alice", "Bob", ["Smithing", "Prayer"]],
+    [["Mining", "Smithing", "Prayer"], "Bob"],
   );
-  assert.equal(days[0].items[2].highlight, true);
+  assert.equal(days[0].items[0].highlight, true);
   // A lone level-up stays an ordinary row.
   assert.deepEqual(
     days[1].items.map((i) => i.kind),
     ["event", "event"],
   );
+});
+
+test("a skill levelled several times in a day becomes one range", () => {
+  const now = new Date("2026-11-17T20:00:00").getTime();
+  const rows = mergeActivity([
+    source("Aku", [
+      level("Thieving", 53, at("2026-11-17T12:00:00")),
+      level("Thieving", 50, at("2026-11-17T11:00:00")),
+      level("Thieving", 52, at("2026-11-17T10:00:00")),
+      { ...level("Agility", 1, at("2026-11-17T09:00:00")), details: "" },
+    ]),
+  ]);
+  const [batch] = groupActivity(rows, now)[0].items;
+  assert.deepEqual(batch.skills, [
+    { skill: "Thieving", from: 50, to: 53, count: 3 },
+    { skill: "Agility", count: 1 },
+  ]);
 });
 
 test("filter chips group the detailed categories", () => {
